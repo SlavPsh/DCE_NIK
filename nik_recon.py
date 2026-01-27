@@ -4,6 +4,7 @@ import torch
 import cupy as cp
 import cufinufft
 
+
 def make_fixed_frame_zslice_coil_dataset(
     k_img_space,
     traj_t,
@@ -83,6 +84,7 @@ def make_fixed_frame_zslice_coil_dataset(
         "y_scale": float(y_scale.item()) if isinstance(y_scale, torch.Tensor) else float(y_scale),
     }
     return x_all, y_ri, kx_all, ky_all, meta
+
 
 def reconstruct_from_kspace(k_t, traj_t, t_frame, coil_idx, z_slice_idx, scales, 
                             img_size=(128, 128)):
@@ -314,19 +316,31 @@ def nufft2d_recon(k_img_space, traj_t, t_frame, coil_idx, z_slice_idx, scales,
 
 
 def fft2d_uniform(k_xy, axes=(-2, -1), shift=True, return_magnitude=False):
-    """
-    Uniform 2D IFFT in x-y for gridded k-space.
-    """
-    if not torch.is_tensor(k_xy):
-        raise TypeError("fft2d_uniform expects a torch.Tensor input.")
-
     if shift:
         k_xy = torch.fft.ifftshift(k_xy, dim=axes)
     img_xy = torch.fft.ifft2(k_xy, dim=axes)
     if shift:
         img_xy = torch.fft.fftshift(img_xy, dim=axes)
-
     if return_magnitude:
         img_xy = torch.abs(img_xy)
-
     return img_xy
+
+
+def to_plot(x):
+    if torch.is_tensor(x):
+        x = x.detach()
+        if x.is_cuda:
+            x = x.cpu()
+        x = x.numpy()
+    x = np.asarray(x)
+    if np.iscomplexobj(x):
+        x = np.abs(x)
+    return x
+
+def norm_img(img, p=99):
+    img = np.asarray(img)
+    s = np.percentile(img, p)
+    return img / (s + 1e-12)
+
+
+

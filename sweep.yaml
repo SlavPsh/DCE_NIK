@@ -1,0 +1,37 @@
+experiment:
+  name: "zslice_sweep"
+  out_dir: "runs/zslice_sweep"
+
+data:
+  t_frame: 0
+  coil_idx_data: 0     # which coil you take from k_img_space for training targets
+  z_slice_idx: 3
+  compute_device: "cuda"
+
+train:
+  steps: 3000
+  batch_size: 65536
+  lr: 1.0e-4
+  amp: false
+  log_every: 1000
+
+recon:
+  img_size: [152, 220]     # (Ny, Nx) 
+  cartesian:
+    oversamp: 1
+    use_disk_mask: true
+
+sweep:
+  # each entry is a model family to try
+  models:
+    - name: "siren_reim_base"
+      ctor: "NIK_SIREN_REIM"
+      params:
+        hidden: [128, 256]
+        depth:  [5, 7]
+        w0:     [20.0, 30.0]
+        k_freq: [32, 64, 96]
+        k_sigma: [2.0, 4.0, 6.0]
+        t_freq: [16]
+        t_sigma: [3.0]
+        coil_emb: [16]
