@@ -167,7 +167,39 @@ def make_sampler(k_t, traj_t, scales, dims, y_scale, compute_device):
     return sample_batch
 
 
-def make_fixed_frame_slice_coil_dataset(
+def make_spoke_sampler_kxy(kxy_sp, y_sp, spokes, *, batch_size, device="cuda"):
+    device = torch.device(device)
+    kxy_sp = kxy_sp.to(device)
+    y_sp = y_sp.to(device)
+    spokes = spokes.to(device)
+
+    S_kz, RO, _ = kxy_sp.shape
+
+    def sample():
+        sp = spokes[torch.randint(spokes.numel(), (batch_size,), device=device)]
+        ro = torch.randint(RO, (batch_size,), device=device)
+        x = kxy_sp[sp, ro, :]   # (B,2)
+        y = y_sp[sp, ro, :]     # (B,2)
+        return x, y
+    return sample
+
+@torch.no_grad()
+def make_fixed_eval_set_kxy(kxy_sp, y_sp, spokes, *, n=200_000, device="cuda"):
+    device = torch.device(device)
+    kxy_sp = kxy_sp.to(device)
+    y_sp = y_sp.to(device)
+    spokes = spokes.to(device)
+
+    S_kz, RO, _ = kxy_sp.shape
+    sp = spokes[torch.randint(spokes.numel(), (n,), device=device)]
+    ro = torch.randint(RO, (n,), device=device)
+    x = kxy_sp[sp, ro, :]
+    y = y_sp[sp, ro, :]
+    return x, y
+
+
+
+def make_fixed_frame_kslice_coil_dataset(
     k_t, traj_t, scales, dims,
     *,
     y_scale,
@@ -203,6 +235,7 @@ def make_fixed_frame_slice_coil_dataset(
     # select spokes belonging to this kz plane
     sp_mask = (kz_sp == kz_target)
     sp_idx = torch.where(sp_mask)[0]  # (S_kz,)
+
 
     # Gather coords for all (spoke, ro)
     # kx,ky,kz: (S_kz, RO)
@@ -246,13 +279,46 @@ def make_fixed_frame_slice_coil_dataset(
     return x_all, y_ri, kx_all, ky_all, meta
 
 
+def split_points_by_spokes(spoke_id_all, *, val_frac=0.2, seed=0, mode="random"):
+    """
+    spoke_id_all: (N,) long, values in {0..S_kz-1} identifying which spoke each point came from.
+
+    Returns:
+      train_idx, val_idx: 1D Long tensors of point indices into x_all/y_all
+      train_spokes, val_spokes: 1D Long tensors of spoke ids
+    """
+    device = spoke_id_all.device
+    S_kz = int(spoke_id_all.max().item()) + 1
+    n_val = max(1, int(round(S_kz * val_frac)))
+
+    g = torch.Generator(device=device)
+    g.manual_seed(int(seed))
+
+    if mode == "random":
+        perm = torch.randperm(S_kz, generator=g, device=device)
+        val_spokes = perm[:n_val]
+        train_spokes = perm[n_val:]
+    else:
+        raise ValueError("mode must be 'random'")
+
+    # point indices
+    train_mask = torch.isin(spoke_id_all, train_spokes)
+    val_mask   = torch.isin(spoke_id_all, val_spokes)
+
+    train_idx = torch.where(train_mask)[0]
+    val_idx   = torch.where(val_mask)[0]
+    return train_idx, val_idx, train_spokes, val_spokes
+
+
+
 def fit_one_frame_slice_coil(
     model,
     *,
     x_all,
     y_all,
-    coil_fixed: int,
+    coil_fixed = None,
     steps: int = 5000,
+    loss_function = F.mse_loss,
     lr: float = 1e-3,
     grad_clip: float = 1.0,
     amp: bool = False,
@@ -268,13 +334,20 @@ def fit_one_frame_slice_coil(
     """
     device = torch.device(device)
     model = model.to(device)
+    model.train()
+    x_all = x_all.to(device, non_blocking=True)
+    y_all = y_all.to(device, non_blocking=True)
+    
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
     scaler = GradScaler("cuda" if device.type == "cuda" else "cpu", enabled=amp)
     amp_dtype = torch.bfloat16 if (amp and device.type == "cuda" and torch.cuda.is_bf16_supported()) else torch.float16
 
     N = x_all.shape[0]
-    coil_idx_full = torch.full((batch_size,), int(coil_fixed), device=device, dtype=torch.long)
+    if coil_fixed is None:
+        coil_idx_full = None
+    else:
+        coil_idx_full = torch.full((batch_size,), int(coil_fixed), device=device, dtype=torch.long)
 
     if use_tqdm:
         from tqdm.auto import trange
@@ -288,7 +361,11 @@ def fit_one_frame_slice_coil(
         idx = torch.randint(0, N, (batch_size,), device=device)
         x = x_all[idx]
         y = y_all[idx]
-        coil_idx = coil_idx_full[: batch_size]  # reuse
+
+        if coil_idx_full is not None:
+            coil_idx = coil_idx_full[: batch_size]  # reuse
+        else:
+            coil_idx = None
 
         opt.zero_grad(set_to_none=True)
 
@@ -296,8 +373,11 @@ def fit_one_frame_slice_coil(
               if amp else nullcontext())
 
         with ac:
-            y_pred = model(x, coil_idx)
-            loss = F.mse_loss(y_pred, y)
+            if coil_idx is not None:
+                y_pred = model(x, coil_idx)
+            else:
+                y_pred = model(x)
+            loss = loss_function(y_pred, y)
 
         if amp:
             scaler.scale(loss).backward()
@@ -587,9 +667,8 @@ def overfit_fixed_subset(
     device="cuda",
 ):
     """
-    Hard sanity check:
-    Overfit a tiny, fixed subset of points.
-    Loss MUST go to ~0.
+     sanity check:
+    Overfit a  fixed subset of points.
     """
     device = torch.device(device)
     model = model.to(device)
@@ -615,6 +694,108 @@ def overfit_fixed_subset(
             print(f"[DEBUG] step {step:4d}  mse {loss.item():.3e}")
 
     return model
+
+import time
+
+def fit_spoke_holdout_kxy(
+    model,
+    *,
+    kxy_sp, y_sp, theta,
+    train_spokes, val_spokes,
+    steps=1000,
+    batch_size=20000,
+    lr=1e-3,
+    grad_clip=1.0,
+    device="cuda",
+    eval_size=20000,
+    eval_every=300,
+    eval_min_rel=5e-4,
+    eval_patience=10,
+    plot_every=250,
+    plot_callback=None,
+):
+    do_eval = val_spokes.numel() > 0
+    device = torch.device(device)
+    model = model.to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
+
+    train_sampler = make_spoke_sampler_kxy(
+        kxy_sp, y_sp, train_spokes,
+        batch_size=batch_size, device=str(device)
+    )
+
+    if do_eval:
+        x_val, y_val = make_fixed_eval_set_kxy(
+            kxy_sp, y_sp, val_spokes,
+            n=eval_size, device=str(device)
+        )
+    else:
+        x_val = y_val = None
+
+
+    stopper = EvalEarlyStopper(min_rel_improve=eval_min_rel, patience=eval_patience)
+    best_state = None
+
+    loss_hist = []          # train loss per step
+    eval_hist = []          # list of (step, eval_loss)
+    best_step = None
+    stopped_step = None
+
+    t0 = time.time()
+    for step in range(1, steps + 1):
+        model.train()
+        x, y = train_sampler()
+
+        opt.zero_grad(set_to_none=True)
+        yp = model(x)
+        loss = F.mse_loss(yp, y)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+        opt.step()
+
+        loss_hist.append(float(loss.item()))
+
+        # validation / early stopping
+        if do_eval and step % eval_every == 0:
+            model.eval()
+            with torch.no_grad():
+                e = float(F.mse_loss(model(x_val), y_val).item())
+            eval_hist.append((step, e))
+
+            if e < stopper.best:
+                best_state = {k: v.detach().cpu() for k, v in model.state_dict().items()}
+                best_step = step
+
+            if stopper.step(e):
+                stopped_step = step
+                break
+
+        # plotting callback
+        if plot_callback is not None and plot_every and (step % plot_every == 0 or step == 1):
+            plot_callback(step, model)
+
+    if stopped_step is None:
+        stopped_step = step  # last step reached
+
+    # restore best model
+    if best_state is not None:
+        model.load_state_dict(best_state)
+
+    info = {
+        "loss_hist": loss_hist,
+        "eval_hist": eval_hist,
+        "best_eval": stopper.best,
+        "best_step": best_step,
+        "stopped_step": stopped_step,
+        "eval_every": eval_every,
+        "eval_size": eval_size,
+        "train_spokes": int(train_spokes.numel()),
+        "val_spokes": int(val_spokes.numel()),
+        "seconds": time.time() - t0,
+    }
+    return model, info
+
+
 
 
 

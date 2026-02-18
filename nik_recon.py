@@ -19,7 +19,7 @@ def make_fixed_frame_zslice_coil_dataset(
     compute_device: str = "cuda",
 ):
     """
-    Build a deterministic dataset for ONE frame, ONE z-slice, ONE coil
+    Build a  dataset for one frame, one z-slice, one coil
     after kz->z IFFT.
 
     returns:
@@ -40,13 +40,25 @@ def make_fixed_frame_zslice_coil_dataset(
         n_slices = len(torch.unique(kz_vals))
 
     z_slice_idx = int(max(0, min(int(z_slice_idx), int(n_slices - 1))))
+    n_ro_per_slice = int(S // n_slices)
 
     # Interleaved readouts for one slice
     indices = torch.arange(0, S, n_slices, device=traj_t.device)
+    
+    # per-point spoke/ro ids aligned with flattening order
+    spoke_ids = torch.arange(n_ro_per_slice, device=dev_data, dtype=torch.long)[:, None].expand(n_ro_per_slice, RO)
+    spoke_id_all = spoke_ids.reshape(-1)   # (N,)
+
+    ro_ids = torch.arange(RO, device=dev_data, dtype=torch.long)[None, :].expand(n_ro_per_slice, RO)
+    ro_id_all = ro_ids.reshape(-1)  # (N,)
+    
 
     # kx, ky for those readouts
     kx = traj_t[t_fixed, indices, 0, :] / sx
     ky = traj_t[t_fixed, indices, 1, :] / sy
+
+    ro_mid = RO // 2
+    theta_sp = torch.atan2(ky[:, ro_mid], kx[:, ro_mid])  # (n_ro_per_slice,)
 
     # Fixed z and t (normalized to [-1, 1])
     z_norm = (torch.tensor(z_slice_idx, device=dev_data, dtype=traj_t.dtype) / (n_slices - 1 + 1e-8)) * 2.0 - 1.0
@@ -71,6 +83,8 @@ def make_fixed_frame_zslice_coil_dataset(
     y_ri = y_ri.to(dev_compute, non_blocking=non_block)
     kx_all = kx_all.to(dev_compute, non_blocking=non_block)
     ky_all = ky_all.to(dev_compute, non_blocking=non_block)
+    spoke_id_all = spoke_id_all.to(dev_compute, non_blocking=non_block)
+    ro_id_all = ro_id_all.to(dev_compute, non_blocking=non_block)
 
     y_ri = y_ri / y_scale
 
@@ -80,10 +94,44 @@ def make_fixed_frame_zslice_coil_dataset(
         "z_slice_idx": z_slice_idx,
         "n_slices": int(n_slices),
         "n_ro_per_slice": int(indices.numel()),
+        "sp_idx_global" : indices.detach().cpu(),
+        "theta_sp" : theta_sp.detach().cpu(),
         "N": int(x_all.shape[0]),
         "y_scale": float(y_scale.item()) if isinstance(y_scale, torch.Tensor) else float(y_scale),
     }
-    return x_all, y_ri, kx_all, ky_all, meta
+    return x_all, y_ri, kx_all, ky_all, spoke_id_all, ro_id_all, meta
+
+
+def split_points_by_spokes(spoke_id_all, *, val_frac=0.2, seed=0, mode="random"):
+    """
+    spoke_id_all: (N,) long, values in {0..S_kz-1} identifying which spoke each point came from.
+
+    Returns:
+      train_idx, val_idx: 1D Long tensors of point indices into x_all/y_all
+      train_spokes, val_spokes: 1D Long tensors of spoke ids
+    """
+    device = spoke_id_all.device
+    S_kz = int(spoke_id_all.max().item()) + 1
+    n_val = max(1, int(round(S_kz * val_frac)))
+
+    g = torch.Generator(device=device)
+    g.manual_seed(int(seed))
+
+    if mode == "random":
+        perm = torch.randperm(S_kz, generator=g, device=device)
+        val_spokes = perm[:n_val]
+        train_spokes = perm[n_val:]
+    else:
+        raise ValueError("mode must be 'random' ")
+
+    # point indices
+    train_mask = torch.isin(spoke_id_all, train_spokes)
+    val_mask   = torch.isin(spoke_id_all, val_spokes)
+
+    train_idx = torch.where(train_mask)[0]
+    val_idx   = torch.where(val_mask)[0]
+    return train_idx, val_idx, train_spokes, val_spokes
+
 
 
 def reconstruct_from_kspace(k_t, traj_t, t_frame, coil_idx, z_slice_idx, scales, 
@@ -341,6 +389,5 @@ def norm_img(img, p=99):
     img = np.asarray(img)
     s = np.percentile(img, p)
     return img / (s + 1e-12)
-
 
 
