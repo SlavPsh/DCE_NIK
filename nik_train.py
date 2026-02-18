@@ -47,6 +47,12 @@ class EvalEarlyStopper:
         self.last_rel = None
 
     def step(self, eval_loss: float) -> bool:
+        if self.best == float("inf"):
+            self.best = eval_loss
+            self.bad = 0
+            self.last_rel = None
+            return False
+
         rel = (self.best - eval_loss) / max(self.best, 1e-12)
         self.last_rel = rel
 
@@ -133,16 +139,6 @@ def make_sampler(k_t, traj_t, scales, dims, y_scale, compute_device):
     idx_dev = k_t.device
     compute_device = torch.device(compute_device)
 
-    with torch.no_grad():
-        probe = 200_000
-        t0 = torch.randint(T, (probe,), device = idx_dev)
-        s0 = torch.randint(S, (probe,), device = idx_dev)
-        c0 = torch.randint(C, (probe,), device = idx_dev)
-        ro0 = torch.randint(RO, (probe,), device = idx_dev)
-
-        y0 = k_t[t0, s0, c0, ro0]
-        y0_ri = torch.view_as_real(y0).float()
-
     def sample_batch(batch_size: int):
         t_idx  = torch.randint(T, (batch_size,), device=idx_dev)
         s_idx  = torch.randint(S, (batch_size,), device=idx_dev)
@@ -173,7 +169,7 @@ def make_spoke_sampler_kxy(kxy_sp, y_sp, spokes, *, batch_size, device="cuda"):
     y_sp = y_sp.to(device)
     spokes = spokes.to(device)
 
-    S_kz, RO, _ = kxy_sp.shape
+    _, RO, _ = kxy_sp.shape
 
     def sample():
         sp = spokes[torch.randint(spokes.numel(), (batch_size,), device=device)]
@@ -190,7 +186,7 @@ def make_fixed_eval_set_kxy(kxy_sp, y_sp, spokes, *, n=200_000, device="cuda"):
     y_sp = y_sp.to(device)
     spokes = spokes.to(device)
 
-    S_kz, RO, _ = kxy_sp.shape
+    _, RO, _ = kxy_sp.shape
     sp = spokes[torch.randint(spokes.numel(), (n,), device=device)]
     ro = torch.randint(RO, (n,), device=device)
     x = kxy_sp[sp, ro, :]
@@ -219,7 +215,7 @@ def make_fixed_frame_kslice_coil_dataset(
       kx_all, ky_all : (N,) float (for plotting)
     """
     sx, sy, sz = scales
-    T, S, C, RO = dims
+    T, _, C, RO = dims
     dev_data = k_t.device
     dev_compute = torch.device(compute_device)
 
@@ -341,7 +337,7 @@ def fit_one_frame_slice_coil(
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
     scaler = GradScaler("cuda" if device.type == "cuda" else "cpu", enabled=amp)
-    amp_dtype = torch.bfloat16 if (amp and device.type == "cuda" and torch.cuda.is_bf16_supported()) else torch.float16
+    amp_dtype = torch.float16 if (device.type == "cuda" and not torch.cuda.is_bf16_supported()) else torch.bfloat16
 
     N = x_all.shape[0]
     if coil_fixed is None:
@@ -430,9 +426,9 @@ def fit_one_scan(
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
     scaler = GradScaler("cuda" if device.type == "cuda" else "cpu", enabled=amp)
-    amp_dtype = torch.bfloat16 if (amp and torch.cuda.is_available() and torch.cuda.is_bf16_supported()) else torch.float16
+    amp_dtype = torch.float16 if (device.type == "cuda" and not torch.cuda.is_bf16_supported()) else torch.bfloat16
 
-    #  fixed eval set  
+    #  fixed eval set
     @torch.no_grad()
     def make_eval_set(n=eval_size):
         model.eval()
@@ -454,7 +450,6 @@ def fit_one_scan(
 
     #stopper = PlateauStopper(window=plateau_window, min_rel_improve=plateau_min_rel, patience=plateau_patience)
 
-    best_loss = float("inf")
     best_state = None
     loss_hist = []
     eval_hist = []
@@ -562,10 +557,6 @@ def plot_measured_vs_pred_kspace(
       - Figure 1: Re/Im (measured vs predicted)  
       - Figure 2: magnitude/phase (optional)     
     """
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import torch
-
     device = x_all.device
     model.eval()
 
@@ -606,7 +597,7 @@ def plot_measured_vs_pred_kspace(
         ax.set_ylabel("ky")
         plt.colorbar(sc, ax=ax, fraction=0.046, pad=0.04, label=("Re" if component == "re" else "Im"))
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+    _, axes = plt.subplots(2, 2, figsize=(12, 12))
     scatter_component(axes[0, 0], y_c,  "Measured Re", component="re")
     scatter_component(axes[0, 1], yp_c, "Predicted Re", component="re")
     scatter_component(axes[1, 0], y_c,  "Measured Im", component="im")
@@ -645,7 +636,7 @@ def plot_measured_vs_pred_kspace(
     thr = np.percentile(mag, phase_mask_percentile) if phase_mask_percentile is not None else 0.0
     mask = mag >= thr if phase_mask_percentile is not None else None
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+    _, axes = plt.subplots(2, 2, figsize=(12, 12))
     scatter_mag(axes[0, 0], y_c,  "Measured |y|")
     scatter_mag(axes[0, 1], yp_c, "Predicted |y|")
     scatter_phase(axes[1, 0], y_c,  f"Measured phase (mask p{phase_mask_percentile})", mask=mask)
@@ -695,7 +686,6 @@ def overfit_fixed_subset(
 
     return model
 
-import time
 
 def fit_spoke_holdout_kxy(
     model,
