@@ -312,9 +312,12 @@ def fit_one_frame_slice_coil(
     *,
     x_all,
     y_all,
-    coil_fixed = None,
+    train_idx=None,
+    val_idx=None,
+    eval_every: int = 50,
+    coil_fixed=None,
     steps: int = 5000,
-    loss_function = F.mse_loss,
+    loss_function=F.mse_loss,
     lr: float = 1e-3,
     grad_clip: float = 1.0,
     amp: bool = False,
@@ -326,20 +329,60 @@ def fit_one_frame_slice_coil(
     callback_every: int = 0,
 ):
     """
-    Overfit on a fixed dataset (x_all,y_all) from one frame/slice/coil.
+    Fit a model on a fixed dataset (x_all, y_all) from one frame/slice/coil.
+
+    Parameters
+    ----------
+    train_idx : (N_train,) long tensor or None
+        Indices into x_all/y_all to use for training.  When None, all points
+        are used (original behaviour).
+    val_idx : (N_val,) long tensor or None
+        Indices into x_all/y_all to use for validation.  When None, no
+        validation loss is tracked.
+    eval_every : int
+        Evaluate the validation loss every this many training steps.
+        The final step is always evaluated regardless.
+
+    Returns
+    -------
+    model : trained model
+    info  : dict with keys
+        "loss_hist"     – train MSE at every step
+        "val_loss_hist" – val   MSE evaluated every eval_every steps (empty if val_idx is None)
+        "val_steps"     – step numbers at which val was evaluated
     """
     device = torch.device(device)
     model = model.to(device)
     model.train()
     x_all = x_all.to(device, non_blocking=True)
     y_all = y_all.to(device, non_blocking=True)
-    
+
+    # Resolve training pool
+    if train_idx is not None:
+        train_idx = train_idx.to(device)
+        x_train = x_all[train_idx]
+        y_train = y_all[train_idx]
+    else:
+        x_train = x_all
+        y_train = y_all
+    N_train = x_train.shape[0]
+
+    # Pre-load validation tensors (typically small — a few thousand points)
+    has_val = val_idx is not None
+    if has_val:
+        val_idx = val_idx.to(device)
+        x_val = x_all[val_idx]
+        y_val = y_all[val_idx]
+        if coil_fixed is not None:
+            coil_val_idx = torch.full((x_val.shape[0],), int(coil_fixed), device=device, dtype=torch.long)
+        else:
+            coil_val_idx = None
+
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
     scaler = GradScaler("cuda" if device.type == "cuda" else "cpu", enabled=amp)
     amp_dtype = torch.float16 if (device.type == "cuda" and not torch.cuda.is_bf16_supported()) else torch.bfloat16
 
-    N = x_all.shape[0]
     if coil_fixed is None:
         coil_idx_full = None
     else:
@@ -347,21 +390,22 @@ def fit_one_frame_slice_coil(
 
     if use_tqdm:
         from tqdm.auto import trange
-        it = trange(1, steps + 1, desc="Overfitting fixed (t,kz,coil)", leave=True, dynamic_ncols=True)
+        it = trange(1, steps + 1, desc="Fitting fixed (t,kz,coil)", leave=True, dynamic_ncols=True)
     else:
         it = range(1, steps + 1)
 
     loss_hist = []
+    val_loss_hist = []
+    val_steps = []
+    last_val_loss = None
+
     for step in it:
+        # ---- Training step ----
+        idx = torch.randint(0, N_train, (batch_size,), device=device)
+        x = x_train[idx]
+        y = y_train[idx]
 
-        idx = torch.randint(0, N, (batch_size,), device=device)
-        x = x_all[idx]
-        y = y_all[idx]
-
-        if coil_idx_full is not None:
-            coil_idx = coil_idx_full[: batch_size]  # reuse
-        else:
-            coil_idx = None
+        coil_idx = coil_idx_full[:batch_size] if coil_idx_full is not None else None
 
         opt.zero_grad(set_to_none=True)
 
@@ -369,10 +413,7 @@ def fit_one_frame_slice_coil(
               if amp else nullcontext())
 
         with ac:
-            if coil_idx is not None:
-                y_pred = model(x, coil_idx)
-            else:
-                y_pred = model(x)
+            y_pred = model(x, coil_idx) if coil_idx is not None else model(x)
             loss = loss_function(y_pred, y)
 
         if amp:
@@ -389,17 +430,38 @@ def fit_one_frame_slice_coil(
         L = float(loss.item())
         loss_hist.append(L)
 
-        if use_tqdm:
-            it.set_postfix_str(f"mse={L:.2e}")
-        elif step % log_every == 0:
-            print(f"step {step:6d}  mse {L:.3e}")
+        # ---- Validation evaluation ----
+        if has_val and (step % eval_every == 0 or step == steps):
+            model.eval()
+            with torch.no_grad():
+                val_pred = model(x_val, coil_val_idx) if coil_val_idx is not None else model(x_val)
+                last_val_loss = float(loss_function(val_pred, y_val).item())
+            model.train()
+            val_loss_hist.append(last_val_loss)
+            val_steps.append(step)
 
-        # callback hook
+        # ---- Logging ----
+        if use_tqdm:
+            postfix = f"train={L:.2e}"
+            if last_val_loss is not None:
+                postfix += f"  val={last_val_loss:.2e}"
+            it.set_postfix_str(postfix)
+        elif step % log_every == 0:
+            msg = f"step {step:6d}  train {L:.3e}"
+            if last_val_loss is not None:
+                msg += f"  val {last_val_loss:.3e}"
+            print(msg)
+
+        # ---- Callback hook ----
         if callback and callback_every > 0:
             if (step % callback_every == 0) or (step == 1) or (step == steps):
                 callback(step, model)
-        
-    return model, {"loss_hist": loss_hist}
+
+    return model, {
+        "loss_hist":     loss_hist,
+        "val_loss_hist": val_loss_hist,
+        "val_steps":     val_steps,
+    }
 
 
 
