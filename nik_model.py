@@ -340,6 +340,242 @@ def compute_theta0_per_spoke(x_all_kxy: torch.Tensor, spoke_id_all: torch.Tensor
         theta0[int(sp)] = float(th0)
     return theta0
 
+# ---------------------------------------------------------------------------
+# GP kernels
+# ---------------------------------------------------------------------------
+
+class RBFKernel(nn.Module):
+    """
+    Squared-exponential (RBF) kernel:
+        k(x, x') = σ_f² exp( -‖x - x'‖² / (2 ℓ²) )
+
+    Parameters are stored as log values for unconstrained optimization.
+    """
+    def __init__(self, lengthscale: float = 0.1, outputscale: float = 1.0):
+        super().__init__()
+        self.log_lengthscale = nn.Parameter(torch.tensor(float(lengthscale)).log())
+        self.log_outputscale = nn.Parameter(torch.tensor(float(outputscale)).log())
+
+    @property
+    def lengthscale(self) -> torch.Tensor:
+        return self.log_lengthscale.exp()
+
+    @property
+    def outputscale(self) -> torch.Tensor:
+        return self.log_outputscale.exp()
+
+    def forward(self, X1: torch.Tensor, X2: torch.Tensor) -> torch.Tensor:
+        """
+        X1: (N, D)
+        X2: (M, D)
+        Returns: (N, M)
+        """
+        sq_dist = torch.cdist(X1, X2).pow(2)
+        return self.outputscale.pow(2) * torch.exp(-0.5 * sq_dist / self.lengthscale.pow(2))
+
+
+class Matern32Kernel(nn.Module):
+    """
+    Matérn 3/2 kernel:
+        k(x, x') = σ_f² (1 + √3 r/ℓ) exp(-√3 r/ℓ),   r = ‖x - x'‖
+
+    Produces once-differentiable sample paths — less smooth than RBF.
+    Useful when the k-space signal has sharper features.
+    """
+    def __init__(self, lengthscale: float = 0.1, outputscale: float = 1.0):
+        super().__init__()
+        self.log_lengthscale = nn.Parameter(torch.tensor(float(lengthscale)).log())
+        self.log_outputscale = nn.Parameter(torch.tensor(float(outputscale)).log())
+
+    @property
+    def lengthscale(self) -> torch.Tensor:
+        return self.log_lengthscale.exp()
+
+    @property
+    def outputscale(self) -> torch.Tensor:
+        return self.log_outputscale.exp()
+
+    def forward(self, X1: torch.Tensor, X2: torch.Tensor) -> torch.Tensor:
+        """
+        X1: (N, D)
+        X2: (M, D)
+        Returns: (N, M)
+        """
+        r = torch.cdist(X1, X2).clamp_min(0.0)
+        sqrt3_r_over_l = math.sqrt(3) * r / self.lengthscale
+        return self.outputscale.pow(2) * (1.0 + sqrt3_r_over_l) * torch.exp(-sqrt3_r_over_l)
+
+
+# ---------------------------------------------------------------------------
+# Classical GP regression (Rasmussen & Williams 2006, §2.2)
+# ---------------------------------------------------------------------------
+
+class GP_REIM(nn.Module):
+    """
+    Gaussian Process regression for 2D k-space (kx, ky) → (Re, Im).
+
+    Re and Im are modelled as two independent GPs sharing the same kernel and
+    noise hyperparameters (learnable via log-marginal-likelihood).
+
+    Workflow
+    --------
+    1.  Instantiate:   model = GP_REIM(kernel="rbf")
+    2.  Fit:           model.fit(X_train, y_train)   # O(N²) mem, O(N³) compute
+    3.  Predict:       y_pred = model(X_test)         # (M, 2) [Re, Im]
+
+    Hyperparameter optimisation (optional, done inside fit_gp):
+        model.log_marginal_likelihood(X, y)  # differentiable, use Adam
+
+    Notes
+    -----
+    - X coordinates are assumed to be normalised to roughly [-1, 1] (same
+      convention as the rest of the NIK pipeline).
+    - For N ≈ 22 k the full kernel matrix requires ~1.8 GB of GPU memory.
+    - forward() evaluates K_* @ α in chunks to bound peak GPU memory.
+    """
+
+    def __init__(
+        self,
+        kernel: str | nn.Module = "rbf",
+        lengthscale: float = 0.1,
+        outputscale: float = 1.0,
+        noise: float = 1e-3,
+    ):
+        super().__init__()
+
+        if isinstance(kernel, str):
+            if kernel == "rbf":
+                self.kernel = RBFKernel(lengthscale=lengthscale, outputscale=outputscale)
+            elif kernel in ("matern32", "matern"):
+                self.kernel = Matern32Kernel(lengthscale=lengthscale, outputscale=outputscale)
+            else:
+                raise ValueError(f"Unknown kernel '{kernel}'. Choose 'rbf' or 'matern32'.")
+        else:
+            self.kernel = kernel  # accept a pre-built kernel module
+
+        self.log_noise = nn.Parameter(torch.tensor(float(noise)).log())
+
+        # Set by fit(); None until then
+        self._X_train: torch.Tensor | None = None
+        self._alpha:   torch.Tensor | None = None  # (N, 2)  K⁻¹ y
+        self._L:       torch.Tensor | None = None  # (N, N)  lower Cholesky of K
+
+    @property
+    def noise(self) -> torch.Tensor:
+        return self.log_noise.exp()
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _build_K(self, X: torch.Tensor) -> torch.Tensor:
+        """K_XX + σ_n² I  — (N, N)"""
+        K = self.kernel(X, X)
+        K.diagonal().add_(self.noise.pow(2))
+        return K
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def fit(self, X_train: torch.Tensor, y_train: torch.Tensor) -> None:
+        """
+        Compute and store the Cholesky factor L and dual variables α = K⁻¹ y.
+
+        Parameters
+        ----------
+        X_train : (N, D) float tensor on the model's device
+        y_train : (N, 2) float tensor [Re, Im]
+        """
+        with torch.no_grad():
+            K = self._build_K(X_train)                        # (N, N)
+            L = torch.linalg.cholesky(K)                      # lower triangular
+            # cholesky_solve(B, L, upper=False) solves (L Lᵀ) x = B
+            alpha = torch.cholesky_solve(y_train, L)          # (N, 2)
+
+        self._X_train = X_train.detach()
+        self._alpha   = alpha.detach()
+        self._L       = L.detach()
+
+    def log_marginal_likelihood(
+        self, X_train: torch.Tensor, y_train: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        Differentiable log marginal likelihood (Rasmussen eq. 2.30):
+
+            log p(y|X,θ) = -½ yᵀ K⁻¹ y  - ½ log|K|  - N/2 log(2π)
+                         = -½ tr(αᵀ y)   - Σ log diag(L)  + const
+
+        Averages over the two output channels (Re, Im).
+        """
+        K   = self._build_K(X_train)
+        L   = torch.linalg.cholesky(K)
+        alpha = torch.cholesky_solve(y_train, L)               # (N, 2)
+
+        # -½ yᵀ α  (sum over both channels, then average)
+        data_fit = -0.5 * (y_train * alpha).sum()
+
+        # -½ log|K| = -Σ log diag(L)  (factor of 2 from both channels)
+        log_det_term = -L.diagonal().log().sum() * y_train.shape[1]
+
+        N = X_train.shape[0]
+        const = -0.5 * N * y_train.shape[1] * math.log(2 * math.pi)
+
+        return data_fit + log_det_term + const
+
+    @torch.no_grad()
+    def forward(self, X_test: torch.Tensor, chunk_size: int = 8192) -> torch.Tensor:
+        """
+        Predict posterior mean at X_test.
+
+            μ* = K(X*, X_train) @ α
+
+        Evaluated in chunks to bound peak GPU memory.
+
+        Parameters
+        ----------
+        X_test     : (M, D) coordinates
+        chunk_size : rows of K_star computed at once
+
+        Returns
+        -------
+        (M, 2) [Re, Im] predicted k-space values
+        """
+        if self._alpha is None or self._X_train is None:
+            raise RuntimeError("GP_REIM.fit() must be called before forward().")
+
+        out_chunks = []
+        for i in range(0, X_test.shape[0], chunk_size):
+            K_star = self.kernel(X_test[i : i + chunk_size], self._X_train)  # (chunk, N)
+            out_chunks.append(K_star @ self._alpha)
+        return torch.cat(out_chunks, dim=0)  # (M, 2)
+
+    @torch.no_grad()
+    def posterior_variance(
+        self, X_test: torch.Tensor, chunk_size: int = 8192
+    ) -> torch.Tensor:
+        """
+        Diagonal of the posterior covariance (same for both channels):
+
+            σ²*(x) = k(x,x) - K(x,X) K⁻¹ K(X,x)
+
+        Returns
+        -------
+        (M,) posterior standard deviation at each test point
+        """
+        if self._L is None or self._X_train is None:
+            raise RuntimeError("GP_REIM.fit() must be called before posterior_variance().")
+
+        var_chunks = []
+        k_diag = self.kernel.outputscale.pow(2)          # k(x,x) for RBF/Matérn
+        for i in range(0, X_test.shape[0], chunk_size):
+            K_star = self.kernel(X_test[i : i + chunk_size], self._X_train)  # (chunk, N)
+            # v = L⁻¹ K_starᵀ  →  ‖v‖² = K_star K⁻¹ K_starᵀ diagonal
+            v = torch.linalg.solve_triangular(self._L, K_star.mT, upper=False)  # (N, chunk)
+            var_chunks.append((k_diag - v.pow(2).sum(dim=0)).clamp_min(0.0))
+        return torch.cat(var_chunks, dim=0).sqrt()        # (M,) posterior std
+
+
 def loss_function(y_pred, y, mag_eps: float = 1e-12, mag_reg: float = 0.1):
     """
     Inverse-magnitude weighted MSE on (Re, Im) predictions.

@@ -786,6 +786,110 @@ def fit_spoke_holdout_kxy(
     return model, info
 
 
+# ---------------------------------------------------------------------------
+# Classical GP fitting
+# ---------------------------------------------------------------------------
+
+def fit_gp(
+    model,
+    x_all: torch.Tensor,
+    y_all: torch.Tensor,
+    *,
+    opt_steps: int = 200,
+    opt_lr: float = 0.01,
+    device: str = "cuda",
+    use_tqdm: bool = True,
+) -> tuple:
+    """
+    Fit a GP_REIM model to k-space data (classical Rasmussen & Williams 2006).
+
+    Two-phase procedure:
+
+    Phase 1 – Hyperparameter optimisation (opt_steps > 0):
+        Maximises the log marginal likelihood
+            log p(y|X,θ) = -½ yᵀ K⁻¹ y  -  ½ log|K|  -  N/2 log(2π)
+        using Adam on the kernel lengthscale, outputscale, and noise variance.
+        This step requires O(N²) memory and O(N³) compute per step.
+
+    Phase 2 – Posterior computation:
+        Cholesky-solves for α = (K + σ²I)⁻¹ y  (done inside model.fit()).
+        After this, model(X_test) returns the posterior mean  K_* @ α.
+
+    Parameters
+    ----------
+    model     : GP_REIM instance
+    x_all     : (N, 2) normalised k-space coordinates [kx, ky]
+    y_all     : (N, 2) complex k-space target          [Re, Im]
+    opt_steps : number of gradient steps for LML optimisation (0 = skip)
+    opt_lr    : Adam learning rate for hyperparameter optimisation
+    device    : "cuda" or "cpu"
+    use_tqdm  : show a progress bar during optimisation
+
+    Returns
+    -------
+    model : GP_REIM  (fitted in-place; also returned for chaining)
+    info  : dict with keys
+                "lml_hist"   – list of LML values per optimisation step
+                "hyperparams"– final {lengthscale, outputscale, noise} values
+                "seconds"    – total wall-clock time
+    """
+    import math as _math
+    import time as _time
+
+    try:
+        from tqdm.auto import tqdm as _tqdm
+    except ImportError:
+        _tqdm = None
+
+    t0 = _time.time()
+
+    model = model.to(device)
+    X = x_all.to(device, dtype=torch.float32)
+    y = y_all.to(device, dtype=torch.float32)
+
+    lml_hist = []
+
+    # ------------------------------------------------------------------
+    # Phase 1: Hyperparameter optimisation via log marginal likelihood
+    # ------------------------------------------------------------------
+    if opt_steps > 0:
+        opt = torch.optim.Adam(model.parameters(), lr=opt_lr)
+
+        steps_iter = range(opt_steps)
+        if use_tqdm and _tqdm is not None:
+            steps_iter = _tqdm(steps_iter, desc="GP hyperparam opt", unit="step")
+
+        for _ in steps_iter:
+            opt.zero_grad()
+            lml = model.log_marginal_likelihood(X, y)
+            (-lml).backward()          # minimise negative LML
+            opt.step()
+            lml_hist.append(lml.item())
+
+            if use_tqdm and _tqdm is not None and hasattr(steps_iter, "set_postfix"):
+                steps_iter.set_postfix(
+                    lml=f"{lml.item():.4f}",
+                    ls=f"{model.kernel.lengthscale.item():.4f}",
+                    noise=f"{model.noise.item():.2e}",
+                )
+
+    # ------------------------------------------------------------------
+    # Phase 2: Final Cholesky fit with the (optimised) hyperparameters
+    # ------------------------------------------------------------------
+    model.fit(X, y)
+
+    hyperparams = {
+        "lengthscale": model.kernel.lengthscale.item(),
+        "outputscale": model.kernel.outputscale.item(),
+        "noise":       model.noise.item(),
+    }
+
+    info = {
+        "lml_hist":   lml_hist,
+        "hyperparams": hyperparams,
+        "seconds":    _time.time() - t0,
+    }
+    return model, info
 
 
 
