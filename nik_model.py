@@ -5,9 +5,14 @@ import torch
 import torch.nn as nn
 
 class FourierFeatures(nn.Module):
-    def __init__(self, in_dim, n_freq=64, sigma=6.0):
+    def __init__(self, in_dim, n_freq=64, sigma=6.0, seed=None):
         super().__init__()
-        B = torch.randn(in_dim, n_freq) * sigma
+        if seed is not None:
+            gen = torch.Generator()
+            gen.manual_seed(seed)
+            B = torch.randn(in_dim, n_freq, generator=gen) * sigma
+        else:
+            B = torch.randn(in_dim, n_freq) * sigma
         self.register_buffer("B", B)
 
     def forward(self, x):
@@ -45,6 +50,8 @@ class NIK_SIREN(nn.Module):
         self.ff_t = FourierFeatures(1, n_freq=t_freq, sigma=t_sigma)
         self.coil_emb = nn.Embedding(n_coils, coil_emb)
 
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
         in_dim = 2 * k_freq + 2 * t_freq + coil_emb
         layers = [SineLayer(in_dim, hidden, w0=w0, is_first=True)]
         for _ in range(depth - 2):
@@ -52,15 +59,17 @@ class NIK_SIREN(nn.Module):
         self.backbone = nn.Sequential(*layers)
         self.head = nn.Linear(hidden, 2)  # [log_mag, phase_raw]
 
-    def forward(self, kxyz_t, coil_idx):
+    def _encode(self, kxyz_t, coil_idx):
         k = kxyz_t[:, :3]
         t = kxyz_t[:, 3:4]
         zk = self.ff_k(k)
         zt = self.ff_t(t)
         ec = self.coil_emb(coil_idx)
         h = torch.cat([zk, zt, ec], dim=-1)
-        h = self.backbone(h)
-        out = self.head(h)
+        return self.backbone(h)
+
+    def forward(self, kxyz_t, coil_idx):
+        out = self.head(self._encode(kxyz_t, coil_idx))
         log_mag = out[:, 0:1]
         phase  = np.pi * torch.tanh(out[:, 1:2])
         return log_mag, phase
@@ -70,23 +79,16 @@ def magphase_to_ri(log_mag, phase):
     mag = torch.exp(log_mag)
     re = mag * torch.cos(phase)
     im = mag * torch.sin(phase)
-    return torch.cat([re, im], dim=1)  # (B,2)
+    return torch.cat([re, im], dim=-1)  # (B,2)
 
 
 class NIK_SIREN_REIM(NIK_SIREN):
     """
-    Same as NIK_SIREN,  output is (Re, Im) 
+    Same as NIK_SIREN, but outputs (Re, Im) directly instead of (log_mag, phase).
+    Note: checkpoints are NOT interchangeable with NIK_SIREN despite sharing architecture.
     """
     def forward(self, kxyz_t, coil_idx):
-        k = kxyz_t[:, :3]
-        t = kxyz_t[:, 3:4]
-        zk = self.ff_k(k)
-        zt = self.ff_t(t)
-        ec = self.coil_emb(coil_idx)
-        h = torch.cat([zk, zt, ec], dim=-1)
-        h = self.backbone(h)
-        out = self.head(h)          # (B,2)  -> (Re, Im)
-        return out
+        return self.head(self._encode(kxyz_t, coil_idx))  # (B,2) -> (Re, Im)
 
 
 class ZEncoder(nn.Module):
@@ -153,6 +155,8 @@ class NIK_SIREN2D_REIM(nn.Module):
 
         self.coil_emb = nn.Embedding(n_coils, coil_emb)
 
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
         in_dim = 2 * k_freq + 2 * t_freq + self.z_enc.out_dim + coil_emb
 
         layers = [SineLayer(in_dim, hidden, w0=w0, is_first=True)]
@@ -196,6 +200,8 @@ class NIK_SIREN_KXY_FF_REIM(nn.Module):
         super().__init__()
         self.ff_kxy = FourierFeatures(x_dim, n_freq=k_freq, sigma=k_sigma)
 
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
         in_dim = 2 * k_freq
         layers = [SineLayer(in_dim, hidden, w0=w0, is_first=True)]
         for _ in range(depth - 2):
@@ -223,8 +229,13 @@ class NIK_SIREN_KXY_REIM(nn.Module):
         depth=7,
         w0=15,
     ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
         super().__init__()
 
+        # First layer uses 4*w0 to boost high-frequency sensitivity on raw (kx,ky) input.
+        # Note: _init_weights for is_first=True does NOT use w0, so only the forward
+        # activation is scaled; verify this is intentional if training is unstable.
         layers = [SineLayer(in_dim, hidden, w0=4*w0, is_first=True)]
         for _ in range(depth - 2):
             layers.append(SineLayer(hidden, hidden, w0=w0, is_first=False))
@@ -238,7 +249,7 @@ class NIK_SIREN_KXY_REIM(nn.Module):
 
 
 
-def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor, eps: float = 1e-12):
+def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor):
     """
     x_kxy: (B,2) [kx, ky]
 
@@ -258,12 +269,12 @@ def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor, eps: float = 1e-12):
     theta0 = torch.remainder(theta + 0.5 * np.pi, np.pi) - 0.5 * np.pi
 
     c = torch.cos(theta0)
-    sng = torch.sin(theta0)
+    sin_theta0 = torch.sin(theta0)
 
     # signed coordinate along the spoke direction
-    s_coord = kx * c + ky * sng  # can be negative
+    s_coord = kx * c + ky * sin_theta0  # can be negative
 
-    x_ssc = torch.stack([s_coord, sng, c], dim=-1)
+    x_ssc = torch.stack([s_coord, sin_theta0, c], dim=-1)
     return x_ssc
 
 def normalize_s(x_ssc: torch.Tensor, s_max: float = None, eps: float = 1e-12):
@@ -301,15 +312,15 @@ class SignedSpokeAdapter:
         theta0 = torch.remainder(theta + 0.5 * np.pi, np.pi) - 0.5 * np.pi
 
         c = torch.cos(theta0)
-        sng = torch.sin(theta0)
+        sin_theta0 = torch.sin(theta0)
 
         # signed coordinate along spoke direction
-        s_coord = kx * c + ky * sng
+        s_coord = kx * c + ky * sin_theta0
 
         # normalize signed coordinate
         s_coord = s_coord / max(self.s_max, self.eps)
 
-        return torch.stack([s_coord, sng, c], dim=-1)
+        return torch.stack([s_coord, sin_theta0, c], dim=-1)
 
 def compute_theta0_per_spoke(x_all_kxy: torch.Tensor, spoke_id_all: torch.Tensor):
     # returns dict: spoke_id -> theta0 (float)
@@ -318,17 +329,29 @@ def compute_theta0_per_spoke(x_all_kxy: torch.Tensor, spoke_id_all: torch.Tensor
         m = (spoke_id_all == sp)
         xk = x_all_kxy[m][:, :2]
         r = torch.sqrt((xk**2).sum(dim=1))
+        r_max = r.max()
+        if r_max == 0:
+            # all points at DC origin; spoke direction is undefined — default to 0
+            theta0[int(sp)] = 0.0
+            continue
         j = torch.argmax(r)
         th = torch.atan2(xk[j,1], xk[j,0])
         th0 = torch.remainder(th + 0.5*np.pi, np.pi) - 0.5*np.pi
         theta0[int(sp)] = float(th0)
     return theta0
 
-def loss_function(y_pred, y):
-    
-    res = y_pred - y
-    mag = torch.sqrt(y[:,0]**2 + y[:,1]**2 + 1e-12)
-    w = 1.0 / (mag + 0.1)
-    loss = (w * (res[:,0]**2 + res[:,1]**2)).mean()
+def loss_function(y_pred, y, mag_eps: float = 1e-12, mag_reg: float = 0.1):
+    """
+    Inverse-magnitude weighted MSE on (Re, Im) predictions.
 
-    return loss
+    Args:
+        y_pred: (B,2) predicted [Re, Im]
+        y:      (B,2) target    [Re, Im]
+        mag_eps: small constant inside sqrt to avoid NaN at exactly zero magnitude
+        mag_reg: additive regulariser in weight denominator; controls how aggressively
+                 near-zero-magnitude (DC/low-signal) samples are up-weighted
+    """
+    res = y_pred - y
+    mag = torch.sqrt(y[:,0]**2 + y[:,1]**2 + mag_eps)
+    w = 1.0 / (mag + mag_reg)
+    return (w * (res[:,0]**2 + res[:,1]**2)).mean()
