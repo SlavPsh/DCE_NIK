@@ -69,6 +69,7 @@ def plot_spoke_zoom_kxy_dense_flat(
     n_s: int = 4096,
     title_prefix="",
     coord_adapter=None,
+    log_scale: bool = False,
 ):
     device = next(model.parameters()).device
     model.eval()
@@ -132,6 +133,11 @@ def plot_spoke_zoom_kxy_dense_flat(
     ax[2].set_xlabel("RO index (edge → center → edge)")
     ax[2].legend()
 
+    if log_scale:
+        ax[0].set_yscale("symlog")
+        ax[1].set_yscale("symlog")
+        ax[2].set_yscale("log")
+
     plt.tight_layout()
     plt.show()
 
@@ -147,6 +153,7 @@ def plot_rings_kxy_train_vs_val_dense_flat(
     n_theta: int = 1024,
     title_prefix="",
     coord_adapter=None,
+    log_scale: bool = False,
 ):
     device = next(model.parameters()).device
     model.eval()
@@ -203,7 +210,10 @@ def plot_rings_kxy_train_vs_val_dense_flat(
         plt.scatter(th_tr, re_tr, s=18, label="train points Re")
         plt.scatter(th_va, re_va, s=18, label="val points Re")
         plt.title(f"{title_prefix} ro={ro_idx} r={r0:.3f}: Re vs theta")
-        plt.xlabel("theta [rad]"); plt.legend(); plt.tight_layout(); plt.show()
+        plt.xlabel("theta [rad]")
+        if log_scale:
+            plt.yscale("symlog")
+        plt.legend(); plt.tight_layout(); plt.show()
 
         # Im
         plt.figure(figsize=(10,4))
@@ -211,7 +221,10 @@ def plot_rings_kxy_train_vs_val_dense_flat(
         plt.scatter(th_tr, im_tr, s=18, label="train points Im")
         plt.scatter(th_va, im_va, s=18, label="val points Im")
         plt.title(f"{title_prefix} ro={ro_idx} r={r0:.3f}: Im vs theta")
-        plt.xlabel("theta [rad]"); plt.legend(); plt.tight_layout(); plt.show()
+        plt.xlabel("theta [rad]")
+        if log_scale:
+            plt.yscale("symlog")
+        plt.legend(); plt.tight_layout(); plt.show()
 
         # Mag
         plt.figure(figsize=(10,4))
@@ -219,7 +232,10 @@ def plot_rings_kxy_train_vs_val_dense_flat(
         plt.scatter(th_tr, mag_tr, s=18, label="train points |y|")
         plt.scatter(th_va, mag_va, s=18, label="val points |y|")
         plt.title(f"{title_prefix} ro={ro_idx} r={r0:.3f}: |y| vs theta")
-        plt.xlabel("theta [rad]"); plt.legend(); plt.tight_layout(); plt.show()
+        plt.xlabel("theta [rad]")
+        if log_scale:
+            plt.yscale("log")
+        plt.legend(); plt.tight_layout(); plt.show()
 
 
 def make_plot_callback_all_flat(
@@ -231,7 +247,8 @@ def make_plot_callback_all_flat(
     ro_list=None,
     train_spoke_show=None,
     val_spoke_show=None,
-    coord_adapter = None,
+    coord_adapter=None,
+    log_scale: bool = False,
 ):
     # choose defaults
     if ro_list is None:
@@ -259,7 +276,8 @@ def make_plot_callback_all_flat(
                 spoke_id=train_spoke_show,
                 y_scale=y_scale, n_s=4096,
                 title_prefix=f"[train] step {step}",
-                coord_adapter=coord_adapter
+                coord_adapter=coord_adapter,
+                log_scale=log_scale,
             )
             plot_spoke_zoom_kxy_dense_flat(model,
                 x_all=x_all, y_all=y_all,
@@ -268,8 +286,9 @@ def make_plot_callback_all_flat(
                 y_scale=y_scale, n_s=4096,
                 title_prefix=f"[val] step {step}",
                 coord_adapter=coord_adapter,
+                log_scale=log_scale,
             )
-    
+
             plot_rings_kxy_train_vs_val_dense_flat(
                 model,
                 x_all=x_all, y_all=y_all,
@@ -279,6 +298,7 @@ def make_plot_callback_all_flat(
                 y_scale=y_scale, n_theta=1024,
                 title_prefix=f"step {step}",
                 coord_adapter=coord_adapter,
+                log_scale=log_scale,
             )
 
             model.train()
