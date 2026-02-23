@@ -275,37 +275,6 @@ def make_fixed_frame_kslice_coil_dataset(
     return x_all, y_ri, kx_all, ky_all, meta
 
 
-def split_points_by_spokes(spoke_id_all, *, val_frac=0.2, seed=0, mode="random"):
-    """
-    spoke_id_all: (N,) long, values in {0..S_kz-1} identifying which spoke each point came from.
-
-    Returns:
-      train_idx, val_idx: 1D Long tensors of point indices into x_all/y_all
-      train_spokes, val_spokes: 1D Long tensors of spoke ids
-    """
-    device = spoke_id_all.device
-    S_kz = int(spoke_id_all.max().item()) + 1
-    n_val = max(1, int(round(S_kz * val_frac)))
-
-    g = torch.Generator(device=device)
-    g.manual_seed(int(seed))
-
-    if mode == "random":
-        perm = torch.randperm(S_kz, generator=g, device=device)
-        val_spokes = perm[:n_val]
-        train_spokes = perm[n_val:]
-    else:
-        raise ValueError("mode must be 'random'")
-
-    # point indices
-    train_mask = torch.isin(spoke_id_all, train_spokes)
-    val_mask   = torch.isin(spoke_id_all, val_spokes)
-
-    train_idx = torch.where(train_mask)[0]
-    val_idx   = torch.where(val_mask)[0]
-    return train_idx, val_idx, train_spokes, val_spokes
-
-
 
 def fit_one_frame_slice_coil(
     model,

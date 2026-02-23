@@ -1,0 +1,32 @@
+# sweep_config.yaml -- wandb sweep configuration for NIK DCE-MRI
+#
+# To create the sweep:
+#   cd /scratch/rnga/vvpshenov/DCE_NIK
+#   wandb sweep sweep_config.yaml
+#
+# This prints a SWEEP_ID. Then submit:
+#   sbatch gpu_job_sweep.sh SWEEP_ID /path/to/data.mat [COUNT]
+
+program: train_wandb.py
+method: bayes
+metric:
+  name: best_val_loss
+  goal: minimize
+
+parameters:
+  hidden:
+    values: [64, 128, 256]
+  depth:
+    values: [3, 4, 5, 7]
+  w0:
+    values: [10, 15, 30]
+  optimizer:
+    values: ["Adam", "AdamW", "SGD"]
+  lr:
+    distribution: log_uniform_values
+    min: 1.0e-5
+    max: 1.0e-2
+  batch_size:
+    values: [2048, 4096, 8192, 16384]
+  steps:
+    values: [2000, 3000, 5000, 8000]

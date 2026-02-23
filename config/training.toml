@@ -1,0 +1,70 @@
+[experiment]
+name = "NIK DCE-MRI k-space fitting"
+description = "SIREN implicit neural representation for radial k-space"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1          # -1 = middle slice (auto)
+val_frac = 0.1
+
+[model]
+hidden = 128
+depth = 4
+w0 = 15
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"         # "Adam", "AdamW", "SGD"
+lr = 2e-4
+grad_clip = 1.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 500           # log fit plots every N steps
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100        # print to stdout every N steps
+
+[wandb]
+watch_interval = 0         # 0 = disabled
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "bayes"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.hidden]
+values = [64, 128, 256]
+
+[sweep.parameters.depth]
+values = [3, 4, 5, 7]
+
+[sweep.parameters.w0]
+values = [10, 15, 30]
+
+[sweep.parameters.optimizer]
+values = ["Adam", "AdamW", "SGD"]
+
+[sweep.parameters.lr]
+distribution = "log_uniform_values"
+min = 1e-5
+max = 1e-2
+
+[sweep.parameters.batch_size]
+values = [2048, 4096, 8192, 16384]
+
+[sweep.parameters.steps]
+values = [2000, 3000, 5000, 8000]
