@@ -108,6 +108,7 @@ def load_data(config):
 
 def main(config_path, data):
     """Single training run with wandb logging."""
+    random.seed()  # reset to OS entropy (undo previous run's deterministic seed)
     run_name = generate_slug(3) + "_nik"
     config = load_config(config_path)
     output_dir = unique_output_dir(config, run_name)
