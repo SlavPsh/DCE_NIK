@@ -26,7 +26,7 @@ from utils.io_utils import (
 from utils.wandb_utils import WandbLogger
 
 from nik_io import load_event
-from nik_model import NIK_SIREN_KXY_REIM
+from nik_model import NIK_SIREN_KXY_REIM, ReLU_MLP_KXY_REIM
 from nik_train import prepare_tensors
 from nik_recon import (
     ifft1d_kz_to_z,
@@ -125,9 +125,10 @@ def main(config_path, data):
 
     # Build flat training config for wandb (sweep params override these)
     train_config = {
+        "model_family": config['model'].get('model_family', 'siren'),
         "hidden": config['model']['hidden'],
         "depth": config['model']['depth'],
-        "w0": config['model']['w0'],
+        "w0": config['model'].get('w0', 15),
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
@@ -148,9 +149,10 @@ def main(config_path, data):
 
     # Resolve hyperparameters (sweep overrides > config defaults)
     wc = wandb.config
+    model_family = getattr(wc, "model_family", "siren")
     hidden = int(wc.hidden)
     depth = int(wc.depth)
-    w0 = float(wc.w0)
+    w0 = float(getattr(wc, "w0", 15))  # unused by relu but kept for config compat
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
@@ -202,13 +204,18 @@ def main(config_path, data):
     y_val = y_all[val_idx].to(device)
 
     # ---- Build model ----
-    model = NIK_SIREN_KXY_REIM(
-        in_dim=2, hidden=hidden, depth=depth, w0=w0
-    ).to(device)
+    if model_family == "relu":
+        model = ReLU_MLP_KXY_REIM(
+            in_dim=2, hidden=hidden, depth=depth,
+        ).to(device)
+    else:  # default: siren
+        model = NIK_SIREN_KXY_REIM(
+            in_dim=2, hidden=hidden, depth=depth, w0=w0,
+        ).to(device)
 
     n_params = sum(p.numel() for p in model.parameters())
-    wandb.config.update({"n_params": n_params}, allow_val_change=True)
-    logging.info(f"Model: hidden={hidden}, depth={depth}, w0={w0}, params={n_params}")
+    wandb.config.update({"model_family": model_family, "n_params": n_params}, allow_val_change=True)
+    logging.info(f"Model: family={model_family}, hidden={hidden}, depth={depth}, w0={w0}, params={n_params}")
 
     # ---- Watch model gradients ----
     watch_interval = config['wandb'].get('watch_interval', 0)

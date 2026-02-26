@@ -248,6 +248,49 @@ class NIK_SIREN_KXY_REIM(nn.Module):
         return self.head(h)  # (B,2) [Re, Im]
 
 
+class ReLU_MLP_KXY_REIM(nn.Module):
+    """
+    Naive ReLU MLP baseline (no positional encoding, no sine activations).
+
+    Drop-in replacement for NIK_SIREN_KXY_REIM to establish a lower bound.
+    Same interface: x (B,2) [kx, ky] → (B,2) [Re, Im].
+
+    Uses Kaiming (He) initialisation for ReLU networks.
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        hidden=64,
+        depth=8,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        layers = []
+        layers.append(nn.Linear(in_dim, hidden))
+        layers.append(nn.ReLU(inplace=True))
+        for _ in range(depth - 2):
+            layers.append(nn.Linear(hidden, hidden))
+            layers.append(nn.ReLU(inplace=True))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(hidden, 2)  # (Re, Im)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.kaiming_uniform_(m.weight, nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # x: (B,2) [kx, ky]
+        h = self.backbone(x)
+        return self.head(h)  # (B,2) [Re, Im]
+
 
 def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor):
     """
