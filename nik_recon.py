@@ -4,6 +4,8 @@ import torch
 import cupy as cp
 import cufinufft
 
+from nik_metrics import compute_image_metrics
+
 
 def make_fixed_frame_zslice_coil_dataset(
     k_img_space,
@@ -391,3 +393,105 @@ def norm_img(img, p=99):
     return img / (s + 1e-12)
 
 
+@torch.no_grad()
+def evaluate_image_metrics(
+    model,
+    *,
+    x_all,
+    y_scale,
+    k_img_space,
+    traj_t,
+    scales,
+    t_frame,
+    coil_idx,
+    z_slice_idx,
+    n_z_slices,
+    n_ro_per_slice,
+    RO,
+    img_size=(128, 128),
+    gt_img=None,
+    ssim_win_size=7,
+    nrmse_norm="euclidean",
+):
+    """
+    End-to-end image-space evaluation: model → k-space → NUFFT → metrics.
+
+    Reconstructs an image from the model's predicted k-space and compares it
+    against (a) the NUFFT reconstruction from measured k-space, and optionally
+    (b) the ground-truth image.
+
+    Parameters
+    ----------
+    model : nn.Module
+        Trained SIREN model that maps (kx, ky) → (Re, Im).
+    x_all : (N, >=2) tensor – input coordinates (only first 2 cols used).
+    y_scale : float or tensor – k-space normalisation scale.
+    k_img_space : (T, S', C, nz, RO) tensor – measured k-space after kz→z IFFT.
+    traj_t, scales, t_frame, coil_idx, z_slice_idx, n_z_slices : NUFFT params.
+    n_ro_per_slice, RO : ints – shape info for reshaping predictions.
+    img_size : (Nx, Ny) – output image size for NUFFT.
+    gt_img : optional (T, nz, H, W) array – ground-truth image.
+    ssim_win_size : int – SSIM window size.
+    nrmse_norm : str – NRMSE normalisation mode.
+
+    Returns
+    -------
+    dict with keys:
+        ``img_pred``         – (Nx, Ny) predicted magnitude image.
+        ``img_measured``     – (Nx, Ny) measured magnitude image.
+        ``metrics_measured`` – {psnr_db, ssim, nrmse} vs measured recon.
+        ``metrics_gt``       – {psnr_db, ssim, nrmse} vs GT (or None).
+    """
+    device = next(model.parameters()).device
+    model.eval()
+
+    ys = float(y_scale.item()) if isinstance(y_scale, torch.Tensor) else float(y_scale)
+
+    x_in = x_all[:, :2].to(device)
+    y_pred_all = model(x_in) * ys
+    k_pred = torch.complex(y_pred_all[:, 0], y_pred_all[:, 1])
+    k_pred_slice = k_pred.reshape(n_ro_per_slice, RO)
+
+    k_img_space_pred = torch.zeros_like(k_img_space)
+    k_img_space_pred[t_frame, :, coil_idx, z_slice_idx, :] = k_pred_slice
+
+    img_pred = nufft2d_recon(
+        k_img_space_pred, traj_t,
+        t_frame=t_frame, coil_idx=coil_idx,
+        z_slice_idx=z_slice_idx,
+        scales=scales, img_size=img_size, n_slices=n_z_slices,
+    )
+
+    img_measured = nufft2d_recon(
+        k_img_space, traj_t,
+        t_frame=t_frame, coil_idx=coil_idx,
+        z_slice_idx=z_slice_idx,
+        scales=scales, img_size=img_size, n_slices=n_z_slices,
+    )
+
+    metrics_measured = compute_image_metrics(
+        img_pred, img_measured,
+        ssim_win_size=ssim_win_size, nrmse_norm=nrmse_norm,
+    )
+
+    metrics_gt = None
+    if gt_img is not None:
+        gt_slice = np.asarray(gt_img[t_frame, z_slice_idx, :, :], dtype=np.float64)
+        if img_pred.shape != gt_slice.shape:
+            from scipy.ndimage import zoom
+            zf = (gt_slice.shape[0] / img_pred.shape[0],
+                  gt_slice.shape[1] / img_pred.shape[1])
+            img_pred_r = zoom(img_pred, zf, order=3)
+        else:
+            img_pred_r = img_pred
+        metrics_gt = compute_image_metrics(
+            img_pred_r, gt_slice,
+            ssim_win_size=ssim_win_size, nrmse_norm=nrmse_norm,
+        )
+
+    return {
+        "img_pred": img_pred,
+        "img_measured": img_measured,
+        "metrics_measured": metrics_measured,
+        "metrics_gt": metrics_gt,
+    }

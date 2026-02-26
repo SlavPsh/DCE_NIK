@@ -15,16 +15,16 @@ depth = 4
 w0 = 15
 
 [training]
-steps = 3000
+steps = 6000
 batch_size = 4096
 optimizer = "Adam"         # "Adam", "AdamW", "SGD"
 lr = 2e-4
 grad_clip = 1.0
-eval_every = 50
+eval_every = 100
 seed = 0
 
 [training.plot]
-plot_every = 500           # log fit plots every N steps
+plot_every = 1000           # log fit plots every N steps
 log_scale = true
 
 [output]
@@ -47,24 +47,10 @@ name = "best_val_loss"
 goal = "minimize"
 
 [sweep.parameters.hidden]
-values = [64, 128, 256]
+values = [16, 32, 48, 64, 96, 128, 192, 256]
 
 [sweep.parameters.depth]
-values = [3, 4, 5, 7]
+values = [2, 3, 4, 5, 6, 8]
 
 [sweep.parameters.w0]
 values = [10, 15, 30]
-
-[sweep.parameters.optimizer]
-values = ["Adam", "AdamW", "SGD"]
-
-[sweep.parameters.lr]
-distribution = "log_uniform_values"
-min = 1e-5
-max = 1e-2
-
-[sweep.parameters.batch_size]
-values = [2048, 4096, 8192, 16384]
-
-[sweep.parameters.steps]
-values = [2000, 3000, 5000, 8000]

@@ -34,6 +34,7 @@ from nik_recon import (
     split_points_by_spokes,
     nufft2d_recon,
 )
+from nik_metrics import compute_image_metrics
 from wandb_logger import (
     make_spoke_figure,
     make_ring_figures,
@@ -103,6 +104,7 @@ def load_data(config):
         "n_ro_per_slice": n_ro_per_slice,
         "T": T, "S": S, "C": C, "RO": RO,
         "z_slice_idx": z_slice_idx, "img_size": img_size,
+        "gt_img": gt_img,
     }
 
 
@@ -239,7 +241,9 @@ def main(config_path, data):
     # ---- Training loop ----
     x_all_2d = x_all[:, :2].to(device)
     y_all_dev = y_all.to(device)
-    N_all = x_all_2d.shape[0]
+    x_train = x_all_2d[train_idx]
+    y_train = y_all_dev[train_idx]
+    N_train = x_train.shape[0]
 
     model.train()
     best_val_loss = float("inf")
@@ -247,12 +251,13 @@ def main(config_path, data):
     last_val_loss = None
 
     logging.info(f"Training for {steps} steps, optimizer={optimizer_name}, lr={lr}")
+    logging.info(f"Train points: {N_train}, Val points: {x_val.shape[0]}")
 
     for step in range(1, steps + 1):
-        # --- Training step (sample from ALL points, matching notebook) ---
-        idx = torch.randint(0, N_all, (batch_size,), device=device)
-        x = x_all_2d[idx]
-        y = y_all_dev[idx]
+        # --- Training step (sample from train split only) ---
+        idx = torch.randint(0, N_train, (batch_size,), device=device)
+        x = x_train[idx]
+        y = y_train[idx]
 
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
@@ -356,10 +361,12 @@ def main(config_path, data):
                 msg += f"  val {last_val_loss:.3e}"
             logging.info(msg)
 
-    # ---- Restore best model and log final reconstruction ----
+    # ---- Restore best model and log final reconstruction + image metrics ----
     if best_state is not None:
         model.load_state_dict(best_state)
     model.eval()
+
+    gt_img = data.get("gt_img")
 
     try:
         with torch.no_grad():
@@ -385,6 +392,56 @@ def main(config_path, data):
             scales=scales, img_size=img_size, n_slices=n_z_slices,
         )
         wandb_logger.log({"recon/measured": wandb.Image(img_measured)}, step=steps)
+
+        # ---- Image-space metrics (PSNR / SSIM / NRMSE) ----
+        # Compare predicted reconstruction against the NUFFT-from-measured
+        metrics_vs_measured = compute_image_metrics(img_pred, img_measured)
+        wandb_logger.log({
+            "metrics/psnr_vs_measured": metrics_vs_measured["psnr_db"],
+            "metrics/ssim_vs_measured": metrics_vs_measured["ssim"],
+            "metrics/nrmse_vs_measured": metrics_vs_measured["nrmse"],
+        }, step=steps)
+        wandb.run.summary.update({
+            "psnr_vs_measured": metrics_vs_measured["psnr_db"],
+            "ssim_vs_measured": metrics_vs_measured["ssim"],
+            "nrmse_vs_measured": metrics_vs_measured["nrmse"],
+        })
+        logging.info(
+            f"Metrics vs measured:  PSNR={metrics_vs_measured['psnr_db']:.2f} dB  "
+            f"SSIM={metrics_vs_measured['ssim']:.4f}  "
+            f"NRMSE={metrics_vs_measured['nrmse']:.4f}"
+        )
+
+        # Compare against ground-truth image if available
+        if gt_img is not None:
+            gt_slice = gt_img[t_frame, z_slice_idx, :, :]
+            # Resize predicted image to match GT if shapes differ
+            if img_pred.shape != gt_slice.shape:
+                from scipy.ndimage import zoom
+                zoom_factors = (
+                    gt_slice.shape[0] / img_pred.shape[0],
+                    gt_slice.shape[1] / img_pred.shape[1],
+                )
+                img_pred_resized = zoom(img_pred, zoom_factors, order=3)
+            else:
+                img_pred_resized = img_pred
+
+            metrics_vs_gt = compute_image_metrics(img_pred_resized, gt_slice)
+            wandb_logger.log({
+                "metrics/psnr_vs_gt": metrics_vs_gt["psnr_db"],
+                "metrics/ssim_vs_gt": metrics_vs_gt["ssim"],
+                "metrics/nrmse_vs_gt": metrics_vs_gt["nrmse"],
+            }, step=steps)
+            wandb.run.summary.update({
+                "psnr_vs_gt": metrics_vs_gt["psnr_db"],
+                "ssim_vs_gt": metrics_vs_gt["ssim"],
+                "nrmse_vs_gt": metrics_vs_gt["nrmse"],
+            })
+            logging.info(
+                f"Metrics vs GT:       PSNR={metrics_vs_gt['psnr_db']:.2f} dB  "
+                f"SSIM={metrics_vs_gt['ssim']:.4f}  "
+                f"NRMSE={metrics_vs_gt['nrmse']:.4f}"
+            )
     except Exception as e:
         logging.warning(f"NUFFT reconstruction failed: {e}")
 
