@@ -292,6 +292,49 @@ class ReLU_MLP_KXY_REIM(nn.Module):
         return self.head(h)  # (B,2) [Re, Im]
 
 
+class ELU_MLP_KXY_REIM(nn.Module):
+    """
+    ELU MLP baseline (no positional encoding).
+
+    Isolates the effect of a smooth activation vs ReLU's dead-zero gradient.
+    Same interface: x (B,2) [kx, ky] → (B,2) [Re, Im].
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        hidden=64,
+        depth=8,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        layers = []
+        layers.append(nn.Linear(in_dim, hidden))
+        layers.append(nn.ELU(inplace=True))
+        for _ in range(depth - 2):
+            layers.append(nn.Linear(hidden, hidden))
+            layers.append(nn.ELU(inplace=True))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(hidden, 2)  # (Re, Im)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                # ELU ≈ leaky_relu for Kaiming purposes (nonzero negative slope)
+                nn.init.kaiming_uniform_(m.weight, nonlinearity="leaky_relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # x: (B,2) [kx, ky]
+        h = self.backbone(x)
+        return self.head(h)  # (B,2) [Re, Im]
+
+
 def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor):
     """
     x_kxy: (B,2) [kx, ky]

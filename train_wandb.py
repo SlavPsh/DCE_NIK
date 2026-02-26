@@ -26,7 +26,7 @@ from utils.io_utils import (
 from utils.wandb_utils import WandbLogger
 
 from nik_io import load_event
-from nik_model import NIK_SIREN_KXY_REIM, ReLU_MLP_KXY_REIM
+from nik_model import NIK_SIREN_KXY_REIM, ReLU_MLP_KXY_REIM, ELU_MLP_KXY_REIM
 from nik_train import prepare_tensors
 from nik_recon import (
     ifft1d_kz_to_z,
@@ -152,7 +152,7 @@ def main(config_path, data):
     model_family = getattr(wc, "model_family", "siren")
     hidden = int(wc.hidden)
     depth = int(wc.depth)
-    w0 = float(getattr(wc, "w0", 15))  # unused by relu but kept for config compat
+    w0 = float(getattr(wc, "w0", 15))  # only used by siren
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
@@ -160,6 +160,16 @@ def main(config_path, data):
     eval_every = int(wc.eval_every)
     grad_clip = float(wc.grad_clip)
     seed = int(wc.seed)
+
+    # Skip redundant sweep combos: w0 is irrelevant for relu/elu,
+    # so only run the canonical w0=15 to avoid wasting compute.
+    if model_family in ("relu", "elu") and w0 != 15:
+        logging.info(
+            f"Skipping: w0={w0} is irrelevant for model_family={model_family}"
+        )
+        wandb.run.summary["skipped"] = True
+        wandb_logger.finish()
+        return
 
     plot_every = config['training']['plot']['plot_every']
     log_scale = config['training']['plot']['log_scale']
@@ -206,6 +216,10 @@ def main(config_path, data):
     # ---- Build model ----
     if model_family == "relu":
         model = ReLU_MLP_KXY_REIM(
+            in_dim=2, hidden=hidden, depth=depth,
+        ).to(device)
+    elif model_family == "elu":
+        model = ELU_MLP_KXY_REIM(
             in_dim=2, hidden=hidden, depth=depth,
         ).to(device)
     else:  # default: siren

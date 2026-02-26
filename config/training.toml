@@ -10,6 +10,7 @@ z_slice_idx = -1          # -1 = middle slice (auto)
 val_frac = 0.1
 
 [model]
+model_family = "siren"    # "siren", "relu", "elu"
 hidden = 128
 depth = 4
 w0 = 15
@@ -46,11 +47,15 @@ method = "bayes"
 name = "best_val_loss"
 goal = "minimize"
 
+[sweep.parameters.model_family]
+values = ["siren", "relu", "elu"]
+
 [sweep.parameters.hidden]
-values = [16, 32, 48, 64, 96, 128, 192, 256]
+values = [32, 64, 128, 256]
 
 [sweep.parameters.depth]
-values = [2, 3, 4, 5, 6, 8]
+values = [4, 6, 8]
 
 [sweep.parameters.w0]
 values = [10, 15, 30]
+# w0 only affects siren; relu/elu runs with w0 != 15 are skipped automatically
