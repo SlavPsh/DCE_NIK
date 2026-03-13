@@ -1,0 +1,96 @@
+# Step 5b: Weight decay regularization sweep
+#
+# Test whether weight decay improves image quality (PSNR/SSIM) for the
+# best-performing configs. Uses the top families: siren, relu, ff_siren.
+# Fixed architecture per family (best-known), sweep weight_decay.
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step5b_weight_decay.toml
+
+[experiment]
+name = "Step 5b: Weight decay sweep"
+description = "Does weight decay regularization improve image quality?"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 256
+depth = 8
+w0 = 15
+k_freq = 64
+k_sigma = 0.75
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["siren", "relu", "ff_siren"]
+
+[sweep.parameters.hidden]
+values = [256]
+
+[sweep.parameters.depth]
+values = [8]
+
+[sweep.parameters.w0]
+values = [7.5, 15]
+
+[sweep.parameters.k_freq]
+values = [64]
+
+[sweep.parameters.k_sigma]
+values = [0.75, 6.0]
+
+[sweep.parameters.weight_decay]
+values = [0.0, 1e-5, 1e-4, 1e-3, 1e-2]
+
+# siren: h=256, d=8, w0=7.5 or 15 (best image PSNR config)
+# relu: h=256, d=8 (best image PSNR config), w0/k_sigma irrelevant (skipped)
+# ff_siren: h=256, d=8, k_sigma=0.75 (close to best), w0 irrelevant for skip logic
+[family_params.siren]
+hidden = [256]
+depth  = [8]
+
+[family_params.relu]
+hidden = [256]
+depth  = [8]
+
+[family_params.ff_siren]
+hidden = [256]
+depth  = [8]

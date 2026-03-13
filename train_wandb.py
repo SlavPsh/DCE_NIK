@@ -26,7 +26,13 @@ from utils.io_utils import (
 from utils.wandb_utils import WandbLogger
 
 from nik_io import load_event
-from nik_model import NIK_SIREN_KXY_REIM, ReLU_MLP_KXY_REIM, ELU_MLP_KXY_REIM
+from nik_model import (
+    NIK_SIREN_KXY_REIM,
+    NIK_SIREN_KXY_FF_REIM,
+    ReLU_MLP_KXY_REIM,
+    ELU_MLP_KXY_REIM,
+    FF_ReLU_MLP_KXY_REIM,
+)
 from nik_train import prepare_tensors
 from nik_recon import (
     ifft1d_kz_to_z,
@@ -129,12 +135,15 @@ def main(config_path, data):
         "hidden": config['model']['hidden'],
         "depth": config['model']['depth'],
         "w0": config['model'].get('w0', 15),
+        "k_freq": config['model'].get('k_freq', 64),
+        "k_sigma": config['model'].get('k_sigma', 6.0),
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
         "steps": config['training']['steps'],
         "eval_every": config['training']['eval_every'],
         "grad_clip": config['training']['grad_clip'],
+        "weight_decay": config['training'].get('weight_decay', 0.0),
         "seed": config['training']['seed'],
     }
 
@@ -152,23 +161,45 @@ def main(config_path, data):
     model_family = getattr(wc, "model_family", "siren")
     hidden = int(wc.hidden)
     depth = int(wc.depth)
-    w0 = float(getattr(wc, "w0", 15))  # only used by siren
+    w0 = float(getattr(wc, "w0", 15))        # siren / ff_siren
+    k_freq = int(getattr(wc, "k_freq", 64))  # ff_relu / ff_siren
+    k_sigma = float(getattr(wc, "k_sigma", 6.0))  # ff_relu / ff_siren
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
     steps = int(wc.steps)
     eval_every = int(wc.eval_every)
     grad_clip = float(wc.grad_clip)
+    weight_decay = float(getattr(wc, "weight_decay", 0.0))
     seed = int(wc.seed)
 
-    # Skip redundant sweep combos: w0 is irrelevant for relu/elu,
-    # so only run the canonical w0=15 to avoid wasting compute.
-    if model_family in ("relu", "elu") and w0 != 15:
-        logging.info(
-            f"Skipping: w0={w0} is irrelevant for model_family={model_family}"
-        )
+    # Skip redundant sweep combos to avoid wasting compute.
+    def _skip(reason: str):
+        logging.info(f"Skipping: {reason}")
         wandb.run.summary["skipped"] = True
+        wandb.run.summary["best_val_loss"] = float("inf")
         wandb_logger.finish()
+
+    # w0 is irrelevant for relu/elu/ff_relu; k_freq/k_sigma irrelevant for relu/elu/siren.
+    if model_family in ("relu", "elu") and w0 != 15:
+        _skip(f"w0={w0} is irrelevant for model_family={model_family}")
+        return
+    if model_family in ("relu", "elu", "siren") and (k_sigma != 6.0 or k_freq != 64):
+        _skip(f"k_sigma={k_sigma}/k_freq={k_freq} irrelevant for model_family={model_family}")
+        return
+    if model_family == "ff_relu" and w0 != 15:
+        _skip(f"w0={w0} is irrelevant for model_family=ff_relu")
+        return
+
+    # Per-family valid architecture ranges (from [family_params] in config).
+    family_params = config.get("family_params", {}).get(model_family, {})
+    valid_hidden = family_params.get("hidden")
+    valid_depth = family_params.get("depth")
+    if valid_hidden and hidden not in valid_hidden:
+        _skip(f"hidden={hidden} not in valid set {valid_hidden} for {model_family}")
+        return
+    if valid_depth and depth not in valid_depth:
+        _skip(f"depth={depth} not in valid set {valid_depth} for {model_family}")
         return
 
     plot_every = config['training']['plot']['plot_every']
@@ -222,14 +253,30 @@ def main(config_path, data):
         model = ELU_MLP_KXY_REIM(
             in_dim=2, hidden=hidden, depth=depth,
         ).to(device)
+    elif model_family == "ff_relu":
+        model = FF_ReLU_MLP_KXY_REIM(
+            in_dim=2, k_freq=k_freq, k_sigma=k_sigma,
+            hidden=hidden, depth=depth,
+        ).to(device)
+    elif model_family == "ff_siren":
+        model = NIK_SIREN_KXY_FF_REIM(
+            x_dim=2, k_freq=k_freq, k_sigma=k_sigma,
+            hidden=hidden, depth=depth, w0=w0,
+        ).to(device)
     else:  # default: siren
         model = NIK_SIREN_KXY_REIM(
             in_dim=2, hidden=hidden, depth=depth, w0=w0,
         ).to(device)
 
     n_params = sum(p.numel() for p in model.parameters())
-    wandb.config.update({"model_family": model_family, "n_params": n_params}, allow_val_change=True)
-    logging.info(f"Model: family={model_family}, hidden={hidden}, depth={depth}, w0={w0}, params={n_params}")
+    wandb.config.update({
+        "model_family": model_family, "n_params": n_params,
+        "k_freq": k_freq, "k_sigma": k_sigma,
+    }, allow_val_change=True)
+    logging.info(
+        f"Model: family={model_family}, hidden={hidden}, depth={depth}, "
+        f"w0={w0}, k_freq={k_freq}, k_sigma={k_sigma}, wd={weight_decay}, params={n_params}"
+    )
 
     # ---- Watch model gradients ----
     watch_interval = config['wandb'].get('watch_interval', 0)
@@ -239,11 +286,11 @@ def main(config_path, data):
 
     # ---- Build optimizer ----
     if optimizer_name == "Adam":
-        opt = torch.optim.Adam(model.parameters(), lr=lr)
+        opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "AdamW":
-        opt = torch.optim.AdamW(model.parameters(), lr=lr)
+        opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "SGD":
-        opt = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+        opt = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=weight_decay)
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 

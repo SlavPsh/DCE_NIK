@@ -3,7 +3,7 @@
 #SBATCH --gres=gpu:2g.20gb:1
 #SBATCH --partition=luna-gpu-short
 #SBATCH --mem=32G
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=1
 #SBATCH --time=0-07:00
 #SBATCH --nice=10000
 #SBATCH --output=slurm-%x-%j.out

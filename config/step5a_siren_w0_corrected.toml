@@ -1,0 +1,84 @@
+# Step 5a: SIREN w0 sweep with corrected values
+#
+# The current code applies 4*w0 to the first SineLayer.
+# Old best result used w0=30 (no multiplier) => effective first-layer w0=30.
+# To reproduce that range: w0=7.5 => effective 30.
+#
+# This sweep covers w0 in [5, 7.5, 10, 15] => effective [20, 30, 40, 60].
+# Also tests depth [4, 6, 8] and hidden [192, 256, 320] around the best configs.
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step5a_siren_w0_corrected.toml
+
+[experiment]
+name = "Step 5a: SIREN w0 corrected"
+description = "Sweep w0 with corrected 4x first-layer multiplier, depth, and hidden"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 256
+depth = 4
+w0 = 7.5
+k_freq = 64
+k_sigma = 6.0
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["siren"]
+
+[sweep.parameters.hidden]
+values = [192, 256, 320]
+
+[sweep.parameters.depth]
+values = [4, 6, 8]
+
+[sweep.parameters.w0]
+values = [5.0, 7.5, 10.0, 15.0]
+
+[sweep.parameters.k_freq]
+values = [64]
+
+[sweep.parameters.k_sigma]
+values = [6.0]
+
+[sweep.parameters.weight_decay]
+values = [0.0]

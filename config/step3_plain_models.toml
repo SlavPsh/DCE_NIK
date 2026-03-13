@@ -1,0 +1,77 @@
+# Step 3b: Plain models (siren, relu) — no Fourier features
+#
+# Baseline sweep over architecture (hidden, depth) for plain siren and relu.
+# No k_sigma sweep needed — these models don't use Fourier feature encoding.
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step3_plain_models.toml
+#   sbatch gpu_job_sweep.sh config/step3_plain_models.toml SWEEP_ID [COUNT]
+
+[experiment]
+name = "Step 3b: Plain models"
+description = "Baseline architecture sweep for plain siren and relu (no FF encoding)"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1          # -1 = middle slice (auto)
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 128
+depth = 4
+w0 = 15
+k_freq = 64
+k_sigma = 6.0
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["siren", "relu"]
+
+[sweep.parameters.hidden]
+values = [128, 256]
+
+[sweep.parameters.depth]
+values = [4, 6, 8]
+
+[sweep.parameters.w0]
+values = [15]
+
+[sweep.parameters.k_freq]
+values = [64]
+
+[sweep.parameters.k_sigma]
+values = [6.0]

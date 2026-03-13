@@ -335,6 +335,58 @@ class ELU_MLP_KXY_REIM(nn.Module):
         return self.head(h)  # (B,2) [Re, Im]
 
 
+class FF_ReLU_MLP_KXY_REIM(nn.Module):
+    """
+    Fourier Features + ReLU MLP for 2D k-space fitting.
+
+    Step 3 experiment: does explicit frequency encoding close the gap with SIREN?
+    The key hyperparameter is sigma of the Fourier feature mapping, which directly
+    controls the bandwidth of the encoding.
+
+    Same interface: x (B,2) [kx, ky] → (B,2) [Re, Im].
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        k_freq=64,
+        k_sigma=6.0,
+        hidden=256,
+        depth=7,
+        ff_seed=None,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        self.ff = FourierFeatures(in_dim, n_freq=k_freq, sigma=k_sigma, seed=ff_seed)
+
+        ff_out_dim = 2 * k_freq
+        layers = []
+        layers.append(nn.Linear(ff_out_dim, hidden))
+        layers.append(nn.ReLU(inplace=True))
+        for _ in range(depth - 2):
+            layers.append(nn.Linear(hidden, hidden))
+            layers.append(nn.ReLU(inplace=True))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(hidden, 2)  # (Re, Im)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.kaiming_uniform_(m.weight, nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # x: (B,2) [kx, ky]
+        h = self.ff(x)
+        h = self.backbone(h)
+        return self.head(h)  # (B,2) [Re, Im]
+
+
 def cart_to_s_sincos_foldpi(x_kxy: torch.Tensor):
     """
     x_kxy: (B,2) [kx, ky]

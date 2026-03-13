@@ -1,0 +1,97 @@
+# Step 4: Refine around best-found parameters
+#
+# Based on sweep analysis:
+#   - siren:    best at hidden=256, depth=4, w0=30  (val_loss ~1e-6)
+#   - relu:     best at hidden=256, depth=8          (val_loss ~1e-3)
+#   - ff_siren: best at hidden=128, k_sigma=1.0      (val_loss ~2e-3)
+#
+# This sweep explores tighter ranges around those optima:
+#   - siren:  w0 in [20,25,30,35,40], depth [3,4,5,6], hidden [192,256,320]
+#   - relu:   depth [6,8,10,12], hidden [192,256,320]
+#   - ff_siren: k_sigma [0.5,0.75,1.0,1.5,2.0], depth [3,4,6], hidden [96,128,192]
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step4_best_models_refine.toml
+#   sbatch gpu_job_sweep.sh config/step4_best_models_refine.toml SWEEP_ID [COUNT]
+
+[experiment]
+name = "Step 4: Refine best models"
+description = "Fine-grained sweep around best-found parameters for siren, relu, ff_siren"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 256
+depth = 4
+w0 = 30
+k_freq = 64
+k_sigma = 1.0
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["siren", "relu", "ff_siren"]
+
+[sweep.parameters.hidden]
+values = [96, 128, 192, 256, 320]
+
+[sweep.parameters.depth]
+values = [3, 4, 5, 6, 8, 10, 12]
+
+[sweep.parameters.w0]
+values = [20, 25, 30, 35, 40]
+
+[sweep.parameters.k_freq]
+values = [64]
+
+[sweep.parameters.k_sigma]
+values = [0.5, 0.75, 1.0, 1.5, 2.0]
+
+# ---- Per-family valid architecture ranges ----
+[family_params.siren]
+hidden = [192, 256, 320]
+depth  = [3, 4, 5, 6]
+
+[family_params.relu]
+hidden = [192, 256, 320]
+depth  = [6, 8, 10, 12]
+
+[family_params.ff_siren]
+hidden = [96, 128, 192]
+depth  = [3, 4, 6]

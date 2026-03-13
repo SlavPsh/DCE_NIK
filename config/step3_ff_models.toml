@@ -1,0 +1,78 @@
+# Step 3a: Fourier-Feature families (ff_relu, ff_siren)
+#
+# Sweep k_sigma to find optimal bandwidth of the random Fourier encoding.
+# Extended depth range [3,4,6,8] to test whether FF models benefit from
+# more depth than originally assumed.
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step3_ff_models.toml
+#   sbatch gpu_job_sweep.sh config/step3_ff_models.toml SWEEP_ID [COUNT]
+
+[experiment]
+name = "Step 3a: FF models"
+description = "Sweep k_sigma and depth for Fourier-feature models (ff_relu, ff_siren)"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1          # -1 = middle slice (auto)
+val_frac = 0.1
+
+[model]
+model_family = "ff_relu"
+hidden = 128
+depth = 4
+w0 = 15
+k_freq = 64
+k_sigma = 6.0
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["ff_relu", "ff_siren"]
+
+[sweep.parameters.hidden]
+values = [64, 128]
+
+[sweep.parameters.depth]
+values = [3, 4, 6, 8]
+
+[sweep.parameters.w0]
+values = [15]
+
+[sweep.parameters.k_freq]
+values = [64]
+
+[sweep.parameters.k_sigma]
+values = [1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0]
