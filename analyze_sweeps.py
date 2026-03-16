@@ -55,7 +55,7 @@ def _parse_image_metrics(text: str) -> dict:
     }
 
 
-def parse_run(run_dir: Path) -> dict | None:
+def parse_run(run_dir: Path):
     log = run_dir / "training.log"
     if not log.exists():
         return None
@@ -118,7 +118,7 @@ def parse_run(run_dir: Path) -> dict | None:
 
 # ---- Display ----
 
-def print_table(rows: list[dict], columns: list[str], title: str = ""):
+def print_table(rows: list, columns: list, title: str = ""):
     if not rows:
         print(f"  (no data)\n")
         return
@@ -149,7 +149,7 @@ def fmt_val(v):
     return str(v)
 
 
-def analyze(runs: list[dict], filter_family: str | None = None):
+def analyze(runs, filter_family=None):
     completed = [r for r in runs if not r["skipped"]]
     skipped = [r for r in runs if r["skipped"]]
 
@@ -265,8 +265,38 @@ def analyze(runs: list[dict], filter_family: str | None = None):
             print_table(w0_rows, ["w0", "n_runs", "min_loss", "mean_loss"],
                         "w0 Analysis: siren")
 
+    # ---- Weight decay analysis per family ----
+    wd_families = defaultdict(lambda: defaultdict(list))
+    for r in completed:
+        wd_families[r["family"]][r.get("weight_decay", 0.0)].append(r)
 
-def export_csv(runs: list[dict], path: str):
+    for fam in sorted(wd_families):
+        wd_groups = wd_families[fam]
+        if len(wd_groups) <= 1:
+            continue
+        wd_rows = []
+        for wd in sorted(wd_groups):
+            group = wd_groups[wd]
+            losses = [r["best_val_loss"] for r in group]
+            psnrs = [r["psnr_meas"] for r in group if r.get("psnr_meas") is not None]
+            best = min(group, key=lambda r: r["best_val_loss"])
+            row = {
+                "weight_decay": wd,
+                "n_runs": len(group),
+                "min_loss": min(losses),
+                "mean_loss": sum(losses) / len(losses),
+            }
+            if psnrs:
+                row["max_psnr"] = max(psnrs)
+                row["mean_psnr"] = sum(psnrs) / len(psnrs)
+            wd_rows.append(row)
+        wd_cols = ["weight_decay", "n_runs", "min_loss", "mean_loss"]
+        if any("max_psnr" in r for r in wd_rows):
+            wd_cols += ["max_psnr", "mean_psnr"]
+        print_table(wd_rows, wd_cols, f"Weight Decay Analysis: {fam}")
+
+
+def export_csv(runs: list, path: str):
     completed = [r for r in runs if not r["skipped"]]
     if not completed:
         print("No completed runs to export.")

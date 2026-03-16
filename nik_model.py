@@ -42,6 +42,91 @@ class SineLayer(nn.Module):
         return torch.sin(self.w0 * self.linear(x))
 
 
+class GaborLayer(nn.Module):
+    """Complex Gabor wavelet layer (WIRE activation).
+
+    ψ(x) = exp(-|s * (Wx+b)|² / 2) · exp(j · w0 · (Wx+b))
+
+    The real part of the output is used as activation (2× hidden features
+    from real and imaginary parts concatenated), keeping the network real-valued
+    while benefiting from the Gabor wavelet's localization.
+
+    Args:
+        in_features: input dimension
+        out_features: output dimension (actual output is 2×out_features)
+        w0: oscillation frequency
+        s0: envelope width (inverse scale — larger = narrower envelope)
+        is_first: if True, uses uniform init scaled by 1/in_features
+    """
+    def __init__(self, in_features, out_features, w0=20.0, s0=10.0, is_first=False):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.linear = nn.Linear(in_features, out_features)
+        self.w0 = w0
+        self.s0 = s0
+        self.is_first = is_first
+        self._init_weights()
+
+    def _init_weights(self):
+        with torch.no_grad():
+            if self.is_first:
+                self.linear.weight.uniform_(-1 / self.in_features, 1 / self.in_features)
+            else:
+                bound = math.sqrt(6 / self.in_features) / self.w0
+                self.linear.weight.uniform_(-bound, bound)
+            self.linear.bias.zero_()
+
+    def forward(self, x):
+        h = self.linear(x)
+        gauss = torch.exp(-0.5 * (self.s0 * h) ** 2)
+        # Real and imaginary parts of complex Gabor
+        real = gauss * torch.cos(self.w0 * h)
+        imag = gauss * torch.sin(self.w0 * h)
+        return torch.cat([real, imag], dim=-1)  # (B, 2*out_features)
+
+
+class WIRE_KXY_REIM(nn.Module):
+    """WIRE (Wavelet Implicit Representation) for k-space fitting.
+
+    Uses complex Gabor wavelet activations instead of SIREN's sin().
+    Each GaborLayer outputs 2×hidden (real+imag parts), so intermediate
+    layers take 2×hidden as input.
+
+    Input:  x (B,2) = [kx, ky]
+    Output: (B,2)   = [Re, Im]
+
+    Args:
+        in_dim: input dimension (default 2 for kx, ky)
+        hidden: hidden layer width (Gabor output is 2×hidden)
+        depth: number of layers (>= 2)
+        w0: oscillation frequency
+        s0: envelope width
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        hidden=64,
+        depth=8,
+        w0=20.0,
+        s0=10.0,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        layers = [GaborLayer(in_dim, hidden, w0=w0, s0=s0, is_first=True)]
+        for _ in range(depth - 2):
+            layers.append(GaborLayer(2 * hidden, hidden, w0=w0, s0=s0, is_first=False))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(2 * hidden, 2)  # (Re, Im)
+
+    def forward(self, x):
+        h = self.backbone(x)
+        return self.head(h)
+
+
 class NIK_SIREN(nn.Module):
     def __init__(self, n_coils, k_freq=96, t_freq=16, k_sigma=6.0, t_sigma=3.0,
                  coil_emb=16, hidden=256, depth=7, w0=30.0):
@@ -233,10 +318,7 @@ class NIK_SIREN_KXY_REIM(nn.Module):
             raise ValueError(f"depth must be >= 2, got {depth}")
         super().__init__()
 
-        # First layer uses 4*w0 to boost high-frequency sensitivity on raw (kx,ky) input.
-        # Note: _init_weights for is_first=True does NOT use w0, so only the forward
-        # activation is scaled; verify this is intentional if training is unstable.
-        layers = [SineLayer(in_dim, hidden, w0=4*w0, is_first=True)]
+        layers = [SineLayer(in_dim, hidden, w0=w0, is_first=True)]
         for _ in range(depth - 2):
             layers.append(SineLayer(hidden, hidden, w0=w0, is_first=False))
         self.backbone = nn.Sequential(*layers)
@@ -377,6 +459,58 @@ class FF_ReLU_MLP_KXY_REIM(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.kaiming_uniform_(m.weight, nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # x: (B,2) [kx, ky]
+        h = self.ff(x)
+        h = self.backbone(h)
+        return self.head(h)  # (B,2) [Re, Im]
+
+
+class FF_ELU_MLP_KXY_REIM(nn.Module):
+    """
+    Fourier Features + ELU MLP for 2D k-space fitting.
+
+    Combines the bandwidth control of Fourier feature encoding with ELU's
+    smooth, non-zero-gradient activation. Same interface as FF_ReLU variant.
+
+    Input:  x (B,2) [kx, ky]
+    Output: (B,2)   [Re, Im]
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        k_freq=64,
+        k_sigma=6.0,
+        hidden=256,
+        depth=7,
+        ff_seed=None,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        self.ff = FourierFeatures(in_dim, n_freq=k_freq, sigma=k_sigma, seed=ff_seed)
+
+        ff_out_dim = 2 * k_freq
+        layers = []
+        layers.append(nn.Linear(ff_out_dim, hidden))
+        layers.append(nn.ELU(inplace=True))
+        for _ in range(depth - 2):
+            layers.append(nn.Linear(hidden, hidden))
+            layers.append(nn.ELU(inplace=True))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(hidden, 2)  # (Re, Im)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.kaiming_uniform_(m.weight, nonlinearity="leaky_relu")
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
@@ -712,6 +846,182 @@ class GP_REIM(nn.Module):
             v = torch.linalg.solve_triangular(self._L, K_star.mT, upper=False)  # (N, chunk)
             var_chunks.append((k_diag - v.pow(2).sum(dim=0)).clamp_min(0.0))
         return torch.cat(var_chunks, dim=0).sqrt()        # (M,) posterior std
+
+
+# ---------------------------------------------------------------------------
+# 1D radial networks (for PolarKSpaceNet)
+# ---------------------------------------------------------------------------
+
+class SIREN_1D(nn.Module):
+    """1D SIREN: s (B,1) → (B, out_dim).
+
+    Intended as radial backbone in PolarKSpaceNet.
+    """
+    def __init__(self, out_dim=2, hidden=128, depth=4, w0=30.0):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+        layers = [SineLayer(1, hidden, w0=w0, is_first=True)]
+        for _ in range(depth - 2):
+            layers.append(SineLayer(hidden, hidden, w0=w0, is_first=False))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(hidden, out_dim)
+
+    def forward(self, x):
+        return self.head(self.backbone(x))
+
+
+class WIRE_1D(nn.Module):
+    """1D WIRE: s (B,1) → (B, out_dim).
+
+    Intended as radial backbone in PolarKSpaceNet.
+    """
+    def __init__(self, out_dim=2, hidden=64, depth=4, w0=20.0, s0=10.0):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+        layers = [GaborLayer(1, hidden, w0=w0, s0=s0, is_first=True)]
+        for _ in range(depth - 2):
+            layers.append(GaborLayer(2 * hidden, hidden, w0=w0, s0=s0, is_first=False))
+        self.backbone = nn.Sequential(*layers)
+        self.head = nn.Linear(2 * hidden, out_dim)
+
+    def forward(self, x):
+        return self.head(self.backbone(x))
+
+
+# ---------------------------------------------------------------------------
+# Polar angular-Fourier + radial coefficient network
+# ---------------------------------------------------------------------------
+
+class PolarKSpaceNet(nn.Module):
+    """Polar decomposition network for k-space fitting.
+
+    Separates k-space into radial and angular components:
+      1. Convert (kx, ky) → signed spoke coordinate s and angle theta
+      2. Radial network: backbone(s) → 2*(2N+1) coefficients
+         (Re and Im parts for angular modes n = -N..N)
+      3. Angular basis: fixed cos(n*theta), sin(n*theta) for n = 0..N
+      4. Output: sum over modes → (Re, Im)
+
+    The angular Fourier basis captures azimuthal structure while the
+    radial network learns the radial profile per mode.
+
+    Input:  k_coords (B, 2) = [kx, ky]
+    Output: (B, 2)          = [Re, Im]
+
+    Args:
+        n_angular_modes: number of angular Fourier modes N (total 2N+1 modes)
+        radial_depth: depth of the radial backbone
+        radial_width: hidden width of the radial backbone
+        radial_type: 'wire' or 'siren'
+        omega_0: frequency parameter for SIREN/WIRE
+        s_0: scale parameter for WIRE
+        s_max: normalization for signed spoke coordinate (set from data)
+    """
+    def __init__(
+        self,
+        n_angular_modes: int = 16,
+        radial_depth: int = 4,
+        radial_width: int = 128,
+        radial_type: str = "wire",
+        omega_0: float = 30.0,
+        s_0: float = 10.0,
+        s_max: float = 1.0,
+    ):
+        super().__init__()
+        self.N = n_angular_modes
+        self.s_max = s_max
+        n_modes = 2 * n_angular_modes + 1  # modes -N..N
+        # Radial network outputs Re and Im coefficients for each mode
+        out_dim = 2 * n_modes  # (Re_coeff, Im_coeff) per mode
+
+        if radial_type == "wire":
+            self.radial = WIRE_1D(
+                out_dim=out_dim, hidden=radial_width, depth=radial_depth,
+                w0=omega_0, s0=s_0,
+            )
+        elif radial_type == "siren":
+            self.radial = SIREN_1D(
+                out_dim=out_dim, hidden=radial_width, depth=radial_depth,
+                w0=omega_0,
+            )
+        else:
+            raise ValueError(f"radial_type must be 'wire' or 'siren', got {radial_type!r}")
+
+        # Pre-compute mode indices: n = -N, -(N-1), ..., -1, 0, 1, ..., N
+        self.register_buffer(
+            "mode_n", torch.arange(-n_angular_modes, n_angular_modes + 1, dtype=torch.float32)
+        )
+
+    def _to_polar(self, k_coords: torch.Tensor):
+        """Convert (kx, ky) → (s, theta).
+
+        s: signed spoke coordinate normalized by s_max
+        theta: full angle in (-pi, pi]
+        """
+        kx = k_coords[:, 0]
+        ky = k_coords[:, 1]
+        theta = torch.atan2(ky, kx)  # (-pi, pi]
+
+        # Signed spoke coordinate: projection onto spoke direction
+        # For radial trajectories, s = kr with sign
+        s = torch.sqrt(kx ** 2 + ky ** 2 + 1e-12)
+        # Give sign based on which half of the spoke we're on
+        # Use the convention: s > 0 for theta in (-pi/2, pi/2], s < 0 otherwise
+        # More robustly: s = signed distance = kx*cos(theta) + ky*sin(theta) = kr
+        # Since kr = sqrt(kx^2+ky^2) is always positive, we need the folded version
+        theta0 = torch.remainder(theta + 0.5 * np.pi, np.pi) - 0.5 * np.pi
+        c = torch.cos(theta0)
+        sin_t = torch.sin(theta0)
+        s = kx * c + ky * sin_t  # signed coordinate along folded spoke direction
+
+        s = s / max(self.s_max, 1e-12)
+        return s, theta
+
+    def forward(self, k_coords: torch.Tensor) -> torch.Tensor:
+        """
+        k_coords: (B, 2) [kx, ky]
+        returns:  (B, 2) [Re, Im]
+        """
+        s, theta = self._to_polar(k_coords)  # (B,), (B,)
+
+        # Radial coefficients: (B, 2*(2N+1))
+        coeffs = self.radial(s.unsqueeze(-1))  # input (B,1)
+
+        n_modes = 2 * self.N + 1
+        # Split into Re and Im coefficient sets: each (B, 2N+1)
+        c_re = coeffs[:, :n_modes]      # coefficients for output Re
+        c_im = coeffs[:, n_modes:]      # coefficients for output Im
+
+        # Angular basis: e^{in*theta} = cos(n*theta) + i*sin(n*theta)
+        n_theta = self.mode_n.unsqueeze(0) * theta.unsqueeze(1)  # (B, 2N+1)
+        cos_basis = torch.cos(n_theta)  # (B, 2N+1)
+        sin_basis = torch.sin(n_theta)  # (B, 2N+1)
+
+        # Radial coefficients R_n(s) = c_re_n + i*c_im_n, combined with angular basis:
+        #   Output_Re = sum_n Re(R_n(s) * e^{in*theta})
+        #             = sum_n (c_re_n * cos(n*theta) - c_im_n * sin(n*theta))
+        #   Output_Im = sum_n Im(R_n(s) * e^{in*theta})
+        #             = sum_n (c_re_n * sin(n*theta) + c_im_n * cos(n*theta))
+        out_re = (c_re * cos_basis - c_im * sin_basis).sum(dim=1)
+        out_im = (c_re * sin_basis + c_im * cos_basis).sum(dim=1)
+
+        return torch.stack([out_re, out_im], dim=1)  # (B, 2)
+
+    def dc_predictions(self, n_theta: int = 64) -> torch.Tensor:
+        """Predict k-space values at s=0 for uniformly spaced angles.
+
+        Used for DC consistency loss: all angles should give the same value at DC.
+
+        Returns: (n_theta, 2) [Re, Im] predictions at k=0 from different angles.
+        """
+        device = self.mode_n.device
+        thetas = torch.linspace(-np.pi, np.pi, n_theta + 1, device=device)[:-1]
+        # At s=0, build k_coords on the unit circle scaled to ~0
+        eps = 1e-8
+        k_coords = torch.stack([eps * torch.cos(thetas), eps * torch.sin(thetas)], dim=1)
+        return self.forward(k_coords)
 
 
 def loss_function(y_pred, y, mag_eps: float = 1e-12, mag_reg: float = 0.1):

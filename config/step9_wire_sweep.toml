@@ -1,0 +1,92 @@
+# Step 9: WIRE model sweep
+#
+# Goal: Find best WIRE (Gabor wavelet) config, compare against SIREN baseline.
+# SIREN baseline: h=64, d=8, w0=60 → 27.30 dB PSNR, 25k params.
+#
+# WIRE has 2× hidden output per layer (real+imag), so effective width is
+# larger than SIREN at same hidden value. Keep hidden small.
+#
+# Sweep: w0, s0, hidden, depth, weight_decay (Bayesian, 50 runs, 20k steps)
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step9_wire_sweep.toml
+
+[experiment]
+name = "Step 9: WIRE Gabor wavelet sweep"
+description = "Bayesian sweep over WIRE model hyperparams vs SIREN baseline"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "wire"
+hidden = 64
+depth = 8
+w0 = 20.0
+s0 = 10.0
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.009
+loss_type = "mse"
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 9: WIRE sweep (Bayesian, 20k steps)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "bayes"
+run_cap = 50
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["wire"]
+
+[sweep.parameters.hidden]
+values = [32, 48, 64, 96]
+
+[sweep.parameters.depth]
+values = [4, 6, 8, 10]
+
+[sweep.parameters.w0]
+min = 10.0
+max = 100.0
+
+[sweep.parameters.s0]
+min = 1.0
+max = 30.0
+
+[sweep.parameters.lr]
+min = 0.00005
+max = 0.002
+distribution = "log_uniform_values"
+
+[sweep.parameters.weight_decay]
+min = 0.001
+max = 0.01

@@ -1,0 +1,70 @@
+# Step 8: Loss function comparison on baseline model
+#
+# Goal: Compare loss weightings to reduce k-space center dominance.
+# All runs use the locked baseline: h=64, d=8, w0=60, wd=0.009.
+# 20k steps for full convergence.
+#
+# Loss types:
+#   mse          — plain MSE (current baseline)
+#   wmse_sqrt    — w = 1/sqrt(|y|), soft down-weighting of center
+#   wmse_inv     — w = 1/|y|, stronger down-weighting
+#   relative_mse — |err|^2/|y|^2, fully relative
+#   log_mse      — MSE in log-magnitude + wrap-aware phase
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step8_wmse_baseline.toml
+
+[experiment]
+name = "Step 8: loss function comparison"
+description = "Compare 5 loss weightings on compact SIREN baseline (20k steps)"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 64
+depth = 8
+w0 = 60
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.009
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 8: loss function comparison (compact SIREN, 20k)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+run_cap = 5
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.loss_type]
+values = ["mse", "wmse_sqrt", "wmse_inv", "relative_mse", "log_mse"]

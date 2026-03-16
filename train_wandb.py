@@ -32,6 +32,15 @@ from nik_model import (
     ReLU_MLP_KXY_REIM,
     ELU_MLP_KXY_REIM,
     FF_ReLU_MLP_KXY_REIM,
+    FF_ELU_MLP_KXY_REIM,
+    WIRE_KXY_REIM,
+    PolarKSpaceNet,
+)
+from nik_loss import (
+    get_loss_fn,
+    density_weighted_mse_loss,
+    dc_consistency_loss,
+    conjugate_symmetry_loss_from_model,
 )
 from nik_train import prepare_tensors
 from nik_recon import (
@@ -137,6 +146,15 @@ def main(config_path, data):
         "w0": config['model'].get('w0', 15),
         "k_freq": config['model'].get('k_freq', 64),
         "k_sigma": config['model'].get('k_sigma', 6.0),
+        "s0": config['model'].get('s0', 10.0),
+        # Polar-specific
+        "n_angular_modes": config['model'].get('n_angular_modes', 16),
+        "radial_type": config['model'].get('radial_type', 'wire'),
+        # Polar loss weights
+        "dc_weight": config['training'].get('dc_weight', 0.0),
+        "density_weight": config['training'].get('density_weight', 0.0),
+        "conj_weight": config['training'].get('conj_weight', 0.0),
+        # Standard
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
@@ -144,6 +162,7 @@ def main(config_path, data):
         "eval_every": config['training']['eval_every'],
         "grad_clip": config['training']['grad_clip'],
         "weight_decay": config['training'].get('weight_decay', 0.0),
+        "loss_type": config['training'].get('loss_type', "mse"),
         "seed": config['training']['seed'],
     }
 
@@ -164,6 +183,12 @@ def main(config_path, data):
     w0 = float(getattr(wc, "w0", 15))        # siren / ff_siren
     k_freq = int(getattr(wc, "k_freq", 64))  # ff_relu / ff_siren
     k_sigma = float(getattr(wc, "k_sigma", 6.0))  # ff_relu / ff_siren
+    s0 = float(getattr(wc, "s0", 10.0))           # wire
+    n_angular_modes = int(getattr(wc, "n_angular_modes", 16))  # polar
+    radial_type = str(getattr(wc, "radial_type", "wire"))      # polar
+    dc_weight = float(getattr(wc, "dc_weight", 0.0))           # polar loss
+    density_weight = float(getattr(wc, "density_weight", 0.0)) # polar loss
+    conj_weight = float(getattr(wc, "conj_weight", 0.0))       # polar loss
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
@@ -171,6 +196,8 @@ def main(config_path, data):
     eval_every = int(wc.eval_every)
     grad_clip = float(wc.grad_clip)
     weight_decay = float(getattr(wc, "weight_decay", 0.0))
+    loss_type = str(getattr(wc, "loss_type", "mse"))
+    loss_fn = get_loss_fn(loss_type)
     seed = int(wc.seed)
 
     # Skip redundant sweep combos to avoid wasting compute.
@@ -187,8 +214,11 @@ def main(config_path, data):
     if model_family in ("relu", "elu", "siren") and (k_sigma != 6.0 or k_freq != 64):
         _skip(f"k_sigma={k_sigma}/k_freq={k_freq} irrelevant for model_family={model_family}")
         return
-    if model_family == "ff_relu" and w0 != 15:
-        _skip(f"w0={w0} is irrelevant for model_family=ff_relu")
+    if model_family in ("ff_relu", "ff_elu") and w0 != 15:
+        _skip(f"w0={w0} is irrelevant for model_family={model_family}")
+        return
+    if model_family == "polar" and (k_sigma != 6.0 or k_freq != 64):
+        _skip(f"k_sigma/k_freq irrelevant for model_family=polar")
         return
 
     # Per-family valid architecture ranges (from [family_params] in config).
@@ -244,6 +274,15 @@ def main(config_path, data):
     x_val = x_all[val_idx][:, :2].to(device)
     y_val = y_all[val_idx].to(device)
 
+    # ---- Compute s_max for polar models ----
+    _x_tmp = x_all[:, :2].to(device)
+    _kx, _ky = _x_tmp[:, 0], _x_tmp[:, 1]
+    _theta = torch.atan2(_ky, _kx)
+    _theta0 = torch.remainder(_theta + 0.5 * np.pi, np.pi) - 0.5 * np.pi
+    _s_coord = _kx * torch.cos(_theta0) + _ky * torch.sin(_theta0)
+    s_max = float(_s_coord.abs().max().item())
+    del _x_tmp, _kx, _ky, _theta, _theta0, _s_coord
+
     # ---- Build model ----
     if model_family == "relu":
         model = ReLU_MLP_KXY_REIM(
@@ -258,10 +297,29 @@ def main(config_path, data):
             in_dim=2, k_freq=k_freq, k_sigma=k_sigma,
             hidden=hidden, depth=depth,
         ).to(device)
+    elif model_family == "ff_elu":
+        model = FF_ELU_MLP_KXY_REIM(
+            in_dim=2, k_freq=k_freq, k_sigma=k_sigma,
+            hidden=hidden, depth=depth,
+        ).to(device)
     elif model_family == "ff_siren":
         model = NIK_SIREN_KXY_FF_REIM(
             x_dim=2, k_freq=k_freq, k_sigma=k_sigma,
             hidden=hidden, depth=depth, w0=w0,
+        ).to(device)
+    elif model_family == "polar":
+        model = PolarKSpaceNet(
+            n_angular_modes=n_angular_modes,
+            radial_depth=depth,
+            radial_width=hidden,
+            radial_type=radial_type,
+            omega_0=w0,
+            s_0=s0,
+            s_max=s_max,
+        ).to(device)
+    elif model_family == "wire":
+        model = WIRE_KXY_REIM(
+            in_dim=2, hidden=hidden, depth=depth, w0=w0, s0=s0,
         ).to(device)
     else:  # default: siren
         model = NIK_SIREN_KXY_REIM(
@@ -269,14 +327,29 @@ def main(config_path, data):
         ).to(device)
 
     n_params = sum(p.numel() for p in model.parameters())
-    wandb.config.update({
+    wandb_extra = {
         "model_family": model_family, "n_params": n_params,
         "k_freq": k_freq, "k_sigma": k_sigma,
-    }, allow_val_change=True)
+    }
+    if model_family == "polar":
+        wandb_extra.update({
+            "n_angular_modes": n_angular_modes, "radial_type": radial_type,
+            "s_max": s_max,
+            "dc_weight": dc_weight, "density_weight": density_weight,
+            "conj_weight": conj_weight,
+        })
+    wandb.config.update(wandb_extra, allow_val_change=True)
     logging.info(
         f"Model: family={model_family}, hidden={hidden}, depth={depth}, "
-        f"w0={w0}, k_freq={k_freq}, k_sigma={k_sigma}, wd={weight_decay}, params={n_params}"
+        f"w0={w0}, s0={s0 if model_family in ('wire', 'polar') else 'n/a'}, "
+        f"k_freq={k_freq}, k_sigma={k_sigma}, wd={weight_decay}, loss={loss_type}, params={n_params}"
     )
+    if model_family == "polar":
+        logging.info(
+            f"  Polar: radial_type={radial_type}, n_angular_modes={n_angular_modes}, "
+            f"s_max={s_max:.4f}, dc_weight={dc_weight}, density_weight={density_weight}, "
+            f"conj_weight={conj_weight}"
+        )
 
     # ---- Watch model gradients ----
     watch_interval = config['wandb'].get('watch_interval', 0)
@@ -329,7 +402,15 @@ def main(config_path, data):
 
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
-        loss = F.mse_loss(y_pred, y)
+        loss = loss_fn(y_pred, y)
+        # Polar constraint losses (only when weights > 0)
+        if model_family == "polar":
+            if dc_weight > 0:
+                loss = loss + dc_weight * dc_consistency_loss(model)
+            if density_weight > 0:
+                loss = loss + density_weight * density_weighted_mse_loss(y_pred, y, x)
+            if conj_weight > 0:
+                loss = loss + conj_weight * conjugate_symmetry_loss_from_model(model, x)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
@@ -341,7 +422,7 @@ def main(config_path, data):
             model.eval()
             with torch.no_grad():
                 val_pred = model(x_val)
-                last_val_loss = float(F.mse_loss(val_pred, y_val).item())
+                last_val_loss = float(loss_fn(val_pred, y_val).item())
             model.train()
 
             if last_val_loss < best_val_loss:

@@ -1,0 +1,100 @@
+# Step 11: Polar angular-Fourier + radial network sweep
+#
+# Goal: Optimize PolarKSpaceNet architecture. Ablation showed:
+#   - WIRE radial > SIREN radial (+2.1 dB)
+#   - Full constraints (DC + density + conj) = best (26.85 dB)
+#   - Polar models beat Cartesian SIREN at fewer params
+#
+# Fix: radial_type=wire, all three constraint losses enabled.
+# Sweep: n_angular_modes, depth, hidden, w0, s0, lr
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step11_polar_sweep.toml
+
+[experiment]
+name = "Step 11: Polar WIRE sweep"
+description = "Bayesian sweep over Polar + WIRE radial architecture"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "polar"
+hidden = 128
+depth = 4
+w0 = 30.0
+s0 = 10.0
+n_angular_modes = 16
+radial_type = "wire"
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.0
+loss_type = "mse"
+eval_every = 50
+seed = 0
+# Polar constraint loss weights
+dc_weight = 0.01
+density_weight = 1.0
+conj_weight = 0.01
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 11: Polar WIRE sweep (Bayesian, 20k steps)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "bayes"
+run_cap = 50
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["polar"]
+
+[sweep.parameters.radial_type]
+values = ["wire"]
+
+[sweep.parameters.n_angular_modes]
+values = [8, 16, 24, 32]
+
+[sweep.parameters.hidden]
+values = [64, 96, 128, 192]
+
+[sweep.parameters.depth]
+values = [3, 4, 5, 6]
+
+[sweep.parameters.w0]
+min = 10.0
+max = 80.0
+
+[sweep.parameters.s0]
+min = 1.0
+max = 20.0
+
+[sweep.parameters.lr]
+min = 0.00005
+max = 0.002
+distribution = "log_uniform_values"

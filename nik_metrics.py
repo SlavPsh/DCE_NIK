@@ -5,8 +5,11 @@ Image-space quality metrics for NIK SIREN baseline.
 Provides PSNR, SSIM, and NRMSE between reconstructed and reference images.
 All functions accept 2-D numpy arrays (single-image) or batches via the
 convenience wrapper ``compute_image_metrics``.
+
+Also provides k-space validation metrics broken down by spoke and frame.
 """
 import numpy as np
+import torch
 from scipy.ndimage import uniform_filter
 
 
@@ -189,4 +192,195 @@ def compute_image_metrics(
         "psnr_db": psnr(img_pred, img_ref, data_range=data_range),
         "ssim": ssim(img_pred, img_ref, data_range=data_range, win_size=ssim_win_size),
         "nrmse": nrmse(img_pred, img_ref, normalization=nrmse_norm),
+    }
+
+
+# ---------------------------------------------------------------------------
+# K-space validation metrics broken down by spoke / frame
+# ---------------------------------------------------------------------------
+
+@torch.no_grad()
+def per_spoke_mse(
+    model,
+    x_all: torch.Tensor,
+    y_all: torch.Tensor,
+    spoke_id_all: torch.Tensor,
+    idx: torch.Tensor = None,
+) -> dict:
+    """Compute MSE broken down by spoke index.
+
+    Args:
+        model: network with forward(x) → (N, 2)
+        x_all:        (N, D) coordinates (first 2 cols used as kx, ky)
+        y_all:        (N, 2) target [Re, Im]
+        spoke_id_all: (N,) spoke index per point
+        idx:          optional subset indices (e.g., val_idx)
+
+    Returns:
+        dict with:
+            "per_spoke": {spoke_id: mse_float, ...}
+            "mean":      mean over all spokes
+            "std":       std over all spokes
+            "worst_spoke": spoke_id with highest MSE
+            "best_spoke":  spoke_id with lowest MSE
+    """
+    if idx is not None:
+        x = x_all[idx][:, :2]
+        y = y_all[idx]
+        spokes = spoke_id_all[idx]
+    else:
+        x = x_all[:, :2]
+        y = y_all
+        spokes = spoke_id_all
+
+    device = next(model.parameters()).device
+    x = x.to(device)
+    y = y.to(device)
+    spokes = spokes.to(device)
+
+    y_pred = model(x)
+    err_sq = (y_pred - y).pow(2).sum(dim=1)  # (N,)
+
+    unique_spokes = torch.unique(spokes)
+    per_spoke = {}
+    for sp in unique_spokes:
+        mask = spokes == sp
+        per_spoke[int(sp.item())] = float(err_sq[mask].mean().item())
+
+    mse_values = list(per_spoke.values())
+    mse_arr = np.array(mse_values)
+
+    return {
+        "per_spoke": per_spoke,
+        "mean": float(mse_arr.mean()),
+        "std": float(mse_arr.std()),
+        "worst_spoke": max(per_spoke, key=per_spoke.get),
+        "best_spoke": min(per_spoke, key=per_spoke.get),
+    }
+
+
+@torch.no_grad()
+def per_frame_mse(
+    model,
+    x_all: torch.Tensor,
+    y_all: torch.Tensor,
+    frame_id_all: torch.Tensor,
+    idx: torch.Tensor = None,
+) -> dict:
+    """Compute MSE broken down by time frame.
+
+    Args:
+        model: network with forward(x) → (N, 2)
+        x_all:         (N, D) coordinates (first 2 cols used as kx, ky)
+        y_all:         (N, 2) target [Re, Im]
+        frame_id_all:  (N,) frame index per point
+        idx:           optional subset indices (e.g., val_idx)
+
+    Returns:
+        dict with:
+            "per_frame": {frame_id: mse_float, ...}
+            "mean":      mean over all frames
+            "std":       std over all frames
+            "worst_frame": frame_id with highest MSE
+            "best_frame":  frame_id with lowest MSE
+    """
+    if idx is not None:
+        x = x_all[idx][:, :2]
+        y = y_all[idx]
+        frames = frame_id_all[idx]
+    else:
+        x = x_all[:, :2]
+        y = y_all
+        frames = frame_id_all
+
+    device = next(model.parameters()).device
+    x = x.to(device)
+    y = y.to(device)
+    frames = frames.to(device)
+
+    y_pred = model(x)
+    err_sq = (y_pred - y).pow(2).sum(dim=1)  # (N,)
+
+    unique_frames = torch.unique(frames)
+    per_frame = {}
+    for fr in unique_frames:
+        mask = frames == fr
+        per_frame[int(fr.item())] = float(err_sq[mask].mean().item())
+
+    mse_values = list(per_frame.values())
+    mse_arr = np.array(mse_values)
+
+    return {
+        "per_frame": per_frame,
+        "mean": float(mse_arr.mean()),
+        "std": float(mse_arr.std()),
+        "worst_frame": max(per_frame, key=per_frame.get),
+        "best_frame": min(per_frame, key=per_frame.get),
+    }
+
+
+@torch.no_grad()
+def spoke_angle_error_distribution(
+    model,
+    x_all: torch.Tensor,
+    y_all: torch.Tensor,
+    spoke_id_all: torch.Tensor,
+    idx: torch.Tensor = None,
+    n_angle_bins: int = 36,
+) -> dict:
+    """Compute error distribution as a function of spoke angle.
+
+    Bins spokes by their angle theta and reports MSE per bin.
+    Useful for diagnosing angular bias in the model.
+
+    Args:
+        model: network with forward(x) → (N, 2)
+        x_all:        (N, D) coordinates (first 2 cols = kx, ky)
+        y_all:        (N, 2) target [Re, Im]
+        spoke_id_all: (N,) spoke index per point
+        idx:          optional subset indices
+        n_angle_bins: number of angular bins over (-pi, pi]
+
+    Returns:
+        dict with:
+            "bin_edges":  (n_bins+1,) bin edges in radians
+            "bin_mse":    (n_bins,) mean MSE per angular bin
+            "bin_counts": (n_bins,) number of points per bin
+    """
+    if idx is not None:
+        x = x_all[idx][:, :2]
+        y = y_all[idx]
+    else:
+        x = x_all[:, :2]
+        y = y_all
+
+    device = next(model.parameters()).device
+    x = x.to(device)
+    y = y.to(device)
+
+    y_pred = model(x)
+    err_sq = (y_pred - y).pow(2).sum(dim=1).cpu().numpy()  # (N,)
+
+    # Compute angle for each point
+    kx = x[:, 0].cpu().numpy()
+    ky = x[:, 1].cpu().numpy()
+    theta = np.arctan2(ky, kx)  # (-pi, pi]
+
+    bin_edges = np.linspace(-np.pi, np.pi, n_angle_bins + 1)
+    bin_mse = np.zeros(n_angle_bins)
+    bin_counts = np.zeros(n_angle_bins, dtype=int)
+
+    bin_idx = np.digitize(theta, bin_edges) - 1
+    bin_idx = np.clip(bin_idx, 0, n_angle_bins - 1)
+
+    for b in range(n_angle_bins):
+        mask = bin_idx == b
+        bin_counts[b] = int(mask.sum())
+        if bin_counts[b] > 0:
+            bin_mse[b] = float(err_sq[mask].mean())
+
+    return {
+        "bin_edges": bin_edges,
+        "bin_mse": bin_mse,
+        "bin_counts": bin_counts,
     }

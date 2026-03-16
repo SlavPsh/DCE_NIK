@@ -1,0 +1,84 @@
+# Step 7: SIREN ultra-compact sweep
+#
+# Step 6 found h=64, d=8, w0~65 as best (27.18 dB PSNR, ~33k params).
+# Now push further: smaller hidden, deeper networks, higher w0.
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step7_siren_ultracompact.toml
+
+[experiment]
+name = "Step 7: SIREN ultra-compact"
+description = "Push smaller hidden (16-64), deeper (8-14), higher w0 (40-120)"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 48
+depth = 10
+w0 = 80
+
+[training]
+steps = 3000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.005
+eval_every = 50
+seed = 0
+
+[training.plot]
+plot_every = 1000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 7: SIREN ultra-compact (h16-64, d8-14, w0 40-120)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "bayes"
+run_cap = 100
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+[sweep.parameters.model_family]
+values = ["siren"]
+
+[sweep.parameters.hidden]
+values = [16, 24, 32, 48, 64]
+
+[sweep.parameters.depth]
+values = [8, 10, 12, 14]
+
+[sweep.parameters.w0]
+min = 40.0
+max = 120.0
+
+[sweep.parameters.lr]
+min = 0.0001
+max = 0.002
+distribution = "log_uniform_values"
+
+[sweep.parameters.batch_size]
+values = [2048, 4096, 8192]
+
+[sweep.parameters.weight_decay]
+min = 0.001
+max = 0.01
