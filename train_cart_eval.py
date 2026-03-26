@@ -522,6 +522,8 @@ def main(config_path, data):
 
         if gt_img_slice is not None:
             gt_slice = np.asarray(gt_img_slice, dtype=np.float64)
+            if gt_slice.shape != img_pred.shape and gt_slice.shape == img_pred.shape[::-1]:
+                gt_slice = gt_slice.T
             if img_pred.shape != gt_slice.shape:
                 from scipy.ndimage import zoom
                 zf = (gt_slice.shape[0] / img_pred.shape[0], gt_slice.shape[1] / img_pred.shape[1])

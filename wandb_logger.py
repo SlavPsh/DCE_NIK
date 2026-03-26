@@ -384,6 +384,9 @@ def make_cartesian_image_comparison(
 
     if gt_img_slice is not None:
         gt = np.asarray(gt_img_slice)
+        # GT may have transposed axes compared to k-space IFFT output
+        if gt.shape != img_pred.shape and gt.shape == img_pred.shape[::-1]:
+            gt = gt.T
         axes[0, 2].imshow(gt, cmap="gray")
         axes[0, 2].set_title(f"{title_prefix} Ground Truth")
 

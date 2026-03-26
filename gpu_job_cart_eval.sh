@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=nik-carteval
-#SBATCH --gres=gpu:2g.20gb:1
+#SBATCH --gres=gpu:1g.10gb:1
 #SBATCH --partition=luna-gpu-short
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=1
