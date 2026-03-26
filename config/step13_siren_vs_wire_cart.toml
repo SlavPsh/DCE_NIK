@@ -1,0 +1,104 @@
+# Step 13: Clean SIREN vs WIRE Cartesian comparison
+#
+# Goal: Head-to-head comparison of plain SIREN (no Fourier features)
+#        versus WIRE on Cartesian 2D k-space fitting.
+#
+# Both families sweep the same hidden / depth / w0 / lr / weight_decay
+# ranges, centred around the best configs from steps 6 & 9.
+#
+# NEW: Conjugate-symmetry loss (conj_weight) is included as a sweep
+#      parameter. density_weight is also swept.
+#      These require changes to train_wandb.py (applied in this step).
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step13_siren_vs_wire_cart.toml
+
+[experiment]
+name = "Step 13: SIREN vs WIRE Cartesian (no FF, +conj/density)"
+description = "Clean head-to-head: plain SIREN vs WIRE, same param grid, with optional conjugate-symmetry & density losses"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "siren"
+hidden = 64
+depth = 8
+w0 = 60.0
+s0 = 10.0
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 2e-4
+grad_clip = 1.0
+weight_decay = 0.005
+loss_type = "mse"
+eval_every = 50
+seed = 0
+# Constraint loss weights (new for Cartesian)
+conj_weight = 0.0
+density_weight = 0.0
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 13: SIREN vs WIRE Cartesian (Bayesian, 20k steps)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "bayes"
+run_cap = 80
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+# ---- Sweep parameters ----
+[sweep.parameters.model_family]
+values = ["siren", "wire"]
+
+[sweep.parameters.hidden]
+values = [32, 48, 64]
+
+[sweep.parameters.depth]
+values = [6, 8, 10]
+
+[sweep.parameters.w0]
+min = 30.0
+max = 80.0
+
+[sweep.parameters.s0]
+min = 3.0
+max = 20.0
+
+[sweep.parameters.lr]
+min = 5e-5
+max = 2e-3
+distribution = "log_uniform_values"
+
+[sweep.parameters.weight_decay]
+min = 0.0
+max = 0.01
+
+[sweep.parameters.conj_weight]
+values = [0.0, 0.001, 0.01]
+
+[sweep.parameters.density_weight]
+values = [0.0, 0.1, 0.5]

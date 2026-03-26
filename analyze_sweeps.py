@@ -31,6 +31,8 @@ _SKIP_RE = re.compile(r"Skipping: (.+)")
 # Extract model_family from config line (old sweeps that had no family= in Model line)
 _FAMILY_RE = re.compile(r"'model_family':\s*'(\w+)'")
 # Image-space metrics
+_CONJ_RE = re.compile(r"Constraints:.*conj_weight=([\d.eE+-]+)")
+_DENSITY_RE = re.compile(r"Constraints:.*density_weight=([\d.eE+-]+)")
 _PSNR_MEAS_RE = re.compile(r"Metrics vs measured:.*PSNR=([\d.eE+-]+) dB")
 _SSIM_MEAS_RE = re.compile(r"Metrics vs measured:.*SSIM=([\d.eE+-]+)")
 _NRMSE_MEAS_RE = re.compile(r"Metrics vs measured:.*NRMSE=([\d.eE+-]+)")
@@ -74,6 +76,12 @@ def parse_run(run_dir: Path):
 
     img_metrics = _parse_image_metrics(text)
 
+    # Parse constraint weights (new step 13+ logs)
+    m_conj = _CONJ_RE.search(text)
+    m_dens = _DENSITY_RE.search(text)
+    conj_weight = float(m_conj.group(1)) if m_conj else 0.0
+    density_weight = float(m_dens.group(1)) if m_dens else 0.0
+
     # Try new format first
     m_model = _MODEL_NEW_RE.search(text)
     if m_model:
@@ -88,6 +96,8 @@ def parse_run(run_dir: Path):
             "k_freq": int(m_model.group(5)) if m_model.group(5) else None,
             "k_sigma": float(m_model.group(6)) if m_model.group(6) else None,
             "weight_decay": float(m_model.group(7)) if m_model.group(7) else 0.0,
+            "conj_weight": conj_weight,
+            "density_weight": density_weight,
             "best_val_loss": float(m_best.group(1)),
             **img_metrics,
         }

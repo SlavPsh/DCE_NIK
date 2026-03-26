@@ -1024,6 +1024,252 @@ class PolarKSpaceNet(nn.Module):
         return self.forward(k_coords)
 
 
+# ---------------------------------------------------------------------------
+# Multi-coil models
+# ---------------------------------------------------------------------------
+
+class CoilFiLMModulation(nn.Module):
+    """Feature-wise Linear Modulation conditioned on coil identity.
+
+    For each hidden layer, produces scale (gamma) and shift (beta)
+    from the coil embedding.  Initialized so that gamma ≈ 1, beta ≈ 0,
+    meaning all coils produce identical output at init.
+
+    Args:
+        n_coils: number of receive coils
+        coil_embed_dim: dimension of the learnable coil embedding
+        hidden_dim: width of the feature vector to modulate
+    """
+    def __init__(self, n_coils: int, coil_embed_dim: int, hidden_dim: int):
+        super().__init__()
+        self.coil_embed = nn.Embedding(n_coils, coil_embed_dim)
+        self.gamma_layer = nn.Linear(coil_embed_dim, hidden_dim)
+        self.beta_layer = nn.Linear(coil_embed_dim, hidden_dim)
+
+        # Init: gamma → 1 (identity scale), beta → 0 (no shift)
+        nn.init.zeros_(self.gamma_layer.weight)
+        nn.init.zeros_(self.gamma_layer.bias)
+        nn.init.zeros_(self.beta_layer.weight)
+        nn.init.zeros_(self.beta_layer.bias)
+
+    def forward(self, coil_idx: torch.Tensor):
+        """
+        coil_idx: (B,) long tensor
+        returns: gamma (B, hidden_dim), beta (B, hidden_dim)
+        """
+        c = self.coil_embed(coil_idx)
+        gamma = self.gamma_layer(c) + 1.0  # centered at 1
+        beta = self.beta_layer(c)           # centered at 0
+        return gamma, beta
+
+
+class MultiCoilWIRE(nn.Module):
+    """Multi-coil WIRE with FiLM conditioning.
+
+    Shared Gabor-wavelet backbone with per-coil FiLM modulation
+    applied after each hidden layer's linear transform, BEFORE the
+    Gabor activation.
+
+    Architecture per layer:
+        h = linear(h)                   # shared spatial weights
+        gamma, beta = film(coil_idx)    # coil-specific modulation
+        h = gamma * h + beta            # FiLM: scale and shift
+        h = gabor_activation(h)         # Gabor wavelet
+
+    Args:
+        in_dim: input dimension (2 for kx, ky)
+        hidden: hidden layer width (Gabor output is 2×hidden)
+        depth: number of layers (>= 2)
+        w0: oscillation frequency
+        s0: envelope width
+        n_coils: number of receive coils
+        coil_embed_dim: dimension of coil embedding
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        hidden=64,
+        depth=8,
+        w0=20.0,
+        s0=10.0,
+        n_coils=8,
+        coil_embed_dim=32,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        self.n_coils = n_coils
+        self.hidden = hidden
+        self.depth = depth
+
+        # First layer: (in_dim) → GaborLayer → (2*hidden)
+        self.first_layer = GaborLayer(in_dim, hidden, w0=w0, s0=s0, is_first=True)
+        self.first_film = CoilFiLMModulation(n_coils, coil_embed_dim, hidden)
+
+        # Hidden layers: (2*hidden) → GaborLayer → (2*hidden)
+        self.hidden_linears = nn.ModuleList()
+        self.hidden_films = nn.ModuleList()
+        for _ in range(depth - 2):
+            self.hidden_linears.append(nn.Linear(2 * hidden, hidden))
+            self.hidden_films.append(CoilFiLMModulation(n_coils, coil_embed_dim, hidden))
+
+        # WIRE init for hidden linears
+        for lin in self.hidden_linears:
+            bound = math.sqrt(6 / lin.in_features) / w0
+            nn.init.uniform_(lin.weight, -bound, bound)
+            nn.init.zeros_(lin.bias)
+
+        self.w0 = w0
+        self.s0 = s0
+
+        # Output head
+        self.head = nn.Linear(2 * hidden, 2)  # (Re, Im)
+
+    def forward(self, coords: torch.Tensor, coil_idx: torch.Tensor) -> torch.Tensor:
+        """
+        coords: (B, 2) — kx, ky
+        coil_idx: (B,) — integer coil index 0..n_coils-1
+        returns: (B, 2) — Re, Im
+        """
+        # First layer: apply FiLM BEFORE Gabor activation
+        # GaborLayer does: h = linear(x); gabor(h)
+        # We decompose: linear → FiLM → gabor activation
+        h = self.first_layer.linear(coords)          # (B, hidden)
+        gamma, beta = self.first_film(coil_idx)       # (B, hidden) each
+        h = gamma * h + beta
+        # Gabor activation
+        gauss = torch.exp(-0.5 * (self.s0 * h) ** 2)
+        real = gauss * torch.cos(self.w0 * h)
+        imag = gauss * torch.sin(self.w0 * h)
+        h = torch.cat([real, imag], dim=-1)            # (B, 2*hidden)
+
+        # Hidden layers
+        for lin, film in zip(self.hidden_linears, self.hidden_films):
+            h = lin(h)                                  # (B, hidden)
+            gamma, beta = film(coil_idx)
+            h = gamma * h + beta
+            gauss = torch.exp(-0.5 * (self.s0 * h) ** 2)
+            real = gauss * torch.cos(self.w0 * h)
+            imag = gauss * torch.sin(self.w0 * h)
+            h = torch.cat([real, imag], dim=-1)         # (B, 2*hidden)
+
+        return self.head(h)
+
+
+class MultiCoilSIREN(nn.Module):
+    """Multi-coil SIREN with FiLM conditioning.
+
+    Same idea as MultiCoilWIRE but with sine activations.
+
+    Architecture per layer:
+        h = linear(h)
+        gamma, beta = film(coil_idx)
+        h = gamma * h + beta
+        h = sin(w0 * h)    ← note: w0 is applied AFTER FiLM
+
+    Actually, for SIREN the standard formulation is sin(w0 * linear(x)).
+    We modify this to: sin(w0 * (gamma * linear(x) + beta))
+    so that FiLM can modulate the phase/amplitude before the sine.
+    """
+    def __init__(
+        self,
+        *,
+        in_dim=2,
+        hidden=64,
+        depth=8,
+        w0=15.0,
+        n_coils=8,
+        coil_embed_dim=32,
+    ):
+        if depth < 2:
+            raise ValueError(f"depth must be >= 2, got {depth}")
+        super().__init__()
+
+        self.n_coils = n_coils
+        self.hidden = hidden
+        self.w0 = w0
+
+        # First layer
+        self.first_linear = nn.Linear(in_dim, hidden)
+        self.first_film = CoilFiLMModulation(n_coils, coil_embed_dim, hidden)
+        # SIREN first-layer init
+        nn.init.uniform_(self.first_linear.weight, -1 / in_dim, 1 / in_dim)
+        nn.init.zeros_(self.first_linear.bias)
+
+        # Hidden layers
+        self.hidden_linears = nn.ModuleList()
+        self.hidden_films = nn.ModuleList()
+        for _ in range(depth - 2):
+            lin = nn.Linear(hidden, hidden)
+            bound = math.sqrt(6 / hidden) / w0
+            nn.init.uniform_(lin.weight, -bound, bound)
+            nn.init.zeros_(lin.bias)
+            self.hidden_linears.append(lin)
+            self.hidden_films.append(CoilFiLMModulation(n_coils, coil_embed_dim, hidden))
+
+        self.head = nn.Linear(hidden, 2)
+
+    def forward(self, coords: torch.Tensor, coil_idx: torch.Tensor) -> torch.Tensor:
+        h = self.first_linear(coords)
+        gamma, beta = self.first_film(coil_idx)
+        h = torch.sin(self.w0 * (gamma * h + beta))
+
+        for lin, film in zip(self.hidden_linears, self.hidden_films):
+            h = lin(h)
+            gamma, beta = film(coil_idx)
+            h = torch.sin(self.w0 * (gamma * h + beta))
+
+        return self.head(h)
+
+
+class MultiCoilConcat(nn.Module):
+    """Simplest multi-coil: concatenate coil embedding to input.
+
+    input = [kx, ky, coil_embedding] → backbone → (Re, Im)
+
+    Uses an existing backbone class (WIRE or SIREN) with input dimension
+    expanded by coil_embed_dim.
+
+    Args:
+        backbone_family: 'wire' or 'siren'
+        backbone_kwargs: dict of kwargs for the backbone (hidden, depth, w0, etc.)
+        n_coils: number of receive coils
+        coil_embed_dim: dimension of coil embedding (default 16)
+    """
+    def __init__(
+        self,
+        backbone_family: str = "wire",
+        backbone_kwargs: dict = None,
+        n_coils: int = 8,
+        coil_embed_dim: int = 16,
+    ):
+        super().__init__()
+        self.coil_embed = nn.Embedding(n_coils, coil_embed_dim)
+        self.n_coils = n_coils
+
+        kwargs = dict(backbone_kwargs or {})
+        kwargs["in_dim"] = 2 + coil_embed_dim
+
+        if backbone_family == "wire":
+            self.backbone = WIRE_KXY_REIM(**kwargs)
+        elif backbone_family == "siren":
+            self.backbone = NIK_SIREN_KXY_REIM(**kwargs)
+        else:
+            raise ValueError(f"Unknown backbone_family: {backbone_family!r}")
+
+    def forward(self, coords: torch.Tensor, coil_idx: torch.Tensor) -> torch.Tensor:
+        """
+        coords: (B, 2) — kx, ky
+        coil_idx: (B,) — integer coil index
+        returns: (B, 2) — Re, Im
+        """
+        c_emb = self.coil_embed(coil_idx)           # (B, coil_embed_dim)
+        x = torch.cat([coords, c_emb], dim=-1)      # (B, 2 + coil_embed_dim)
+        return self.backbone(x)
+
+
 def loss_function(y_pred, y, mag_eps: float = 1e-12, mag_reg: float = 0.1):
     """
     Inverse-magnitude weighted MSE on (Re, Im) predictions.

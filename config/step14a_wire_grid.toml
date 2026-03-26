@@ -1,0 +1,99 @@
+# Step 14a: WIRE focused grid sweep
+#
+# Goal: Systematic grid exploration of WIRE around the promising region
+#        identified in Step 13 (best: h=64, d=10, w0~42, s0~10, lr~5e-5).
+#
+# Changes from Step 13:
+#   - Grid sweep (not Bayesian) for full coverage
+#   - ReduceLROnPlateau scheduler enabled (patience=500 evals = 25k steps plateau)
+#   - Narrowed parameter ranges around Step 13 winners
+#   - conj_weight fixed at 0.001 (marginal winner from Step 13)
+#   - density_weight: [0.0, 0.1] (0.5 helped k-loss but hurt PSNR)
+#
+# Usage:
+#   sbatch gpu_job_sweep.sh config/step14a_wire_grid.toml
+
+[experiment]
+name = "Step 14a: WIRE grid sweep (+LR scheduler)"
+description = "Focused grid sweep of WIRE around Step 13 best configs, with ReduceLROnPlateau"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "wire"
+hidden = 64
+depth = 10
+w0 = 45.0
+s0 = 10.0
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 1e-4
+grad_clip = 1.0
+weight_decay = 0.002
+loss_type = "mse"
+eval_every = 50
+seed = 0
+conj_weight = 0.001
+density_weight = 0.0
+# LR scheduler
+scheduler_patience = 50
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-6
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 14a: WIRE grid (+ReduceLROnPlateau)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+# ---- Sweep parameters ----
+[sweep.parameters.model_family]
+values = ["wire"]
+
+# Grid: 2 x 2 x 3 x 3 x 3 x 2 x 2 = 432 runs (~22 GPU-hrs at ~3 min/run)
+[sweep.parameters.hidden]
+values = [48, 64]
+
+[sweep.parameters.depth]
+values = [8, 10]
+
+[sweep.parameters.w0]
+values = [38.0, 46.0, 62.0]
+
+[sweep.parameters.s0]
+values = [6.0, 10.0, 15.0]
+
+[sweep.parameters.lr]
+values = [3e-5, 5e-5, 1e-4]
+
+[sweep.parameters.weight_decay]
+values = [0.0, 0.003]
+
+[sweep.parameters.density_weight]
+values = [0.0, 0.1]

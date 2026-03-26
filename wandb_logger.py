@@ -270,3 +270,144 @@ def make_error_map_figure(
     return fig
 
 
+# =========================================================================
+# Cartesian evaluation figures
+# =========================================================================
+
+@torch.no_grad()
+def make_cartesian_error_map(
+    model,
+    *,
+    x_cart, y_cart,
+    y_scale=1.0,
+    nky, nkx,
+    title_prefix="",
+):
+    """
+    Error heatmaps on the Cartesian grid (absolute and relative, log scale).
+
+    Returns a matplotlib Figure with 2 rows x 3 cols:
+      Row 1: absolute errors  log10(|dRe|+eps), log10(|dIm|+eps), log10(|dMag|+eps)
+      Row 2: relative errors  log10(|dRe|/(|Re|+eps)), etc.
+    """
+    device = next(model.parameters()).device
+    model.eval()
+
+    x = x_cart.to(device)
+    yp = model(x)
+
+    ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
+    y0 = (y_cart * ys).detach().cpu().numpy()
+    yp0 = (yp * ys).detach().cpu().numpy()
+
+    dRe = np.abs(yp0[:, 0] - y0[:, 0]).reshape(nky, nkx)
+    dIm = np.abs(yp0[:, 1] - y0[:, 1]).reshape(nky, nkx)
+    mag_y = np.sqrt(y0[:, 0]**2 + y0[:, 1]**2).reshape(nky, nkx)
+    mag_yp = np.sqrt(yp0[:, 0]**2 + yp0[:, 1]**2).reshape(nky, nkx)
+    dMag = np.abs(mag_yp - mag_y)
+
+    eps = 1e-10
+
+    # Relative errors
+    rel_dRe = dRe / (np.abs(y0[:, 0]).reshape(nky, nkx) + eps)
+    rel_dIm = dIm / (np.abs(y0[:, 1]).reshape(nky, nkx) + eps)
+    rel_dMag = dMag / (mag_y + eps)
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+
+    def imshow_log(ax, data, ttl, vmin=None, vmax=None):
+        im = ax.imshow(np.log10(data + eps), aspect="auto", cmap="hot",
+                       vmin=vmin, vmax=vmax)
+        ax.set_title(ttl)
+        ax.set_xlabel("kx")
+        ax.set_ylabel("ky")
+        plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # Row 1: absolute errors
+    imshow_log(axes[0, 0], dRe, f"{title_prefix} abs |dRe| (log10)")
+    imshow_log(axes[0, 1], dIm, f"{title_prefix} abs |dIm| (log10)")
+    imshow_log(axes[0, 2], dMag, f"{title_prefix} abs |dMag| (log10)")
+
+    # Row 2: relative errors
+    imshow_log(axes[1, 0], rel_dRe, f"{title_prefix} rel |dRe|/|Re| (log10)")
+    imshow_log(axes[1, 1], rel_dIm, f"{title_prefix} rel |dIm|/|Im| (log10)")
+    imshow_log(axes[1, 2], rel_dMag, f"{title_prefix} rel |dMag|/|Mag| (log10)")
+
+    plt.tight_layout()
+    return fig
+
+
+@torch.no_grad()
+def make_cartesian_image_comparison(
+    model,
+    *,
+    x_cart, y_cart,
+    y_scale=1.0,
+    nky, nkx,
+    gt_img_slice=None,
+    title_prefix="",
+):
+    """
+    Compare image reconstructed from model's Cartesian prediction vs
+    image from actual Cartesian k-space (both via 2D IFFT).
+
+    Returns a matplotlib Figure.
+    """
+    device = next(model.parameters()).device
+    model.eval()
+
+    ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
+
+    # Predicted k-space on Cartesian grid
+    yp = model(x_cart.to(device))
+    yp_scaled = yp * ys
+    k_pred = torch.complex(yp_scaled[:, 0], yp_scaled[:, 1]).reshape(nky, nkx)
+
+    # Measured Cartesian k-space
+    y_meas = y_cart * ys
+    k_meas = torch.complex(y_meas[:, 0], y_meas[:, 1]).reshape(nky, nkx).to(device)
+
+    # IFFT to image space
+    img_pred = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_pred))).abs().cpu().numpy()
+    img_meas = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_meas))).abs().cpu().numpy()
+
+    n_cols = 3 if gt_img_slice is not None else 2
+    fig, axes = plt.subplots(2, n_cols, figsize=(6 * n_cols, 10))
+
+    vmax = max(img_meas.max(), img_pred.max())
+
+    axes[0, 0].imshow(img_meas, cmap="gray", vmax=vmax)
+    axes[0, 0].set_title(f"{title_prefix} Cartesian IFFT (measured)")
+
+    axes[0, 1].imshow(img_pred, cmap="gray", vmax=vmax)
+    axes[0, 1].set_title(f"{title_prefix} Cartesian IFFT (predicted)")
+
+    if gt_img_slice is not None:
+        gt = np.asarray(gt_img_slice)
+        axes[0, 2].imshow(gt, cmap="gray")
+        axes[0, 2].set_title(f"{title_prefix} Ground Truth")
+
+    # Error maps
+    diff = np.abs(img_pred - img_meas)
+    axes[1, 0].imshow(diff, cmap="hot")
+    axes[1, 0].set_title(f"{title_prefix} |pred - meas|")
+
+    eps = 1e-10
+    rel_diff = diff / (img_meas + eps)
+    im_rel = axes[1, 1].imshow(np.log10(rel_diff + eps), cmap="hot")
+    axes[1, 1].set_title(f"{title_prefix} relative error (log10)")
+    plt.colorbar(im_rel, ax=axes[1, 1], fraction=0.046, pad=0.04)
+
+    if gt_img_slice is not None:
+        diff_gt = np.abs(img_pred - gt)
+        axes[1, 2].imshow(diff_gt, cmap="hot")
+        axes[1, 2].set_title(f"{title_prefix} |pred - GT|")
+
+    for ax_row in axes:
+        for ax in ax_row:
+            ax.axis("off")
+
+    plt.tight_layout()
+    return fig
+
+

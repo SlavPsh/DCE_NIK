@@ -1,0 +1,83 @@
+# Step 15: Multi-coil NIK — Concat baseline
+#
+# Goal: Joint fitting of all 8 coils using shared spatial backbone
+#        with coil-specific modulation. Uses the best single-coil WIRE
+#        config from Step 14a (dingo: h=64, d=8, w0=62, s0=10, wd=0.003).
+#
+# Hypothesis: multi-coil provides 8x more training data with shared
+#             spatial structure, reducing overfit and angular artifacts.
+#
+# Scientific question: "does multi-coil data help?"
+# Run concat FIRST to answer this. FiLM is a follow-up experiment.
+#
+# Key change: backbone architecture (depth, width, w0) is FIXED from
+#             single-coil winner. Only coil embedding is new.
+#
+# Usage:
+#   python train_multicoil.py config/step15_multicoil.toml
+
+[experiment]
+name = "Step 15: Multi-coil WIRE (Concat baseline)"
+description = "Joint 8-coil fitting with Concat conditioning — establish multi-coil value"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
+t_frame = 0
+z_slice_idx = -1
+val_frac = 0.1
+
+[model]
+model_family = "wire"
+multicoil_mode = "concat"
+hidden = 64
+depth = 8
+w0 = 62.0
+s0 = 10.0
+coil_embed_dim = 16
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 1e-4
+grad_clip = 1.0
+weight_decay = 0.003
+loss_type = "mse"
+eval_every = 50
+seed = 0
+scheduler_patience = 50
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-6
+
+[training.plot]
+plot_every = 5000
+log_scale = true
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 200
+
+[wandb]
+watch_interval = 0
+
+[sweep]
+name = "Step 15: Multi-coil WIRE Concat (embed dim sweep)"
+entity = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method = "grid"
+
+[sweep.metric]
+name = "best_val_loss"
+goal = "minimize"
+
+# ---- Sweep parameters ----
+# Phase A: Concat only — answer "does multi-coil help?"
+[sweep.parameters.coil_embed_dim]
+values = [8, 16, 32]
+
+# Phase B: FiLM (uncomment after Phase A is evaluated)
+# [sweep.parameters.multicoil_mode]
+# values = ["concat", "film"]

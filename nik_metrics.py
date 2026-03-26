@@ -6,6 +6,9 @@ Provides PSNR, SSIM, and NRMSE between reconstructed and reference images.
 All functions accept 2-D numpy arrays (single-image) or batches via the
 convenience wrapper ``compute_image_metrics``.
 
+Also provides perceptual image quality metrics (DISTS, HaarPSI, VSI, LPIPS)
+validated for MRI via the ``piq`` library (Kastryulin et al. 2022).
+
 Also provides k-space validation metrics broken down by spoke and frame.
 """
 import numpy as np
@@ -193,6 +196,210 @@ def compute_image_metrics(
         "ssim": ssim(img_pred, img_ref, data_range=data_range, win_size=ssim_win_size),
         "nrmse": nrmse(img_pred, img_ref, normalization=nrmse_norm),
     }
+
+
+# ---------------------------------------------------------------------------
+# Perceptual image quality metrics (piq library)
+# ---------------------------------------------------------------------------
+
+def _to_piq_tensor(img: np.ndarray, n_channels: int = 1) -> torch.Tensor:
+    """Convert 2-D numpy array to (1, C, H, W) float32 tensor on CPU."""
+    t = torch.from_numpy(np.asarray(img, dtype=np.float32))
+    t = t.unsqueeze(0).unsqueeze(0)  # (1, 1, H, W)
+    if n_channels == 3:
+        t = t.repeat(1, 3, 1, 1)
+    return t
+
+
+@torch.no_grad()
+def compute_perceptual_metrics(
+    img_pred: np.ndarray,
+    img_ref: np.ndarray,
+) -> dict:
+    """
+    Evaluation-only perceptual image quality metrics. NOT for use as training loss.
+
+    Computed with no_grad on CPU. Do not backpropagate through these.
+
+    Metrics chosen based on Kastryulin et al. 2022 — "Image Quality Assessment
+    for Magnetic Resonance Imaging":
+      - DISTS (best for MRI, SRCC=0.76 on artifacts) — lower is better
+      - HaarPSI (second best, wavelet-based) — higher is better
+      - VSI (third best, saliency-based) — higher is better
+      - PSNR, SSIM from piq as baselines
+
+    Parameters
+    ----------
+    img_pred, img_ref : 2-D numpy arrays (magnitude images, any value range).
+
+    Returns
+    -------
+    dict with metric names as keys and float values.
+    """
+    import piq
+
+    img_pred = np.asarray(img_pred, dtype=np.float64)
+    img_ref = np.asarray(img_ref, dtype=np.float64)
+
+    # Normalize both to [0, 1] using the same scale
+    vmax = max(img_pred.max(), img_ref.max())
+    if vmax == 0:
+        return {
+            "PSNR": 0.0, "SSIM": 0.0, "DISTS": 1.0,
+            "HaarPSI": 0.0, "VSI": 0.0,
+        }
+    img_pred_n = img_pred / vmax
+    img_ref_n = img_ref / vmax
+
+    # Build tensors — all on CPU
+    pred_1ch = _to_piq_tensor(img_pred_n, n_channels=1)
+    ref_1ch = _to_piq_tensor(img_ref_n, n_channels=1)
+    pred_3ch = _to_piq_tensor(img_pred_n, n_channels=3)
+    ref_3ch = _to_piq_tensor(img_ref_n, n_channels=3)
+
+    results = {}
+
+    # PSNR (higher is better)
+    results["PSNR"] = float(piq.psnr(pred_1ch, ref_1ch, data_range=1.0).item())
+
+    # SSIM (higher is better)
+    results["SSIM"] = float(piq.ssim(pred_1ch, ref_1ch, data_range=1.0).item())
+
+    # HaarPSI (higher is better) — works on grayscale natively
+    results["HaarPSI"] = float(piq.haarpsi(pred_1ch, ref_1ch, data_range=1.0).item())
+
+    # DISTS (lower is better) — needs 3-channel
+    dists_metric = piq.DISTS()
+    results["DISTS"] = float(dists_metric(pred_3ch, ref_3ch).item())
+
+    # VSI (higher is better) — needs 3-channel
+    results["VSI"] = float(piq.vsi(pred_3ch, ref_3ch, data_range=1.0).item())
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Formatting and comparison utilities
+# ---------------------------------------------------------------------------
+
+# Direction indicators: True = higher is better
+_METRIC_DIRECTION = {
+    "psnr_db": True, "ssim": True, "nrmse": False,
+    "PSNR": True, "SSIM": True, "DISTS": False,
+    "HaarPSI": True, "VSI": True,
+}
+
+
+def format_metrics_table(metrics_dict: dict, label: str = "") -> str:
+    """
+    Format a metrics dict into a readable string with direction arrows.
+
+    Parameters
+    ----------
+    metrics_dict : dict
+        May contain keys from compute_image_metrics (psnr_db, ssim, nrmse)
+        and/or compute_perceptual_metrics (PSNR, SSIM, DISTS, HaarPSI, VSI).
+    label : str, optional
+        Context label, e.g. "vs NUFFT proxy (not ground truth)" or
+        "vs Ground Truth".
+
+    Returns
+    -------
+    str — formatted table.
+    """
+    basic_keys = ["psnr_db", "ssim", "nrmse"]
+    perceptual_keys = ["DISTS", "HaarPSI", "VSI", "PSNR", "SSIM"]
+
+    lines = []
+
+    basic_present = [k for k in basic_keys if k in metrics_dict]
+    if basic_present:
+        header = f"Basic Metrics{f' ({label})' if label else ''}:"
+        lines.append(header)
+        for k in basic_present:
+            arrow = "\u2191" if _METRIC_DIRECTION.get(k, True) else "\u2193"
+            v = metrics_dict[k]
+            unit = " dB" if k == "psnr_db" else ""
+            lines.append(f"  {k:8s} {arrow}  {v:.4f}{unit}")
+
+    perc_present = [k for k in perceptual_keys if k in metrics_dict]
+    if perc_present:
+        header = f"Perceptual Metrics{f' ({label})' if label else ''}:"
+        lines.append(header)
+        for k in perc_present:
+            arrow = "\u2191" if _METRIC_DIRECTION.get(k, True) else "\u2193"
+            v = metrics_dict[k]
+            unit = " dB" if k == "PSNR" else ""
+            lines.append(f"  {k:8s} {arrow}  {v:.4f}{unit}")
+
+    return "\n".join(lines)
+
+
+def compare_reconstructions(
+    metrics_list: list,
+    labels: list,
+    csv_path: str = None,
+) -> str:
+    """
+    Compare multiple reconstruction methods side-by-side.
+
+    Parameters
+    ----------
+    metrics_list : list of dicts — one per method.
+    labels : list of str — method names.
+    csv_path : optional path to save CSV.
+
+    Returns
+    -------
+    str — formatted comparison table with best values highlighted.
+    """
+    all_keys = []
+    for m in metrics_list:
+        for k in m:
+            if k not in all_keys:
+                all_keys.append(k)
+
+    # Column widths
+    label_w = max(len(l) for l in labels)
+    col_w = max(12, label_w + 2)
+
+    header = f"{'Metric':>10s} | " + " | ".join(f"{l:>{col_w}s}" for l in labels)
+    sep = "-" * len(header)
+
+    lines = [header, sep]
+    for k in all_keys:
+        vals = [m.get(k) for m in metrics_list]
+        higher_better = _METRIC_DIRECTION.get(k, True)
+
+        # Find best index
+        valid = [(i, v) for i, v in enumerate(vals) if v is not None]
+        best_i = None
+        if valid:
+            best_i = (max if higher_better else min)(valid, key=lambda x: x[1])[0]
+
+        row_parts = []
+        for i, v in enumerate(vals):
+            if v is None:
+                s = "--"
+            else:
+                s = f"{v:.4f}"
+                if i == best_i:
+                    s = f"*{s}*"
+            row_parts.append(f"{s:>{col_w}s}")
+
+        arrow = "\u2191" if higher_better else "\u2193"
+        lines.append(f"{k:>8s} {arrow} | " + " | ".join(row_parts))
+
+    table = "\n".join(lines)
+
+    if csv_path is not None:
+        with open(csv_path, "w") as f:
+            f.write("metric," + ",".join(labels) + "\n")
+            for k in all_keys:
+                vals = [str(m.get(k, "")) for m in metrics_list]
+                f.write(k + "," + ",".join(vals) + "\n")
+
+    return table
 
 
 # ---------------------------------------------------------------------------

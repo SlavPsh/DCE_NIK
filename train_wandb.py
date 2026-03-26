@@ -150,7 +150,7 @@ def main(config_path, data):
         # Polar-specific
         "n_angular_modes": config['model'].get('n_angular_modes', 16),
         "radial_type": config['model'].get('radial_type', 'wire'),
-        # Polar loss weights
+        # Constraint loss weights (polar + Cartesian)
         "dc_weight": config['training'].get('dc_weight', 0.0),
         "density_weight": config['training'].get('density_weight', 0.0),
         "conj_weight": config['training'].get('conj_weight', 0.0),
@@ -164,6 +164,10 @@ def main(config_path, data):
         "weight_decay": config['training'].get('weight_decay', 0.0),
         "loss_type": config['training'].get('loss_type', "mse"),
         "seed": config['training']['seed'],
+        # LR scheduler (ReduceLROnPlateau)
+        "scheduler_patience": config['training'].get('scheduler_patience', 0),
+        "scheduler_factor": config['training'].get('scheduler_factor', 0.5),
+        "scheduler_min_lr": config['training'].get('scheduler_min_lr', 1e-6),
     }
 
     # Initialize wandb
@@ -199,6 +203,9 @@ def main(config_path, data):
     loss_type = str(getattr(wc, "loss_type", "mse"))
     loss_fn = get_loss_fn(loss_type)
     seed = int(wc.seed)
+    scheduler_patience = int(getattr(wc, "scheduler_patience", 0))
+    scheduler_factor = float(getattr(wc, "scheduler_factor", 0.5))
+    scheduler_min_lr = float(getattr(wc, "scheduler_min_lr", 1e-6))
 
     # Skip redundant sweep combos to avoid wasting compute.
     def _skip(reason: str):
@@ -330,13 +337,13 @@ def main(config_path, data):
     wandb_extra = {
         "model_family": model_family, "n_params": n_params,
         "k_freq": k_freq, "k_sigma": k_sigma,
+        "dc_weight": dc_weight, "density_weight": density_weight,
+        "conj_weight": conj_weight,
     }
     if model_family == "polar":
         wandb_extra.update({
             "n_angular_modes": n_angular_modes, "radial_type": radial_type,
             "s_max": s_max,
-            "dc_weight": dc_weight, "density_weight": density_weight,
-            "conj_weight": conj_weight,
         })
     wandb.config.update(wandb_extra, allow_val_change=True)
     logging.info(
@@ -344,11 +351,14 @@ def main(config_path, data):
         f"w0={w0}, s0={s0 if model_family in ('wire', 'polar') else 'n/a'}, "
         f"k_freq={k_freq}, k_sigma={k_sigma}, wd={weight_decay}, loss={loss_type}, params={n_params}"
     )
+    if conj_weight > 0 or density_weight > 0:
+        logging.info(
+            f"  Constraints: conj_weight={conj_weight}, density_weight={density_weight}"
+        )
     if model_family == "polar":
         logging.info(
             f"  Polar: radial_type={radial_type}, n_angular_modes={n_angular_modes}, "
-            f"s_max={s_max:.4f}, dc_weight={dc_weight}, density_weight={density_weight}, "
-            f"conj_weight={conj_weight}"
+            f"s_max={s_max:.4f}, dc_weight={dc_weight}"
         )
 
     # ---- Watch model gradients ----
@@ -366,6 +376,18 @@ def main(config_path, data):
         opt = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=weight_decay)
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
+
+    # ---- LR scheduler (ReduceLROnPlateau) ----
+    scheduler = None
+    if scheduler_patience > 0:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            opt, mode="min", factor=scheduler_factor,
+            patience=scheduler_patience, min_lr=scheduler_min_lr,
+        )
+        logging.info(
+            f"LR scheduler: ReduceLROnPlateau(patience={scheduler_patience}, "
+            f"factor={scheduler_factor}, min_lr={scheduler_min_lr})"
+        )
 
     # ---- Plot metadata ----
     train_spoke_show = int(torch.unique(spoke_id_all[train_idx])[0].item())
@@ -403,14 +425,13 @@ def main(config_path, data):
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
         loss = loss_fn(y_pred, y)
-        # Polar constraint losses (only when weights > 0)
-        if model_family == "polar":
-            if dc_weight > 0:
-                loss = loss + dc_weight * dc_consistency_loss(model)
-            if density_weight > 0:
-                loss = loss + density_weight * density_weighted_mse_loss(y_pred, y, x)
-            if conj_weight > 0:
-                loss = loss + conj_weight * conjugate_symmetry_loss_from_model(model, x)
+        # Constraint losses (polar gets all three; Cartesian gets density + conjugate)
+        if dc_weight > 0 and hasattr(model, "dc_predictions"):
+            loss = loss + dc_weight * dc_consistency_loss(model)
+        if density_weight > 0:
+            loss = loss + density_weight * density_weighted_mse_loss(y_pred, y, x)
+        if conj_weight > 0:
+            loss = loss + conj_weight * conjugate_symmetry_loss_from_model(model, x)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
@@ -432,10 +453,16 @@ def main(config_path, data):
                     for k, v in model.state_dict().items()
                 }
 
+            # Step the LR scheduler on validation loss
+            if scheduler is not None:
+                scheduler.step(last_val_loss)
+
         # --- wandb scalar logging ---
         log_dict = {"train/train_loss": train_loss}
         if last_val_loss is not None and (step % eval_every == 0 or step == steps):
             log_dict["train/val_loss"] = last_val_loss
+        if scheduler is not None:
+            log_dict["train/lr"] = opt.param_groups[0]["lr"]
         wandb_logger.log(log_dict, step=step)
 
         # --- Figure logging ---
