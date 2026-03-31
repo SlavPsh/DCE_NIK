@@ -1,45 +1,45 @@
 [experiment]
-name = "NIK cross-domain: radial train, Cartesian eval"
-description = "Train on subsampled radial spokes, evaluate on Cartesian grid"
+name = "Sweep: subsample fraction + SIREN params"
+description = "Envelope norm, no DCF. Sweep over spoke subsampling and SIREN architecture."
 
 [data]
 radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
 cartesian_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T113845_cart.mat"
 t_frame = 0
 coil_idx = 0
-z_slice_idx = -1          # -1 = middle slice
-subsample_frac = 1.0      # fraction of radial spokes to use for training
+z_slice_idx = -1
+subsample_frac = 1.0
 
 [model]
-model_family = "wire"    # best from step14a grid search
-hidden = 64
-depth = 8
-w0 = 62.0
-s0 = 10.0
+model_family = "siren"
+hidden = 128
+depth = 4
+w0 = 15.0
 
 [training]
 steps = 20000
 batch_size = 4096
 optimizer = "Adam"
-lr = 1e-4
+lr = 2e-4
 grad_clip = 1.0
 eval_every = 100
 seed = 0
 loss_type = "mse"
-weight_decay = 0.003
-warmup_steps = 4000       # skip checkpointing before this step
-# LR scheduler (from step14a best)
+weight_decay = 0.0
+warmup_steps = 4000
 scheduler_patience = 50
 scheduler_factor = 0.5
 scheduler_min_lr = 1e-6
 
 [training.plot]
-plot_every = 1000
+plot_every = 5000
 log_scale = true
 
 [normalization]
 dcf_method = "simple_ramp"
-dcf_power = 0.7               # tempering: 1.0 = full DCF, 0.0 = uniform
+dcf_power = 0.0
+use_envelope = true
+use_dcf = true
 envelope_bins = 128
 envelope_statistic = "weighted_rms"
 envelope_smooth_method = "moving_average"
@@ -58,29 +58,30 @@ console_every = 100
 watch_interval = 0
 
 [sweep]
-name = "Cross-domain: radial train, Cartesian eval (WIRE subsample sweep)"
+name = "Subsample + SIREN params (envelope, no DCF)"
 entity = "spshenov-university-of-amsterdam"
 project = "NIK-DCE-MRI-CartEval"
 method = "bayes"
+run_cap = 50
 
 [sweep.metric]
 name = "cart_eval_loss"
 goal = "minimize"
 
-[sweep.parameters.model_family]
-values = ["siren", "wire"]
-
-[sweep.parameters.hidden]
-values = [48, 64]
-
-[sweep.parameters.depth]
-values = [8, 10]
-
-[sweep.parameters.w0]
-values = [38.0, 46.0, 62.0]
-
-[sweep.parameters.s0]
-values = [6.0, 10.0, 15.0]
-
 [sweep.parameters.subsample_frac]
 values = [0.1, 0.25, 0.5, 1.0]
+
+[sweep.parameters.hidden]
+values = [64, 128, 256]
+
+[sweep.parameters.depth]
+values = [4, 6, 8]
+
+[sweep.parameters.w0]
+min = 5.0
+max = 60.0
+
+[sweep.parameters.lr]
+min = 5e-5
+max = 1e-3
+distribution = "log_uniform_values"

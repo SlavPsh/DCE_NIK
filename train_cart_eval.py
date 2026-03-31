@@ -18,6 +18,9 @@ import logging
 import numpy as np
 import torch
 import torch.nn.functional as F
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import wandb
 from coolname import generate_slug
 
@@ -37,12 +40,14 @@ from nik_model import (
     WIRE_KXY_REIM,
     PolarKSpaceNet,
 )
+# nik_loss kept for potential fallback; weighted_complex_mse is the primary loss
 from nik_loss import get_loss_fn
 from nik_train import prepare_tensors
+from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
+from losses import weighted_complex_mse
 from nik_recon import (
     ifft1d_kz_to_z,
     make_fixed_frame_zslice_coil_dataset,
-    split_points_by_spokes,
     ifft1d_kz_to_z_cartesian,
     make_cartesian_eval_dataset,
 )
@@ -92,10 +97,11 @@ def load_data(config):
 
     z_slice_idx = n_z_slices // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
+    # Get raw (unnormalized) k-space values by passing y_scale=1.0
     x_all, y_all, kx_all, ky_all, spoke_id_all, ro_id_all, meta = \
         make_fixed_frame_zslice_coil_dataset(
             k_img_space, traj_t, scales, dims,
-            y_scale=k_scale,
+            y_scale=torch.tensor(1.0),
             t_fixed=t_frame,
             coil_fixed=coil_idx,
             z_slice_idx=z_slice_idx,
@@ -123,8 +129,6 @@ def load_data(config):
     cart_event = load_cartesian_kspace(cart_file, load_images=True, load_coil_maps=True)
     k_cart_np = cart_event["k_cart"]
     coil_maps_cart = cart_event.get("coil_maps")
-    cart_meta = cart_event["meta"]
-    cart_gt_img = cart_event.get("gt_img")
 
     k_cart_t = torch.from_numpy(k_cart_np.astype(np.complex64))
     if device == "cuda":
@@ -138,44 +142,36 @@ def load_data(config):
     # Use same z_slice_idx (middle by default)
     z_slice_cart = nz_cart // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
+    # Get raw Cartesian k-space (y_scale=1.0)
     x_cart, y_cart, meta_cart = make_cartesian_eval_dataset(
         k_cart_z,
         t_fixed=min(t_frame, k_cart_z.shape[0] - 1),
         coil_fixed=coil_idx,
         z_slice_idx=z_slice_cart,
         scales_radial=scales,
-        y_scale=k_scale,
+        y_scale=torch.tensor(1.0),
         compute_device=device,
     )
     print(f"Cartesian eval dataset: {meta_cart['N']} points "
           f"(nky={meta_cart['nky']}, nkx={meta_cart['nkx']})", flush=True)
 
-    # Sanity check: compare k-space magnitude ranges
-    rad_mag = float(torch.abs(y_all).max().item()) * float(k_scale.item() if torch.is_tensor(k_scale) else k_scale)
-    cart_mag = float(torch.abs(y_cart).max().item()) * float(k_scale.item() if torch.is_tensor(k_scale) else k_scale)
-    print(f"K-space magnitude sanity check: radial_max={rad_mag:.2e}, cart_max={cart_mag:.2e}, "
-          f"ratio={cart_mag/(rad_mag+1e-12):.2f}", flush=True)
-
-    # Get GT image slice for comparison
     gt_img_slice = None
-    if cart_gt_img is not None:
-        t_cart = min(t_frame, cart_gt_img.shape[0] - 1)
-        gt_img_slice = cart_gt_img[t_cart, z_slice_cart, :, :]
 
     return {
-        # Radial training data
-        "x_all": x_all, "y_all": y_all,
+        # Radial training data (RAW, unnormalized)
+        "x_all": x_all, "y_all_raw": y_all,
         "spoke_id_all": spoke_id_all, "ro_id_all": ro_id_all,
         "train_idx": train_idx,
         "meta": meta, "k_scale": k_scale,
+        "k_img_space": k_img_space, "traj_t": traj_t,
         "n_ro_per_slice": n_ro_per_slice,
         "T": T, "S": S, "C": C, "RO": RO,
         "z_slice_idx": z_slice_idx,
         "n_z_slices": n_z_slices,
         "scales": scales, "dims": dims,
         "coil_maps_radial": coil_maps_radial,
-        # Cartesian eval data
-        "x_cart": x_cart, "y_cart": y_cart,
+        # Cartesian eval data (RAW, unnormalized)
+        "x_cart": x_cart, "y_cart_raw": y_cart,
         "meta_cart": meta_cart,
         "gt_img_slice": gt_img_slice,
         "coil_maps_cart": coil_maps_cart,
@@ -270,18 +266,66 @@ def main(config_path, data):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ---- Unpack data ----
+    # ---- Unpack raw data ----
     x_all = data["x_all"]
-    y_all = data["y_all"]
+    y_all_raw = data["y_all_raw"]
     spoke_id_all = data["spoke_id_all"]
     ro_id_all = data["ro_id_all"]
     train_idx = data["train_idx"]
     k_scale = data["k_scale"]
     meta_cart = data["meta_cart"]
     x_cart = data["x_cart"]
-    y_cart = data["y_cart"]
+    y_cart_raw = data["y_cart_raw"]
     nky, nkx = meta_cart["nky"], meta_cart["nkx"]
     gt_img_slice = data.get("gt_img_slice")
+
+    # ---- Normalization (sweepable) ----
+    use_envelope = bool(getattr(wc, "use_envelope", config.get('normalization', {}).get('use_envelope', True)))
+    use_dcf = bool(getattr(wc, "use_dcf", config.get('normalization', {}).get('use_dcf', True)))
+    norm_cfg = config.get('normalization', {})
+    dcf_method = norm_cfg.get('dcf_method', 'simple_ramp')
+    dcf_power = float(getattr(wc, "dcf_power", norm_cfg.get('dcf_power', 0.7)))
+
+    kcoords_radial = x_all[:, :2]
+
+    if use_dcf:
+        dcf = compute_dcf_radial(kcoords_radial, method=dcf_method)
+    else:
+        dcf = torch.ones(kcoords_radial.shape[0], device=kcoords_radial.device)
+
+    normalizer = KSpaceNormalizer()
+    if use_envelope:
+        normalizer.fit(
+            kcoords_radial, y_all_raw, dcf=dcf,
+            envelope_bins=norm_cfg.get('envelope_bins', 128),
+            envelope_statistic=norm_cfg.get('envelope_statistic', 'weighted_rms'),
+            envelope_smooth_method=norm_cfg.get('envelope_smooth_method', 'moving_average'),
+            envelope_smooth_width=norm_cfg.get('envelope_smooth_width', 5),
+            envelope_floor_fraction=norm_cfg.get('envelope_floor_fraction', 1e-3),
+            global_scale_method=norm_cfg.get('global_scale_method', 'weighted_rms'),
+        )
+    else:
+        from kspace_normalization import compute_global_scale, compute_radius, _to_complex, RadialEnvelope
+        y_c = _to_complex(y_all_raw)
+        normalizer.global_scale = compute_global_scale(y_c, dcf=dcf)
+        r_max = float(compute_radius(kcoords_radial).max().item())
+        normalizer.envelope = RadialEnvelope(
+            bin_centers=torch.linspace(0, r_max, 128),
+            raw_shell_values=torch.ones(128),
+            smoothed_shell_values=torch.ones(128),
+            floor_value=1.0, r_max=r_max,
+            statistic="flat", smooth_method="none",
+        )
+        normalizer._fitted = True
+
+    y_all = normalizer.normalize(kcoords_radial, y_all_raw)
+    y_cart = normalizer.normalize(x_cart[:, :2], y_cart_raw)
+
+    logging.info(f"Normalization: use_envelope={use_envelope}, use_dcf={use_dcf}, "
+                 f"dcf_power={dcf_power}, global_scale={normalizer.global_scale:.4f}")
+    wandb.config.update({
+        "use_envelope": use_envelope, "use_dcf": use_dcf, "dcf_power": dcf_power,
+    }, allow_val_change=True)
 
     # If sweep overrides subsample_frac, re-subsample
     if subsample_frac != data["subsample_frac"]:
@@ -358,6 +402,10 @@ def main(config_path, data):
     y_train = y_all_dev[train_idx]
     N_train = x_train.shape[0]
 
+    # DCF for training points (dcf, dcf_power, normalizer are local vars from above)
+    dcf = dcf.to(device)
+    dcf_train = dcf[train_idx]
+
     # Cartesian eval tensors (already on device from load_data)
     x_cart_dev = x_cart.to(device)
     y_cart_dev = y_cart.to(device)
@@ -386,10 +434,11 @@ def main(config_path, data):
         idx = torch.randint(0, N_train, (batch_size,), device=device)
         x = x_train[idx]
         y = y_train[idx]
+        w = dcf_train[idx]
 
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
-        loss = loss_fn(y_pred, y)
+        loss = weighted_complex_mse(y_pred, y, weights=w, power=dcf_power)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
@@ -404,7 +453,11 @@ def main(config_path, data):
                 last_cart_loss = float(F.mse_loss(cart_pred, y_cart_dev).item())
             model.train()
 
-            if last_cart_loss < best_cart_loss:
+            # Only checkpoint after warmup: an untrained model predicting
+            # near-zero trivially achieves low cart MSE since most of k-space
+            # is small.
+            warmup_steps = config['training'].get('warmup_steps', steps // 5)
+            if step >= warmup_steps and last_cart_loss < best_cart_loss:
                 best_cart_loss = last_cart_loss
                 best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
 
@@ -432,7 +485,7 @@ def main(config_path, data):
                     spoke_id_all=spoke_id_all,
                     ro_id_all=ro_id_all,
                     spoke_id=train_spoke_show,
-                    y_scale=k_scale,
+                    y_scale=1.0,
                     n_s=4096,
                     title_prefix=f"[train] step {step}",
                     log_scale=log_scale,
@@ -444,16 +497,16 @@ def main(config_path, data):
                     model,
                     x_sub=x_all[train_idx],
                     y_sub=y_all[train_idx],
-                    y_scale=k_scale,
+                    y_scale=1.0,
                     title_prefix=f"[radial train] step {step}",
                 )
                 figures["plots/error_map_radial_train"] = fig_err
 
-                # Cartesian error map
+                # Cartesian error map (in normalized space)
                 fig_cart_err = make_cartesian_error_map(
                     model,
                     x_cart=x_cart, y_cart=y_cart,
-                    y_scale=k_scale,
+                    y_scale=1.0,
                     nky=nky, nkx=nkx,
                     title_prefix=f"[cart eval] step {step}",
                 )
@@ -463,12 +516,58 @@ def main(config_path, data):
                 fig_cart_img = make_cartesian_image_comparison(
                     model,
                     x_cart=x_cart, y_cart=y_cart,
-                    y_scale=k_scale,
+                    normalizer=normalizer,
                     nky=nky, nkx=nkx,
                     gt_img_slice=gt_img_slice,
                     title_prefix=f"step {step}",
                 )
                 figures["plots/cart_image_comparison"] = fig_cart_img
+
+                # Radial NUFFT image comparison (full spokes)
+                try:
+                    from nik_recon import nufft2d_recon
+                    _normalizer = normalizer
+                    _x_rad = x_all[:, :2].to(device)
+                    _y_pred_norm = model(_x_rad)
+                    _y_pred_denorm = _normalizer.denormalize(_x_rad, _y_pred_norm)
+                    _k_pred = torch.complex(_y_pred_denorm[:, 0], _y_pred_denorm[:, 1])
+                    _k_pred_slice = _k_pred.reshape(data["n_ro_per_slice"], data["RO"])
+
+                    _k_img_pred = torch.zeros_like(data["k_img_space"])
+                    _t = config['data']['t_frame']
+                    _c = config['data']['coil_idx']
+                    _z = data["z_slice_idx"]
+                    _k_img_pred[_t, :, _c, _z, :] = _k_pred_slice
+
+                    img_rad_pred = nufft2d_recon(
+                        _k_img_pred, data["traj_t"], t_frame=_t, coil_idx=_c,
+                        z_slice_idx=_z, scales=data["scales"],
+                        img_size=(312, 312), n_slices=data["n_z_slices"],
+                    )
+                    img_rad_meas = nufft2d_recon(
+                        data["k_img_space"], data["traj_t"], t_frame=_t, coil_idx=_c,
+                        z_slice_idx=_z, scales=data["scales"],
+                        img_size=(312, 312), n_slices=data["n_z_slices"],
+                    )
+
+                    def _norm01(x):
+                        mx = x.max()
+                        return x / mx if mx > 0 else x
+
+                    fig_rad, ax_rad = plt.subplots(1, 3, figsize=(18, 5))
+                    ax_rad[0].imshow(_norm01(img_rad_meas), cmap="gray")
+                    ax_rad[0].set_title(f"step {step} Radial NUFFT (measured)")
+                    ax_rad[1].imshow(_norm01(img_rad_pred), cmap="gray")
+                    ax_rad[1].set_title(f"step {step} Radial NUFFT (predicted)")
+                    diff_rad = np.abs(_norm01(img_rad_pred) - _norm01(img_rad_meas))
+                    ax_rad[2].imshow(diff_rad, cmap="hot")
+                    ax_rad[2].set_title(f"step {step} |pred - meas|")
+                    for ax in ax_rad:
+                        ax.axis("off")
+                    plt.tight_layout()
+                    figures["plots/radial_image_comparison"] = fig_rad
+                except Exception as e:
+                    logging.warning(f"Radial NUFFT recon failed: {e}")
 
             wandb_logger.log_figures(figures, step=step)
             model.train()
@@ -485,23 +584,26 @@ def main(config_path, data):
         model.load_state_dict(best_state)
     model.eval()
 
+    # normalizer is already a local variable from normalization setup above
+
     try:
         with torch.no_grad():
-            # Final Cartesian k-space prediction
-            ys = float(k_scale.item()) if torch.is_tensor(k_scale) else float(k_scale)
-            cart_pred_final = model(x_cart_dev) * ys
-            k_pred = torch.complex(cart_pred_final[:, 0], cart_pred_final[:, 1]).reshape(nky, nkx)
+            # Final Cartesian k-space prediction (denormalize to original scale)
+            cart_pred_norm = model(x_cart_dev)
+            cart_pred_denorm = normalizer.denormalize(x_cart[:, :2].to(device), cart_pred_norm)
+            # cart_pred_denorm is (N, 2) real
+            k_pred = torch.complex(cart_pred_denorm[:, 0], cart_pred_denorm[:, 1]).reshape(nky, nkx)
 
-            y_meas_scaled = y_cart_dev * ys
-            k_meas = torch.complex(y_meas_scaled[:, 0], y_meas_scaled[:, 1]).reshape(nky, nkx)
+            y_meas_denorm = normalizer.denormalize(x_cart[:, :2].to(device), y_cart_dev)
+            k_meas = torch.complex(y_meas_denorm[:, 0], y_meas_denorm[:, 1]).reshape(nky, nkx)
 
-            # IFFT to image
-            img_pred = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_pred))).abs().cpu().numpy()
-            img_meas = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_meas))).abs().cpu().numpy()
+            # IFFT to image (.T to match radial NUFFT axis convention)
+            img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
+            img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
         wandb_logger.log({
-            "recon/cart_predicted": wandb.Image(img_pred),
-            "recon/cart_measured": wandb.Image(img_meas),
+            "recon/cart_predicted": wandb.Image(img_pred / (img_pred.max() or 1.0)),
+            "recon/cart_measured": wandb.Image(img_meas / (img_meas.max() or 1.0)),
         }, step=steps)
 
         metrics = compute_image_metrics(img_pred, img_meas)
@@ -530,7 +632,11 @@ def main(config_path, data):
                 img_pred_r = zoom(img_pred, zf, order=3)
             else:
                 img_pred_r = img_pred
-            metrics_gt = compute_image_metrics(img_pred_r, gt_slice)
+            # Normalize both to [0, 1] for meaningful metrics
+            # (IFFT output scale differs from GT scale due to single-coil + FFT normalization)
+            gt_n = gt_slice / (gt_slice.max() or 1.0)
+            pred_n = img_pred_r / (img_pred_r.max() or 1.0)
+            metrics_gt = compute_image_metrics(pred_n, gt_n)
             wandb_logger.log({
                 "metrics/psnr_vs_gt": metrics_gt["psnr_db"],
                 "metrics/ssim_vs_gt": metrics_gt["ssim"],
@@ -546,7 +652,57 @@ def main(config_path, data):
                 f"SSIM={metrics_gt['ssim']:.4f}  NRMSE={metrics_gt['nrmse']:.4f}"
             )
     except Exception as e:
-        logging.warning(f"Final evaluation failed: {e}")
+        logging.warning(f"Final Cartesian evaluation failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+    # ---- Final radial NUFFT reconstruction ----
+    try:
+        from nik_recon import nufft2d_recon
+        _x_rad = x_all[:, :2].to(device)
+        with torch.no_grad():
+            _y_pred_norm = model(_x_rad)
+            _y_pred_denorm = normalizer.denormalize(_x_rad, _y_pred_norm)
+        _k_pred = torch.complex(_y_pred_denorm[:, 0], _y_pred_denorm[:, 1])
+        _k_pred_slice = _k_pred.reshape(data["n_ro_per_slice"], data["RO"])
+
+        _k_img_pred = torch.zeros_like(data["k_img_space"])
+        _t = config['data']['t_frame']
+        _c = config['data']['coil_idx']
+        _z = data["z_slice_idx"]
+        _k_img_pred[_t, :, _c, _z, :] = _k_pred_slice
+
+        img_rad_pred = nufft2d_recon(
+            _k_img_pred, data["traj_t"], t_frame=_t, coil_idx=_c,
+            z_slice_idx=_z, scales=data["scales"],
+            img_size=(312, 312), n_slices=data["n_z_slices"],
+        )
+        img_rad_meas = nufft2d_recon(
+            data["k_img_space"], data["traj_t"], t_frame=_t, coil_idx=_c,
+            z_slice_idx=_z, scales=data["scales"],
+            img_size=(312, 312), n_slices=data["n_z_slices"],
+        )
+        wandb_logger.log({
+            "recon/radial_predicted": wandb.Image(img_rad_pred / (img_rad_pred.max() or 1.0)),
+            "recon/radial_measured": wandb.Image(img_rad_meas / (img_rad_meas.max() or 1.0)),
+        }, step=steps)
+        rad_metrics = compute_image_metrics(img_rad_pred, img_rad_meas)
+        wandb_logger.log({
+            "metrics/psnr_radial": rad_metrics["psnr_db"],
+            "metrics/ssim_radial": rad_metrics["ssim"],
+            "metrics/nrmse_radial": rad_metrics["nrmse"],
+        }, step=steps)
+        wandb.run.summary.update({
+            "psnr_radial": rad_metrics["psnr_db"],
+            "ssim_radial": rad_metrics["ssim"],
+            "nrmse_radial": rad_metrics["nrmse"],
+        })
+        logging.info(
+            f"Radial metrics: PSNR={rad_metrics['psnr_db']:.2f} dB  "
+            f"SSIM={rad_metrics['ssim']:.4f}  NRMSE={rad_metrics['nrmse']:.4f}"
+        )
+    except Exception as e:
+        logging.warning(f"Radial NUFFT evaluation failed: {e}")
         import traceback
         traceback.print_exc()
 

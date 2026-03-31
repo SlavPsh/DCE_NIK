@@ -854,8 +854,12 @@ def ifft1d_kz_to_z_cartesian(k_cart):
     Returns:
         k_z_space: (T, C, nz, ky, kx) complex tensor after kz->z IFFT
     """
+    # Match radial pipeline: ifft → fftshift, then roll by -n_kz//2 to align
+    # z-slice indices with the radial convention (empirically validated).
+    n_kz = k_cart.shape[2]
     k_z_space = torch.fft.ifft(k_cart, dim=2)
     k_z_space = torch.fft.fftshift(k_z_space, dim=2)
+    k_z_space = torch.roll(k_z_space, shifts=-(n_kz // 2), dims=2)
     return k_z_space
 
 

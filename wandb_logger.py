@@ -343,6 +343,7 @@ def make_cartesian_image_comparison(
     *,
     x_cart, y_cart,
     y_scale=1.0,
+    normalizer=None,
     nky, nkx,
     gt_img_slice=None,
     title_prefix="",
@@ -351,35 +352,52 @@ def make_cartesian_image_comparison(
     Compare image reconstructed from model's Cartesian prediction vs
     image from actual Cartesian k-space (both via 2D IFFT).
 
+    If normalizer is provided, uses it to denormalize. Otherwise falls back
+    to scalar y_scale multiplication.
+
     Returns a matplotlib Figure.
     """
     device = next(model.parameters()).device
     model.eval()
 
-    ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
+    kcoords = x_cart[:, :2]
 
     # Predicted k-space on Cartesian grid
     yp = model(x_cart.to(device))
-    yp_scaled = yp * ys
-    k_pred = torch.complex(yp_scaled[:, 0], yp_scaled[:, 1]).reshape(nky, nkx)
+    if normalizer is not None:
+        yp_denorm = normalizer.denormalize(kcoords.to(device), yp)
+    else:
+        ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
+        yp_denorm = yp * ys
+    k_pred = torch.complex(yp_denorm[:, 0], yp_denorm[:, 1]).reshape(nky, nkx)
 
     # Measured Cartesian k-space
-    y_meas = y_cart * ys
-    k_meas = torch.complex(y_meas[:, 0], y_meas[:, 1]).reshape(nky, nkx).to(device)
+    if normalizer is not None:
+        y_meas_denorm = normalizer.denormalize(kcoords.to(device), y_cart.to(device))
+    else:
+        ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
+        y_meas_denorm = y_cart * ys
+    k_meas = torch.complex(y_meas_denorm[:, 0], y_meas_denorm[:, 1]).reshape(nky, nkx).to(device)
 
     # IFFT to image space
-    img_pred = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_pred))).abs().cpu().numpy()
-    img_meas = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(k_meas))).abs().cpu().numpy()
+    # Measured k-space (from simulator) and predicted k-space (from model) have
+    # different phase conventions, requiring different shift operations.
+    # .T transposes to match radial NUFFT axis convention (ky,kx) → (kx,ky).
+    img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
+    img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
     n_cols = 3 if gt_img_slice is not None else 2
     fig, axes = plt.subplots(2, n_cols, figsize=(6 * n_cols, 10))
 
-    vmax = max(img_meas.max(), img_pred.max())
+    # Normalize each image to [0, 1] for display
+    def norm01(x):
+        mx = x.max()
+        return x / mx if mx > 0 else x
 
-    axes[0, 0].imshow(img_meas, cmap="gray", vmax=vmax)
+    axes[0, 0].imshow(norm01(img_meas), cmap="gray", vmin=0, vmax=1)
     axes[0, 0].set_title(f"{title_prefix} Cartesian IFFT (measured)")
 
-    axes[0, 1].imshow(img_pred, cmap="gray", vmax=vmax)
+    axes[0, 1].imshow(norm01(img_pred), cmap="gray", vmin=0, vmax=1)
     axes[0, 1].set_title(f"{title_prefix} Cartesian IFFT (predicted)")
 
     if gt_img_slice is not None:
@@ -387,24 +405,27 @@ def make_cartesian_image_comparison(
         # GT may have transposed axes compared to k-space IFFT output
         if gt.shape != img_pred.shape and gt.shape == img_pred.shape[::-1]:
             gt = gt.T
-        axes[0, 2].imshow(gt, cmap="gray")
+        axes[0, 2].imshow(norm01(gt), cmap="gray", vmin=0, vmax=1)
         axes[0, 2].set_title(f"{title_prefix} Ground Truth")
 
-    # Error maps
-    diff = np.abs(img_pred - img_meas)
+    # Error maps (normalize pred/meas to same scale for comparison)
+    img_pred_n = norm01(img_pred)
+    img_meas_n = norm01(img_meas)
+
+    diff = np.abs(img_pred_n - img_meas_n)
     axes[1, 0].imshow(diff, cmap="hot")
-    axes[1, 0].set_title(f"{title_prefix} |pred - meas|")
+    axes[1, 0].set_title(f"{title_prefix} |pred - meas| (normalized)")
 
     eps = 1e-10
-    rel_diff = diff / (img_meas + eps)
+    rel_diff = diff / (img_meas_n + eps)
     im_rel = axes[1, 1].imshow(np.log10(rel_diff + eps), cmap="hot")
     axes[1, 1].set_title(f"{title_prefix} relative error (log10)")
     plt.colorbar(im_rel, ax=axes[1, 1], fraction=0.046, pad=0.04)
 
     if gt_img_slice is not None:
-        diff_gt = np.abs(img_pred - gt)
+        diff_gt = np.abs(img_pred_n - norm01(gt))
         axes[1, 2].imshow(diff_gt, cmap="hot")
-        axes[1, 2].set_title(f"{title_prefix} |pred - GT|")
+        axes[1, 2].set_title(f"{title_prefix} |pred - GT| (normalized)")
 
     for ax_row in axes:
         for ax in ax_row:
