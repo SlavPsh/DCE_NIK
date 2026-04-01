@@ -15,6 +15,8 @@ import numpy as np
 import torch
 from scipy.ndimage import uniform_filter
 
+_PIQ_DISTS_METRIC = None
+
 
 # ---------------------------------------------------------------------------
 # PSNR
@@ -237,6 +239,7 @@ def compute_perceptual_metrics(
     dict with metric names as keys and float values.
     """
     import piq
+    global _PIQ_DISTS_METRIC
 
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
@@ -269,8 +272,9 @@ def compute_perceptual_metrics(
     results["HaarPSI"] = float(piq.haarpsi(pred_1ch, ref_1ch, data_range=1.0).item())
 
     # DISTS (lower is better) — needs 3-channel
-    dists_metric = piq.DISTS()
-    results["DISTS"] = float(dists_metric(pred_3ch, ref_3ch).item())
+    if _PIQ_DISTS_METRIC is None:
+        _PIQ_DISTS_METRIC = piq.DISTS()
+    results["DISTS"] = float(_PIQ_DISTS_METRIC(pred_3ch, ref_3ch).item())
 
     # VSI (higher is better) — needs 3-channel
     results["VSI"] = float(piq.vsi(pred_3ch, ref_3ch, data_range=1.0).item())

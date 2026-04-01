@@ -876,8 +876,10 @@ def make_cartesian_eval_dataset(
     """
     Build evaluation dataset on the Cartesian grid.
 
-    The Cartesian grid coordinates are normalized using the radial trajectory
-    scales so that the coordinate systems match between training and evaluation.
+    The Cartesian grid coordinates are built from centered FFT bins,
+    matching XCAT-ERIC's ``fftshift(fftn(...))`` convention. They are then
+    normalized using the radial trajectory scales so the coordinate systems
+    match between training and evaluation.
 
     Args:
         k_cart_z: (T, C, nz, ky, kx) complex tensor (after kz->z IFFT)
@@ -902,9 +904,15 @@ def make_cartesian_eval_dataset(
     # Extract single slice: (ky, kx) complex
     k_slice = k_cart_z[t_fixed, coil_fixed, z_slice_idx, :, :]  # (nky, nkx)
 
-    # Generate Cartesian grid coordinates in [-0.5, 0.5]
-    kx_lin = torch.linspace(-0.5, 0.5, nkx)
-    ky_lin = torch.linspace(-0.5, 0.5, nky)
+    # Match the simulator's centered FFT convention exactly:
+    # DC is at index n//2, the negative Nyquist bin is included,
+    # and the positive endpoint is excluded.
+    kx_lin = torch.fft.fftshift(
+        torch.fft.fftfreq(nkx, device=dev, dtype=torch.float32)
+    )
+    ky_lin = torch.fft.fftshift(
+        torch.fft.fftfreq(nky, device=dev, dtype=torch.float32)
+    )
     KY, KX = torch.meshgrid(ky_lin, kx_lin, indexing="ij")  # (nky, nkx)
 
     # Normalize by radial scales (same normalization as training data)

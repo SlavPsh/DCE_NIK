@@ -51,7 +51,7 @@ from nik_recon import (
     ifft1d_kz_to_z_cartesian,
     make_cartesian_eval_dataset,
 )
-from nik_metrics import compute_image_metrics
+from nik_metrics import compute_image_metrics, compute_perceptual_metrics
 from wandb_logger import (
     make_spoke_figure,
     make_error_map_figure,
@@ -286,6 +286,18 @@ def main(config_path, data):
     dcf_method = norm_cfg.get('dcf_method', 'simple_ramp')
     dcf_power = float(getattr(wc, "dcf_power", norm_cfg.get('dcf_power', 0.7)))
 
+    # If sweep overrides subsample_frac, re-subsample
+    if subsample_frac != data["subsample_frac"]:
+        n_unique_spokes = data["n_unique_spokes"]
+        n_train_spokes = max(1, int(n_unique_spokes * subsample_frac))
+        g = torch.Generator(device=spoke_id_all.device)
+        g.manual_seed(seed)
+        perm = torch.randperm(n_unique_spokes, generator=g, device=spoke_id_all.device)
+        train_spokes = perm[:n_train_spokes]
+        train_mask = torch.isin(spoke_id_all, train_spokes)
+        train_idx = torch.where(train_mask)[0]
+        logging.info(f"Re-subsampled: {n_train_spokes}/{n_unique_spokes} spokes ({subsample_frac:.0%})")
+
     kcoords_radial = x_all[:, :2]
 
     if use_dcf:
@@ -293,10 +305,16 @@ def main(config_path, data):
     else:
         dcf = torch.ones(kcoords_radial.shape[0], device=kcoords_radial.device)
 
+    # Fit normalization only on the actual training split to avoid
+    # leaking held-out spokes into the target scaling.
+    kcoords_train = kcoords_radial[train_idx]
+    y_train_raw_for_norm = y_all_raw[train_idx]
+    dcf_train_for_norm = dcf[train_idx]
+
     normalizer = KSpaceNormalizer()
     if use_envelope:
         normalizer.fit(
-            kcoords_radial, y_all_raw, dcf=dcf,
+            kcoords_train, y_train_raw_for_norm, dcf=dcf_train_for_norm,
             envelope_bins=norm_cfg.get('envelope_bins', 128),
             envelope_statistic=norm_cfg.get('envelope_statistic', 'weighted_rms'),
             envelope_smooth_method=norm_cfg.get('envelope_smooth_method', 'moving_average'),
@@ -306,9 +324,9 @@ def main(config_path, data):
         )
     else:
         from kspace_normalization import compute_global_scale, compute_radius, _to_complex, RadialEnvelope
-        y_c = _to_complex(y_all_raw)
-        normalizer.global_scale = compute_global_scale(y_c, dcf=dcf)
-        r_max = float(compute_radius(kcoords_radial).max().item())
+        y_c = _to_complex(y_train_raw_for_norm)
+        normalizer.global_scale = compute_global_scale(y_c, dcf=dcf_train_for_norm)
+        r_max = float(compute_radius(kcoords_train).max().item())
         normalizer.envelope = RadialEnvelope(
             bin_centers=torch.linspace(0, r_max, 128),
             raw_shell_values=torch.ones(128),
@@ -321,23 +339,15 @@ def main(config_path, data):
     y_all = normalizer.normalize(kcoords_radial, y_all_raw)
     y_cart = normalizer.normalize(x_cart[:, :2], y_cart_raw)
 
-    logging.info(f"Normalization: use_envelope={use_envelope}, use_dcf={use_dcf}, "
-                 f"dcf_power={dcf_power}, global_scale={normalizer.global_scale:.4f}")
+    logging.info(
+        f"Normalization: fit_on_train_only=True, use_envelope={use_envelope}, "
+        f"use_dcf={use_dcf}, dcf_power={dcf_power}, "
+        f"global_scale={normalizer.global_scale:.4f}"
+    )
     wandb.config.update({
         "use_envelope": use_envelope, "use_dcf": use_dcf, "dcf_power": dcf_power,
+        "normalizer_fit_on_train_only": True,
     }, allow_val_change=True)
-
-    # If sweep overrides subsample_frac, re-subsample
-    if subsample_frac != data["subsample_frac"]:
-        n_unique_spokes = data["n_unique_spokes"]
-        n_train_spokes = max(1, int(n_unique_spokes * subsample_frac))
-        g = torch.Generator(device=spoke_id_all.device)
-        g.manual_seed(seed)
-        perm = torch.randperm(n_unique_spokes, generator=g, device=spoke_id_all.device)
-        train_spokes = perm[:n_train_spokes]
-        train_mask = torch.isin(spoke_id_all, train_spokes)
-        train_idx = torch.where(train_mask)[0]
-        logging.info(f"Re-subsampled: {n_train_spokes}/{n_unique_spokes} spokes ({subsample_frac:.0%})")
 
     wandb.config.update({
         "n_train_points": int(train_idx.shape[0]),
@@ -406,9 +416,58 @@ def main(config_path, data):
     dcf = dcf.to(device)
     dcf_train = dcf[train_idx]
 
+    # Held-out radial spokes (for validation when subsample_frac < 1)
+    all_spokes = torch.arange(data["n_unique_spokes"], device=spoke_id_all.device)
+    train_spoke_set = torch.unique(spoke_id_all[train_idx])
+    heldout_mask = ~torch.isin(spoke_id_all, train_spoke_set)
+    heldout_idx = torch.where(heldout_mask)[0]
+    has_heldout = heldout_idx.numel() > 0
+    if has_heldout:
+        x_heldout = x_all_2d[heldout_idx]
+        y_heldout = y_all_dev[heldout_idx]
+        logging.info(f"Held-out radial spokes: {data['n_unique_spokes'] - len(train_spoke_set)} spokes, "
+                     f"{heldout_idx.shape[0]} points")
+    else:
+        x_heldout = y_heldout = None
+        logging.info("No held-out radial spokes (subsample_frac=1.0)")
+
     # Cartesian eval tensors (already on device from load_data)
     x_cart_dev = x_cart.to(device)
     y_cart_dev = y_cart.to(device)
+    radial_rmax = float(torch.sqrt((kcoords_train[:, 0] ** 2 + kcoords_train[:, 1] ** 2)).max().item())
+    cart_r_dev = torch.sqrt(x_cart_dev[:, 0] ** 2 + x_cart_dev[:, 1] ** 2)
+    cart_in_disk_mask = cart_r_dev <= (radial_rmax + 1e-6)
+    cart_kspace_mask = cart_in_disk_mask.reshape(nky, nkx)
+    n_cart_in_disk = int(cart_in_disk_mask.sum().item())
+    wandb.config.update({
+        "radial_rmax": radial_rmax,
+        "n_cart_eval_points_in_disk": n_cart_in_disk,
+        "cart_eval_in_disk_fraction": n_cart_in_disk / max(1, meta_cart["N"]),
+    }, allow_val_change=True)
+    with torch.no_grad():
+        y_meas_denorm_hist = normalizer.denormalize(x_cart_dev, y_cart_dev)
+        k_meas_hist = torch.complex(
+            y_meas_denorm_hist[:, 0], y_meas_denorm_hist[:, 1]
+        ).reshape(nky, nkx)
+        k_meas_hist = k_meas_hist * cart_kspace_mask
+        cart_ref_img = torch.fft.ifft2(k_meas_hist).abs().cpu().numpy().T
+    cart_image_metrics_enabled = True
+
+    def _compute_cartesian_image_history_metrics(cart_pred_norm: torch.Tensor) -> dict:
+        cart_pred_denorm = normalizer.denormalize(x_cart_dev, cart_pred_norm)
+        k_pred = torch.complex(
+            cart_pred_denorm[:, 0], cart_pred_denorm[:, 1]
+        ).reshape(nky, nkx)
+        k_pred = k_pred * cart_kspace_mask
+        img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
+
+        img_metrics = compute_image_metrics(img_pred, cart_ref_img)
+        perc_metrics = compute_perceptual_metrics(img_pred, cart_ref_img)
+        return {
+            "train/cart_ref_ssim": img_metrics["ssim"],
+            "train/cart_ref_dists": perc_metrics["DISTS"],
+            "train/cart_ref_haarpsi": perc_metrics["HaarPSI"],
+        }
 
     # ---- Plot metadata ----
     train_spoke_show = int(torch.unique(spoke_id_all[train_idx])[0].item())
@@ -423,11 +482,15 @@ def main(config_path, data):
     # ---- Training loop ----
     model.train()
     best_cart_loss = float("inf")
+    best_cart_loss_in_disk = float("inf")
     best_state = None
     last_cart_loss = None
+    last_cart_loss_in_disk = None
+    last_heldout_loss = None
 
     logging.info(f"Training for {steps} steps on {N_train} radial points, "
-                 f"eval on {meta_cart['N']} Cartesian points")
+                 f"eval on {meta_cart['N']} Cartesian points "
+                 f"({n_cart_in_disk} in-disk)")
 
     for step in range(1, steps + 1):
         # Training step
@@ -445,29 +508,49 @@ def main(config_path, data):
 
         train_loss = float(loss.item())
 
-        # Cartesian evaluation
+        # Evaluation
         if step % eval_every == 0 or step == steps:
             model.eval()
             with torch.no_grad():
                 cart_pred = model(x_cart_dev)
                 last_cart_loss = float(F.mse_loss(cart_pred, y_cart_dev).item())
+                last_cart_loss_in_disk = float(
+                    F.mse_loss(cart_pred[cart_in_disk_mask], y_cart_dev[cart_in_disk_mask]).item()
+                )
+                if has_heldout:
+                    heldout_pred = model(x_heldout)
+                    last_heldout_loss = float(F.mse_loss(heldout_pred, y_heldout).item())
+                else:
+                    last_heldout_loss = None
             model.train()
 
             # Only checkpoint after warmup: an untrained model predicting
             # near-zero trivially achieves low cart MSE since most of k-space
             # is small.
             warmup_steps = config['training'].get('warmup_steps', steps // 5)
-            if step >= warmup_steps and last_cart_loss < best_cart_loss:
-                best_cart_loss = last_cart_loss
+            if step >= warmup_steps and last_cart_loss_in_disk < best_cart_loss:
+                best_cart_loss = last_cart_loss_in_disk
                 best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+            if step >= warmup_steps:
+                best_cart_loss_in_disk = min(best_cart_loss_in_disk, last_cart_loss_in_disk)
 
             if scheduler is not None:
-                scheduler.step(last_cart_loss)
+                scheduler.step(last_cart_loss_in_disk)
 
         # Logging
         log_dict = {"train/train_loss": train_loss}
-        if last_cart_loss is not None and (step % eval_every == 0 or step == steps):
+        if step % eval_every == 0 or step == steps:
             log_dict["train/cart_eval_loss"] = last_cart_loss
+            log_dict["train/cart_eval_loss_full"] = last_cart_loss
+            log_dict["train/cart_eval_loss_in_disk"] = last_cart_loss_in_disk
+            if last_heldout_loss is not None:
+                log_dict["train/heldout_spoke_loss"] = last_heldout_loss
+            if cart_image_metrics_enabled:
+                try:
+                    log_dict.update(_compute_cartesian_image_history_metrics(cart_pred))
+                except Exception as e:
+                    cart_image_metrics_enabled = False
+                    logging.warning(f"Disabling per-eval Cartesian image metrics: {e}")
         if scheduler is not None:
             log_dict["train/lr"] = opt.param_groups[0]["lr"]
         wandb_logger.log(log_dict, step=step)
@@ -518,6 +601,7 @@ def main(config_path, data):
                     x_cart=x_cart, y_cart=y_cart,
                     normalizer=normalizer,
                     nky=nky, nkx=nkx,
+                    kspace_mask=cart_in_disk_mask,
                     gt_img_slice=gt_img_slice,
                     title_prefix=f"step {step}",
                 )
@@ -576,7 +660,11 @@ def main(config_path, data):
         if step % console_every == 0:
             msg = f"step {step:6d}  train {train_loss:.3e}"
             if last_cart_loss is not None:
-                msg += f"  cart_eval {last_cart_loss:.3e}"
+                msg += f"  cart_full {last_cart_loss:.3e}"
+            if last_cart_loss_in_disk is not None:
+                msg += f"  cart_disk {last_cart_loss_in_disk:.3e}"
+            if last_heldout_loss is not None:
+                msg += f"  heldout {last_heldout_loss:.3e}"
             logging.info(msg)
 
     # ---- Restore best model and final evaluation ----
@@ -585,6 +673,17 @@ def main(config_path, data):
     model.eval()
 
     # normalizer is already a local variable from normalization setup above
+    final_cart_loss = None
+    final_cart_loss_in_disk = None
+    final_heldout_loss = None
+    with torch.no_grad():
+        cart_pred_eval = model(x_cart_dev)
+        final_cart_loss = float(F.mse_loss(cart_pred_eval, y_cart_dev).item())
+        final_cart_loss_in_disk = float(
+            F.mse_loss(cart_pred_eval[cart_in_disk_mask], y_cart_dev[cart_in_disk_mask]).item()
+        )
+        if has_heldout:
+            final_heldout_loss = float(F.mse_loss(model(x_heldout), y_heldout).item())
 
     try:
         with torch.no_grad():
@@ -597,60 +696,127 @@ def main(config_path, data):
             y_meas_denorm = normalizer.denormalize(x_cart[:, :2].to(device), y_cart_dev)
             k_meas = torch.complex(y_meas_denorm[:, 0], y_meas_denorm[:, 1]).reshape(nky, nkx)
 
+            # Fair image-space comparison: keep only the radial-supported disk
+            # and zero-fill the unsupported Cartesian corners.
+            k_pred = k_pred * cart_kspace_mask
+            k_meas = k_meas * cart_kspace_mask
+
             # IFFT to image (.T to match radial NUFFT axis convention)
             img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
             img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
+        # GT = IFFT of fully sampled Cartesian (single coil)
+        # All images are in original absolute scale (denormalized).
+        # Only /max() for wandb.Image display, NOT for metrics.
+        gt_cart = img_meas
+        display_max = max(img_meas.max(), img_pred.max()) or 1.0
+
         wandb_logger.log({
-            "recon/cart_predicted": wandb.Image(img_pred / (img_pred.max() or 1.0)),
-            "recon/cart_measured": wandb.Image(img_meas / (img_meas.max() or 1.0)),
+            "recon/gt_cart": wandb.Image(gt_cart / display_max),
+            "recon/model_cart_pred": wandb.Image(img_pred / display_max),
         }, step=steps)
 
-        metrics = compute_image_metrics(img_pred, img_meas)
+        # ---- Method 1: Model predicted Cartesian → IFFT vs GT ----
+        m1_metrics = compute_image_metrics(img_pred, gt_cart)
+        m1_perceptual = compute_perceptual_metrics(img_pred, gt_cart)
         wandb_logger.log({
-            "metrics/psnr_cart": metrics["psnr_db"],
-            "metrics/ssim_cart": metrics["ssim"],
-            "metrics/nrmse_cart": metrics["nrmse"],
+            "model_vs_gt/psnr": m1_metrics["psnr_db"],
+            "model_vs_gt/ssim": m1_metrics["ssim"],
+            "model_vs_gt/nrmse": m1_metrics["nrmse"],
+            "model_vs_gt/dists": m1_perceptual["DISTS"],
+            "model_vs_gt/haarpsi": m1_perceptual["HaarPSI"],
+            "model_vs_gt/vsi": m1_perceptual["VSI"],
         }, step=steps)
         wandb.run.summary.update({
-            "psnr_cart": metrics["psnr_db"],
-            "ssim_cart": metrics["ssim"],
-            "nrmse_cart": metrics["nrmse"],
+            "model_psnr": m1_metrics["psnr_db"],
+            "model_ssim": m1_metrics["ssim"],
+            "model_nrmse": m1_metrics["nrmse"],
+            "model_dists": m1_perceptual["DISTS"],
+            "model_haarpsi": m1_perceptual["HaarPSI"],
+            "model_vsi": m1_perceptual["VSI"],
         })
         logging.info(
-            f"Cart metrics:  PSNR={metrics['psnr_db']:.2f} dB  "
-            f"SSIM={metrics['ssim']:.4f}  NRMSE={metrics['nrmse']:.4f}"
+            f"Model vs GT:  PSNR={m1_metrics['psnr_db']:.2f}  SSIM={m1_metrics['ssim']:.4f}  "
+            f"DISTS={m1_perceptual['DISTS']:.4f}  HaarPSI={m1_perceptual['HaarPSI']:.4f}  "
+            f"VSI={m1_perceptual['VSI']:.4f}"
         )
 
-        if gt_img_slice is not None:
-            gt_slice = np.asarray(gt_img_slice, dtype=np.float64)
-            if gt_slice.shape != img_pred.shape and gt_slice.shape == img_pred.shape[::-1]:
-                gt_slice = gt_slice.T
-            if img_pred.shape != gt_slice.shape:
-                from scipy.ndimage import zoom
-                zf = (gt_slice.shape[0] / img_pred.shape[0], gt_slice.shape[1] / img_pred.shape[1])
-                img_pred_r = zoom(img_pred, zf, order=3)
-            else:
-                img_pred_r = img_pred
-            # Normalize both to [0, 1] for meaningful metrics
-            # (IFFT output scale differs from GT scale due to single-coil + FFT normalization)
-            gt_n = gt_slice / (gt_slice.max() or 1.0)
-            pred_n = img_pred_r / (img_pred_r.max() or 1.0)
-            metrics_gt = compute_image_metrics(pred_n, gt_n)
-            wandb_logger.log({
-                "metrics/psnr_vs_gt": metrics_gt["psnr_db"],
-                "metrics/ssim_vs_gt": metrics_gt["ssim"],
-                "metrics/nrmse_vs_gt": metrics_gt["nrmse"],
-            }, step=steps)
-            wandb.run.summary.update({
-                "psnr_vs_gt": metrics_gt["psnr_db"],
-                "ssim_vs_gt": metrics_gt["ssim"],
-                "nrmse_vs_gt": metrics_gt["nrmse"],
-            })
-            logging.info(
-                f"GT metrics:    PSNR={metrics_gt['psnr_db']:.2f} dB  "
-                f"SSIM={metrics_gt['ssim']:.4f}  NRMSE={metrics_gt['nrmse']:.4f}"
-            )
+        # ---- Method 2: NUFFT of subsampled radial vs GT ----
+        # Reconstruct from the training spokes (subsampled radial)
+        from nik_recon import nufft2d_recon
+        _t = config['data']['t_frame']
+        _c = config['data']['coil_idx']
+        _z = data["z_slice_idx"]
+
+        # Build k_img_space with only training spokes
+        k_img_sub = torch.zeros_like(data["k_img_space"])
+        # train_idx indexes into the flattened (spoke, RO) array for one z-slice
+        # We need spoke indices, not point indices
+        train_spoke_ids = torch.unique(spoke_id_all[train_idx])
+        # Copy only training spokes into k_img_sub
+        for sp_id in train_spoke_ids:
+            k_img_sub[:, sp_id, :, :, :] = data["k_img_space"][:, sp_id, :, :, :]
+
+        img_nufft_sub = nufft2d_recon(
+            k_img_sub, data["traj_t"], t_frame=_t, coil_idx=_c,
+            z_slice_idx=_z, scales=data["scales"],
+            img_size=(312, 312), n_slices=data["n_z_slices"],
+        )
+
+        # Crop NUFFT image (312×312) to match Cartesian GT size (after .T)
+        # Cartesian FOV is 214 in AP vs 312 in radial (padded to square)
+        gt_h, gt_w = gt_cart.shape
+        nufft_h, nufft_w = img_nufft_sub.shape
+        if nufft_h != gt_h or nufft_w != gt_w:
+            # Center crop
+            y0 = (nufft_h - gt_h) // 2
+            x0 = (nufft_w - gt_w) // 2
+            img_nufft_crop = img_nufft_sub[y0:y0+gt_h, x0:x0+gt_w]
+        else:
+            img_nufft_crop = img_nufft_sub
+
+        nufft_display_max = max(img_nufft_crop.max(), gt_cart.max()) or 1.0
+        wandb_logger.log({
+            "recon/nufft_subsampled": wandb.Image(img_nufft_crop / nufft_display_max),
+        }, step=steps)
+
+        m2_metrics = compute_image_metrics(img_nufft_crop, gt_cart)
+        m2_perceptual = compute_perceptual_metrics(img_nufft_crop, gt_cart)
+        wandb_logger.log({
+            "nufft_vs_gt/psnr": m2_metrics["psnr_db"],
+            "nufft_vs_gt/ssim": m2_metrics["ssim"],
+            "nufft_vs_gt/nrmse": m2_metrics["nrmse"],
+            "nufft_vs_gt/dists": m2_perceptual["DISTS"],
+            "nufft_vs_gt/haarpsi": m2_perceptual["HaarPSI"],
+            "nufft_vs_gt/vsi": m2_perceptual["VSI"],
+        }, step=steps)
+        wandb.run.summary.update({
+            "nufft_psnr": m2_metrics["psnr_db"],
+            "nufft_ssim": m2_metrics["ssim"],
+            "nufft_nrmse": m2_metrics["nrmse"],
+            "nufft_dists": m2_perceptual["DISTS"],
+            "nufft_haarpsi": m2_perceptual["HaarPSI"],
+            "nufft_vsi": m2_perceptual["VSI"],
+        })
+        logging.info(
+            f"NUFFT vs GT:  PSNR={m2_metrics['psnr_db']:.2f}  SSIM={m2_metrics['ssim']:.4f}  "
+            f"DISTS={m2_perceptual['DISTS']:.4f}  HaarPSI={m2_perceptual['HaarPSI']:.4f}  "
+            f"VSI={m2_perceptual['VSI']:.4f}"
+        )
+
+        # ---- Delta: model improvement over NUFFT baseline ----
+        delta_psnr = m1_metrics["psnr_db"] - m2_metrics["psnr_db"]
+        delta_dists = m2_perceptual["DISTS"] - m1_perceptual["DISTS"]  # positive = model better
+        delta_haarpsi = m1_perceptual["HaarPSI"] - m2_perceptual["HaarPSI"]  # positive = model better
+        wandb.run.summary.update({
+            "delta_psnr": delta_psnr,
+            "delta_dists": delta_dists,
+            "delta_haarpsi": delta_haarpsi,
+        })
+        logging.info(
+            f"Model vs NUFFT delta:  dPSNR={delta_psnr:+.2f} dB  "
+            f"dDISTS={delta_dists:+.4f}  dHaarPSI={delta_haarpsi:+.4f}"
+        )
     except Exception as e:
         logging.warning(f"Final Cartesian evaluation failed: {e}")
         import traceback
@@ -687,19 +853,28 @@ def main(config_path, data):
             "recon/radial_measured": wandb.Image(img_rad_meas / (img_rad_meas.max() or 1.0)),
         }, step=steps)
         rad_metrics = compute_image_metrics(img_rad_pred, img_rad_meas)
+        rad_perceptual = compute_perceptual_metrics(img_rad_pred, img_rad_meas)
         wandb_logger.log({
             "metrics/psnr_radial": rad_metrics["psnr_db"],
             "metrics/ssim_radial": rad_metrics["ssim"],
             "metrics/nrmse_radial": rad_metrics["nrmse"],
+            "metrics/dists_radial": rad_perceptual["DISTS"],
+            "metrics/haarpsi_radial": rad_perceptual["HaarPSI"],
+            "metrics/vsi_radial": rad_perceptual["VSI"],
         }, step=steps)
         wandb.run.summary.update({
             "psnr_radial": rad_metrics["psnr_db"],
             "ssim_radial": rad_metrics["ssim"],
             "nrmse_radial": rad_metrics["nrmse"],
+            "dists_radial": rad_perceptual["DISTS"],
+            "haarpsi_radial": rad_perceptual["HaarPSI"],
+            "vsi_radial": rad_perceptual["VSI"],
         })
         logging.info(
             f"Radial metrics: PSNR={rad_metrics['psnr_db']:.2f} dB  "
-            f"SSIM={rad_metrics['ssim']:.4f}  NRMSE={rad_metrics['nrmse']:.4f}"
+            f"SSIM={rad_metrics['ssim']:.4f}  NRMSE={rad_metrics['nrmse']:.4f}  "
+            f"DISTS={rad_perceptual['DISTS']:.4f}  HaarPSI={rad_perceptual['HaarPSI']:.4f}  "
+            f"VSI={rad_perceptual['VSI']:.4f}"
         )
     except Exception as e:
         logging.warning(f"Radial NUFFT evaluation failed: {e}")
@@ -710,10 +885,18 @@ def main(config_path, data):
     wandb_logger.save_model(model, "model_best.pth", opt, steps, output_dir)
 
     wandb.run.summary["cart_eval_loss"] = best_cart_loss
+    wandb.run.summary["best_cart_eval_loss_in_disk"] = best_cart_loss_in_disk
+    wandb.run.summary["final_cart_eval_loss"] = final_cart_loss
+    wandb.run.summary["final_cart_eval_loss_in_disk"] = final_cart_loss_in_disk
+    if final_heldout_loss is not None:
+        wandb.run.summary["final_heldout_spoke_loss"] = final_heldout_loss
     wandb.run.summary["final_train_loss"] = train_loss
     wandb.run.summary["total_steps"] = steps
 
-    logging.info(f"Done. best_cart_eval_loss={best_cart_loss:.3e}")
+    logging.info(
+        f"Done. best_cart_eval_loss={best_cart_loss:.3e}  "
+        f"best_cart_eval_loss_in_disk={best_cart_loss_in_disk:.3e}"
+    )
     wandb_logger.finish()
 
 

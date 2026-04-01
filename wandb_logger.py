@@ -345,6 +345,7 @@ def make_cartesian_image_comparison(
     y_scale=1.0,
     normalizer=None,
     nky, nkx,
+    kspace_mask=None,
     gt_img_slice=None,
     title_prefix="",
 ):
@@ -354,6 +355,9 @@ def make_cartesian_image_comparison(
 
     If normalizer is provided, uses it to denormalize. Otherwise falls back
     to scalar y_scale multiplication.
+
+    If kspace_mask is provided, it is applied in k-space before IFFT,
+    typically to zero-fill Cartesian points outside the radial support.
 
     Returns a matplotlib Figure.
     """
@@ -378,6 +382,13 @@ def make_cartesian_image_comparison(
         ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
         y_meas_denorm = y_cart * ys
     k_meas = torch.complex(y_meas_denorm[:, 0], y_meas_denorm[:, 1]).reshape(nky, nkx).to(device)
+
+    if kspace_mask is not None:
+        mask = kspace_mask.to(device)
+        if mask.ndim == 1:
+            mask = mask.reshape(nky, nkx)
+        k_pred = k_pred * mask
+        k_meas = k_meas * mask
 
     # IFFT to image space
     # Measured k-space (from simulator) and predicted k-space (from model) have
@@ -433,5 +444,4 @@ def make_cartesian_image_comparison(
 
     plt.tight_layout()
     return fig
-
 
