@@ -1,14 +1,14 @@
 [experiment]
-name = "Sweep: subsampling grid with best WIRE configs"
-description = "Fix architecture near best, grid sweep over subsample_frac"
+name = "Multicoil NIK: radial train, Cartesian eval"
+description = "Direct multicoil output, coil-combined reconstruction with known sensitivities"
 
 [data]
 radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
 cartesian_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T113845_cart.mat"
 t_frame = 0
-coil_idx = 0
 z_slice_idx = -1
 subsample_frac = 1.0
+multicoil = true
 
 [model]
 model_family = "wire"
@@ -31,9 +31,10 @@ warmup_steps = 1600
 scheduler_patience = 50
 scheduler_factor = 0.5
 scheduler_min_lr = 1e-6
+image_metric_every = 1000
 
 [training.plot]
-plot_every = 5000
+plot_every = 2000
 log_scale = true
 
 [normalization]
@@ -57,25 +58,3 @@ console_every = 100
 
 [wandb]
 watch_interval = 0
-
-[sweep]
-name = "Subsample + WIRE: model vs NUFFT (absolute scale metrics)"
-entity = "spshenov-university-of-amsterdam"
-project = "NIK-DCE-MRI-CartEval"
-method = "grid"
-
-[sweep.metric]
-name = "delta_dists"
-goal = "maximize"
-
-[sweep.parameters.subsample_frac]
-values = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0]
-
-[sweep.parameters.w0]
-values = [32.0, 55.0, 77.0]
-
-[sweep.parameters.depth]
-values = [6, 8]
-
-[sweep.parameters.s0]
-values = [14.0, 18.0]

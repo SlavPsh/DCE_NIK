@@ -155,7 +155,7 @@ def load_data(config):
     print(f"Cartesian eval dataset: {meta_cart['N']} points "
           f"(nky={meta_cart['nky']}, nkx={meta_cart['nkx']})", flush=True)
 
-    gt_img_slice = None
+    ref_img_slice = None
 
     return {
         # Radial training data (RAW, unnormalized)
@@ -173,7 +173,7 @@ def load_data(config):
         # Cartesian eval data (RAW, unnormalized)
         "x_cart": x_cart, "y_cart_raw": y_cart,
         "meta_cart": meta_cart,
-        "gt_img_slice": gt_img_slice,
+        "ref_img_slice": ref_img_slice,
         "coil_maps_cart": coil_maps_cart,
         # Shared
         "gt_img": gt_img,
@@ -277,7 +277,7 @@ def main(config_path, data):
     x_cart = data["x_cart"]
     y_cart_raw = data["y_cart_raw"]
     nky, nkx = meta_cart["nky"], meta_cart["nkx"]
-    gt_img_slice = data.get("gt_img_slice")
+    ref_img_slice = data.get("ref_img_slice")
 
     # ---- Normalization (sweepable) ----
     use_envelope = bool(getattr(wc, "use_envelope", config.get('normalization', {}).get('use_envelope', True)))
@@ -399,11 +399,27 @@ def main(config_path, data):
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
     scheduler = None
-    if scheduler_patience > 0:
+    scheduler_type = config['training'].get('scheduler_type', 'plateau')
+    if scheduler_type == "onecycle":
+        # Cosine warmup + decay; max LR = lr (config), pct_start = warmup fraction
+        scheduler = torch.optim.lr_scheduler.OneCycleLR(
+            opt, max_lr=lr * 10,  # 10x peak above base lr
+            total_steps=int(config['training']['steps']),
+            pct_start=0.1, anneal_strategy='cos',
+            div_factor=10.0, final_div_factor=1e3,
+        )
+        logging.info(f"Scheduler: OneCycleLR (max_lr={lr*10:.2e}, total={config['training']['steps']})")
+    elif scheduler_type == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            opt, T_max=int(config['training']['steps']), eta_min=scheduler_min_lr,
+        )
+        logging.info(f"Scheduler: CosineAnnealingLR (eta_min={scheduler_min_lr})")
+    elif scheduler_patience > 0:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             opt, mode="min", factor=scheduler_factor,
             patience=scheduler_patience, min_lr=scheduler_min_lr,
         )
+        logging.info(f"Scheduler: ReduceLROnPlateau (patience={scheduler_patience})")
 
     # ---- Prepare training tensors ----
     x_all_2d = x_all[:, :2].to(device)
@@ -506,6 +522,10 @@ def main(config_path, data):
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
 
+        # Per-step scheduler step (OneCycle, Cosine)
+        if scheduler is not None and scheduler_type in ("onecycle", "cosine"):
+            scheduler.step()
+
         train_loss = float(loss.item())
 
         # Evaluation
@@ -534,7 +554,7 @@ def main(config_path, data):
             if step >= warmup_steps:
                 best_cart_loss_in_disk = min(best_cart_loss_in_disk, last_cart_loss_in_disk)
 
-            if scheduler is not None:
+            if scheduler is not None and scheduler_type == "plateau":
                 scheduler.step(last_cart_loss_in_disk)
 
         # Logging
@@ -545,7 +565,8 @@ def main(config_path, data):
             log_dict["train/cart_eval_loss_in_disk"] = last_cart_loss_in_disk
             if last_heldout_loss is not None:
                 log_dict["train/heldout_spoke_loss"] = last_heldout_loss
-            if cart_image_metrics_enabled:
+            image_metric_every = config['training'].get('image_metric_every', 1000)
+            if cart_image_metrics_enabled and (step % image_metric_every == 0 or step == steps):
                 try:
                     log_dict.update(_compute_cartesian_image_history_metrics(cart_pred))
                 except Exception as e:
@@ -602,7 +623,7 @@ def main(config_path, data):
                     normalizer=normalizer,
                     nky=nky, nkx=nkx,
                     kspace_mask=cart_in_disk_mask,
-                    gt_img_slice=gt_img_slice,
+                    ref_img_slice=ref_img_slice,
                     title_prefix=f"step {step}",
                 )
                 figures["plots/cart_image_comparison"] = fig_cart_img
@@ -705,27 +726,36 @@ def main(config_path, data):
             img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
             img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
-        # GT = IFFT of fully sampled Cartesian (single coil)
-        # All images are in original absolute scale (denormalized).
-        # Only /max() for wandb.Image display, NOT for metrics.
-        gt_cart = img_meas
+        # Reference = IFFT of fully sampled Cartesian (single coil)
+        # For model vs ref: both denormalized, same absolute scale.
+        cart_ref_denorm = img_meas
         display_max = max(img_meas.max(), img_pred.max()) or 1.0
 
+        # For NUFFT vs ref: use raw (non-normalized) Cartesian k-space
+        # so both NUFFT and ref are in the same raw scale.
+        with torch.no_grad():
+            k_meas_raw = torch.complex(y_cart_raw[:, 0], y_cart_raw[:, 1]).reshape(nky, nkx).to(device)
+            k_meas_raw = k_meas_raw * cart_kspace_mask
+            cart_ref_raw = torch.fft.ifft2(k_meas_raw).abs().cpu().numpy().T
+
         wandb_logger.log({
-            "recon/gt_cart": wandb.Image(gt_cart / display_max),
+            "recon/cart_ref": wandb.Image(cart_ref_denorm / display_max),
             "recon/model_cart_pred": wandb.Image(img_pred / display_max),
         }, step=steps)
 
-        # ---- Method 1: Model predicted Cartesian → IFFT vs GT ----
-        m1_metrics = compute_image_metrics(img_pred, gt_cart)
-        m1_perceptual = compute_perceptual_metrics(img_pred, gt_cart)
+        # ---- Method 1: Model predicted Cartesian → IFFT vs Ref ----
+        # Normalize to [0,1] for comparable metrics with NUFFT baseline.
+        img_pred_n = img_pred / (img_pred.max() or 1.0)
+        cart_ref_denorm_n = cart_ref_denorm / (cart_ref_denorm.max() or 1.0)
+        m1_metrics = compute_image_metrics(img_pred_n, cart_ref_denorm_n)
+        m1_perceptual = compute_perceptual_metrics(img_pred_n, cart_ref_denorm_n)
         wandb_logger.log({
-            "model_vs_gt/psnr": m1_metrics["psnr_db"],
-            "model_vs_gt/ssim": m1_metrics["ssim"],
-            "model_vs_gt/nrmse": m1_metrics["nrmse"],
-            "model_vs_gt/dists": m1_perceptual["DISTS"],
-            "model_vs_gt/haarpsi": m1_perceptual["HaarPSI"],
-            "model_vs_gt/vsi": m1_perceptual["VSI"],
+            "model_vs_ref/psnr": m1_metrics["psnr_db"],
+            "model_vs_ref/ssim": m1_metrics["ssim"],
+            "model_vs_ref/nrmse": m1_metrics["nrmse"],
+            "model_vs_ref/dists": m1_perceptual["DISTS"],
+            "model_vs_ref/haarpsi": m1_perceptual["HaarPSI"],
+            "model_vs_ref/vsi": m1_perceptual["VSI"],
         }, step=steps)
         wandb.run.summary.update({
             "model_psnr": m1_metrics["psnr_db"],
@@ -736,12 +766,12 @@ def main(config_path, data):
             "model_vsi": m1_perceptual["VSI"],
         })
         logging.info(
-            f"Model vs GT:  PSNR={m1_metrics['psnr_db']:.2f}  SSIM={m1_metrics['ssim']:.4f}  "
+            f"Model vs Ref:  PSNR={m1_metrics['psnr_db']:.2f}  SSIM={m1_metrics['ssim']:.4f}  "
             f"DISTS={m1_perceptual['DISTS']:.4f}  HaarPSI={m1_perceptual['HaarPSI']:.4f}  "
             f"VSI={m1_perceptual['VSI']:.4f}"
         )
 
-        # ---- Method 2: NUFFT of subsampled radial vs GT ----
+        # ---- Method 2: NUFFT of subsampled radial vs Ref ----
         # Reconstruct from the training spokes (subsampled radial)
         from nik_recon import nufft2d_recon
         _t = config['data']['t_frame']
@@ -765,7 +795,7 @@ def main(config_path, data):
 
         # Crop NUFFT image (312×312) to match Cartesian GT size (after .T)
         # Cartesian FOV is 214 in AP vs 312 in radial (padded to square)
-        gt_h, gt_w = gt_cart.shape
+        gt_h, gt_w = cart_ref_raw.shape
         nufft_h, nufft_w = img_nufft_sub.shape
         if nufft_h != gt_h or nufft_w != gt_w:
             # Center crop
@@ -775,20 +805,25 @@ def main(config_path, data):
         else:
             img_nufft_crop = img_nufft_sub
 
-        nufft_display_max = max(img_nufft_crop.max(), gt_cart.max()) or 1.0
+        # Normalize NUFFT and its reference to [0,1] for metrics.
+        # NUFFT adjoint has arbitrary scale (no 1/N normalization), so
+        # absolute-scale comparison is meaningless. Only structural similarity matters.
+        img_nufft_n = img_nufft_crop / (img_nufft_crop.max() or 1.0)
+        cart_ref_raw_n = cart_ref_raw / (cart_ref_raw.max() or 1.0)
+
         wandb_logger.log({
-            "recon/nufft_subsampled": wandb.Image(img_nufft_crop / nufft_display_max),
+            "recon/nufft_subsampled": wandb.Image(img_nufft_n),
         }, step=steps)
 
-        m2_metrics = compute_image_metrics(img_nufft_crop, gt_cart)
-        m2_perceptual = compute_perceptual_metrics(img_nufft_crop, gt_cart)
+        m2_metrics = compute_image_metrics(img_nufft_n, cart_ref_raw_n)
+        m2_perceptual = compute_perceptual_metrics(img_nufft_n, cart_ref_raw_n)
         wandb_logger.log({
-            "nufft_vs_gt/psnr": m2_metrics["psnr_db"],
-            "nufft_vs_gt/ssim": m2_metrics["ssim"],
-            "nufft_vs_gt/nrmse": m2_metrics["nrmse"],
-            "nufft_vs_gt/dists": m2_perceptual["DISTS"],
-            "nufft_vs_gt/haarpsi": m2_perceptual["HaarPSI"],
-            "nufft_vs_gt/vsi": m2_perceptual["VSI"],
+            "nufft_vs_ref/psnr": m2_metrics["psnr_db"],
+            "nufft_vs_ref/ssim": m2_metrics["ssim"],
+            "nufft_vs_ref/nrmse": m2_metrics["nrmse"],
+            "nufft_vs_ref/dists": m2_perceptual["DISTS"],
+            "nufft_vs_ref/haarpsi": m2_perceptual["HaarPSI"],
+            "nufft_vs_ref/vsi": m2_perceptual["VSI"],
         }, step=steps)
         wandb.run.summary.update({
             "nufft_psnr": m2_metrics["psnr_db"],
@@ -799,7 +834,7 @@ def main(config_path, data):
             "nufft_vsi": m2_perceptual["VSI"],
         })
         logging.info(
-            f"NUFFT vs GT:  PSNR={m2_metrics['psnr_db']:.2f}  SSIM={m2_metrics['ssim']:.4f}  "
+            f"NUFFT vs Ref:  PSNR={m2_metrics['psnr_db']:.2f}  SSIM={m2_metrics['ssim']:.4f}  "
             f"DISTS={m2_perceptual['DISTS']:.4f}  HaarPSI={m2_perceptual['HaarPSI']:.4f}  "
             f"VSI={m2_perceptual['VSI']:.4f}"
         )

@@ -37,9 +37,10 @@ def weighted_complex_mse(
     # Compute pointwise squared error
     if torch.is_complex(pred):
         err_sq = (pred - target).abs() ** 2
-    elif pred.ndim == 2 and pred.shape[-1] == 2:
+    elif pred.ndim == 2 and pred.shape[-1] % 2 == 0:
+        # (N, 2) single coil or (N, 2*C) multicoil — sum of squared errors over all Re/Im pairs
         diff = pred - target
-        err_sq = diff[:, 0] ** 2 + diff[:, 1] ** 2
+        err_sq = (diff ** 2).sum(dim=-1)  # (N,) — total error per point across all coils
     else:
         raise ValueError(f"Unsupported pred shape: {pred.shape}")
 

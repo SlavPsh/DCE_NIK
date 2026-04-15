@@ -94,7 +94,7 @@ class WIRE_KXY_REIM(nn.Module):
     layers take 2×hidden as input.
 
     Input:  x (B,2) = [kx, ky]
-    Output: (B,2)   = [Re, Im]
+    Output: (B, out_dim) = [Re_c0, Im_c0, ...] for n_coils coils, or [Re, Im] for single coil
 
     Args:
         in_dim: input dimension (default 2 for kx, ky)
@@ -102,6 +102,7 @@ class WIRE_KXY_REIM(nn.Module):
         depth: number of layers (>= 2)
         w0: oscillation frequency
         s0: envelope width
+        out_dim: output dimension (2 for single coil, 2*n_coils for multicoil)
     """
     def __init__(
         self,
@@ -111,16 +112,18 @@ class WIRE_KXY_REIM(nn.Module):
         depth=8,
         w0=20.0,
         s0=10.0,
+        out_dim=2,
     ):
         if depth < 2:
             raise ValueError(f"depth must be >= 2, got {depth}")
         super().__init__()
+        self.out_dim = out_dim
 
         layers = [GaborLayer(in_dim, hidden, w0=w0, s0=s0, is_first=True)]
         for _ in range(depth - 2):
             layers.append(GaborLayer(2 * hidden, hidden, w0=w0, s0=s0, is_first=False))
         self.backbone = nn.Sequential(*layers)
-        self.head = nn.Linear(2 * hidden, 2)  # (Re, Im)
+        self.head = nn.Linear(2 * hidden, out_dim)
 
     def forward(self, x):
         h = self.backbone(x)

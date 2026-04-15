@@ -556,9 +556,10 @@ def ifft1d_kz_to_z(k_t, traj_t, t_frame):
 
 
 def nufft2d_recon(k_img_space, traj_t, t_frame, coil_idx, z_slice_idx, scales,
-                 img_size=(128, 128), n_slices=None):
+                 img_size=(128, 128), n_slices=None, return_complex=False):
     """
     2D NUFFT adjoint reconstruction for one z-slice after kz->z IFFT.
+    If return_complex=True, returns complex image (for SENSE coil combination).
     """
     sx, sy, _ = scales
     _, S, _, _ = traj_t.shape
@@ -596,8 +597,10 @@ def nufft2d_recon(k_img_space, traj_t, t_frame, coil_idx, z_slice_idx, scales,
     plan.setpts(kx_cu, ky_cu)
     img_cu = plan.execute(k_weighted_cu)
 
-    img = np.abs(cp.asnumpy(img_cu))
-    return img
+    img = cp.asnumpy(img_cu)
+    if return_complex:
+        return img
+    return np.abs(img)
 
 
 def nufft2d_recon_multicoil_sos(
@@ -941,3 +944,166 @@ def make_cartesian_eval_dataset(
         "N": nky * nkx,
     }
     return x_cart, y_cart, meta_cart
+
+
+# =========================================================================
+# Multicoil utilities
+# =========================================================================
+
+def make_multicoil_radial_dataset(
+    k_img_space,
+    traj_t,
+    scales,
+    dims,
+    *,
+    t_fixed: int = 0,
+    z_slice_idx: int = 0,
+    n_slices: int = None,
+    compute_device: str = "cuda",
+):
+    """
+    Build multicoil dataset for one frame, one z-slice, ALL coils.
+
+    Same trajectory for all coils; targets are concatenated as
+    (N, 2*C) = [Re_c0, Im_c0, Re_c1, Im_c1, ...].
+
+    Returns:
+        x_all: (N, 4) float [kx, ky, z_norm, t_norm]
+        y_all: (N, 2*C) float [Re_c0, Im_c0, ..., Re_cC-1, Im_cC-1]
+        spoke_id_all: (N,) long
+        ro_id_all: (N,) long
+        meta: dict
+    """
+    sx, sy, _ = scales
+    T, S, C, RO = dims
+    dev_data = k_img_space.device
+    dev_compute = torch.device(compute_device)
+
+    if n_slices is None:
+        kz_vals = traj_t[t_fixed, :, 2, 0]
+        n_slices = len(torch.unique(kz_vals))
+
+    z_slice_idx = int(max(0, min(int(z_slice_idx), int(n_slices - 1))))
+    n_ro_per_slice = int(S // n_slices)
+
+    indices = torch.arange(0, S, n_slices, device=traj_t.device)
+
+    spoke_ids = torch.arange(n_ro_per_slice, device=dev_data, dtype=torch.long)[:, None].expand(n_ro_per_slice, RO)
+    spoke_id_all = spoke_ids.reshape(-1)
+    ro_ids = torch.arange(RO, device=dev_data, dtype=torch.long)[None, :].expand(n_ro_per_slice, RO)
+    ro_id_all = ro_ids.reshape(-1)
+
+    kx = traj_t[t_fixed, indices, 0, :] / sx
+    ky = traj_t[t_fixed, indices, 1, :] / sy
+
+    z_norm = (torch.tensor(z_slice_idx, device=dev_data, dtype=traj_t.dtype) / (n_slices - 1 + 1e-8)) * 2.0 - 1.0
+    t_norm = (torch.tensor(t_fixed, device=dev_data, dtype=traj_t.dtype) / (T - 1 + 1e-8)) * 2.0 - 1.0
+    z_col = torch.full((indices.numel(), RO), z_norm, device=dev_data, dtype=traj_t.dtype)
+    t_col = torch.full((indices.numel(), RO), t_norm, device=dev_data, dtype=traj_t.dtype)
+
+    kx_all = kx.reshape(-1)
+    ky_all = ky.reshape(-1)
+    x_all = torch.stack([kx_all, ky_all, z_col.reshape(-1), t_col.reshape(-1)], dim=1).float()
+
+    # Concatenate all coils: (N, 2*C)
+    y_parts = []
+    for c in range(C):
+        y_c = k_img_space[t_fixed, :, c, z_slice_idx, :].reshape(-1)
+        y_parts.append(torch.view_as_real(y_c).float())  # (N, 2)
+    y_all = torch.cat(y_parts, dim=1)  # (N, 2*C)
+
+    non_block = (dev_data.type == "cuda" and dev_compute.type == "cuda")
+    x_all = x_all.to(dev_compute, non_blocking=non_block)
+    y_all = y_all.to(dev_compute, non_blocking=non_block)
+    spoke_id_all = spoke_id_all.to(dev_compute, non_blocking=non_block)
+    ro_id_all = ro_id_all.to(dev_compute, non_blocking=non_block)
+
+    meta = {
+        "t_fixed": t_fixed,
+        "z_slice_idx": z_slice_idx,
+        "n_slices": int(n_slices),
+        "n_coils": C,
+        "n_ro_per_slice": int(indices.numel()),
+        "N": int(x_all.shape[0]),
+        "RO": RO,
+    }
+    return x_all, y_all, spoke_id_all, ro_id_all, meta
+
+
+def make_multicoil_cartesian_dataset(
+    k_cart_z,
+    *,
+    t_fixed: int = 0,
+    z_slice_idx: int = 0,
+    scales_radial,
+    compute_device: str = "cuda",
+):
+    """
+    Build multicoil Cartesian evaluation dataset. All coils, one z-slice.
+
+    Returns:
+        x_cart: (M, 2) float [kx_norm, ky_norm]
+        y_cart: (M, 2*C) float [Re_c0, Im_c0, ..., Re_cC-1, Im_cC-1]
+        meta: dict with nky, nkx, n_coils, etc.
+    """
+    sx, sy, _ = scales_radial
+    dev = torch.device(compute_device)
+
+    T, C, nz, nky, nkx = k_cart_z.shape
+    z_slice_idx = int(max(0, min(int(z_slice_idx), nz - 1)))
+
+    kx_lin = torch.linspace(-0.5, 0.5, nkx)
+    ky_lin = torch.linspace(-0.5, 0.5, nky)
+    KY, KX = torch.meshgrid(ky_lin, kx_lin, indexing="ij")
+
+    sx_f = float(sx.item()) if torch.is_tensor(sx) else float(sx)
+    sy_f = float(sy.item()) if torch.is_tensor(sy) else float(sy)
+    x_cart = torch.stack([KX.reshape(-1) / sx_f, KY.reshape(-1) / sy_f], dim=1).float().to(dev)
+
+    # All coils concatenated
+    y_parts = []
+    for c in range(C):
+        k_slice = k_cart_z[t_fixed, c, z_slice_idx, :, :].reshape(-1)
+        y_parts.append(torch.view_as_real(k_slice).float())
+    y_cart = torch.cat(y_parts, dim=1).to(dev)  # (M, 2*C)
+
+    meta = {
+        "nky": nky, "nkx": nkx, "nz": nz, "n_coils": C,
+        "t_fixed": t_fixed, "z_slice_idx": z_slice_idx,
+        "N": nky * nkx,
+    }
+    return x_cart, y_cart, meta
+
+
+def coil_combine_sense(coil_images, sensitivity_maps):
+    """
+    SENSE-type coil combination: sum(conj(S) * img) / sum(|S|^2).
+
+    Args:
+        coil_images: (C, H, W) complex or magnitude images
+        sensitivity_maps: (C, H, W) real or complex sensitivity maps
+
+    Returns:
+        combined: (H, W) combined image (magnitude)
+    """
+    S = sensitivity_maps
+    # sum(conj(S) * img) / sum(|S|^2)
+    if not np.iscomplexobj(coil_images):
+        # Magnitude images — use RSS instead
+        return np.sqrt(np.sum(np.abs(coil_images) ** 2, axis=0))
+
+    numerator = np.sum(np.conj(S) * coil_images, axis=0)
+    denominator = np.sum(np.abs(S) ** 2, axis=0) + 1e-10
+    return np.abs(numerator / denominator)
+
+
+def coil_combine_rss(coil_images):
+    """Root-sum-of-squares coil combination.
+
+    Args:
+        coil_images: (C, H, W) complex or real images
+
+    Returns:
+        combined: (H, W) magnitude image
+    """
+    return np.sqrt(np.sum(np.abs(coil_images) ** 2, axis=0))

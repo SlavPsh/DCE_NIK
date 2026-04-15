@@ -346,7 +346,7 @@ def make_cartesian_image_comparison(
     normalizer=None,
     nky, nkx,
     kspace_mask=None,
-    gt_img_slice=None,
+    ref_img_slice=None,
     title_prefix="",
 ):
     """
@@ -397,7 +397,7 @@ def make_cartesian_image_comparison(
     img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
     img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
-    n_cols = 3 if gt_img_slice is not None else 2
+    n_cols = 3 if ref_img_slice is not None else 2
     fig, axes = plt.subplots(2, n_cols, figsize=(6 * n_cols, 10))
 
     # Normalize each image to [0, 1] for display
@@ -411,13 +411,13 @@ def make_cartesian_image_comparison(
     axes[0, 1].imshow(norm01(img_pred), cmap="gray", vmin=0, vmax=1)
     axes[0, 1].set_title(f"{title_prefix} Cartesian IFFT (predicted)")
 
-    if gt_img_slice is not None:
-        gt = np.asarray(gt_img_slice)
+    if ref_img_slice is not None:
+        gt = np.asarray(ref_img_slice)
         # GT may have transposed axes compared to k-space IFFT output
         if gt.shape != img_pred.shape and gt.shape == img_pred.shape[::-1]:
             gt = gt.T
         axes[0, 2].imshow(norm01(gt), cmap="gray", vmin=0, vmax=1)
-        axes[0, 2].set_title(f"{title_prefix} Ground Truth")
+        axes[0, 2].set_title(f"{title_prefix} Reference (full Cartesian)")
 
     # Error maps (normalize pred/meas to same scale for comparison)
     img_pred_n = norm01(img_pred)
@@ -433,7 +433,7 @@ def make_cartesian_image_comparison(
     axes[1, 1].set_title(f"{title_prefix} relative error (log10)")
     plt.colorbar(im_rel, ax=axes[1, 1], fraction=0.046, pad=0.04)
 
-    if gt_img_slice is not None:
+    if ref_img_slice is not None:
         diff_gt = np.abs(img_pred_n - norm01(gt))
         axes[1, 2].imshow(diff_gt, cmap="hot")
         axes[1, 2].set_title(f"{title_prefix} |pred - GT| (normalized)")

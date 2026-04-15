@@ -271,18 +271,48 @@ def compute_global_scale(
 # =========================================================================
 
 def _to_complex(y: torch.Tensor) -> torch.Tensor:
-    """Convert (N, 2) real or (N,) complex to (N,) complex."""
+    """Convert (N, 2) or (N, 2*C) real, or (N,) complex to complex.
+
+    For single coil (N, 2): returns (N,) complex.
+    For multicoil (N, 2*C): returns (N, C) complex.
+    For already complex: returns as-is.
+    """
     if torch.is_complex(y):
         return y
     if y.ndim == 2 and y.shape[-1] == 2:
         return torch.complex(y[:, 0], y[:, 1])
+    if y.ndim == 2 and y.shape[-1] > 2 and y.shape[-1] % 2 == 0:
+        C = y.shape[-1] // 2
+        return torch.complex(y[:, 0::2], y[:, 1::2])  # (N, C) complex
     raise ValueError(f"Cannot convert shape {y.shape} to complex")
 
 
+def _rss_magnitude(y: torch.Tensor) -> torch.Tensor:
+    """Compute RSS magnitude for normalizer fitting.
+
+    Single coil (N,) complex → (N,) magnitude.
+    Multicoil (N, C) complex → (N,) RSS magnitude.
+    """
+    if y.ndim == 1:
+        return torch.abs(y)
+    return torch.sqrt((torch.abs(y) ** 2).sum(dim=-1))
+
+
 def _from_complex(y: torch.Tensor, as_real: bool = False) -> torch.Tensor:
-    """Convert (N,) complex to either complex or (N, 2) real."""
+    """Convert complex to real format.
+
+    (N,) complex → (N, 2) real.
+    (N, C) complex → (N, 2*C) real [Re_c0, Im_c0, Re_c1, Im_c1, ...].
+    """
     if as_real:
-        return torch.stack([y.real, y.imag], dim=-1)
+        if y.ndim == 1:
+            return torch.stack([y.real, y.imag], dim=-1)
+        # (N, C) → (N, 2*C) interleaved
+        parts = []
+        for c in range(y.shape[-1]):
+            parts.append(y[:, c].real)
+            parts.append(y[:, c].imag)
+        return torch.stack(parts, dim=-1)
     return y
 
 
@@ -315,17 +345,24 @@ class KSpaceNormalizer:
     ):
         """Fit normalizer on radial training data.
 
+        Supports single coil (N, 2) or multicoil (N, 2*C) real format.
+        For multicoil, the envelope is fitted on RSS magnitude across coils.
+        The same per-point scale a(r)*s is applied to all coils.
+
         Args:
             kcoords_radial: (N, 2) radial coordinates.
-            y_radial: (N,) complex or (N, 2) real k-space values.
+            y_radial: (N, 2) or (N, 2*C) real, or (N,) complex k-space values.
             dcf: (N,) optional density compensation weights.
-            Other args: see estimate_radial_envelope and compute_global_scale.
         """
         y_c = _to_complex(y_radial)
+        # For envelope fitting, use RSS magnitude across coils
+        y_mag_for_envelope = _rss_magnitude(y_c)  # (N,)
+        # Create a dummy complex with this magnitude for the envelope estimator
+        y_mag_complex = y_mag_for_envelope.to(torch.complex64)
 
-        # Step 1: estimate radial envelope a(r)
+        # Step 1: estimate radial envelope a(r) from RSS magnitude
         self.envelope = estimate_radial_envelope(
-            kcoords_radial, y_c, dcf=dcf,
+            kcoords_radial, y_mag_complex, dcf=dcf,
             n_bins=envelope_bins,
             statistic=envelope_statistic,
             smooth_method=envelope_smooth_method,
@@ -337,11 +374,12 @@ class KSpaceNormalizer:
         # Step 2: divide by envelope
         r = compute_radius(kcoords_radial)
         a_r = self.envelope.evaluate(r).to(y_c.device)
-        y_env_corrected = y_c / (a_r + eps)
+        y_env_corrected_mag = y_mag_for_envelope / (a_r + eps)
 
-        # Step 3: global scale from envelope-corrected values
+        # Step 3: global scale from envelope-corrected RSS magnitude
         self.global_scale = compute_global_scale(
-            y_env_corrected, dcf=dcf, method=global_scale_method, eps=eps,
+            y_env_corrected_mag.to(torch.complex64), dcf=dcf,
+            method=global_scale_method, eps=eps,
         )
 
         self._fitted = True
@@ -364,7 +402,11 @@ class KSpaceNormalizer:
 
         r = compute_radius(kcoords)
         a_r = self.envelope.evaluate(r).to(y_c.device)
-        pointwise_scale = a_r * self.global_scale
+        pointwise_scale = a_r * self.global_scale  # (N,)
+
+        # Broadcast across coils if multicoil (N, C)
+        if y_c.ndim == 2:
+            pointwise_scale = pointwise_scale.unsqueeze(-1)
 
         y_tilde = y_c / (pointwise_scale + 1e-8)
         return _from_complex(y_tilde, as_real=as_real)
@@ -376,7 +418,7 @@ class KSpaceNormalizer:
 
         Args:
             kcoords: (N, 2) coordinates.
-            y_tilde: (N,) complex or (N, 2) real normalized values.
+            y_tilde: (N,) complex or (N, 2) or (N, 2*C) real normalized values.
 
         Returns:
             y: same format as input y_tilde.
@@ -387,7 +429,11 @@ class KSpaceNormalizer:
 
         r = compute_radius(kcoords)
         a_r = self.envelope.evaluate(r).to(y_c.device)
-        pointwise_scale = a_r * self.global_scale
+        pointwise_scale = a_r * self.global_scale  # (N,)
+
+        # Broadcast across coils if multicoil (N, C)
+        if y_c.ndim == 2:
+            pointwise_scale = pointwise_scale.unsqueeze(-1)
 
         y = y_c * pointwise_scale
         return _from_complex(y, as_real=as_real)

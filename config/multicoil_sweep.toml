@@ -1,21 +1,21 @@
 [experiment]
-name = "Sweep: subsampling grid with best WIRE configs"
-description = "Fix architecture near best, grid sweep over subsample_frac"
+name = "Multicoil sweep: subsampling + WIRE params"
+description = "Direct multicoil output, SENSE recon, grid sweep over subsampling and architecture"
 
 [data]
 radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
 cartesian_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T113845_cart.mat"
 t_frame = 0
-coil_idx = 0
 z_slice_idx = -1
 subsample_frac = 1.0
+multicoil = true
 
 [model]
 model_family = "wire"
 hidden = 64
 depth = 6
 w0 = 32.0
-s0 = 18.0
+s0 = 14.0
 
 [training]
 steps = 8000
@@ -31,6 +31,7 @@ warmup_steps = 1600
 scheduler_patience = 50
 scheduler_factor = 0.5
 scheduler_min_lr = 1e-6
+image_metric_every = 1000
 
 [training.plot]
 plot_every = 5000
@@ -59,13 +60,14 @@ console_every = 100
 watch_interval = 0
 
 [sweep]
-name = "Subsample + WIRE: model vs NUFFT (absolute scale metrics)"
+name = "Multicoil: subsampling + WIRE params"
 entity = "spshenov-university-of-amsterdam"
 project = "NIK-DCE-MRI-CartEval"
 method = "grid"
+run_cap = 72
 
 [sweep.metric]
-name = "delta_dists"
+name = "delta_haarpsi"
 goal = "maximize"
 
 [sweep.parameters.subsample_frac]

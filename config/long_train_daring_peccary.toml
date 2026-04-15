@@ -1,6 +1,6 @@
 [experiment]
-name = "Sweep: subsampling grid with best WIRE configs"
-description = "Fix architecture near best, grid sweep over subsample_frac"
+name = "Long training: daring-peccary config (sub=0.3, looking for grokking)"
+description = "Best sub=0.3 config from previous sweep, long training with OneCycle LR"
 
 [data]
 radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
@@ -8,32 +8,34 @@ cartesian_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_2
 t_frame = 0
 coil_idx = 0
 z_slice_idx = -1
-subsample_frac = 1.0
+subsample_frac = 0.3       # daring-peccary used 0.3
 
 [model]
 model_family = "wire"
 hidden = 64
 depth = 6
 w0 = 32.0
-s0 = 18.0
+s0 = 14.0
 
 [training]
-steps = 8000
+steps = 100000             # 12.5x longer than 8k
 batch_size = 4096
 optimizer = "Adam"
-lr = 1e-4
+lr = 1e-4                  # base lr (OneCycle peaks at 10x = 1e-3)
 grad_clip = 1.0
-eval_every = 100
+eval_every = 200
 seed = 0
 loss_type = "mse"
 weight_decay = 0.003
-warmup_steps = 1600
-scheduler_patience = 50
+warmup_steps = 5000        # 5% of total
+scheduler_type = "onecycle"  # onecycle | cosine | plateau
+scheduler_patience = 100   # only used for plateau
 scheduler_factor = 0.5
-scheduler_min_lr = 1e-6
+scheduler_min_lr = 1e-7
+image_metric_every = 2000  # less frequent for long runs
 
 [training.plot]
-plot_every = 5000
+plot_every = 10000
 log_scale = true
 
 [normalization]
@@ -53,29 +55,7 @@ base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
 
 [logging]
 level = "INFO"
-console_every = 100
+console_every = 500
 
 [wandb]
 watch_interval = 0
-
-[sweep]
-name = "Subsample + WIRE: model vs NUFFT (absolute scale metrics)"
-entity = "spshenov-university-of-amsterdam"
-project = "NIK-DCE-MRI-CartEval"
-method = "grid"
-
-[sweep.metric]
-name = "delta_dists"
-goal = "maximize"
-
-[sweep.parameters.subsample_frac]
-values = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0]
-
-[sweep.parameters.w0]
-values = [32.0, 55.0, 77.0]
-
-[sweep.parameters.depth]
-values = [6, 8]
-
-[sweep.parameters.s0]
-values = [14.0, 18.0]
