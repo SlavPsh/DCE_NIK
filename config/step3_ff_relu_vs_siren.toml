@@ -1,12 +1,4 @@
-# Step 3: Fourier Features + ReLU MLP
-#
-# Question: does explicit frequency encoding close the gap with SIREN?
-# Key hyperparameter: sigma of the Fourier feature mapping (controls bandwidth).
-# Per-family depth/width ranges ensure fair comparison at matched capacity.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step3_ff_relu_vs_siren.toml
-#   sbatch gpu_job_sweep.sh config/step3_ff_relu_vs_siren.toml SWEEP_ID [COUNT]
+# step 3, ff relu vs siren
 
 [experiment]
 name = "Step 3: FF+ReLU vs SIREN"
@@ -16,7 +8,7 @@ description = "Does explicit Fourier feature encoding close the gap with SIREN?"
 file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
 t_frame = 0
 coil_idx = 0
-z_slice_idx = -1          # -1 = middle slice (auto)
+z_slice_idx = -1
 val_frac = 0.1
 
 [model]
@@ -59,18 +51,15 @@ method = "grid"
 name = "best_val_loss"
 goal = "minimize"
 
-# Sweep over model families with per-family architecture ranges.
-# hidden/depth are swept over the union; [family_params] restricts
-# which combos are valid per family (skip logic in train_wandb.py).
-# k_sigma only affects FF families (existing skip logic handles this).
+# family sweep
 [sweep.parameters.model_family]
 values = ["ff_relu", "ff_siren", "siren", "relu"]
 
 [sweep.parameters.hidden]
-values = [64, 128, 256]          # union across families
+values = [64, 128, 256]
 
 [sweep.parameters.depth]
-values = [3, 4, 6, 8]            # union across families
+values = [3, 4, 6, 8]
 
 [sweep.parameters.w0]
 values = [15]
@@ -81,9 +70,7 @@ values = [64]
 [sweep.parameters.k_sigma]
 values = [1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0]
 
-# ---- Per-family valid architecture ranges ----
-# FF models get wider input from the Fourier layer, so use smaller hidden/depth.
-# Plain models need wider/deeper nets to compensate for no frequency encoding.
+# per family valid ranges
 [family_params.ff_relu]
 hidden = [64, 128]
 depth  = [3, 4]

@@ -6,11 +6,11 @@ description = "SIREN implicit neural representation for radial k-space"
 file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
 t_frame = 0
 coil_idx = 0
-z_slice_idx = -1          # -1 = middle slice (auto)
+z_slice_idx = -1
 val_frac = 0.1
 
 [model]
-model_family = "siren"    # "siren", "relu", "elu"
+model_family = "siren"
 hidden = 128
 depth = 4
 w0 = 15
@@ -18,14 +18,14 @@ w0 = 15
 [training]
 steps = 6000
 batch_size = 4096
-optimizer = "Adam"         # "Adam", "AdamW", "SGD"
+optimizer = "Adam"
 lr = 2e-4
 grad_clip = 1.0
 eval_every = 100
 seed = 0
 
 [training.plot]
-plot_every = 1000           # log fit plots every N steps
+plot_every = 1000
 log_scale = true
 
 [output]
@@ -33,10 +33,10 @@ base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
 
 [logging]
 level = "INFO"
-console_every = 100        # print to stdout every N steps
+console_every = 100
 
 [wandb]
-watch_interval = 0         # 0 = disabled
+watch_interval = 0
 
 [sweep]
 entity = "spshenov-university-of-amsterdam"
@@ -58,4 +58,4 @@ values = [4, 6, 8]
 
 [sweep.parameters.w0]
 values = [10, 15, 30]
-# w0 only affects siren; relu/elu runs with w0 != 15 are skipped automatically
+# w0 siren only

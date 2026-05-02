@@ -1,10 +1,4 @@
-# Step 7: SIREN ultra-compact sweep
-#
-# Step 6 found h=64, d=8, w0~65 as best (27.18 dB PSNR, ~33k params).
-# Now push further: smaller hidden, deeper networks, higher w0.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step7_siren_ultracompact.toml
+# step 7, siren ultra compact
 
 [experiment]
 name = "Step 7: SIREN ultra-compact"

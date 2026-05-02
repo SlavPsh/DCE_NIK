@@ -1,17 +1,4 @@
-# Step 13: Clean SIREN vs WIRE Cartesian comparison
-#
-# Goal: Head-to-head comparison of plain SIREN (no Fourier features)
-#        versus WIRE on Cartesian 2D k-space fitting.
-#
-# Both families sweep the same hidden / depth / w0 / lr / weight_decay
-# ranges, centred around the best configs from steps 6 & 9.
-#
-# NEW: Conjugate-symmetry loss (conj_weight) is included as a sweep
-#      parameter. density_weight is also swept.
-#      These require changes to train_wandb.py (applied in this step).
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step13_siren_vs_wire_cart.toml
+# step 13, siren vs wire cart
 
 [experiment]
 name = "Step 13: SIREN vs WIRE Cartesian (no FF, +conj/density)"
@@ -41,7 +28,7 @@ weight_decay = 0.005
 loss_type = "mse"
 eval_every = 50
 seed = 0
-# Constraint loss weights (new for Cartesian)
+# constraint weights
 conj_weight = 0.0
 density_weight = 0.0
 
@@ -70,7 +57,7 @@ run_cap = 80
 name = "best_val_loss"
 goal = "minimize"
 
-# ---- Sweep parameters ----
+# sweep params
 [sweep.parameters.model_family]
 values = ["siren", "wire"]
 

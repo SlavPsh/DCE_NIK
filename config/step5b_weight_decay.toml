@@ -1,11 +1,4 @@
-# Step 5b: Weight decay regularization sweep
-#
-# Test whether weight decay improves image quality (PSNR/SSIM) for the
-# best-performing configs. Uses the top families: siren, relu, ff_siren.
-# Fixed architecture per family (best-known), sweep weight_decay.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step5b_weight_decay.toml
+# step 5b, weight decay sweep
 
 [experiment]
 name = "Step 5b: Weight decay sweep"
@@ -80,9 +73,7 @@ values = [0.75, 6.0]
 [sweep.parameters.weight_decay]
 values = [0.0, 0.00001, 0.0001, 0.001, 0.01]
 
-# siren: h=256, d=8, w0=7.5 or 15 (best image PSNR config)
-# relu: h=256, d=8 (best image PSNR config), w0/k_sigma irrelevant (skipped)
-# ff_siren: h=256, d=8, k_sigma=0.75 (close to best), w0 irrelevant for skip logic
+# per family valid ranges
 [family_params.siren]
 hidden = [256]
 depth  = [8]

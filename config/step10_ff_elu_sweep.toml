@@ -1,14 +1,4 @@
-# Step 10: Fourier Features + ELU sweep
-#
-# Goal: Find best FF+ELU config, compare against SIREN (27.30 dB) and WIRE (27.34 dB).
-#
-# FF encoding provides explicit bandwidth control via k_sigma; ELU gives smooth
-# gradients without the training instability seen with WIRE.
-#
-# Sweep: k_sigma, k_freq, hidden, depth, lr, weight_decay (Bayesian, 50 runs, 20k steps)
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step10_ff_elu_sweep.toml
+# step 10, ff elu sweep
 
 [experiment]
 name = "Step 10: FF+ELU sweep"

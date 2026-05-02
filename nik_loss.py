@@ -1,62 +1,91 @@
-"""
-nik_loss.py -- Loss functions for NIK k-space fitting.
-
-All loss functions take (y_pred, y_true) with shape (N, 2) [Re, Im]
-and return a scalar loss.
-"""
+"""nik kspace losses"""
 import torch
 import torch.nn.functional as F
 
 
+def _ensure_complex(x: torch.Tensor) -> torch.Tensor:
+    if torch.is_complex(x):
+        return x
+    if x.shape[-1] != 2:
+        raise ValueError(f"Expected last dimension of size 2 for real-imag tensor, got {x.shape}")
+    return torch.view_as_complex(x.contiguous())
+
+
+class HDRLossFF(torch.nn.Module):
+    """nikmri hdr loss, gaussian ff regularizer"""
+
+    def __init__(self, sigma=1.0, eps=1e-2, factor=0.0):
+        super().__init__()
+        self.sigma = float(sigma)
+        self.eps = float(eps)
+        self.factor = float(factor)
+
+    def forward(self, input, target, kcoords, weights=None, reduce=True):
+        input_c = _ensure_complex(input)
+        target_c = _ensure_complex(target)
+
+        if kcoords.shape[-1] < 4:
+            raise ValueError(
+                "HDRLossFF expects coordinates ordered as [t, coil, kx, ky]"
+            )
+
+        dist_to_center2 = kcoords[..., 2] ** 2 + kcoords[..., 3] ** 2
+        filter_value = torch.exp(-dist_to_center2 / (2 * self.sigma ** 2))
+        while filter_value.ndim < input_c.ndim:
+            filter_value = filter_value.unsqueeze(-1)
+
+        denom = input_c.detach().abs() + self.eps
+        error = input_c - target_c
+        loss = (error.abs() / denom) ** 2
+
+        if weights is not None:
+            while weights.ndim < loss.ndim:
+                weights = weights.unsqueeze(-1)
+            loss = loss * weights
+
+        reg_error = input_c - input_c * filter_value
+        reg = self.factor * (reg_error.abs() / denom) ** 2
+
+        if reduce:
+            return loss.mean() + reg.mean(), reg.mean()
+        return loss, reg
+
+
 def mse_loss(y_pred, y_true):
-    """Plain MSE — equal weight on every k-space sample."""
+    """plain mse"""
     return F.mse_loss(y_pred, y_true)
 
 
 def wmse_sqrt_loss(y_pred, y_true, eps=1e-8):
-    """Weighted MSE with w = 1 / sqrt(|y| + eps).
-
-    Soft down-weighting of high-magnitude (center) samples.
-    """
+    """sqrt magnitude weighted mse"""
     mag = torch.sqrt(y_true[:, 0] ** 2 + y_true[:, 1] ** 2 + eps)
     w = 1.0 / torch.sqrt(mag + eps)
     return (w.unsqueeze(1) * (y_pred - y_true) ** 2).mean()
 
 
 def wmse_inv_loss(y_pred, y_true, eps=1e-8):
-    """Weighted MSE with w = 1 / (|y| + eps).
-
-    Stronger down-weighting of center than sqrt variant.
-    """
+    """inverse magnitude weighted mse"""
     mag = torch.sqrt(y_true[:, 0] ** 2 + y_true[:, 1] ** 2 + eps)
     w = 1.0 / (mag + eps)
     return (w.unsqueeze(1) * (y_pred - y_true) ** 2).mean()
 
 
 def relative_mse_loss(y_pred, y_true, eps=1e-8):
-    """Relative MSE: |pred - true|^2 / (|true|^2 + eps).
-
-    Each sample's error is relative to its own magnitude.
-    Most aggressive equalisation.
-    """
+    """relative mse"""
     mag_sq = y_true[:, 0] ** 2 + y_true[:, 1] ** 2 + eps
     err_sq = (y_pred - y_true) ** 2
     return (err_sq.sum(dim=1) / mag_sq).mean()
 
 
 def log_mse_loss(y_pred, y_true, eps=1e-8):
-    """MSE in log-magnitude space (phase fitted linearly).
-
-    Compresses the dynamic range of k-space magnitudes.
-    Loss = MSE(log|pred|, log|true|) + MSE(angle(pred), angle(true))
-    """
+    """log magnitude mse, phase mse"""
     pred_mag = torch.sqrt(y_pred[:, 0] ** 2 + y_pred[:, 1] ** 2 + eps)
     true_mag = torch.sqrt(y_true[:, 0] ** 2 + y_true[:, 1] ** 2 + eps)
     mag_loss = F.mse_loss(torch.log(pred_mag), torch.log(true_mag))
 
     pred_phase = torch.atan2(y_pred[:, 1], y_pred[:, 0])
     true_phase = torch.atan2(y_true[:, 1], y_true[:, 0])
-    # Wrap-aware phase difference
+    # wrap aware phase
     phase_diff = pred_phase - true_phase
     phase_diff = torch.atan2(torch.sin(phase_diff), torch.cos(phase_diff))
     phase_loss = (phase_diff ** 2).mean()
@@ -64,86 +93,40 @@ def log_mse_loss(y_pred, y_true, eps=1e-8):
     return mag_loss + phase_loss
 
 
-# ---------------------------------------------------------------------------
-# Density-weighted loss
-# ---------------------------------------------------------------------------
+# density weighted loss
 
 def density_weighted_mse_loss(y_pred, y_true, k_coords, eps=1e-8):
-    """Density-weighted MSE: weight = |kr| = sqrt(kx^2 + ky^2).
-
-    Up-weights outer k-space (high frequency) samples, which are sparser
-    in radial trajectories and contribute more to image detail.
-
-    Args:
-        y_pred:   (N, 2) predicted [Re, Im]
-        y_true:   (N, 2) target    [Re, Im]
-        k_coords: (N, 2) [kx, ky] coordinates
-    """
+    """kr density weighted mse"""
     kr = torch.sqrt(k_coords[:, 0] ** 2 + k_coords[:, 1] ** 2 + eps)
-    err_sq = (y_pred - y_true) ** 2  # (N, 2)
+    err_sq = (y_pred - y_true) ** 2
     return (kr.unsqueeze(1) * err_sq).mean()
 
 
-# ---------------------------------------------------------------------------
-# DC consistency loss (for PolarKSpaceNet)
-# ---------------------------------------------------------------------------
+# dc consistency loss, polar net
 
 def dc_consistency_loss(model, n_theta=64):
-    """Variance of predictions at DC (k=0) across different angles.
-
-    At the center of k-space (s=0), the signal should be the same
-    regardless of the spoke angle. This loss penalizes angular variation
-    at DC.
-
-    Args:
-        model: PolarKSpaceNet instance (must have dc_predictions method)
-        n_theta: number of angles to sample
-    Returns:
-        scalar loss = Var(Re predictions at DC) + Var(Im predictions at DC)
-    """
-    dc_preds = model.dc_predictions(n_theta)  # (n_theta, 2)
+    """dc angular variance"""
+    dc_preds = model.dc_predictions(n_theta)
     return dc_preds.var(dim=0).sum()
 
 
-# ---------------------------------------------------------------------------
-# Conjugate symmetry loss
-# ---------------------------------------------------------------------------
+# conjugate symmetry loss
 
 def conjugate_symmetry_loss(y_pred, y_pred_neg, eps=1e-8):
-    """Enforce S(-k) = S*(k) for real-valued images.
-
-    For each sample, compares the prediction at k with the complex conjugate
-    of the prediction at -k:
-        loss = |S(k) - conj(S(-k))|^2
-
-    S*(k) = (Re, -Im), so S(-k) should equal (Re(k), -Im(k)).
-
-    Args:
-        y_pred:     (N, 2) predictions at k = (kx, ky)
-        y_pred_neg: (N, 2) predictions at -k = (-kx, -ky)
-    """
-    # conj(S(-k)) = (Re(-k), -Im(-k))
+    """real image conjugate symmetry"""
+    # conj of negative kspace
     conj_neg = torch.stack([y_pred_neg[:, 0], -y_pred_neg[:, 1]], dim=1)
     return F.mse_loss(y_pred, conj_neg)
 
 
 def conjugate_symmetry_loss_from_model(model, k_coords, eps=1e-8):
-    """Compute conjugate symmetry loss by evaluating model at k and -k.
-
-    Convenience wrapper that handles the forward passes.
-
-    Args:
-        model: network with forward(k_coords) → (N, 2)
-        k_coords: (N, 2) [kx, ky]
-    """
+    """model wrapper, conjugate symmetry"""
     y_pred = model(k_coords)
     y_pred_neg = model(-k_coords)
     return conjugate_symmetry_loss(y_pred, y_pred_neg)
 
 
-# ---------------------------------------------------------------------------
-# Combined polar loss
-# ---------------------------------------------------------------------------
+# polar combined loss
 
 def polar_kspace_loss(
     y_pred, y_true, k_coords,
@@ -154,41 +137,27 @@ def polar_kspace_loss(
     conj_weight=0.01,
     n_dc_theta=64,
 ):
-    """Combined loss for PolarKSpaceNet training.
-
-    L = L_base + density_weight * L_density + dc_weight * L_dc + conj_weight * L_conj
-
-    Args:
-        y_pred:   (N, 2) predicted [Re, Im]
-        y_true:   (N, 2) target [Re, Im]
-        k_coords: (N, 2) [kx, ky]
-        model:    PolarKSpaceNet (needed for DC and conjugate losses)
-        base_loss: base loss type ('mse', 'wmse_sqrt', etc.)
-        density_weight: weight for density-weighted MSE term
-        dc_weight: weight for DC consistency term
-        conj_weight: weight for conjugate symmetry term
-        n_dc_theta: number of angles for DC consistency evaluation
-    """
-    # Base reconstruction loss
+    """combined polar loss"""
+    # base loss
     base_fn = LOSS_FNS[base_loss]
     loss = base_fn(y_pred, y_true)
 
-    # Density-weighted loss
+    # density term
     if density_weight > 0:
         loss = loss + density_weight * density_weighted_mse_loss(y_pred, y_true, k_coords)
 
-    # DC consistency (requires model)
+    # dc term
     if dc_weight > 0 and model is not None and hasattr(model, "dc_predictions"):
         loss = loss + dc_weight * dc_consistency_loss(model, n_dc_theta)
 
-    # Conjugate symmetry (requires model)
+    # conjugate term
     if conj_weight > 0 and model is not None:
         loss = loss + conj_weight * conjugate_symmetry_loss_from_model(model, k_coords)
 
     return loss
 
 
-# Registry mapping config string → function
+# loss registry
 LOSS_FNS = {
     "mse": mse_loss,
     "wmse_sqrt": wmse_sqrt_loss,
@@ -200,7 +169,7 @@ LOSS_FNS = {
 
 
 def get_loss_fn(name: str):
-    """Return loss function by config name."""
+    """loss lookup"""
     if name not in LOSS_FNS:
         raise ValueError(f"Unknown loss_type '{name}'. Choose from: {list(LOSS_FNS.keys())}")
     return LOSS_FNS[name]

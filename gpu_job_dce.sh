@@ -12,7 +12,7 @@
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 nvidia-smi || true
 
-# Micromamba env
+# micromamba env
 export PATH="/scratch/rnga/vvpshenov/micromamba/bin:$PATH"
 export MAMBA_ROOT_PREFIX="/scratch/rnga/vvpshenov/micromamba"
 
@@ -24,7 +24,7 @@ python --version
 
 cd /scratch/rnga/vvpshenov
 
-# Adjust --data-device to 'cpu' if GPU OOM occurs
+# cpu fallback for oom
 python DCE_NIK_try.py \
   --file /scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260109T221333.mat \
   --steps 20000 \

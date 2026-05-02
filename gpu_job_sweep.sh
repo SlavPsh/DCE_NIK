@@ -14,7 +14,7 @@ set -eu
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 nvidia-smi || true
 
-# ---- Micromamba setup ----
+# micromamba setup
 export PATH="/scratch/rnga/vvpshenov/micromamba/bin:$PATH"
 export MAMBA_ROOT_PREFIX="/scratch/rnga/vvpshenov/micromamba"
 eval "$(/scratch/rnga/vvpshenov/micromamba/bin/micromamba shell hook -s bash)"
@@ -23,15 +23,12 @@ micromamba activate torch29
 which python
 python --version
 
-# ---- wandb offline mode  ----
+# wandb offline
 # export WANDB_MODE=offline
 
 cd /scratch/rnga/vvpshenov/DCE_NIK
 
-# ---- Parse arguments ----
-# Usage:
-#   sbatch gpu_job_sweep.sh config/training.toml                        # creates new sweep
-#   sbatch gpu_job_sweep.sh config/training.toml SWEEP_ID [COUNT]       # joins existing sweep
+# parse args
 CONFIG_PATH="${1:?Usage: sbatch gpu_job_sweep.sh CONFIG_PATH [SWEEP_ID] [COUNT]}"
 SWEEP_ID="${2:-}"
 COUNT="${3:-50}"

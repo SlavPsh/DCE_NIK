@@ -1,18 +1,4 @@
-# Step 8: Loss function comparison on baseline model
-#
-# Goal: Compare loss weightings to reduce k-space center dominance.
-# All runs use the locked baseline: h=64, d=8, w0=60, wd=0.009.
-# 20k steps for full convergence.
-#
-# Loss types:
-#   mse          — plain MSE (current baseline)
-#   wmse_sqrt    — w = 1/sqrt(|y|), soft down-weighting of center
-#   wmse_inv     — w = 1/|y|, stronger down-weighting
-#   relative_mse — |err|^2/|y|^2, fully relative
-#   log_mse      — MSE in log-magnitude + wrap-aware phase
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step8_wmse_baseline.toml
+# step 8, loss function compare
 
 [experiment]
 name = "Step 8: loss function comparison"

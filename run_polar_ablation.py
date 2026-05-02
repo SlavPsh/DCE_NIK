@@ -1,20 +1,5 @@
 #!/usr/bin/env python3
-"""
-run_polar_ablation.py -- Systematic ablation: Cartesian vs Polar k-space models.
-
-Compares 6 configurations on one slice, one coil, one frame:
-  A. Baseline: Cartesian SIREN (depth 7, width 256)
-  B. Polar + SIREN radial (depth 4, width 128, N=16)
-  C. Polar + WIRE radial  (depth 4, width 128, N=16)
-  D. Polar + WIRE + DC consistency loss
-  E. Polar + WIRE + DC + density-weighted loss
-  F. Polar + WIRE + DC + density + conjugate symmetry
-
-Usage:
-    python run_polar_ablation.py                    # default settings
-    python run_polar_ablation.py --steps 30000      # more training
-    python run_polar_ablation.py --device cpu        # force CPU
-"""
+"""polar ablation, cartesian vs polar"""
 import argparse
 import json
 import logging
@@ -116,7 +101,7 @@ def load_data(data_file, t_frame=0, coil_idx=0, z_slice_idx=-1, val_frac=0.1, se
 # ---------------------------------------------------------------------------
 
 def make_configs():
-    """Return list of (name, model_builder, loss_builder) tuples."""
+    """ablation tuples"""
 
     # Compute s_max from data at runtime; placeholder here
     configs = []
@@ -207,7 +192,7 @@ def make_configs():
 
 def compute_loss(loss_type, y_pred, y_true, k_coords, model,
                  dc_weight=0.01, density_weight=1.0, conj_weight=0.01):
-    """Compute combined loss based on loss_type string."""
+    """combined loss"""
     loss = mse_loss(y_pred, y_true)
 
     if "dc" in loss_type:
@@ -228,7 +213,7 @@ def compute_loss(loss_type, y_pred, y_true, k_coords, model,
 
 def train_one(config, data, steps=20000, batch_size=4096, eval_every=50,
               grad_clip=1.0, seed=0, device="cuda"):
-    """Train a single model configuration and return results dict."""
+    """single config train"""
     torch.manual_seed(seed)
     np.random.seed(seed)
 
@@ -421,7 +406,7 @@ def train_one(config, data, steps=20000, batch_size=4096, eval_every=50,
 # ---------------------------------------------------------------------------
 
 def print_summary_table(results):
-    """Print ASCII summary table."""
+    """ascii summary"""
     print(f"\n{'='*100}")
     print(f"  ABLATION SUMMARY")
     print(f"{'='*100}")
@@ -445,7 +430,7 @@ def print_summary_table(results):
 
 
 def plot_training_curves(results, output_dir):
-    """Create comparison training curve plot."""
+    """training curves plot"""
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
 
     # --- Val loss curves ---
@@ -488,7 +473,7 @@ def plot_training_curves(results, output_dir):
 
 
 def save_results_json(results, output_dir):
-    """Save results to JSON (strip large arrays for readability)."""
+    """save json"""
     # Make a compact version without full loss histories
     compact = []
     for r in results:

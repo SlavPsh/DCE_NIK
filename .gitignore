@@ -8,3 +8,4 @@ runs/
 wandb/
 slurm-*.out
 slurm-*.err
+*.h5

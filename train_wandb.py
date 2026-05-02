@@ -1,16 +1,5 @@
 #!/usr/bin/env python
-"""
-train_wandb.py -- wandb-integrated training & sweep for NIK DCE-MRI.
-
-Replicates the pipeline from NIK_DCE_iter_spoke_based.ipynb with wandb logging.
-
-Usage:
-    # Create new sweep and run agent:
-    python train_wandb.py config/training.toml
-
-    # Join existing sweep:
-    python train_wandb.py config/training.toml --sweep-id ENTITY/PROJECT/ID --count 50
-"""
+"""nik wandb trainer, sweeps"""
 import argparse
 import random
 import logging
@@ -58,7 +47,7 @@ from wandb_logger import (
 
 
 def load_data(config):
-    """Load and preprocess data once, reusable across sweep runs."""
+    """data once, sweep reusable"""
     data_cfg = config['data']
     file_path = data_cfg['file']
     t_frame = data_cfg['t_frame']
@@ -74,7 +63,7 @@ def load_data(config):
     k_np, traj_np = event["k"], event["traj"]
     gt_img = event.get("gt_img")
 
-    # Transpose to (T, S, C, RO) -- matches notebook convention
+    # tscro layout
     k_np = np.transpose(k_np, (0, 2, 1, 3))
     traj_np = np.transpose(traj_np, (0, 2, 1, 3))
     T, S, C, RO = k_np.shape
@@ -124,7 +113,7 @@ def load_data(config):
 
 
 def main(config_path, data):
-    """Single training run with wandb logging."""
+    """single run, wandb logged"""
     random.seed()  # reset to OS entropy (undo previous run's deterministic seed)
     run_name = generate_slug(3) + "_nik"
     config = load_config(config_path)
@@ -138,7 +127,7 @@ def main(config_path, data):
     for key, value in config.items():
         logging.info(f"  {key}: {value}")
 
-    # Build flat training config for wandb (sweep params override these)
+    # flat config, sweep override
     train_config = {
         "model_family": config['model'].get('model_family', 'siren'),
         "hidden": config['model']['hidden'],
@@ -147,14 +136,15 @@ def main(config_path, data):
         "k_freq": config['model'].get('k_freq', 64),
         "k_sigma": config['model'].get('k_sigma', 6.0),
         "s0": config['model'].get('s0', 10.0),
-        # Polar-specific
+        # polar
         "n_angular_modes": config['model'].get('n_angular_modes', 16),
         "radial_type": config['model'].get('radial_type', 'wire'),
-        # Constraint loss weights (polar + Cartesian)
+        "dropout": config['model'].get('dropout', 0.0),
+        # constraint weights
         "dc_weight": config['training'].get('dc_weight', 0.0),
         "density_weight": config['training'].get('density_weight', 0.0),
         "conj_weight": config['training'].get('conj_weight', 0.0),
-        # Standard
+        # standard
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
@@ -164,13 +154,13 @@ def main(config_path, data):
         "weight_decay": config['training'].get('weight_decay', 0.0),
         "loss_type": config['training'].get('loss_type', "mse"),
         "seed": config['training']['seed'],
-        # LR scheduler (ReduceLROnPlateau)
+        # lr scheduler
         "scheduler_patience": config['training'].get('scheduler_patience', 0),
         "scheduler_factor": config['training'].get('scheduler_factor', 0.5),
         "scheduler_min_lr": config['training'].get('scheduler_min_lr', 1e-6),
     }
 
-    # Initialize wandb
+    # wandb init
     wandb_logger = WandbLogger(
         config=train_config,
         output_dir=output_dir,
@@ -179,20 +169,21 @@ def main(config_path, data):
     )
     wandb_logger.initialize()
 
-    # Resolve hyperparameters (sweep overrides > config defaults)
+    # hyperparam resolve
     wc = wandb.config
     model_family = getattr(wc, "model_family", "siren")
     hidden = int(wc.hidden)
     depth = int(wc.depth)
-    w0 = float(getattr(wc, "w0", 15))        # siren / ff_siren
-    k_freq = int(getattr(wc, "k_freq", 64))  # ff_relu / ff_siren
-    k_sigma = float(getattr(wc, "k_sigma", 6.0))  # ff_relu / ff_siren
-    s0 = float(getattr(wc, "s0", 10.0))           # wire
-    n_angular_modes = int(getattr(wc, "n_angular_modes", 16))  # polar
-    radial_type = str(getattr(wc, "radial_type", "wire"))      # polar
-    dc_weight = float(getattr(wc, "dc_weight", 0.0))           # polar loss
-    density_weight = float(getattr(wc, "density_weight", 0.0)) # polar loss
-    conj_weight = float(getattr(wc, "conj_weight", 0.0))       # polar loss
+    w0 = float(getattr(wc, "w0", 15))
+    k_freq = int(getattr(wc, "k_freq", 64))
+    k_sigma = float(getattr(wc, "k_sigma", 6.0))
+    s0 = float(getattr(wc, "s0", 10.0))
+    n_angular_modes = int(getattr(wc, "n_angular_modes", 16))
+    radial_type = str(getattr(wc, "radial_type", "wire"))
+    dropout = float(getattr(wc, "dropout", 0.0))
+    dc_weight = float(getattr(wc, "dc_weight", 0.0))
+    density_weight = float(getattr(wc, "density_weight", 0.0))
+    conj_weight = float(getattr(wc, "conj_weight", 0.0))
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
@@ -207,14 +198,14 @@ def main(config_path, data):
     scheduler_factor = float(getattr(wc, "scheduler_factor", 0.5))
     scheduler_min_lr = float(getattr(wc, "scheduler_min_lr", 1e-6))
 
-    # Skip redundant sweep combos to avoid wasting compute.
+    # skip redundant combos
     def _skip(reason: str):
         logging.info(f"Skipping: {reason}")
         wandb.run.summary["skipped"] = True
         wandb.run.summary["best_val_loss"] = float("inf")
         wandb_logger.finish()
 
-    # w0 is irrelevant for relu/elu/ff_relu; k_freq/k_sigma irrelevant for relu/elu/siren.
+    # family relevance
     if model_family in ("relu", "elu") and w0 != 15:
         _skip(f"w0={w0} is irrelevant for model_family={model_family}")
         return
@@ -228,7 +219,7 @@ def main(config_path, data):
         _skip(f"k_sigma/k_freq irrelevant for model_family=polar")
         return
 
-    # Per-family valid architecture ranges (from [family_params] in config).
+    # family valid ranges
     family_params = config.get("family_params", {}).get(model_family, {})
     valid_hidden = family_params.get("hidden")
     valid_depth = family_params.get("depth")
@@ -243,7 +234,7 @@ def main(config_path, data):
     log_scale = config['training']['plot']['log_scale']
     console_every = config['logging']['console_every']
 
-    # ---- Reproducibility ----
+    # reproducibility
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -251,7 +242,7 @@ def main(config_path, data):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ---- Unpack preloaded data ----
+    # unpack data
     k_img_space = data["k_img_space"]
     traj_t = data["traj_t"]
     scales = data["scales"]
@@ -281,7 +272,7 @@ def main(config_path, data):
     x_val = x_all[val_idx][:, :2].to(device)
     y_val = y_all[val_idx].to(device)
 
-    # ---- Compute s_max for polar models ----
+    # polar s_max
     _x_tmp = x_all[:, :2].to(device)
     _kx, _ky = _x_tmp[:, 0], _x_tmp[:, 1]
     _theta = torch.atan2(_ky, _kx)
@@ -290,7 +281,7 @@ def main(config_path, data):
     s_max = float(_s_coord.abs().max().item())
     del _x_tmp, _kx, _ky, _theta, _theta0, _s_coord
 
-    # ---- Build model ----
+    # build model
     if model_family == "relu":
         model = ReLU_MLP_KXY_REIM(
             in_dim=2, hidden=hidden, depth=depth,
@@ -326,9 +317,9 @@ def main(config_path, data):
         ).to(device)
     elif model_family == "wire":
         model = WIRE_KXY_REIM(
-            in_dim=2, hidden=hidden, depth=depth, w0=w0, s0=s0,
+            in_dim=2, hidden=hidden, depth=depth, w0=w0, s0=s0, dropout=dropout,
         ).to(device)
-    else:  # default: siren
+    else:
         model = NIK_SIREN_KXY_REIM(
             in_dim=2, hidden=hidden, depth=depth, w0=w0,
         ).to(device)
@@ -361,13 +352,13 @@ def main(config_path, data):
             f"s_max={s_max:.4f}, dc_weight={dc_weight}"
         )
 
-    # ---- Watch model gradients ----
+    # watch grads
     watch_interval = config['wandb'].get('watch_interval', 0)
     if watch_interval > 0:
         wandb_logger.run.watch(model, log_freq=watch_interval)
         logging.info(f"wandb watching model at interval {watch_interval}")
 
-    # ---- Build optimizer ----
+    # build optimizer
     if optimizer_name == "Adam":
         opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "AdamW":
@@ -377,7 +368,7 @@ def main(config_path, data):
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
-    # ---- LR scheduler (ReduceLROnPlateau) ----
+    # lr scheduler
     scheduler = None
     if scheduler_patience > 0:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -389,7 +380,7 @@ def main(config_path, data):
             f"factor={scheduler_factor}, min_lr={scheduler_min_lr})"
         )
 
-    # ---- Plot metadata ----
+    # plot metadata
     train_spoke_show = int(torch.unique(spoke_id_all[train_idx])[0].item())
     val_spoke_show = int(torch.unique(spoke_id_all[val_idx])[0].item())
     RO_total = int(ro_id_all.max().item()) + 1
@@ -401,7 +392,7 @@ def main(config_path, data):
         plot_steps.add(s)
         s += plot_every
 
-    # ---- Training loop ----
+    # training loop
     x_all_2d = x_all[:, :2].to(device)
     y_all_dev = y_all.to(device)
     x_train = x_all_2d[train_idx]
@@ -417,7 +408,7 @@ def main(config_path, data):
     logging.info(f"Train points: {N_train}, Val points: {x_val.shape[0]}")
 
     for step in range(1, steps + 1):
-        # --- Training step (sample from train split only) ---
+        # train step
         idx = torch.randint(0, N_train, (batch_size,), device=device)
         x = x_train[idx]
         y = y_train[idx]
@@ -425,7 +416,7 @@ def main(config_path, data):
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
         loss = loss_fn(y_pred, y)
-        # Constraint losses (polar gets all three; Cartesian gets density + conjugate)
+        # constraint losses
         if dc_weight > 0 and hasattr(model, "dc_predictions"):
             loss = loss + dc_weight * dc_consistency_loss(model)
         if density_weight > 0:
@@ -438,7 +429,7 @@ def main(config_path, data):
 
         train_loss = float(loss.item())
 
-        # --- Validation ---
+        # validation
         if step % eval_every == 0 or step == steps:
             model.eval()
             with torch.no_grad():
@@ -453,11 +444,11 @@ def main(config_path, data):
                     for k, v in model.state_dict().items()
                 }
 
-            # Step the LR scheduler on validation loss
+            # scheduler step
             if scheduler is not None:
                 scheduler.step(last_val_loss)
 
-        # --- wandb scalar logging ---
+        # scalar logging
         log_dict = {"train/train_loss": train_loss}
         if last_val_loss is not None and (step % eval_every == 0 or step == steps):
             log_dict["train/val_loss"] = last_val_loss
@@ -465,13 +456,13 @@ def main(config_path, data):
             log_dict["train/lr"] = opt.param_groups[0]["lr"]
         wandb_logger.log(log_dict, step=step)
 
-        # --- Figure logging ---
+        # figure logging
         if step in plot_steps:
             model.eval()
             with torch.no_grad():
                 figures = {}
 
-                # Spoke plots (train and val)
+                # spoke plots
                 for sp_id, label in [
                     (train_spoke_show, "train"),
                     (val_spoke_show, "val"),
@@ -489,7 +480,7 @@ def main(config_path, data):
                     )
                     figures[f"plots/spoke_{label}"] = fig
 
-                # Ring (theta) plots
+                # ring plots
                 ring_figs = make_ring_figures(
                     model,
                     x_all=x_all, y_all=y_all,
@@ -508,7 +499,7 @@ def main(config_path, data):
                     component = ["Re", "Im", "Mag"][i % 3]
                     figures[f"plots/ring_ro{ro_idx_i}_{component}"] = fig
 
-                # Error maps
+                # error maps
                 fig_err_train = make_error_map_figure(
                     model,
                     x_sub=x_all[train_idx],
@@ -530,14 +521,14 @@ def main(config_path, data):
             wandb_logger.log_figures(figures, step=step)
             model.train()
 
-        # --- Console logging ---
+        # console logging
         if step % console_every == 0:
             msg = f"step {step:6d}  train {train_loss:.3e}"
             if last_val_loss is not None:
                 msg += f"  val {last_val_loss:.3e}"
             logging.info(msg)
 
-    # ---- Restore best model and log final reconstruction + image metrics ----
+    # restore best, recon, metrics
     if best_state is not None:
         model.load_state_dict(best_state)
     model.eval()
@@ -569,8 +560,7 @@ def main(config_path, data):
         )
         wandb_logger.log({"recon/measured": wandb.Image(img_measured)}, step=steps)
 
-        # ---- Image-space metrics (PSNR / SSIM / NRMSE) ----
-        # Compare predicted reconstruction against the NUFFT-from-measured
+        # image metrics, vs nufft
         metrics_vs_measured = compute_image_metrics(img_pred, img_measured)
         wandb_logger.log({
             "metrics/psnr_vs_measured": metrics_vs_measured["psnr_db"],
@@ -588,10 +578,10 @@ def main(config_path, data):
             f"NRMSE={metrics_vs_measured['nrmse']:.4f}"
         )
 
-        # Compare against ground-truth image if available
+        # vs ground truth
         if gt_img is not None:
             gt_slice = gt_img[t_frame, z_slice_idx, :, :]
-            # Resize predicted image to match GT if shapes differ
+            # resize match gt
             if img_pred.shape != gt_slice.shape:
                 from scipy.ndimage import zoom
                 zoom_factors = (
@@ -621,10 +611,10 @@ def main(config_path, data):
     except Exception as e:
         logging.warning(f"NUFFT reconstruction failed: {e}")
 
-    # ---- Save model ----
+    # save model
     wandb_logger.save_model(model, "model_best.pth", opt, steps, output_dir)
 
-    # ---- Summary ----
+    # summary
     wandb.run.summary["best_val_loss"] = best_val_loss
     wandb.run.summary["final_train_loss"] = train_loss
     wandb.run.summary["total_steps"] = steps
@@ -645,19 +635,19 @@ if __name__ == "__main__":
                         help='Number of sweep runs (default: 50).')
     args = parser.parse_args()
 
-    # Load config and data once (shared across all sweep runs)
+    # config, data once
     config = load_config(args.config_path)
     data = load_data(config)
 
     if args.sweep_id:
-        # Join existing sweep
+        # join existing
         wandb.agent(
             args.sweep_id,
             function=lambda: main(args.config_path, data),
             count=args.count,
         )
     else:
-        # Create new sweep and run agent
+        # new sweep
         sweep_config = config['sweep']
         sweep_id = wandb.sweep(sweep=sweep_config)
         wandb.agent(

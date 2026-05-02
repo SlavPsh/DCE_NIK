@@ -1,10 +1,4 @@
-# wandb_logger.py
-"""
-wandb logging utilities and figure-returning plot functions for NIK DCE-MRI.
-
-Plot functions are adapted from nik_plot.py but return matplotlib Figures
-instead of calling plt.show(), suitable for logging to wandb.
-"""
+"""wandb plot figures, return only"""
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -12,9 +6,7 @@ import matplotlib.pyplot as plt
 import torch
 
 
-# =========================================================================
-# Figure-returning plot functions
-# =========================================================================
+# figure plotters
 
 @torch.no_grad()
 def make_spoke_figure(
@@ -29,11 +21,7 @@ def make_spoke_figure(
     coord_adapter=None,
     log_scale: bool = True,
 ):
-    """
-    Plot Re, Im, |y| of prediction vs measured along a single spoke.
-    Adapted from nik_plot.plot_spoke_zoom_kxy_dense_flat().
-    Returns a matplotlib Figure.
-    """
+    """spoke pred vs measured"""
     device = next(model.parameters()).device
     model.eval()
 
@@ -116,11 +104,7 @@ def make_ring_figures(
     coord_adapter=None,
     log_scale: bool = True,
 ):
-    """
-    Plot Re, Im, |y| along theta for each ring in ro_list.
-    Adapted from nik_plot.plot_rings_kxy_train_vs_val_dense_flat().
-    Returns a list of matplotlib Figures (3 per ring: Re, Im, Mag).
-    """
+    """ring plots, train val"""
     device = next(model.parameters()).device
     model.eval()
 
@@ -168,7 +152,7 @@ def make_ring_figures(
         th_tr, re_tr, im_tr, mag_tr = get_points(train_idx, ro_idx)
         th_va, re_va, im_va, mag_va = get_points(val_idx, ro_idx)
 
-        # Re
+        # re
         fig_re = plt.figure(figsize=(10, 4))
         plt.plot(th_np, re_p, label="pred Re (dense ring)")
         plt.scatter(th_tr, re_tr, s=18, label="train points Re")
@@ -181,7 +165,7 @@ def make_ring_figures(
         plt.tight_layout()
         figures.append(fig_re)
 
-        # Im
+        # im
         fig_im = plt.figure(figsize=(10, 4))
         plt.plot(th_np, im_p, label="pred Im (dense ring)")
         plt.scatter(th_tr, im_tr, s=18, label="train points Im")
@@ -194,7 +178,7 @@ def make_ring_figures(
         plt.tight_layout()
         figures.append(fig_im)
 
-        # Mag
+        # mag
         fig_mag = plt.figure(figsize=(10, 4))
         plt.plot(th_np, mag_p, label="pred |y| (dense ring)")
         plt.scatter(th_tr, mag_tr, s=18, label="train points |y|")
@@ -220,11 +204,7 @@ def make_error_map_figure(
     title_prefix="",
     coord_adapter=None,
 ):
-    """
-    Error heatmaps (dRe, dIm, d|y|) in k-space.
-    Adapted from nik_plot.plot_error_maps_kxy_flat().
-    Returns a matplotlib Figure.
-    """
+    """kspace error maps"""
     device = next(model.parameters()).device
     model.eval()
 
@@ -270,9 +250,7 @@ def make_error_map_figure(
     return fig
 
 
-# =========================================================================
-# Cartesian evaluation figures
-# =========================================================================
+# cart eval figures
 
 @torch.no_grad()
 def make_cartesian_error_map(
@@ -283,13 +261,7 @@ def make_cartesian_error_map(
     nky, nkx,
     title_prefix="",
 ):
-    """
-    Error heatmaps on the Cartesian grid (absolute and relative, log scale).
-
-    Returns a matplotlib Figure with 2 rows x 3 cols:
-      Row 1: absolute errors  log10(|dRe|+eps), log10(|dIm|+eps), log10(|dMag|+eps)
-      Row 2: relative errors  log10(|dRe|/(|Re|+eps)), etc.
-    """
+    """cart error maps"""
     device = next(model.parameters()).device
     model.eval()
 
@@ -308,7 +280,7 @@ def make_cartesian_error_map(
 
     eps = 1e-10
 
-    # Relative errors
+    # relative errors
     rel_dRe = dRe / (np.abs(y0[:, 0]).reshape(nky, nkx) + eps)
     rel_dIm = dIm / (np.abs(y0[:, 1]).reshape(nky, nkx) + eps)
     rel_dMag = dMag / (mag_y + eps)
@@ -323,12 +295,12 @@ def make_cartesian_error_map(
         ax.set_ylabel("ky")
         plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
-    # Row 1: absolute errors
+    # row 1, absolute
     imshow_log(axes[0, 0], dRe, f"{title_prefix} abs |dRe| (log10)")
     imshow_log(axes[0, 1], dIm, f"{title_prefix} abs |dIm| (log10)")
     imshow_log(axes[0, 2], dMag, f"{title_prefix} abs |dMag| (log10)")
 
-    # Row 2: relative errors
+    # row 2, relative
     imshow_log(axes[1, 0], rel_dRe, f"{title_prefix} rel |dRe|/|Re| (log10)")
     imshow_log(axes[1, 1], rel_dIm, f"{title_prefix} rel |dIm|/|Im| (log10)")
     imshow_log(axes[1, 2], rel_dMag, f"{title_prefix} rel |dMag|/|Mag| (log10)")
@@ -349,24 +321,13 @@ def make_cartesian_image_comparison(
     ref_img_slice=None,
     title_prefix="",
 ):
-    """
-    Compare image reconstructed from model's Cartesian prediction vs
-    image from actual Cartesian k-space (both via 2D IFFT).
-
-    If normalizer is provided, uses it to denormalize. Otherwise falls back
-    to scalar y_scale multiplication.
-
-    If kspace_mask is provided, it is applied in k-space before IFFT,
-    typically to zero-fill Cartesian points outside the radial support.
-
-    Returns a matplotlib Figure.
-    """
+    """cart image compare"""
     device = next(model.parameters()).device
     model.eval()
 
     kcoords = x_cart[:, :2]
 
-    # Predicted k-space on Cartesian grid
+    # predicted kspace
     yp = model(x_cart.to(device))
     if normalizer is not None:
         yp_denorm = normalizer.denormalize(kcoords.to(device), yp)
@@ -375,7 +336,7 @@ def make_cartesian_image_comparison(
         yp_denorm = yp * ys
     k_pred = torch.complex(yp_denorm[:, 0], yp_denorm[:, 1]).reshape(nky, nkx)
 
-    # Measured Cartesian k-space
+    # measured kspace
     if normalizer is not None:
         y_meas_denorm = normalizer.denormalize(kcoords.to(device), y_cart.to(device))
     else:
@@ -390,17 +351,14 @@ def make_cartesian_image_comparison(
         k_pred = k_pred * mask
         k_meas = k_meas * mask
 
-    # IFFT to image space
-    # Measured k-space (from simulator) and predicted k-space (from model) have
-    # different phase conventions, requiring different shift operations.
-    # .T transposes to match radial NUFFT axis convention (ky,kx) → (kx,ky).
+    # ifft to image
     img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
     img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
     n_cols = 3 if ref_img_slice is not None else 2
     fig, axes = plt.subplots(2, n_cols, figsize=(6 * n_cols, 10))
 
-    # Normalize each image to [0, 1] for display
+    # peak normalize
     def norm01(x):
         mx = x.max()
         return x / mx if mx > 0 else x
@@ -413,13 +371,13 @@ def make_cartesian_image_comparison(
 
     if ref_img_slice is not None:
         gt = np.asarray(ref_img_slice)
-        # GT may have transposed axes compared to k-space IFFT output
+        # gt transpose check
         if gt.shape != img_pred.shape and gt.shape == img_pred.shape[::-1]:
             gt = gt.T
         axes[0, 2].imshow(norm01(gt), cmap="gray", vmin=0, vmax=1)
         axes[0, 2].set_title(f"{title_prefix} Reference (full Cartesian)")
 
-    # Error maps (normalize pred/meas to same scale for comparison)
+    # error maps
     img_pred_n = norm01(img_pred)
     img_meas_n = norm01(img_meas)
 

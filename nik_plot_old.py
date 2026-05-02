@@ -1,3 +1,4 @@
+"""old kspace plot helpers"""
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -64,42 +65,37 @@ def plot_spoke_zoom_kxy_dense(
     kxy_sp, y_sp,
     spoke_id: int,
     y_scale=1.0,
-    n_s: int = 4096,        # dense samples along the spoke ordering
+    n_s: int = 4096,
     title_prefix="",
 ):
-    """
-    Plot in the native spoke ordering: RO index increases from one edge,
-    through the center (~mid index), to the opposite edge.
-
-    Dense curve is constructed by interpolating (kx,ky) along RO.
-    """
+    """spoke zoom, dense interp"""
     device = next(model.parameters()).device
     model.eval()
 
-    # measured spoke (RO,2) and measurements (RO,2)
-    x_m = kxy_sp[spoke_id].to(device)    # (RO,2)
-    y_m = y_sp[spoke_id].to(device)      # (RO,2)
+    # measured spoke
+    x_m = kxy_sp[spoke_id].to(device)
+    y_m = y_sp[spoke_id].to(device)
     RO = x_m.shape[0]
 
     ys = float(y_scale.detach().cpu().item()) if isinstance(y_scale, torch.Tensor) else float(y_scale)
-    y_m0 = (y_m * ys).detach().cpu().numpy()  # (RO,2)
+    y_m0 = (y_m * ys).detach().cpu().numpy()
 
-    # x-axis: native RO index
+    # ro index
     idx_m = np.arange(RO)
 
-    # Dense parameter s in [0, RO-1] following the same ordering
-    s = torch.linspace(0, RO - 1, n_s, device=device)  # (n_s,)
+    # dense param
+    s = torch.linspace(0, RO - 1, n_s, device=device)
     s0 = torch.floor(s).long().clamp(0, RO - 1)
     s1 = (s0 + 1).clamp(0, RO - 1)
-    w = (s - s0.float()).unsqueeze(1)  # (n_s,1)
+    w = (s - s0.float()).unsqueeze(1)
 
-    # interpolate kx,ky along the trajectory in index-space
-    x0 = x_m[s0]  # (n_s,2)
-    x1 = x_m[s1]  # (n_s,2)
-    x_d = (1.0 - w) * x0 + w * x1       # (n_s,2)
+    # kxy interp
+    x0 = x_m[s0]
+    x1 = x_m[s1]
+    x_d = (1.0 - w) * x0 + w * x1
 
-    # predict dense along spoke
-    yp_d = model(x_d)                   # (n_s,2)
+    # dense pred
+    yp_d = model(x_d)
     yp_d0 = (yp_d * ys).detach().cpu().numpy()
 
     # components
@@ -143,9 +139,9 @@ def plot_rings_kxy_train_vs_val_dense(
     *,
     kxy_sp, y_sp, theta,
     train_spokes, val_spokes,
-    ro_list,                 # list of ro_idx values, e.g. [RO//4, RO//2, int(0.8*RO)]
+    ro_list,
     y_scale=1.0,
-    n_theta: int = 1024,     # dense in angle
+    n_theta: int = 1024,
     title_prefix="",
 ):
     device = next(model.parameters()).device
@@ -164,11 +160,11 @@ def plot_rings_kxy_train_vs_val_dense(
         return th_m, re_m, im_m, mag_m
 
     for ro_idx in ro_list:
-        # radius estimate from median across all spokes at this ro_idx
+        # median radius
         r_all = torch.sqrt((kxy_sp[:, ro_idx, 0]**2 + kxy_sp[:, ro_idx, 1]**2)).detach().cpu().numpy()
         r0 = float(np.median(r_all))
 
-        # dense prediction around ring
+        # dense ring
         th = torch.linspace(-np.pi, np.pi, n_theta, device=device)
         x_dense = torch.stack([torch.tensor(r0, device=device) * torch.cos(th),
                                torch.tensor(r0, device=device) * torch.sin(th)], dim=1).float()
@@ -177,11 +173,11 @@ def plot_rings_kxy_train_vs_val_dense(
         mag_p = np.sqrt(re_p**2 + im_p**2)
         th_np = th.detach().cpu().numpy()
 
-        # measured points on that ring for train/val spokes
+        # train val rings
         th_tr, re_tr, im_tr, mag_tr = get_points(train_spokes, ro_idx)
         th_va, re_va, im_va, mag_va = get_points(val_spokes, ro_idx)
 
-        # Re
+        # re
         plt.figure(figsize=(10,4))
         plt.plot(th_np, re_p, label="pred Re (dense ring)")
         plt.scatter(th_tr, re_tr, s=18, label="train points Re")
@@ -192,7 +188,7 @@ def plot_rings_kxy_train_vs_val_dense(
         plt.tight_layout()
         plt.show()
 
-        # Im
+        # im
         plt.figure(figsize=(10,4))
         plt.plot(th_np, im_p, label="pred Im (dense ring)")
         plt.scatter(th_tr, im_tr, s=18, label="train points Im")
@@ -203,7 +199,7 @@ def plot_rings_kxy_train_vs_val_dense(
         plt.tight_layout()
         plt.show()
 
-        # Mag
+        # mag
         plt.figure(figsize=(10,4))
         plt.plot(th_np, mag_p, label="pred |y| (dense ring)")
         plt.scatter(th_tr, mag_tr, s=18, label="train points |y|")
@@ -224,7 +220,7 @@ def make_plot_callback_all(
     train_spoke_show=None,
     val_spoke_show=None,
 
-    # --- add these for recon snapshots ---
+    # recon snapshots
     pred_imgs=None,
     pred_steps=None,
     k_img_space=None,
@@ -235,8 +231,8 @@ def make_plot_callback_all(
     scales=None,
     img_size=None,
     n_z_slices=None,
-    n_ro_per_slice=None,   # number of spokes in this kz plane (S_kz)
-    RO_full=None,          # RO length
+    n_ro_per_slice=None,
+    RO_full=None,
 ):
     S_kz, RO, _ = kxy_sp.shape
     if ro_idx_ring is None:
@@ -287,22 +283,22 @@ def make_plot_callback_all(
         if not do_recon:
             return cb
 
-        # Build predicted k-space for this (t_frame, coil_idx, z_slice_idx) plane
+        # predicted kspace plane
 
         model.eval()
         with torch.no_grad():
             device = next(model.parameters()).device
 
-            # kxy_sp is (S_kz, RO, 2) for the selected kz plane
-            x_all_2d = kxy_sp.reshape(-1, 2).to(device)  # (S_kz*RO, 2)
+            # flat coords
+            x_all_2d = kxy_sp.reshape(-1, 2).to(device)
 
-            yp = model(x_all_2d)  # (N,2) scaled
+            yp = model(x_all_2d)
             ys = float(y_scale.detach().cpu().item()) if isinstance(y_scale, torch.Tensor) else float(y_scale)
-            yp = yp * ys  # unscale to original k-space units
+            yp = yp * ys
 
-            k_pred = torch.complex(yp[:, 0], yp[:, 1]).reshape(S_kz, RO)  # (spokes, RO)
+            k_pred = torch.complex(yp[:, 0], yp[:, 1]).reshape(S_kz, RO)
 
-            # create a k-space tensor with only this slice filled
+            # filled tensor
             k_img_space_pred = torch.zeros_like(k_img_space)
             k_img_space_pred[t_frame, :, coil_idx, z_slice_idx, :] = k_pred
 

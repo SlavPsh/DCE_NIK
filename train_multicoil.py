@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""
-train_multicoil.py -- Multi-coil NIK training with wandb logging.
-
-Trains a multi-coil model (FiLM or Concat) on all C coils jointly.
-Based on train_wandb.py but with multi-coil data loading and model.
-
-Usage:
-    # Single run:
-    python train_multicoil.py config/step15_multicoil.toml
-
-    # Sweep:
-    python train_multicoil.py config/step15_multicoil.toml --sweep-id ENTITY/PROJECT/ID --count 10
-"""
+"""multicoil nik trainer, wandb"""
 import argparse
 import random
 import logging
@@ -48,7 +36,7 @@ from nik_metrics import compute_image_metrics, compute_perceptual_metrics
 
 
 def load_data(config):
-    """Load and preprocess multi-coil data."""
+    """multicoil data once"""
     data_cfg = config['data']
     file_path = data_cfg['file']
     t_frame = data_cfg['t_frame']
@@ -79,7 +67,7 @@ def load_data(config):
 
     z_slice_idx = n_z_slices // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
-    # Multi-coil dataset: all C coils
+    # multicoil dataset
     x_all, y_all, coil_id_all, spoke_id_all, ro_id_all, meta = \
         make_fixed_frame_zslice_multicoil_dataset(
             k_img_space, traj_t, scales, dims,
@@ -92,12 +80,12 @@ def load_data(config):
     print(f"Multi-coil dataset: {meta['N_total']} points "
           f"({meta['n_coils']} coils × {meta['N_per_coil']} pts/coil)", flush=True)
 
-    # Spoke-based train/val split (identical across coils)
+    # spoke train val split
     train_idx, val_idx, train_spokes, val_spokes = split_points_by_spokes(
         spoke_id_all, val_frac=val_frac, seed=seed, mode="random",
     )
 
-    # ---- Verification checks ----
+    # verify checks
     N_per_coil = meta["N_per_coil"]
     print("Verifying multi-coil data loader...", flush=True)
     verify_multicoil_data(x_all, y_all, coil_id_all, spoke_id_all,
@@ -108,15 +96,15 @@ def load_data(config):
     print(f"  Val points: {len(val_idx)}, Train points: {len(train_idx)}")
     print("All multi-coil data loader checks passed.", flush=True)
 
-    # Angular sector split (additional eval diagnostic — not used for training)
-    # Compute spoke angles from trajectory
+    # angular sector diagnostic
+    # spoke angles
     sx, sy, _ = scales
     indices = torch.arange(0, S, n_z_slices, device=traj_t.device)
     kx_sp = traj_t[t_frame, indices, 0, RO // 2] / sx
     ky_sp = traj_t[t_frame, indices, 1, RO // 2] / sy
     theta_sp = torch.atan2(ky_sp, kx_sp)
 
-    # Hold out sector 0 (of 4 sectors) for angular validation
+    # holdout sector 0
     sector_train_idx, sector_val_idx, sector_val_spokes = \
         split_points_by_angular_sector(
             spoke_id_all, theta_sp, n_sectors=4, val_sector=0,
@@ -143,7 +131,7 @@ def load_data(config):
 
 
 def main(config_path, data):
-    """Single multi-coil training run."""
+    """single multicoil run"""
     random.seed()
     run_name = generate_slug(3) + "_mc"
     config = load_config(config_path)
@@ -155,7 +143,7 @@ def main(config_path, data):
     logging.info(f"Config: {config_path}")
     logging.info(f"Output: {output_dir}")
 
-    # Build training config
+    # build config
     train_config = {
         "model_family": config['model'].get('model_family', 'wire'),
         "multicoil_mode": config['model'].get('multicoil_mode', 'film'),
@@ -210,7 +198,7 @@ def main(config_path, data):
 
     console_every = config['logging']['console_every']
 
-    # Reproducibility
+    # reproducibility
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -218,7 +206,7 @@ def main(config_path, data):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # Unpack data
+    # unpack data
     k_img_space = data["k_img_space"]
     traj_t = data["traj_t"]
     scales = data["scales"]
@@ -239,7 +227,7 @@ def main(config_path, data):
     t_frame = config['data']['t_frame']
     N_per_coil = meta["N_per_coil"]
 
-    # Build model
+    # build model
     backbone_kwargs = dict(hidden=hidden, depth=depth, w0=w0, s0=s0)
 
     if multicoil_mode == "film":
@@ -267,12 +255,12 @@ def main(config_path, data):
 
     n_params = sum(p.numel() for p in model.parameters())
 
-    # Param count breakdown: backbone vs coil-specific
+    # param breakdown
     if multicoil_mode == "concat":
         backbone_params = sum(p.numel() for p in model.backbone.parameters())
         coil_params = sum(p.numel() for p in model.coil_embed.parameters())
     else:
-        # FiLM: backbone = linears + head, coil = film modules
+        # film split
         backbone_params = sum(p.numel() for n, p in model.named_parameters()
                               if 'film' not in n and 'coil' not in n)
         coil_params = n_params - backbone_params
@@ -289,7 +277,7 @@ def main(config_path, data):
         f"(backbone={backbone_params}, coil={coil_params})"
     )
 
-    # Optimizer
+    # optimizer
     if optimizer_name == "Adam":
         opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "AdamW":
@@ -297,7 +285,7 @@ def main(config_path, data):
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
-    # LR scheduler
+    # lr scheduler
     scheduler = None
     if scheduler_patience > 0:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -309,7 +297,7 @@ def main(config_path, data):
             f"factor={scheduler_factor}, min_lr={scheduler_min_lr})"
         )
 
-    # Prepare training tensors
+    # training tensors
     x_all_2d = x_all[:, :2].to(device)
     y_all_dev = y_all.to(device)
     coil_all_dev = coil_id_all.to(device)
@@ -323,7 +311,7 @@ def main(config_path, data):
     y_val = y_all_dev[val_idx]
     coil_val = coil_all_dev[val_idx]
 
-    # Angular sector val tensors (additional diagnostic)
+    # angular sector tensors
     x_sector_val = x_all_2d[sector_val_idx]
     y_sector_val = y_all_dev[sector_val_idx]
     coil_sector_val = coil_all_dev[sector_val_idx]
@@ -337,11 +325,11 @@ def main(config_path, data):
     logging.info(f"Train points: {N_train}, Val points (spokes): {x_val.shape[0]}, "
                  f"Val points (sector): {x_sector_val.shape[0]}")
 
-    # Per-coil val loss tracking
+    # per coil val
     val_coil_ids = coil_id_all[val_idx]
 
     for step in range(1, steps + 1):
-        # --- Training step: random batch from all coils ---
+        # train step
         idx = torch.randint(0, N_train, (batch_size,), device=device)
         x = x_train[idx]
         y = y_train[idx]
@@ -356,14 +344,14 @@ def main(config_path, data):
 
         train_loss = float(loss.item())
 
-        # --- Validation (PRIMARY: k-space MSE on held-out whole spokes) ---
+        # validation, kspace mse
         if step % eval_every == 0 or step == steps:
             model.eval()
             with torch.no_grad():
                 val_pred = model(x_val, coil_val)
                 last_val_loss = float(loss_fn(val_pred, y_val).item())
 
-                # Per-coil val loss + angular sector (every 10 evals or at end)
+                # per coil, sector
                 if step == steps or step % (eval_every * 10) == 0:
                     per_coil_val = {}
                     for ci in range(C):
@@ -378,7 +366,7 @@ def main(config_path, data):
                         step=step,
                     )
 
-                    # Angular sector validation (harder test)
+                    # angular sector val
                     sector_pred = model(x_sector_val, coil_sector_val)
                     sector_val_loss = float(loss_fn(sector_pred, y_sector_val).item())
                     wandb_logger.log({
@@ -397,7 +385,7 @@ def main(config_path, data):
             if scheduler is not None:
                 scheduler.step(last_val_loss)
 
-        # --- Logging ---
+        # logging
         log_dict = {"train/train_loss": train_loss}
         if last_val_loss is not None and (step % eval_every == 0 or step == steps):
             log_dict["train/val_loss"] = last_val_loss
@@ -411,14 +399,14 @@ def main(config_path, data):
                 msg += f"  val {last_val_loss:.3e}"
             logging.info(msg)
 
-    # ---- Restore best model and evaluate ----
+    # restore best, eval
     if best_state is not None:
         model.load_state_dict(best_state)
     model.eval()
 
     gt_img = data.get("gt_img")
 
-    # ---- PRIMARY: k-space validation metrics ----
+    # kspace val metrics
     with torch.no_grad():
         val_pred_final = model(x_val, coil_val)
         val_kspace_mse = float(F.mse_loss(val_pred_final, y_val).item())
@@ -426,7 +414,7 @@ def main(config_path, data):
         sector_pred_final = model(x_sector_val, coil_sector_val)
         val_sector_mse = float(F.mse_loss(sector_pred_final, y_sector_val).item())
 
-        # Per-coil breakdown
+        # per coil breakdown
         per_coil_mse = []
         for ci in range(C):
             mask = val_coil_ids == ci
@@ -448,7 +436,7 @@ def main(config_path, data):
     logging.info(f"  Val/train ratio:           {val_train_ratio:.1f}x")
     logging.info(f"  Per-coil val MSE:          {['%.3e' % m for m in per_coil_mse]}")
 
-    # ---- SECONDARY: SOS image reconstruction (qualitative) ----
+    # sos recon
     try:
         recon = nufft2d_recon_multicoil_sos(
             model,
@@ -476,16 +464,13 @@ def main(config_path, data):
             "recon/sos_measured": wandb.Image(img_sos_meas),
         }, step=steps)
 
-        # Log per-coil images
+        # per coil log
         for ci, img_c in enumerate(recon["imgs_per_coil"]):
             wandb_logger.log({
                 f"recon/coil_{ci}": wandb.Image(img_c),
             }, step=steps)
 
-        # ---- TERTIARY: image-space metrics vs NUFFT proxy ----
-        # NOTE: metrics_vs_nufft_proxy compares against NUFFT reconstruction,
-        # which itself has artifacts. These are PROXY metrics for relative
-        # comparison between models, NOT absolute quality measures.
+        # nufft proxy metrics
         metrics_sos = compute_image_metrics(img_sos_pred, img_sos_meas)
         wandb_logger.log({
             "metrics/psnr_sos_vs_nufft": metrics_sos["psnr_db"],
@@ -502,7 +487,7 @@ def main(config_path, data):
             f"SSIM={metrics_sos['ssim']:.4f}  NRMSE={metrics_sos['nrmse']:.4f}"
         )
 
-        # Perceptual metrics (end of training only)
+        # perceptual metrics
         try:
             perc = compute_perceptual_metrics(img_sos_pred, img_sos_meas)
             wandb_logger.log({
@@ -516,7 +501,7 @@ def main(config_path, data):
         except Exception as e:
             logging.warning(f"Perceptual metrics failed: {e}")
 
-        # Coil embedding visualization
+        # coil embedding viz
         try:
             if hasattr(model, 'first_film'):
                 embeds = model.first_film.coil_embed.weight.detach().cpu().numpy()
@@ -526,7 +511,7 @@ def main(config_path, data):
                 embeds = None
 
             if embeds is not None:
-                # Log pairwise distances
+                # pairwise distances
                 from scipy.spatial.distance import pdist, squareform
                 dists = squareform(pdist(embeds))
                 logging.info(f"Coil embedding pairwise distances:\n{np.array2string(dists, precision=3)}")
@@ -538,10 +523,10 @@ def main(config_path, data):
         import traceback
         traceback.print_exc()
 
-    # Save model
+    # save model
     wandb_logger.save_model(model, "model_best.pth", opt, steps, output_dir)
 
-    # Summary
+    # summary
     wandb.run.summary["best_val_loss"] = best_val_loss
     wandb.run.summary["final_train_loss"] = train_loss
     wandb.run.summary["total_steps"] = steps
@@ -581,6 +566,5 @@ if __name__ == "__main__":
                 count=args.count,
             )
         else:
-            # Single run (no sweep)
-            # Initialize wandb directly for non-sweep mode
+            # single run
             main(args.config_path, data)

@@ -1,14 +1,4 @@
-# Step 12: Polar WIRE sweep with low angular modes
-#
-# Goal: Test whether fewer angular modes (N=4..10) suffice.
-#   Step 11 saturated at N=24 (upper bound), but N=24 may be
-#   unnecessarily high. Start from N=8 and explore nearby.
-#
-# Fix: radial_type=wire, all three constraint losses enabled.
-# Sweep: n_angular_modes, depth, hidden, w0, s0, lr, weight_decay
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step12_polar_lowN_sweep.toml
+# step 12, polar low n sweep
 
 [experiment]
 name = "Step 12: Polar WIRE low-N sweep"
@@ -40,7 +30,7 @@ weight_decay = 0.005
 loss_type = "mse"
 eval_every = 50
 seed = 0
-# Polar constraint loss weights
+# polar constraint weights
 dc_weight = 0.01
 density_weight = 1.0
 conj_weight = 0.01
@@ -76,11 +66,7 @@ values = ["polar"]
 [sweep.parameters.radial_type]
 values = ["wire"]
 
-# Param count guide (WIRE_1D radial):
-#   N=4  h=96  d=4 → ~40k    N=4  h=128 d=4 → ~72k
-#   N=6  h=96  d=4 → ~42k    N=6  h=128 d=4 → ~75k
-#   N=8  h=96  d=4 → ~44k    N=8  h=128 d=4 → ~79k
-#   N=10 h=96  d=4 → ~46k    N=10 h=128 d=4 → ~82k
+# param count guide
 
 [sweep.parameters.n_angular_modes]
 values = [4, 6, 8, 10]

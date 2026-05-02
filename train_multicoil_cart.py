@@ -1,14 +1,5 @@
 #!/usr/bin/env python
-"""
-train_multicoil_cart.py -- Multicoil INR: train on all coils, evaluate with coil-combined reconstruction.
-
-Model: f(kx, ky) → (Re_c0, Im_c0, ..., Re_cC-1, Im_cC-1) — direct multicoil output.
-Training: MSE loss averaged over all coils.
-Evaluation: per-coil IFFT → coil combination using known sensitivity maps → image metrics.
-
-Usage:
-    python train_multicoil_cart.py config/multicoil_cart_eval.toml --single
-"""
+"""multicoil cart trainer, sense recon"""
 import argparse
 import random
 import logging
@@ -41,7 +32,7 @@ from nik_metrics import compute_image_metrics, compute_perceptual_metrics
 
 
 def load_data(config):
-    """Load multicoil radial + Cartesian data."""
+    """multicoil radial, cart"""
     data_cfg = config['data']
     t_frame = data_cfg['t_frame']
     z_slice_raw = data_cfg['z_slice_idx']
@@ -49,7 +40,7 @@ def load_data(config):
     seed = config['training']['seed']
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ---- Radial ----
+    # radial
     print("Loading radial data ...", flush=True)
     event = load_event(data_cfg['radial_file'], load_images=True, load_coil_maps=True)
     k_np = np.transpose(event["k"], (0, 2, 1, 3))
@@ -61,7 +52,7 @@ def load_data(config):
     k_img_space, n_z_slices, n_ro_per_slice, _ = ifft1d_kz_to_z(k_t, traj_t, t_frame=t_frame)
     z_slice_idx = n_z_slices // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
-    # Multicoil radial dataset: (N, 4) coords, (N, 2*C) targets
+    # multicoil radial dataset
     x_all, y_all_raw, spoke_id_all, ro_id_all, meta = make_multicoil_radial_dataset(
         k_img_space, traj_t, scales, dims,
         t_fixed=t_frame, z_slice_idx=z_slice_idx,
@@ -69,7 +60,7 @@ def load_data(config):
     )
     print(f"Radial multicoil: {meta['N']} points, {C} coils", flush=True)
 
-    # Subsample spokes
+    # subsample spokes
     n_unique = int(spoke_id_all.max().item()) + 1
     n_train = max(1, int(n_unique * subsample_frac))
     g = torch.Generator(device=spoke_id_all.device).manual_seed(seed)
@@ -77,7 +68,7 @@ def load_data(config):
     train_idx = torch.where(torch.isin(spoke_id_all, perm[:n_train]))[0]
     print(f"Spokes: {n_train}/{n_unique} ({subsample_frac:.0%}), {train_idx.shape[0]} points", flush=True)
 
-    # ---- Cartesian ----
+    # cartesian
     print("Loading Cartesian data ...", flush=True)
     cart_event = load_cartesian_kspace(data_cfg['cartesian_file'], load_images=True, load_coil_maps=True)
     k_cart_t = torch.from_numpy(cart_event['k_cart'].astype(np.complex64)).to(device)
@@ -90,10 +81,9 @@ def load_data(config):
     )
     print(f"Cart multicoil: {meta_cart['N']} points, {meta_cart['n_coils']} coils", flush=True)
 
-    # ---- Coil sensitivity maps ----
-    # Radial coil maps: (C, kz, 312, 312) — pick z-slice, transpose to match image orientation
-    coil_maps_rad = event.get("coil_maps")  # (C, kz, x, y) float64
-    coil_maps_cart = cart_event.get("coil_maps")  # (C, kz, x, y) float64
+    # coil maps
+    coil_maps_rad = event.get("coil_maps")
+    coil_maps_cart = cart_event.get("coil_maps")
 
     return {
         "x_all": x_all, "y_all_raw": y_all_raw,
@@ -115,7 +105,7 @@ def load_data(config):
 
 
 def main(config_path, data):
-    """Single multicoil training run."""
+    """single multicoil run"""
     random.seed()
     run_name = generate_slug(3) + "_mc_carteval"
     config = load_config(config_path)
@@ -129,12 +119,13 @@ def main(config_path, data):
     random.seed(seed); np.random.seed(seed)
     torch.manual_seed(seed); torch.cuda.manual_seed_all(seed)
 
-    # ---- Initialize wandb early so we can read sweep overrides ----
+    # wandb early init
     mc_default = config['model']
     tc = config['training']
     init_config = {
         "hidden": mc_default['hidden'], "depth": mc_default['depth'],
         "w0": mc_default['w0'], "s0": mc_default['s0'],
+        "dropout": mc_default.get('dropout', 0.0),
         "lr": tc['lr'], "weight_decay": tc.get('weight_decay', 0),
         "subsample_frac": data["subsample_frac"],
     }
@@ -143,16 +134,17 @@ def main(config_path, data):
     wandb_logger.initialize()
     wc = wandb.config
 
-    # Read sweep overrides
+    # sweep overrides
     hidden = int(getattr(wc, "hidden", mc_default['hidden']))
     depth = int(getattr(wc, "depth", mc_default['depth']))
     w0 = float(getattr(wc, "w0", mc_default['w0']))
     s0 = float(getattr(wc, "s0", mc_default['s0']))
+    dropout = float(getattr(wc, "dropout", mc_default.get('dropout', 0.0)))
     lr = float(getattr(wc, "lr", tc['lr']))
     weight_decay = float(getattr(wc, "weight_decay", tc.get('weight_decay', 0)))
     subsample_frac = float(getattr(wc, "subsample_frac", data["subsample_frac"]))
 
-    # ---- Unpack ----
+    # unpack
     x_all = data["x_all"]
     y_all_raw = data["y_all_raw"]
     spoke_id_all = data["spoke_id_all"]
@@ -163,7 +155,7 @@ def main(config_path, data):
     meta_cart = data["meta_cart"]
     nky, nkx = meta_cart["nky"], meta_cart["nkx"]
 
-    # If sweep overrides subsample_frac, re-subsample
+    # resubsample if needed
     if subsample_frac != data["subsample_frac"]:
         n_unique = data["n_unique_spokes"]
         n_train = max(1, int(n_unique * subsample_frac))
@@ -174,7 +166,7 @@ def main(config_path, data):
         train_idx = torch.where(train_mask)[0]
         logging.info(f"Re-subsampled: {n_train}/{n_unique} spokes ({subsample_frac:.0%})")
 
-    # ---- Normalization ----
+    # normalization
     norm_cfg = config.get('normalization', {})
     use_envelope = norm_cfg.get('use_envelope', True)
     dcf_power = norm_cfg.get('dcf_power', 0.0)
@@ -207,10 +199,10 @@ def main(config_path, data):
     y_cart = normalizer.normalize(x_cart[:, :2], y_cart_raw)
     logging.info(f"Normalizer: global_scale={normalizer.global_scale:.4f}, C={C}")
 
-    # ---- Build model (sweep params) ----
+    # build model
     model = WIRE_KXY_REIM(
         in_dim=2, hidden=hidden, depth=depth,
-        w0=w0, s0=s0, out_dim=2*C,
+        w0=w0, s0=s0, out_dim=2*C, dropout=dropout,
     ).to(device)
     n_params = sum(p.numel() for p in model.parameters())
     logging.info(f"Model: WIRE multicoil h={hidden} d={depth} w0={w0} s0={s0} out_dim={2*C} params={n_params}")
@@ -221,7 +213,7 @@ def main(config_path, data):
         "use_envelope": use_envelope, "dcf_power": dcf_power,
     }, allow_val_change=True)
 
-    # ---- Optimizer ----
+    # optimizer
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = None
     if tc.get('scheduler_patience', 0) > 0:
@@ -229,7 +221,7 @@ def main(config_path, data):
             opt, mode="min", factor=tc['scheduler_factor'],
             patience=tc['scheduler_patience'], min_lr=tc['scheduler_min_lr'])
 
-    # ---- Prepare tensors ----
+    # prepare tensors
     x_all_2d = x_all[:, :2].to(device)
     y_all_dev = y_all.to(device)
     x_train = x_all_2d[train_idx]
@@ -240,7 +232,7 @@ def main(config_path, data):
     x_cart_dev = x_cart.to(device)
     y_cart_dev = y_cart.to(device)
 
-    # Held-out spokes
+    # heldout spokes
     train_spoke_set = torch.unique(spoke_id_all[train_idx])
     heldout_mask = ~torch.isin(spoke_id_all, train_spoke_set)
     heldout_idx = torch.where(heldout_mask)[0]
@@ -249,21 +241,18 @@ def main(config_path, data):
         x_heldout = x_all_2d[heldout_idx]
         y_heldout = y_all_dev[heldout_idx]
 
-    # ---- Coil sensitivity maps for reconstruction ----
-    # Use Cartesian coil maps (correct FOV). Shape: (C, kz, x, y).
-    # Pick z-slice and transpose to match image convention.
+    # cart coil maps
     coil_maps = data["coil_maps_cart"]
     if coil_maps is not None:
         z_cart = data["z_slice_cart"]
-        # coil_maps: (C, kz, x=312, y=214) — already matches model coil image
-        # shape (C, 312, 214) after IFFT2(ky,kx) + .T
+        # cart shape match
         sens = coil_maps[:, z_cart, :, :].astype(np.complex64)
         logging.info(f"Coil sensitivity maps: {sens.shape}")
     else:
         sens = None
         logging.warning("No coil sensitivity maps — will use RSS combination")
 
-    # ---- Training ----
+    # training
     steps = tc['steps']
     batch_size = tc['batch_size']
     grad_clip = tc['grad_clip']
@@ -321,44 +310,44 @@ def main(config_path, data):
             if last_heldout_loss is not None: msg += f"  heldout {last_heldout_loss:.3e}"
             logging.info(msg)
 
-    # ---- Restore best and final evaluation ----
+    # restore best, eval
     if best_state is not None:
         model.load_state_dict(best_state)
     model.eval()
 
     try:
         with torch.no_grad():
-            # Predict multicoil Cartesian k-space, denormalize
+            # predict, denormalize
             cart_pred_norm = model(x_cart_dev)
             cart_pred_denorm = normalizer.denormalize(x_cart[:, :2].to(device), cart_pred_norm)
             y_meas_denorm = normalizer.denormalize(x_cart[:, :2].to(device), y_cart_dev)
 
-        # Per-coil IFFT → images
+        # per coil ifft
         pred_coil_imgs = []
         meas_coil_imgs = []
         for c in range(C):
-            # Predicted
+            # predicted
             k_pred_c = torch.complex(
                 cart_pred_denorm[:, 2*c], cart_pred_denorm[:, 2*c+1]
             ).reshape(nky, nkx)
             img_pred_c = torch.fft.fftshift(torch.fft.ifft2(k_pred_c)).cpu().numpy().T
             pred_coil_imgs.append(img_pred_c)
 
-            # Measured
+            # measured
             k_meas_c = torch.complex(
                 y_meas_denorm[:, 2*c], y_meas_denorm[:, 2*c+1]
             ).reshape(nky, nkx)
             img_meas_c = torch.fft.ifft2(k_meas_c).cpu().numpy().T
             meas_coil_imgs.append(img_meas_c)
 
-        pred_coil_imgs = np.array(pred_coil_imgs)   # (C, H, W) complex
-        meas_coil_imgs = np.array(meas_coil_imgs)   # (C, H, W) complex
+        pred_coil_imgs = np.array(pred_coil_imgs)
+        meas_coil_imgs = np.array(meas_coil_imgs)
 
-        # Coil combination
+        # coil combine
         if sens is not None:
             assert sens.shape == pred_coil_imgs.shape, \
                 f"sens shape {sens.shape} != coil imgs {pred_coil_imgs.shape}"
-            # SENSE: sum(conj(S) * img) / sum(|S|^2)
+            # sense formula
             denom = np.sum(np.abs(sens) ** 2, axis=0) + 1e-10
             img_pred_combined = np.abs(np.sum(np.conj(sens) * pred_coil_imgs, axis=0) / denom)
             img_meas_combined = np.abs(np.sum(np.conj(sens) * meas_coil_imgs, axis=0) / denom)
@@ -366,17 +355,17 @@ def main(config_path, data):
             img_pred_combined = coil_combine_rss(pred_coil_imgs)
             img_meas_combined = coil_combine_rss(meas_coil_imgs)
 
-        # Normalize to [0,1] for metrics
+        # peak normalize
         img_pred_n = img_pred_combined / (img_pred_combined.max() or 1.0)
         img_meas_n = img_meas_combined / (img_meas_combined.max() or 1.0)
 
-        # Log images
+        # log images
         wandb_logger.log({
             "recon/model_combined": wandb.Image(img_pred_n),
             "recon/ref_combined": wandb.Image(img_meas_n),
         }, step=steps)
 
-        # Metrics: model vs reference
+        # model vs reference
         m_metrics = compute_image_metrics(img_pred_n, img_meas_n)
         m_perceptual = compute_perceptual_metrics(img_pred_n, img_meas_n)
         wandb_logger.log({
@@ -396,9 +385,7 @@ def main(config_path, data):
             f"HaarPSI={m_perceptual['HaarPSI']:.4f}"
         )
 
-        # ---- NUFFT baseline (SENSE combination with known coil maps) ----
-        # Build k_img_sub: only training spokes, zero out non-training spokes
-        # train_idx indexes into (spoke, RO) flattened — need spoke ids
+        # nufft baseline
         k_img_sub = torch.zeros_like(data["k_img_space"])
         train_spoke_ids = torch.unique(spoke_id_all[train_idx])
         for sp_id in train_spoke_ids:
@@ -415,13 +402,10 @@ def main(config_path, data):
                 return_complex=True,
             )
             nufft_coil_imgs.append(img_c)
-        nufft_coil_imgs = np.array(nufft_coil_imgs)  # (C, H, W) complex
+        nufft_coil_imgs = np.array(nufft_coil_imgs)
 
-        # NUFFT outputs (C, 312, 312) — square padded radial FOV.
-        # Cartesian sensitivity maps are (C, 312, 214). Center-crop NUFFT
-        # coil images to match Cartesian FOV BEFORE SENSE combination, so
-        # sensitivity weights align with the actual coil response at each pixel.
-        gt_h, gt_w = img_meas_combined.shape  # (312, 214)
+        # center crop fov
+        gt_h, gt_w = img_meas_combined.shape
         nh, nw = nufft_coil_imgs.shape[1], nufft_coil_imgs.shape[2]
         if nh != gt_h or nw != gt_w:
             y0 = (nh - gt_h) // 2; x0 = (nw - gt_w) // 2
@@ -447,7 +431,7 @@ def main(config_path, data):
             "recon/nufft_combined": wandb.Image(img_nufft_n),
         }, step=steps)
 
-        # Delta
+        # delta
         d_psnr = m_metrics["psnr_db"] - n_metrics["psnr_db"]
         d_dists = n_perceptual["DISTS"] - m_perceptual["DISTS"]
         wandb.run.summary.update({

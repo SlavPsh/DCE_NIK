@@ -1,15 +1,4 @@
-# Step 9: WIRE model sweep
-#
-# Goal: Find best WIRE (Gabor wavelet) config, compare against SIREN baseline.
-# SIREN baseline: h=64, d=8, w0=60 → 27.30 dB PSNR, 25k params.
-#
-# WIRE has 2× hidden output per layer (real+imag), so effective width is
-# larger than SIREN at same hidden value. Keep hidden small.
-#
-# Sweep: w0, s0, hidden, depth, weight_decay (Bayesian, 50 runs, 20k steps)
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step9_wire_sweep.toml
+# step 9, wire sweep
 
 [experiment]
 name = "Step 9: WIRE Gabor wavelet sweep"

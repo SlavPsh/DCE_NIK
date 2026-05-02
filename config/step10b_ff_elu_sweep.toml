@@ -1,11 +1,4 @@
-# Step 10b: FF+ELU sweep — broader architecture search
-#
-# Follow-up to step10: fix lr=1.5e-3 and wd=1e-4 (clear winners from step10),
-# broaden k_freq (96 dominated → extend to 192), wider hidden/depth grid,
-# and wider k_sigma range.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step10b_ff_elu_sweep.toml
+# step 10b, ff elu broad sweep
 
 [experiment]
 name = "Step 10b: FF+ELU broad architecture sweep"

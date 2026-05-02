@@ -16,11 +16,18 @@ class WandbLogger:
 
     def initialize(self):
         if not self.initialized:
+            init_kwargs = {}
+            if isinstance(self.config, dict):
+                if "project" in self.config:
+                    init_kwargs["project"] = self.config["project"]
+                if "entity" in self.config:
+                    init_kwargs["entity"] = self.config["entity"]
             self.run = wandb.init(
                 name=self.run_name,
                 config=self.config,
                 dir=self.output_dir,
                 job_type=self.job_type,
+                **init_kwargs,
             )
             self.initialized = True
 

@@ -1,3 +1,4 @@
+"""dce nik scratch script"""
 import itertools
 import argparse
 import math
@@ -55,14 +56,7 @@ def h5_exists(file_path: str, path_in_file: str) -> bool:
 
 
 def canonicalize_k_and_traj(k: np.ndarray, traj: np.ndarray, coil_max: int = 64):
-    """
-    Find consistent permutations so that:
-      traj -> (RO, S, 3, T)
-      k    -> (RO, S, C, T)
-    Then, return tensors re-ordered to:
-      traj_ts3ro -> (T, S, 3, RO)
-      k_tscro    -> (T, S, C, RO)
-    """
+    """canonical layouts"""
     best = None
     for p_tr in itertools.permutations(range(4)):
         trp = np.transpose(traj, p_tr)

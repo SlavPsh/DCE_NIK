@@ -1,20 +1,4 @@
-# Step 15: Multi-coil NIK — Concat baseline
-#
-# Goal: Joint fitting of all 8 coils using shared spatial backbone
-#        with coil-specific modulation. Uses the best single-coil WIRE
-#        config from Step 14a (dingo: h=64, d=8, w0=62, s0=10, wd=0.003).
-#
-# Hypothesis: multi-coil provides 8x more training data with shared
-#             spatial structure, reducing overfit and angular artifacts.
-#
-# Scientific question: "does multi-coil data help?"
-# Run concat FIRST to answer this. FiLM is a follow-up experiment.
-#
-# Key change: backbone architecture (depth, width, w0) is FIXED from
-#             single-coil winner. Only coil embedding is new.
-#
-# Usage:
-#   python train_multicoil.py config/step15_multicoil.toml
+# step 15, multicoil concat baseline
 
 [experiment]
 name = "Step 15: Multi-coil WIRE (Concat baseline)"
@@ -73,11 +57,11 @@ method = "grid"
 name = "best_val_loss"
 goal = "minimize"
 
-# ---- Sweep parameters ----
-# Phase A: Concat only — answer "does multi-coil help?"
+# sweep params
+# phase a, concat only
 [sweep.parameters.coil_embed_dim]
 values = [8, 16, 32]
 
-# Phase B: FiLM (uncomment after Phase A is evaluated)
+# phase b, film follow up
 # [sweep.parameters.multicoil_mode]
 # values = ["concat", "film"]

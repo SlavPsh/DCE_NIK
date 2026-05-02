@@ -1,0 +1,87 @@
+[experiment]
+name = "NIK_MRI sweep on DCE z-slice"
+description = "wandb sweep over NIK_MRI hyperparameters using train_nik_mri_style.py (multi-frame, multi-coil, one z-slice)"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
+z_slice_idx = -1
+reference_t_frame = 0
+require_coil_maps = true
+data_device = "cpu"
+
+[model]
+coord_dim   = 4
+feature_dim = 512
+num_layers  = 8
+out_dim     = 1
+omega_0     = 30.0
+ff_scale    = 1.0
+
+[training]
+num_steps = 50
+batch_size = 30000
+optimizer = "Adam"
+lr = 3e-5
+adam_beta1 = 0.9
+adam_beta2 = 0.999
+adam_eps = 1e-8
+num_workers = 0
+seed = 0
+recon_every = 5
+cartesian_chunk_size = 131072
+
+[loss]
+hdr_eps = 1e-2
+hdr_ff_sigma = 1.0
+hdr_ff_factor = 0.4
+
+[recon]
+nx = 312
+ny = 312
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 5
+
+[wandb]
+enabled = true
+project = "NIK-DCE-MRI"
+entity  = "spshenov-university-of-amsterdam"
+
+[sweep]
+name    = "NIK_MRI z-slice sweep"
+entity  = "spshenov-university-of-amsterdam"
+project = "NIK-DCE-MRI"
+method  = "bayes"
+run_cap = 80
+
+[sweep.metric]
+name = "best_train_loss"
+goal = "minimize"
+
+[sweep.parameters.feature_dim]
+values = [128, 256, 512]
+
+[sweep.parameters.num_layers]
+values = [4, 6, 8]
+
+[sweep.parameters.omega_0]
+values = [10.0, 20.0, 30.0, 50.0]
+
+[sweep.parameters.ff_scale]
+values = [0.5, 1.0, 2.0, 4.0]
+
+[sweep.parameters.hdr_eps]
+values = [1e-3, 1e-2, 1e-1]
+
+[sweep.parameters.hdr_ff_sigma]
+values = [0.5, 1.0, 2.0]
+
+[sweep.parameters.hdr_ff_factor]
+values = [0.0, 0.2, 0.4]
+
+[sweep.parameters.lr]
+values = [1e-5, 3e-5, 1e-4]

@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""
-train_cart_eval.py -- Train on radial k-space, evaluate on Cartesian grid.
-
-Usage:
-    # Single run:
-    python train_cart_eval.py config/training_cart_eval.toml --single
-
-    # Create new sweep and run agent:
-    python train_cart_eval.py config/training_cart_eval.toml
-
-    # Join existing sweep:
-    python train_cart_eval.py config/training_cart_eval.toml --sweep-id ENTITY/PROJECT/ID --count 50
-"""
+"""radial training, cart eval"""
 import argparse
 import random
 import logging
@@ -40,7 +28,7 @@ from nik_model import (
     WIRE_KXY_REIM,
     PolarKSpaceNet,
 )
-# nik_loss kept for potential fallback; weighted_complex_mse is the primary loss
+# weighted complex mse primary
 from nik_loss import get_loss_fn
 from nik_train import prepare_tensors
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
@@ -61,7 +49,7 @@ from wandb_logger import (
 
 
 def load_data(config):
-    """Load radial training data and Cartesian evaluation data."""
+    """radial train, cart eval data"""
     data_cfg = config['data']
     radial_file = data_cfg['radial_file']
     cart_file = data_cfg['cartesian_file']
@@ -73,14 +61,14 @@ def load_data(config):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ---- Load radial data ----
+    # radial data
     print(f"Loading radial data from {radial_file} ...", flush=True)
     event = load_event(radial_file, load_images=True, load_coil_maps=True)
     k_np, traj_np = event["k"], event["traj"]
     gt_img = event.get("gt_img")
     coil_maps_radial = event.get("coil_maps")
 
-    # Transpose to (T, S, C, RO)
+    # tscro layout
     k_np = np.transpose(k_np, (0, 2, 1, 3))
     traj_np = np.transpose(traj_np, (0, 2, 1, 3))
     T, S, C, RO = k_np.shape
@@ -97,7 +85,7 @@ def load_data(config):
 
     z_slice_idx = n_z_slices // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
-    # Get raw (unnormalized) k-space values by passing y_scale=1.0
+    # raw kspace values
     x_all, y_all, kx_all, ky_all, spoke_id_all, ro_id_all, meta = \
         make_fixed_frame_zslice_coil_dataset(
             k_img_space, traj_t, scales, dims,
@@ -110,7 +98,7 @@ def load_data(config):
         )
     print(f"Radial dataset: {meta['N']} points", flush=True)
 
-    # ---- Subsample spokes ----
+    # subsample spokes
     n_unique_spokes = int(spoke_id_all.max().item()) + 1
     n_train_spokes = max(1, int(n_unique_spokes * subsample_frac))
 
@@ -124,7 +112,7 @@ def load_data(config):
     print(f"Spoke subsampling: {n_train_spokes}/{n_unique_spokes} spokes "
           f"({subsample_frac:.0%}), {train_idx.shape[0]} points", flush=True)
 
-    # ---- Load Cartesian data ----
+    # cartesian data
     print(f"Loading Cartesian data from {cart_file} ...", flush=True)
     cart_event = load_cartesian_kspace(cart_file, load_images=True, load_coil_maps=True)
     k_cart_np = cart_event["k_cart"]
@@ -135,14 +123,14 @@ def load_data(config):
         k_cart_t = k_cart_t.cuda()
     print(f"Cartesian k-space shape: {k_cart_t.shape}", flush=True)
 
-    # kz->z IFFT for Cartesian
+    # cart kz to z
     k_cart_z = ifft1d_kz_to_z_cartesian(k_cart_t)
     nz_cart = k_cart_z.shape[2]
 
-    # Use same z_slice_idx (middle by default)
+    # same zslice
     z_slice_cart = nz_cart // 2 if z_slice_raw == -1 else int(z_slice_raw)
 
-    # Get raw Cartesian k-space (y_scale=1.0)
+    # raw cart kspace
     x_cart, y_cart, meta_cart = make_cartesian_eval_dataset(
         k_cart_z,
         t_fixed=min(t_frame, k_cart_z.shape[0] - 1),
@@ -158,7 +146,7 @@ def load_data(config):
     ref_img_slice = None
 
     return {
-        # Radial training data (RAW, unnormalized)
+        # raw radial
         "x_all": x_all, "y_all_raw": y_all,
         "spoke_id_all": spoke_id_all, "ro_id_all": ro_id_all,
         "train_idx": train_idx,
@@ -170,12 +158,12 @@ def load_data(config):
         "n_z_slices": n_z_slices,
         "scales": scales, "dims": dims,
         "coil_maps_radial": coil_maps_radial,
-        # Cartesian eval data (RAW, unnormalized)
+        # raw cart eval
         "x_cart": x_cart, "y_cart_raw": y_cart,
         "meta_cart": meta_cart,
         "ref_img_slice": ref_img_slice,
         "coil_maps_cart": coil_maps_cart,
-        # Shared
+        # shared
         "gt_img": gt_img,
         "subsample_frac": subsample_frac,
         "n_unique_spokes": n_unique_spokes,
@@ -184,7 +172,7 @@ def load_data(config):
 
 
 def main(config_path, data):
-    """Single training run: radial train, Cartesian eval."""
+    """single run, radial train, cart eval"""
     random.seed()
     run_name = generate_slug(3) + "_carteval"
     config = load_config(config_path)
@@ -194,7 +182,7 @@ def main(config_path, data):
 
     logging.info(f"Run: {run_name}")
 
-    # Build flat training config for wandb
+    # flat config
     train_config = {
         "model_family": config['model'].get('model_family', 'siren'),
         "hidden": config['model']['hidden'],
@@ -205,6 +193,7 @@ def main(config_path, data):
         "s0": config['model'].get('s0', 10.0),
         "n_angular_modes": config['model'].get('n_angular_modes', 16),
         "radial_type": config['model'].get('radial_type', 'wire'),
+        "dropout": config['model'].get('dropout', 0.0),
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
@@ -228,7 +217,7 @@ def main(config_path, data):
     )
     wandb_logger.initialize()
 
-    # Resolve hyperparams (sweep overrides)
+    # hyperparam resolve
     wc = wandb.config
     model_family = getattr(wc, "model_family", "siren")
     hidden = int(wc.hidden)
@@ -239,6 +228,7 @@ def main(config_path, data):
     s0 = float(getattr(wc, "s0", 10.0))
     n_angular_modes = int(getattr(wc, "n_angular_modes", 16))
     radial_type = str(getattr(wc, "radial_type", "wire"))
+    dropout = float(getattr(wc, "dropout", 0.0))
     optimizer_name = str(wc.optimizer)
     lr = float(wc.lr)
     batch_size = int(wc.batch_size)
@@ -258,7 +248,7 @@ def main(config_path, data):
     log_scale = config['training']['plot']['log_scale']
     console_every = config['logging']['console_every']
 
-    # Reproducibility
+    # reproducibility
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -266,7 +256,7 @@ def main(config_path, data):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # ---- Unpack raw data ----
+    # unpack raw
     x_all = data["x_all"]
     y_all_raw = data["y_all_raw"]
     spoke_id_all = data["spoke_id_all"]
@@ -279,14 +269,14 @@ def main(config_path, data):
     nky, nkx = meta_cart["nky"], meta_cart["nkx"]
     ref_img_slice = data.get("ref_img_slice")
 
-    # ---- Normalization (sweepable) ----
+    # normalization
     use_envelope = bool(getattr(wc, "use_envelope", config.get('normalization', {}).get('use_envelope', True)))
     use_dcf = bool(getattr(wc, "use_dcf", config.get('normalization', {}).get('use_dcf', True)))
     norm_cfg = config.get('normalization', {})
     dcf_method = norm_cfg.get('dcf_method', 'simple_ramp')
     dcf_power = float(getattr(wc, "dcf_power", norm_cfg.get('dcf_power', 0.7)))
 
-    # If sweep overrides subsample_frac, re-subsample
+    # resubsample
     if subsample_frac != data["subsample_frac"]:
         n_unique_spokes = data["n_unique_spokes"]
         n_train_spokes = max(1, int(n_unique_spokes * subsample_frac))
@@ -305,8 +295,7 @@ def main(config_path, data):
     else:
         dcf = torch.ones(kcoords_radial.shape[0], device=kcoords_radial.device)
 
-    # Fit normalization only on the actual training split to avoid
-    # leaking held-out spokes into the target scaling.
+    # fit on train only
     kcoords_train = kcoords_radial[train_idx]
     y_train_raw_for_norm = y_all_raw[train_idx]
     dcf_train_for_norm = dcf[train_idx]
@@ -356,7 +345,7 @@ def main(config_path, data):
         "subsample_frac_actual": subsample_frac,
     }, allow_val_change=True)
 
-    # ---- Compute s_max for polar models ----
+    # polar s_max
     _x_tmp = x_all[:, :2].to(device)
     _kx, _ky = _x_tmp[:, 0], _x_tmp[:, 1]
     _theta = torch.atan2(_ky, _kx)
@@ -365,7 +354,7 @@ def main(config_path, data):
     s_max = float(_s_coord.abs().max().item())
     del _x_tmp, _kx, _ky, _theta, _theta0, _s_coord
 
-    # ---- Build model ----
+    # build model
     if model_family == "relu":
         model = ReLU_MLP_KXY_REIM(in_dim=2, hidden=hidden, depth=depth).to(device)
     elif model_family == "elu":
@@ -380,7 +369,7 @@ def main(config_path, data):
         model = PolarKSpaceNet(n_angular_modes=n_angular_modes, radial_depth=depth, radial_width=hidden,
                                radial_type=radial_type, omega_0=w0, s_0=s0, s_max=s_max).to(device)
     elif model_family == "wire":
-        model = WIRE_KXY_REIM(in_dim=2, hidden=hidden, depth=depth, w0=w0, s0=s0).to(device)
+        model = WIRE_KXY_REIM(in_dim=2, hidden=hidden, depth=depth, w0=w0, s0=s0, dropout=dropout).to(device)
     else:
         model = NIK_SIREN_KXY_REIM(in_dim=2, hidden=hidden, depth=depth, w0=w0).to(device)
 
@@ -388,7 +377,7 @@ def main(config_path, data):
     wandb.config.update({"n_params": n_params, "model_family": model_family}, allow_val_change=True)
     logging.info(f"Model: {model_family}, hidden={hidden}, depth={depth}, params={n_params}")
 
-    # ---- Optimizer ----
+    # optimizer
     if optimizer_name == "Adam":
         opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "AdamW":
@@ -401,7 +390,7 @@ def main(config_path, data):
     scheduler = None
     scheduler_type = config['training'].get('scheduler_type', 'plateau')
     if scheduler_type == "onecycle":
-        # Cosine warmup + decay; max LR = lr (config), pct_start = warmup fraction
+        # cosine warmup decay
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             opt, max_lr=lr * 10,  # 10x peak above base lr
             total_steps=int(config['training']['steps']),
@@ -421,18 +410,18 @@ def main(config_path, data):
         )
         logging.info(f"Scheduler: ReduceLROnPlateau (patience={scheduler_patience})")
 
-    # ---- Prepare training tensors ----
+    # training tensors
     x_all_2d = x_all[:, :2].to(device)
     y_all_dev = y_all.to(device)
     x_train = x_all_2d[train_idx]
     y_train = y_all_dev[train_idx]
     N_train = x_train.shape[0]
 
-    # DCF for training points (dcf, dcf_power, normalizer are local vars from above)
+    # training dcf
     dcf = dcf.to(device)
     dcf_train = dcf[train_idx]
 
-    # Held-out radial spokes (for validation when subsample_frac < 1)
+    # heldout spokes
     all_spokes = torch.arange(data["n_unique_spokes"], device=spoke_id_all.device)
     train_spoke_set = torch.unique(spoke_id_all[train_idx])
     heldout_mask = ~torch.isin(spoke_id_all, train_spoke_set)
@@ -447,7 +436,7 @@ def main(config_path, data):
         x_heldout = y_heldout = None
         logging.info("No held-out radial spokes (subsample_frac=1.0)")
 
-    # Cartesian eval tensors (already on device from load_data)
+    # cart eval tensors
     x_cart_dev = x_cart.to(device)
     y_cart_dev = y_cart.to(device)
     radial_rmax = float(torch.sqrt((kcoords_train[:, 0] ** 2 + kcoords_train[:, 1] ** 2)).max().item())
@@ -485,7 +474,7 @@ def main(config_path, data):
             "train/cart_ref_haarpsi": perc_metrics["HaarPSI"],
         }
 
-    # ---- Plot metadata ----
+    # plot metadata
     train_spoke_show = int(torch.unique(spoke_id_all[train_idx])[0].item())
     RO_total = int(ro_id_all.max().item()) + 1
 
@@ -495,7 +484,7 @@ def main(config_path, data):
         plot_steps.add(s)
         s += plot_every
 
-    # ---- Training loop ----
+    # training loop
     model.train()
     best_cart_loss = float("inf")
     best_cart_loss_in_disk = float("inf")
@@ -509,7 +498,7 @@ def main(config_path, data):
                  f"({n_cart_in_disk} in-disk)")
 
     for step in range(1, steps + 1):
-        # Training step
+        # train step
         idx = torch.randint(0, N_train, (batch_size,), device=device)
         x = x_train[idx]
         y = y_train[idx]
@@ -522,13 +511,13 @@ def main(config_path, data):
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
 
-        # Per-step scheduler step (OneCycle, Cosine)
+        # scheduler step
         if scheduler is not None and scheduler_type in ("onecycle", "cosine"):
             scheduler.step()
 
         train_loss = float(loss.item())
 
-        # Evaluation
+        # eval
         if step % eval_every == 0 or step == steps:
             model.eval()
             with torch.no_grad():
@@ -544,9 +533,7 @@ def main(config_path, data):
                     last_heldout_loss = None
             model.train()
 
-            # Only checkpoint after warmup: an untrained model predicting
-            # near-zero trivially achieves low cart MSE since most of k-space
-            # is small.
+            # post warmup checkpoint
             warmup_steps = config['training'].get('warmup_steps', steps // 5)
             if step >= warmup_steps and last_cart_loss_in_disk < best_cart_loss:
                 best_cart_loss = last_cart_loss_in_disk
@@ -557,7 +544,7 @@ def main(config_path, data):
             if scheduler is not None and scheduler_type == "plateau":
                 scheduler.step(last_cart_loss_in_disk)
 
-        # Logging
+        # logging
         log_dict = {"train/train_loss": train_loss}
         if step % eval_every == 0 or step == steps:
             log_dict["train/cart_eval_loss"] = last_cart_loss
@@ -576,13 +563,13 @@ def main(config_path, data):
             log_dict["train/lr"] = opt.param_groups[0]["lr"]
         wandb_logger.log(log_dict, step=step)
 
-        # Figure logging
+        # figure logging
         if step in plot_steps:
             model.eval()
             with torch.no_grad():
                 figures = {}
 
-                # Spoke plot (training data)
+                # spoke plot
                 fig = make_spoke_figure(
                     model,
                     x_all=x_all, y_all=y_all,
@@ -596,7 +583,7 @@ def main(config_path, data):
                 )
                 figures["plots/spoke_train"] = fig
 
-                # Radial error map (training points)
+                # radial error map
                 fig_err = make_error_map_figure(
                     model,
                     x_sub=x_all[train_idx],
@@ -606,7 +593,7 @@ def main(config_path, data):
                 )
                 figures["plots/error_map_radial_train"] = fig_err
 
-                # Cartesian error map (in normalized space)
+                # cart error map
                 fig_cart_err = make_cartesian_error_map(
                     model,
                     x_cart=x_cart, y_cart=y_cart,
@@ -616,7 +603,7 @@ def main(config_path, data):
                 )
                 figures["plots/cart_error_map"] = fig_cart_err
 
-                # Cartesian image comparison
+                # cart image compare
                 fig_cart_img = make_cartesian_image_comparison(
                     model,
                     x_cart=x_cart, y_cart=y_cart,
@@ -628,7 +615,7 @@ def main(config_path, data):
                 )
                 figures["plots/cart_image_comparison"] = fig_cart_img
 
-                # Radial NUFFT image comparison (full spokes)
+                # radial nufft compare
                 try:
                     from nik_recon import nufft2d_recon
                     _normalizer = normalizer
@@ -677,7 +664,7 @@ def main(config_path, data):
             wandb_logger.log_figures(figures, step=step)
             model.train()
 
-        # Console logging
+        # console logging
         if step % console_every == 0:
             msg = f"step {step:6d}  train {train_loss:.3e}"
             if last_cart_loss is not None:
@@ -688,12 +675,12 @@ def main(config_path, data):
                 msg += f"  heldout {last_heldout_loss:.3e}"
             logging.info(msg)
 
-    # ---- Restore best model and final evaluation ----
+    # restore best, eval
     if best_state is not None:
         model.load_state_dict(best_state)
     model.eval()
 
-    # normalizer is already a local variable from normalization setup above
+    # normalizer reuse
     final_cart_loss = None
     final_cart_loss_in_disk = None
     final_heldout_loss = None
@@ -708,31 +695,28 @@ def main(config_path, data):
 
     try:
         with torch.no_grad():
-            # Final Cartesian k-space prediction (denormalize to original scale)
+            # final cart pred, denorm
             cart_pred_norm = model(x_cart_dev)
             cart_pred_denorm = normalizer.denormalize(x_cart[:, :2].to(device), cart_pred_norm)
-            # cart_pred_denorm is (N, 2) real
+            # reim shape
             k_pred = torch.complex(cart_pred_denorm[:, 0], cart_pred_denorm[:, 1]).reshape(nky, nkx)
 
             y_meas_denorm = normalizer.denormalize(x_cart[:, :2].to(device), y_cart_dev)
             k_meas = torch.complex(y_meas_denorm[:, 0], y_meas_denorm[:, 1]).reshape(nky, nkx)
 
-            # Fair image-space comparison: keep only the radial-supported disk
-            # and zero-fill the unsupported Cartesian corners.
+            # disk mask
             k_pred = k_pred * cart_kspace_mask
             k_meas = k_meas * cart_kspace_mask
 
-            # IFFT to image (.T to match radial NUFFT axis convention)
+            # ifft to image
             img_pred = torch.fft.fftshift(torch.fft.ifft2(k_pred)).abs().cpu().numpy().T
             img_meas = torch.fft.ifft2(k_meas).abs().cpu().numpy().T
 
-        # Reference = IFFT of fully sampled Cartesian (single coil)
-        # For model vs ref: both denormalized, same absolute scale.
+        # reference, fully sampled
         cart_ref_denorm = img_meas
         display_max = max(img_meas.max(), img_pred.max()) or 1.0
 
-        # For NUFFT vs ref: use raw (non-normalized) Cartesian k-space
-        # so both NUFFT and ref are in the same raw scale.
+        # raw scale for nufft
         with torch.no_grad():
             k_meas_raw = torch.complex(y_cart_raw[:, 0], y_cart_raw[:, 1]).reshape(nky, nkx).to(device)
             k_meas_raw = k_meas_raw * cart_kspace_mask
@@ -743,8 +727,7 @@ def main(config_path, data):
             "recon/model_cart_pred": wandb.Image(img_pred / display_max),
         }, step=steps)
 
-        # ---- Method 1: Model predicted Cartesian → IFFT vs Ref ----
-        # Normalize to [0,1] for comparable metrics with NUFFT baseline.
+        # method 1, model vs ref
         img_pred_n = img_pred / (img_pred.max() or 1.0)
         cart_ref_denorm_n = cart_ref_denorm / (cart_ref_denorm.max() or 1.0)
         m1_metrics = compute_image_metrics(img_pred_n, cart_ref_denorm_n)
@@ -771,19 +754,17 @@ def main(config_path, data):
             f"VSI={m1_perceptual['VSI']:.4f}"
         )
 
-        # ---- Method 2: NUFFT of subsampled radial vs Ref ----
-        # Reconstruct from the training spokes (subsampled radial)
+        # method 2, nufft baseline
         from nik_recon import nufft2d_recon
         _t = config['data']['t_frame']
         _c = config['data']['coil_idx']
         _z = data["z_slice_idx"]
 
-        # Build k_img_space with only training spokes
+        # train only kspace
         k_img_sub = torch.zeros_like(data["k_img_space"])
-        # train_idx indexes into the flattened (spoke, RO) array for one z-slice
-        # We need spoke indices, not point indices
+        # spoke ids, not points
         train_spoke_ids = torch.unique(spoke_id_all[train_idx])
-        # Copy only training spokes into k_img_sub
+        # copy train spokes
         for sp_id in train_spoke_ids:
             k_img_sub[:, sp_id, :, :, :] = data["k_img_space"][:, sp_id, :, :, :]
 
@@ -793,21 +774,18 @@ def main(config_path, data):
             img_size=(312, 312), n_slices=data["n_z_slices"],
         )
 
-        # Crop NUFFT image (312×312) to match Cartesian GT size (after .T)
-        # Cartesian FOV is 214 in AP vs 312 in radial (padded to square)
+        # crop to cart fov
         gt_h, gt_w = cart_ref_raw.shape
         nufft_h, nufft_w = img_nufft_sub.shape
         if nufft_h != gt_h or nufft_w != gt_w:
-            # Center crop
+            # center crop
             y0 = (nufft_h - gt_h) // 2
             x0 = (nufft_w - gt_w) // 2
             img_nufft_crop = img_nufft_sub[y0:y0+gt_h, x0:x0+gt_w]
         else:
             img_nufft_crop = img_nufft_sub
 
-        # Normalize NUFFT and its reference to [0,1] for metrics.
-        # NUFFT adjoint has arbitrary scale (no 1/N normalization), so
-        # absolute-scale comparison is meaningless. Only structural similarity matters.
+        # peak normalize
         img_nufft_n = img_nufft_crop / (img_nufft_crop.max() or 1.0)
         cart_ref_raw_n = cart_ref_raw / (cart_ref_raw.max() or 1.0)
 
@@ -839,7 +817,7 @@ def main(config_path, data):
             f"VSI={m2_perceptual['VSI']:.4f}"
         )
 
-        # ---- Delta: model improvement over NUFFT baseline ----
+        # delta vs nufft
         delta_psnr = m1_metrics["psnr_db"] - m2_metrics["psnr_db"]
         delta_dists = m2_perceptual["DISTS"] - m1_perceptual["DISTS"]  # positive = model better
         delta_haarpsi = m1_perceptual["HaarPSI"] - m2_perceptual["HaarPSI"]  # positive = model better
@@ -857,7 +835,7 @@ def main(config_path, data):
         import traceback
         traceback.print_exc()
 
-    # ---- Final radial NUFFT reconstruction ----
+    # final radial nufft
     try:
         from nik_recon import nufft2d_recon
         _x_rad = x_all[:, :2].to(device)
@@ -916,7 +894,7 @@ def main(config_path, data):
         import traceback
         traceback.print_exc()
 
-    # ---- Save model ----
+    # save model
     wandb_logger.save_model(model, "model_best.pth", opt, steps, output_dir)
 
     wandb.run.summary["cart_eval_loss"] = best_cart_loss

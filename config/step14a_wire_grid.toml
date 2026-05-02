@@ -1,17 +1,4 @@
-# Step 14a: WIRE focused grid sweep
-#
-# Goal: Systematic grid exploration of WIRE around the promising region
-#        identified in Step 13 (best: h=64, d=10, w0~42, s0~10, lr~5e-5).
-#
-# Changes from Step 13:
-#   - Grid sweep (not Bayesian) for full coverage
-#   - ReduceLROnPlateau scheduler enabled (patience=500 evals = 25k steps plateau)
-#   - Narrowed parameter ranges around Step 13 winners
-#   - conj_weight fixed at 0.001 (marginal winner from Step 13)
-#   - density_weight: [0.0, 0.1] (0.5 helped k-loss but hurt PSNR)
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step14a_wire_grid.toml
+# step 14a, wire grid sweep
 
 [experiment]
 name = "Step 14a: WIRE grid sweep (+LR scheduler)"
@@ -43,7 +30,7 @@ eval_every = 50
 seed = 0
 conj_weight = 0.001
 density_weight = 0.0
-# LR scheduler
+# lr scheduler
 scheduler_patience = 50
 scheduler_factor = 0.5
 scheduler_min_lr = 1e-6
@@ -72,11 +59,11 @@ method = "grid"
 name = "best_val_loss"
 goal = "minimize"
 
-# ---- Sweep parameters ----
+# sweep params
 [sweep.parameters.model_family]
 values = ["wire"]
 
-# Grid: 2 x 2 x 3 x 3 x 3 x 2 x 2 = 432 runs (~22 GPU-hrs at ~3 min/run)
+# grid 432 runs
 [sweep.parameters.hidden]
 values = [48, 64]
 

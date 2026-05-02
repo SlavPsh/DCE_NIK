@@ -1,10 +1,4 @@
-"""
-losses.py — Complex-valued k-space losses with density weighting.
-
-Provides:
-  - weighted_complex_mse: DCF-weighted complex MSE with power tempering
-  - shell_balanced_complex_mse: equal weighting per radial shell
-"""
+"""kspace losses, dcf and shell"""
 
 import torch
 from kspace_normalization import compute_radius
@@ -18,29 +12,14 @@ def weighted_complex_mse(
     normalize: bool = True,
     eps: float = 1e-8,
 ) -> torch.Tensor:
-    """Density-weighted complex MSE loss.
-
-    Computes pointwise |pred - target|^2, optionally weighted by DCF^power.
-    Power tempering (default 0.7) avoids over-emphasizing noisy outer k-space.
-
-    Args:
-        pred: (N,) complex or (N, 2) real.
-        target: (N,) complex or (N, 2) real.
-        weights: (N,) optional DCF weights (should have mean~1).
-        power: exponent on weights. 1.0 = full DCF, 0.0 = uniform.
-        normalize: if True, normalize by sum of effective weights.
-        eps: numerical stability.
-
-    Returns:
-        Scalar loss tensor.
-    """
-    # Compute pointwise squared error
+    """dcf weighted complex mse"""
+    # pointwise squared error
     if torch.is_complex(pred):
         err_sq = (pred - target).abs() ** 2
     elif pred.ndim == 2 and pred.shape[-1] % 2 == 0:
-        # (N, 2) single coil or (N, 2*C) multicoil — sum of squared errors over all Re/Im pairs
+        # multicoil reim pairs
         diff = pred - target
-        err_sq = (diff ** 2).sum(dim=-1)  # (N,) — total error per point across all coils
+        err_sq = (diff ** 2).sum(dim=-1)
     else:
         raise ValueError(f"Unsupported pred shape: {pred.shape}")
 
@@ -63,21 +42,7 @@ def shell_balanced_complex_mse(
     n_bins: int = 64,
     eps: float = 1e-8,
 ) -> torch.Tensor:
-    """Shell-balanced complex MSE: equal weighting per radial shell.
-
-    Splits samples into radial bins, computes mean MSE per non-empty shell,
-    then averages shell losses equally. Useful when outer k-space is underfit.
-
-    Args:
-        pred: (N,) complex or (N, 2) real.
-        target: (N,) complex or (N, 2) real.
-        radii: (N,) radial distances.
-        n_bins: number of radial shells.
-        eps: numerical stability.
-
-    Returns:
-        Scalar loss tensor.
-    """
+    """shell balanced complex mse"""
     if torch.is_complex(pred):
         err_sq = (pred - target).abs() ** 2
     elif pred.ndim == 2 and pred.shape[-1] == 2:

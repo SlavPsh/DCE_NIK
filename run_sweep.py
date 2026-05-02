@@ -1,16 +1,15 @@
+"""yaml sweep cli"""
 import os, json, hashlib, itertools
 import yaml
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
-from nik_model import NIK_SIREN_REIM   # add  NIK_SIREN2D_REIM  later
+from nik_model import NIK_SIREN_REIM
 from nik_train import fit_one_frame_slice_coil
 from nik_recon import nufft2d_recon, fft2d_uniform, to_plot, make_fixed_frame_zslice_coil_dataset
 
-# ---------------------------
 # helpers
-# ---------------------------
 def ensure_dir(p): os.makedirs(p, exist_ok=True)
 
 def dict_product(d):
@@ -43,7 +42,7 @@ def predict_on_points(model, x_all, coil_model_idx, k_scale):
 
 @torch.no_grad()
 def predict_cartesian_kspace(model, x_all, coil_model_idx, k_scale, Ny, Nx, kx_max, ky_max, oversamp=1):
-    # reuse z,t constants from x_all
+    # zt constants
     z_const = x_all[0, 2]
     t_const = x_all[0, 3]
 
@@ -77,14 +76,12 @@ def load_yaml(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
-# ---------------------------
 # main sweep
-# ---------------------------
 cfg = load_yaml("sweep.yaml")
 out_dir = cfg["experiment"]["out_dir"]
 ensure_dir(out_dir)
 
-# read fixed settings
+# fixed settings
 t_frame = cfg["data"]["t_frame"]
 coil_idx_data = cfg["data"]["coil_idx_data"]
 z_slice_idx = cfg["data"]["z_slice_idx"]
@@ -96,7 +93,7 @@ lr = cfg["train"]["lr"]
 amp = cfg["train"].get("amp", False)
 log_every = cfg["train"].get("log_every", 1000)
 
-Ny, Nx = cfg["recon"]["img_size"]  # (Ny, Nx)
+Ny, Nx = cfg["recon"]["img_size"]
 oversamp = cfg["recon"]["cartesian"].get("oversamp", 1)
 use_disk_mask = cfg["recon"]["cartesian"].get("use_disk_mask", True)
 

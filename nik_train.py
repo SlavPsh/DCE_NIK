@@ -1,4 +1,4 @@
-# nik_train.py
+"""nik training utils, samplers and loops"""
 import time
 import numpy as np
 import torch
@@ -15,26 +15,16 @@ def compute_scale1(y_in):
 
 @torch.no_grad()
 def compute_scale(k_t, q: float = 0.95, probe_size: int = 200_000) -> torch.Tensor:
-    """
-    Compute quantile scale by sampling from k-space.
-    
-    Args:
-        k_t: complex k-space tensor of any shape
-        q: quantile (default 0.95)
-        probe_size: number of random samples to draw
-    
-    Returns:
-        scalar tensor: q-th percentile of magnitude
-    """
-    # Random sampling from full k-space
+    """quantile kspace scale"""
+    # random probe
     shape = k_t.shape
     total_elements = np.prod(shape)
     probe_size = min(probe_size, total_elements)
-    
+
     k_flat = k_t.reshape(-1)
     idx = torch.randperm(k_flat.numel(), device=k_t.device)[:probe_size]
     y_probe = k_flat[idx]
-    
+
     y_abs = torch.abs(y_probe)
     return torch.quantile(y_abs, q) + 1e-8
 
@@ -102,24 +92,20 @@ class PlateauStopper:
 
 
 def prepare_tensors(k_np, traj_np, data_device="cpu"):
-    """
-    k_np:    (T,S,C,RO) complex64
-    traj_np: (T,S,3,RO) float32
-
-    Returns k_t, traj_t, scales (sx,sy,sz), dims (T,S,C,RO).
-    """
+    """tensors, scales, dims"""
     device = torch.device(data_device)
     k_t = torch.from_numpy(k_np)
     traj_t = torch.from_numpy(traj_np)
 
     if device.type == "cpu":
-        k_t = k_t.pin_memory()
-        traj_t = traj_t.pin_memory()
+        if torch.cuda.is_available():
+            k_t = k_t.pin_memory()
+            traj_t = traj_t.pin_memory()
     else:
         k_t = k_t.to(device, non_blocking=True)
         traj_t = traj_t.to(device, non_blocking=True)
 
-    # keep as tensors 
+    # tensor scales
     sx = traj_t[:, :, 0, :].abs().amax() + 1e-8
     sy = traj_t[:, :, 1, :].abs().amax() + 1e-8
     sz = traj_t[:, :, 2, :].abs().amax() + 1e-8
@@ -130,10 +116,7 @@ def prepare_tensors(k_np, traj_np, data_device="cpu"):
 
 
 def make_sampler(k_t, traj_t, scales, dims, y_scale, compute_device):
-    """
-    Returns a callable sample_batch(batch_size) -> (x, coil_idx, y_meas)
-    x: (B,4) float, coil_idx: (B,) long, y_meas: (B,2) float
-    """
+    """random kspace sampler"""
     sx, sy, sz = scales
     T, S, C, RO = dims
     idx_dev = k_t.device
@@ -146,7 +129,7 @@ def make_sampler(k_t, traj_t, scales, dims, y_scale, compute_device):
         ro_idx = torch.randint(RO, (batch_size,), device=idx_dev)
 
         y = k_t[t_idx, s_idx, c_idx, ro_idx]
-        y_ri = torch.view_as_real(y).float()  # (B,2)
+        y_ri = torch.view_as_real(y).float()
         y_ri = y_ri / y_scale
 
         kx = traj_t[t_idx, s_idx, 0, ro_idx] / sx
@@ -174,8 +157,8 @@ def make_spoke_sampler_kxy(kxy_sp, y_sp, spokes, *, batch_size, device="cuda"):
     def sample():
         sp = spokes[torch.randint(spokes.numel(), (batch_size,), device=device)]
         ro = torch.randint(RO, (batch_size,), device=device)
-        x = kxy_sp[sp, ro, :]   # (B,2)
-        y = y_sp[sp, ro, :]     # (B,2)
+        x = kxy_sp[sp, ro, :]
+        y = y_sp[sp, ro, :]
         return x, y
     return sample
 
@@ -204,16 +187,7 @@ def make_fixed_frame_kslice_coil_dataset(
     kz_index: int = 0,
     compute_device: str = "cuda",
 ):
-    """
-    Build a deterministic dataset for ONE frame, ONE kz-plane, ONE coil.
-
-    k_t    : (T,S,C,RO) complex
-    traj_t : (T,S,3,RO) float
-    returns:
-      x_all   : (N,4) float  [kx,ky,kz,t_norm]
-      y_all   : (N,2) float  [Re,Im]
-      kx_all, ky_all : (N,) float (for plotting)
-    """
+    """single frame, kz plane, coil"""
     sx, sy, sz = scales
     T, _, C, RO = dims
     dev_data = k_t.device
@@ -222,38 +196,37 @@ def make_fixed_frame_kslice_coil_dataset(
     assert 0 <= t_fixed < T
     assert 0 <= coil_fixed < C
 
-    # kz per spoke (constant along RO, so take ro=0)
-    kz_sp = traj_t[t_fixed, :, 2, 0]  # (S,)
+    # kz per spoke
+    kz_sp = traj_t[t_fixed, :, 2, 0]
     kz_bins = torch.sort(torch.unique(kz_sp)).values
     kz_index = int(max(0, min(int(kz_index), int(len(kz_bins) - 1))))
     kz_target = kz_bins[kz_index]
 
-    # select spokes belonging to this kz plane
+    # spokes in plane
     sp_mask = (kz_sp == kz_target)
-    sp_idx = torch.where(sp_mask)[0]  # (S_kz,)
+    sp_idx = torch.where(sp_mask)[0]
 
 
-    # Gather coords for all (spoke, ro)
-    # kx,ky,kz: (S_kz, RO)
+    # spoke ro coords
     kx = traj_t[t_fixed, sp_idx, 0, :] / sx
     ky = traj_t[t_fixed, sp_idx, 1, :] / sy
     kz = traj_t[t_fixed, sp_idx, 2, :] / sz
 
-    # time is fixed (normalized)
+    # fixed t
     t_norm = (torch.tensor(t_fixed, device=dev_data, dtype=traj_t.dtype) / (T - 1 + 1e-8)) * 2.0 - 1.0
     t_col = torch.full((sp_idx.numel(), RO), t_norm, device=dev_data, dtype=traj_t.dtype)
 
-    # Flatten to (N,)
+    # flatten
     kx_all = kx.reshape(-1)
     ky_all = ky.reshape(-1)
     kz_all = kz.reshape(-1)
     t_all  = t_col.reshape(-1)
 
-    x_all = torch.stack([kx_all, ky_all, kz_all, t_all], dim=1).float()  # (N,4)
+    x_all = torch.stack([kx_all, ky_all, kz_all, t_all], dim=1).float()
 
-    # Measured k-space for this coil: (S_kz, RO) -> (N,)
+    # measured kspace
     y = k_t[t_fixed, sp_idx, coil_fixed, :].reshape(-1)
-    y_ri = torch.view_as_real(y).float()  # (N,2)
+    y_ri = torch.view_as_real(y).float()
 
     non_block = (dev_data.type == "cuda" and dev_compute.type == "cuda")
     x_all = x_all.to(dev_compute, non_blocking=non_block)
@@ -297,36 +270,14 @@ def fit_one_frame_slice_coil(
     callback=None,
     callback_every: int = 0,
 ):
-    """
-    Fit a model on a fixed dataset (x_all, y_all) from one frame/slice/coil.
-
-    Parameters
-    ----------
-    train_idx : (N_train,) long tensor or None
-        Indices into x_all/y_all to use for training.  When None, all points
-        are used (original behaviour).
-    val_idx : (N_val,) long tensor or None
-        Indices into x_all/y_all to use for validation.  When None, no
-        validation loss is tracked.
-    eval_every : int
-        Evaluate the validation loss every this many training steps.
-        The final step is always evaluated regardless.
-
-    Returns
-    -------
-    model : trained model
-    info  : dict with keys
-        "loss_hist"     – train MSE at every step
-        "val_loss_hist" – val   MSE evaluated every eval_every steps (empty if val_idx is None)
-        "val_steps"     – step numbers at which val was evaluated
-    """
+    """fit fixed dataset"""
     device = torch.device(device)
     model = model.to(device)
     model.train()
     x_all = x_all.to(device, non_blocking=True)
     y_all = y_all.to(device, non_blocking=True)
 
-    # Resolve training pool
+    # train pool
     if train_idx is not None:
         train_idx = train_idx.to(device)
         x_train = x_all[train_idx]
@@ -336,7 +287,7 @@ def fit_one_frame_slice_coil(
         y_train = y_all
     N_train = x_train.shape[0]
 
-    # Pre-load validation tensors (typically small — a few thousand points)
+    # val tensors
     has_val = val_idx is not None
     if has_val:
         val_idx = val_idx.to(device)
@@ -369,7 +320,7 @@ def fit_one_frame_slice_coil(
     last_val_loss = None
 
     for step in it:
-        # ---- Training step ----
+        # train step
         idx = torch.randint(0, N_train, (batch_size,), device=device)
         x = x_train[idx]
         y = y_train[idx]
@@ -399,7 +350,7 @@ def fit_one_frame_slice_coil(
         L = float(loss.item())
         loss_hist.append(L)
 
-        # ---- Validation evaluation ----
+        # val eval
         if has_val and (step % eval_every == 0 or step == steps):
             model.eval()
             with torch.no_grad():
@@ -409,7 +360,7 @@ def fit_one_frame_slice_coil(
             val_loss_hist.append(last_val_loss)
             val_steps.append(step)
 
-        # ---- Logging ----
+        # logging
         if use_tqdm:
             postfix = f"train={L:.2e}"
             if last_val_loss is not None:
@@ -421,7 +372,7 @@ def fit_one_frame_slice_coil(
                 msg += f"  val {last_val_loss:.3e}"
             print(msg)
 
-        # ---- Callback hook ----
+        # callback
         if callback and callback_every > 0:
             if (step % callback_every == 0) or (step == 1) or (step == steps):
                 callback(step, model)
@@ -459,7 +410,7 @@ def fit_one_scan(
     scaler = GradScaler("cuda" if device.type == "cuda" else "cpu", enabled=amp)
     amp_dtype = torch.float16 if (device.type == "cuda" and not torch.cuda.is_bf16_supported()) else torch.bfloat16
 
-    #  fixed eval set
+    # fixed eval set
     @torch.no_grad()
     def make_eval_set(n=eval_size):
         model.eval()
@@ -478,8 +429,6 @@ def fit_one_scan(
             return F.mse_loss(y_pred, y_eval).item()
 
     stopper = EvalEarlyStopper(min_rel_improve=eval_min_rel, patience=eval_patience)
-
-    #stopper = PlateauStopper(window=plateau_window, min_rel_improve=plateau_min_rel, patience=plateau_patience)
 
     best_state = None
     loss_hist = []
@@ -520,12 +469,12 @@ def fit_one_scan(
         L = float(loss.item())
         loss_hist.append(L)
 
-        #  early stop on eval plateau
+        # eval plateau
         if step % eval_every == 0:
             e = eval_mse()
             eval_hist.append((step, e))
 
-            # save best-on-eval state
+            # best state
             if e < stopper.best:
                 best_state = {k: v.detach().cpu() for k, v in model.state_dict().items()}
 
@@ -555,7 +504,7 @@ def fit_one_scan(
                 it_s = step / max(elapsed, 1e-6)
                 print(f"step {step:6d}  train {L:.3e}  it/s {it_s:.2f}")
 
-    # restore best model 
+    # restore best
     if best_state is not None:
         model.load_state_dict(best_state)
 
@@ -580,14 +529,7 @@ def plot_measured_vs_pred_kspace(
     show_magphase=True,
     phase_mask_percentile=60,
 ):
-    """
-    Plot measured vs predicted k-space on the (kx,ky) plane.
-
-
-    Outputs:
-      - Figure 1: Re/Im (measured vs predicted)  
-      - Figure 2: magnitude/phase (optional)     
-    """
+    """measured vs predicted scatter"""
     device = x_all.device
     model.eval()
 
@@ -599,22 +541,22 @@ def plot_measured_vs_pred_kspace(
     kx = kx_all[idx].detach().cpu().numpy()
     ky = ky_all[idx].detach().cpu().numpy()
 
-    # ensure y_scale is float
+    # float scale
     ys = float(y_scale.detach().cpu().item()) if isinstance(y_scale, torch.Tensor) else float(y_scale)
 
     coil_idx = torch.full((x.shape[0],), int(coil_fixed), device=device, dtype=torch.long)
 
-    # model outputs Re/Im 
-    y_pred = model(x, coil_idx)  # (B,2)
+    # reim model
+    y_pred = model(x, coil_idx)
 
-    # undo normalization for plotting 
+    # denormalize
     y_plot = (y * ys).detach().cpu().numpy()
     yp_plot = (y_pred * ys).detach().cpu().numpy()
 
     y_c  = y_plot[:, 0] + 1j * y_plot[:, 1]
     yp_c = yp_plot[:, 0] + 1j * yp_plot[:, 1]
 
-    #  Figure 1: Re/Im  
+    # reim scatter
     def scatter_component(ax, vals_complex, title, component="re"):
         def clip_vals(v, p=99):
             lo, hi = np.percentile(v, [100-p, p])
@@ -636,7 +578,7 @@ def plot_measured_vs_pred_kspace(
     plt.tight_layout()
     plt.show()
 
-    #  Figure 2: magnitude/phase 
+    # mag phase scatter
     if not show_magphase:
         return
 
@@ -662,7 +604,7 @@ def plot_measured_vs_pred_kspace(
         ax.set_ylabel("ky")
         plt.colorbar(sc, ax=ax, fraction=0.046, pad=0.04, label="phase [rad]")
 
-    # mask low-magnitude points for phase visibility
+    # mask low magnitude
     mag = np.abs(y_c)
     thr = np.percentile(mag, phase_mask_percentile) if phase_mask_percentile is not None else 0.0
     mask = mag >= thr if phase_mask_percentile is not None else None
@@ -688,15 +630,12 @@ def overfit_fixed_subset(
     lr=1e-4,
     device="cuda",
 ):
-    """
-     sanity check:
-    Overfit a  fixed subset of points.
-    """
+    """overfit sanity check"""
     device = torch.device(device)
     model = model.to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
-    # pick subset 
+    # subset
     N = x_all.shape[0]
     idx = torch.randperm(N, device=device)[:n_points]
     x_fix = x_all[idx]
@@ -707,7 +646,7 @@ def overfit_fixed_subset(
 
     for step in range(1, steps + 1):
         opt.zero_grad(set_to_none=True)
-        y_pred = model(x_fix, coil_idx)   # Re/Im model
+        y_pred = model(x_fix, coil_idx)
         loss = F.mse_loss(y_pred, y_fix)
         loss.backward()
         opt.step()
@@ -757,8 +696,8 @@ def fit_spoke_holdout_kxy(
     stopper = EvalEarlyStopper(min_rel_improve=eval_min_rel, patience=eval_patience)
     best_state = None
 
-    loss_hist = []          # train loss per step
-    eval_hist = []          # list of (step, eval_loss)
+    loss_hist = []
+    eval_hist = []
     best_step = None
     stopped_step = None
 
@@ -776,7 +715,7 @@ def fit_spoke_holdout_kxy(
 
         loss_hist.append(float(loss.item()))
 
-        # validation / early stopping
+        # eval, early stop
         if do_eval and step % eval_every == 0:
             model.eval()
             with torch.no_grad():
@@ -791,14 +730,14 @@ def fit_spoke_holdout_kxy(
                 stopped_step = step
                 break
 
-        # plotting callback
+        # plot callback
         if plot_callback is not None and plot_every and (step % plot_every == 0 or step == 1):
             plot_callback(step, model)
 
     if stopped_step is None:
-        stopped_step = step  # last step reached
+        stopped_step = step
 
-    # restore best model
+    # restore best
     if best_state is not None:
         model.load_state_dict(best_state)
 
@@ -817,9 +756,7 @@ def fit_spoke_holdout_kxy(
     return model, info
 
 
-# ---------------------------------------------------------------------------
-# Classical GP fitting
-# ---------------------------------------------------------------------------
+# gp fitting
 
 def fit_gp(
     model,
@@ -831,39 +768,7 @@ def fit_gp(
     device: str = "cuda",
     use_tqdm: bool = True,
 ) -> tuple:
-    """
-    Fit a GP_REIM model to k-space data (classical Rasmussen & Williams 2006).
-
-    Two-phase procedure:
-
-    Phase 1 – Hyperparameter optimisation (opt_steps > 0):
-        Maximises the log marginal likelihood
-            log p(y|X,θ) = -½ yᵀ K⁻¹ y  -  ½ log|K|  -  N/2 log(2π)
-        using Adam on the kernel lengthscale, outputscale, and noise variance.
-        This step requires O(N²) memory and O(N³) compute per step.
-
-    Phase 2 – Posterior computation:
-        Cholesky-solves for α = (K + σ²I)⁻¹ y  (done inside model.fit()).
-        After this, model(X_test) returns the posterior mean  K_* @ α.
-
-    Parameters
-    ----------
-    model     : GP_REIM instance
-    x_all     : (N, 2) normalised k-space coordinates [kx, ky]
-    y_all     : (N, 2) complex k-space target          [Re, Im]
-    opt_steps : number of gradient steps for LML optimisation (0 = skip)
-    opt_lr    : Adam learning rate for hyperparameter optimisation
-    device    : "cuda" or "cpu"
-    use_tqdm  : show a progress bar during optimisation
-
-    Returns
-    -------
-    model : GP_REIM  (fitted in-place; also returned for chaining)
-    info  : dict with keys
-                "lml_hist"   – list of LML values per optimisation step
-                "hyperparams"– final {lengthscale, outputscale, noise} values
-                "seconds"    – total wall-clock time
-    """
+    """gp fit, lml then cholesky"""
     import math as _math
     import time as _time
 
@@ -880,9 +785,7 @@ def fit_gp(
 
     lml_hist = []
 
-    # ------------------------------------------------------------------
-    # Phase 1: Hyperparameter optimisation via log marginal likelihood
-    # ------------------------------------------------------------------
+    # phase 1, lml opt
     if opt_steps > 0:
         opt = torch.optim.Adam(model.parameters(), lr=opt_lr)
 
@@ -893,7 +796,7 @@ def fit_gp(
         for _ in steps_iter:
             opt.zero_grad()
             lml = model.log_marginal_likelihood(X, y)
-            (-lml).backward()          # minimise negative LML
+            (-lml).backward()
             opt.step()
             lml_hist.append(lml.item())
 
@@ -904,9 +807,7 @@ def fit_gp(
                     noise=f"{model.noise.item():.2e}",
                 )
 
-    # ------------------------------------------------------------------
-    # Phase 2: Final Cholesky fit with the (optimised) hyperparameters
-    # ------------------------------------------------------------------
+    # phase 2, cholesky fit
     model.fit(X, y)
 
     hyperparams = {
@@ -921,7 +822,6 @@ def fit_gp(
         "seconds":    _time.time() - t0,
     }
     return model, info
-
 
 
 

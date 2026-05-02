@@ -1,22 +1,12 @@
 #!/usr/bin/env python3
-"""Quick test for multi-coil models and data loading.
-
-Verifies:
-  1. MultiCoilWIRE, MultiCoilSIREN, MultiCoilConcat forward passes
-  2. Multi-coil data loader produces correct shapes
-  3. Spoke-based splitting works with repeated coil data
-  4. Gradient flows through FiLM parameters
-
-Usage:
-    micromamba run -n torch29 python test_multicoil.py
-"""
+"""multicoil model tests"""
 import sys
 import torch
 import numpy as np
 
 
 def test_models():
-    """Test model forward passes and parameter counts."""
+    """forward, params"""
     from nik_model import MultiCoilWIRE, MultiCoilSIREN, MultiCoilConcat
 
     B = 64
@@ -26,7 +16,7 @@ def test_models():
 
     print("=== Model tests ===")
 
-    # MultiCoilWIRE (FiLM)
+    # multicoil wire
     model = MultiCoilWIRE(
         in_dim=2, hidden=48, depth=6, w0=62.0, s0=10.0,
         n_coils=n_coils, coil_embed_dim=32,
@@ -36,7 +26,7 @@ def test_models():
     n_params = sum(p.numel() for p in model.parameters())
     print(f"  MultiCoilWIRE:  out={out.shape}, params={n_params}")
 
-    # Verify FiLM init: all coils should produce similar output at init
+    # film init similarity
     c0 = torch.zeros(B, dtype=torch.long)
     c1 = torch.ones(B, dtype=torch.long)
     out0 = model(coords, c0)
@@ -45,7 +35,7 @@ def test_models():
     print(f"    FiLM init coil 0 vs 1 max diff: {diff:.6f} (should be ~0)")
     assert diff < 0.01, f"FiLM init too divergent: {diff}"
 
-    # MultiCoilSIREN (FiLM)
+    # multicoil siren
     model_s = MultiCoilSIREN(
         in_dim=2, hidden=48, depth=6, w0=60.0,
         n_coils=n_coils, coil_embed_dim=32,
@@ -54,7 +44,7 @@ def test_models():
     n_params_s = sum(p.numel() for p in model_s.parameters())
     print(f"  MultiCoilSIREN: out={out_s.shape}, params={n_params_s}")
 
-    # MultiCoilConcat (WIRE backbone)
+    # concat wire
     model_c = MultiCoilConcat(
         backbone_family="wire",
         backbone_kwargs=dict(hidden=48, depth=6, w0=62.0, s0=10.0),
@@ -64,7 +54,7 @@ def test_models():
     n_params_c = sum(p.numel() for p in model_c.parameters())
     print(f"  MultiCoilConcat(wire): out={out_c.shape}, params={n_params_c}")
 
-    # MultiCoilConcat (SIREN backbone)
+    # concat siren
     model_cs = MultiCoilConcat(
         backbone_family="siren",
         backbone_kwargs=dict(hidden=48, depth=6, w0=60.0),
@@ -74,7 +64,7 @@ def test_models():
     n_params_cs = sum(p.numel() for p in model_cs.parameters())
     print(f"  MultiCoilConcat(siren): out={out_cs.shape}, params={n_params_cs}")
 
-    # Gradient test: FiLM parameters get gradients
+    # film gradient test
     model.zero_grad()
     loss = out.pow(2).mean()
     loss.backward()
@@ -87,44 +77,44 @@ def test_models():
 
 
 def test_data_loader():
-    """Test multi-coil data loader with synthetic data."""
+    """synthetic data loader"""
     from nik_recon import split_points_by_spokes
 
     print("=== Data loader tests (synthetic) ===")
 
-    # Simulate multi-coil spoke_id_all: 3 coils, 4 spokes, 10 pts/spoke
+    # synthetic shape
     n_coils = 3
     n_spokes = 4
     pts_per_spoke = 10
     N_per_coil = n_spokes * pts_per_spoke
 
-    # spoke_id for one coil
+    # one coil ids
     spoke_ids_1c = torch.arange(n_spokes).repeat_interleave(pts_per_spoke)
-    # Repeat for all coils
+    # all coils
     spoke_id_all = spoke_ids_1c.repeat(n_coils)
 
     assert spoke_id_all.shape[0] == N_per_coil * n_coils
     print(f"  spoke_id_all shape: {spoke_id_all.shape}")
     print(f"  Unique spokes: {torch.unique(spoke_id_all).tolist()}")
 
-    # Split: should select same spokes for all coils
+    # consistent split
     train_idx, val_idx, train_spokes, val_spokes = split_points_by_spokes(
         spoke_id_all, val_frac=0.25, seed=42,
     )
 
-    # Check that val spokes are consistent across coils
+    # val spokes consistent
     val_spoke_set = set(val_spokes.tolist())
     print(f"  Val spokes: {val_spoke_set}")
     print(f"  Train idx: {len(train_idx)}, Val idx: {len(val_idx)}")
 
-    # Each coil should have the same number of val points
+    # equal val per coil
     for c in range(n_coils):
         start = c * N_per_coil
         end = (c + 1) * N_per_coil
         coil_val = ((val_idx >= start) & (val_idx < end)).sum().item()
         coil_train = ((train_idx >= start) & (train_idx < end)).sum().item()
         print(f"    Coil {c}: train={coil_train}, val={coil_val}")
-        # All coils should have same val count
+        # equal val count
         if c > 0:
             first_val = ((val_idx >= 0) & (val_idx < N_per_coil)).sum().item()
             assert coil_val == first_val, f"Coil {c} val count differs"
@@ -133,7 +123,7 @@ def test_data_loader():
 
 
 def test_training_step():
-    """Test one training step with multi-coil model."""
+    """one training step"""
     from nik_model import MultiCoilWIRE
 
     print("=== Training step test ===")
@@ -150,16 +140,16 @@ def test_training_step():
     coil_idx = torch.randint(0, n_coils, (B,))
     targets = torch.randn(B, 2)
 
-    # Forward
+    # forward
     pred = model(coords, coil_idx)
     loss = torch.nn.functional.mse_loss(pred, targets)
 
-    # Backward
+    # backward
     opt.zero_grad()
     loss.backward()
     opt.step()
 
-    # Check loss decreased on second step
+    # second step
     pred2 = model(coords, coil_idx)
     loss2 = torch.nn.functional.mse_loss(pred2, targets)
 

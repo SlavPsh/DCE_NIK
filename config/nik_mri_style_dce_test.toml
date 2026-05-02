@@ -1,0 +1,55 @@
+[experiment]
+name = "NIK_MRI-style DCE slice fitting (test)"
+description = "Short smoke test for the exact NIK_MRI-style DCE pipeline"
+
+[data]
+file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
+z_slice_idx = -1
+reference_t_frame = 0
+require_coil_maps = true
+data_device = "cpu"
+
+[model]
+coord_dim = 4
+feature_dim = 512
+num_layers = 8
+out_dim = 1
+omega_0 = 30.0
+ff_scale = 1.0
+
+[training]
+# epoch passes
+num_steps = 5
+# minibatch size
+batch_size = 30000
+optimizer = "Adam"
+lr = 3e-5
+adam_beta1 = 0.9
+adam_beta2 = 0.999
+adam_eps = 1e-8
+num_workers = 0
+seed = 0
+# end of run recon
+recon_every = 5
+cartesian_chunk_size = 131072
+
+[loss]
+hdr_eps = 1e-2
+hdr_ff_sigma = 1.0
+hdr_ff_factor = 0.4
+
+[recon]
+nx = 312
+ny = 312
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 1
+
+[wandb]
+enabled = true
+project = "NIK-DCE-MRI"
+entity = "spshenov-university-of-amsterdam"

@@ -14,7 +14,7 @@ set -eu
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 nvidia-smi || true
 
-# ---- Micromamba setup ----
+# micromamba setup
 export PATH="/scratch/rnga/vvpshenov/micromamba/bin:$PATH"
 export MAMBA_ROOT_PREFIX="/scratch/rnga/vvpshenov/micromamba"
 eval "$(/scratch/rnga/vvpshenov/micromamba/bin/micromamba shell hook -s bash)"
@@ -25,11 +25,7 @@ python --version
 
 cd /scratch/rnga/vvpshenov/DCE_NIK
 
-# ---- Parse arguments ----
-# Usage:
-#   sbatch gpu_job_cart_eval.sh config/training_cart_eval.toml                          # single run
-#   sbatch gpu_job_cart_eval.sh config/training_cart_eval.toml sweep                    # new sweep
-#   sbatch gpu_job_cart_eval.sh config/training_cart_eval.toml SWEEP_ID [COUNT]         # join sweep
+# parse args
 CONFIG_PATH="${1:?Usage: sbatch gpu_job_cart_eval.sh CONFIG_PATH [sweep|SWEEP_ID] [COUNT]}"
 MODE="${2:-single}"
 COUNT="${3:-50}"
@@ -42,6 +38,6 @@ if [ "$MODE" = "single" ]; then
 elif [ "$MODE" = "sweep" ]; then
     python train_cart_eval.py "$CONFIG_PATH" --count "$COUNT"
 else
-    # MODE is a sweep ID
+    # sweep id
     python train_cart_eval.py "$CONFIG_PATH" --sweep-id "$MODE" --count "$COUNT"
 fi

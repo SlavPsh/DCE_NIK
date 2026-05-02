@@ -1,14 +1,4 @@
-# Step 5a: SIREN w0 sweep with corrected values
-#
-# The current code applies 4*w0 to the first SineLayer.
-# Old best result used w0=30 (no multiplier) => effective first-layer w0=30.
-# To reproduce that range: w0=7.5 => effective 30.
-#
-# This sweep covers w0 in [5, 7.5, 10, 15] => effective [20, 30, 40, 60].
-# Also tests depth [4, 6, 8] and hidden [192, 256, 320] around the best configs.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step5a_siren_w0_corrected.toml
+# step 5a, siren w0 corrected
 
 [experiment]
 name = "Step 5a: SIREN w0 corrected"

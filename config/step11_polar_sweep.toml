@@ -1,17 +1,4 @@
-# Step 11: Polar angular-Fourier + radial network sweep
-#
-# Goal: Optimize PolarKSpaceNet architecture. Ablation showed:
-#   - WIRE radial > SIREN radial (+2.1 dB)
-#   - Full constraints (DC + density + conj) = best (26.85 dB)
-#   - Ablation config: h=128, d=4, N=16 → 83k params
-#
-# Constrain model size to ~40k-120k params (around ablation's 83k).
-# Fix: radial_type=wire, all three constraint losses enabled.
-# Added weight_decay to combat overfitting.
-# Sweep: n_angular_modes, depth, hidden, w0, s0, lr, weight_decay
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step11_polar_sweep.toml
+# step 11, polar wire sweep
 
 [experiment]
 name = "Step 11: Polar WIRE sweep"
@@ -43,7 +30,7 @@ weight_decay = 0.005
 loss_type = "mse"
 eval_every = 50
 seed = 0
-# Polar constraint loss weights
+# polar constraint weights
 dc_weight = 0.01
 density_weight = 1.0
 conj_weight = 0.01
@@ -79,11 +66,7 @@ values = ["polar"]
 [sweep.parameters.radial_type]
 values = ["wire"]
 
-# Param count guide (WIRE_1D radial):
-#   N=12 h=96  d=4 → 47k     N=16 h=96  d=4 → 50k
-#   N=16 h=128 d=3 → 50k     N=16 h=128 d=4 → 83k  (ablation)
-#   N=16 h=128 d=5 → 116k    N=24 h=96  d=4 → 56k
-#   N=20 h=128 d=4 → 87k     N=24 h=128 d=4 → 91k
+# param count guide
 
 [sweep.parameters.n_angular_modes]
 values = [12, 16, 20, 24]

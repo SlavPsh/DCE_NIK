@@ -1,3 +1,4 @@
+"""kspace plotting utils"""
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -6,7 +7,7 @@ import torch
 def plot_error_maps_kxy_flat(
     model,
     *,
-    x_sub, y_sub,                # (M,4), (M,2) scaled
+    x_sub, y_sub,
     y_scale=1.0,
     max_points=250_000,
     title_prefix="",
@@ -62,8 +63,8 @@ def plot_error_maps_kxy_flat(
 def plot_spoke_zoom_kxy_dense_flat(
     model,
     *,
-    x_all, y_all,               # (N,4), (N,2) scaled
-    spoke_id_all, ro_id_all,     # (N,), (N,)
+    x_all, y_all,
+    spoke_id_all, ro_id_all,
     spoke_id: int,
     y_scale=1.0,
     n_s: int = 4096,
@@ -74,24 +75,24 @@ def plot_spoke_zoom_kxy_dense_flat(
     device = next(model.parameters()).device
     model.eval()
 
-    # select this spoke
+    # one spoke
     m = (spoke_id_all == int(spoke_id))
     ro = ro_id_all[m]
     x_m = x_all[m][:, :2]
     y_m = y_all[m]
 
-    # sort by RO index (native ordering)
+    # ro sort
     order = torch.argsort(ro)
     ro = ro[order]
-    x_m = x_m[order].to(device)        # (RO,2)
-    y_m = y_m[order].to(device)        # (RO,2)
+    x_m = x_m[order].to(device)
+    y_m = y_m[order].to(device)
     RO = x_m.shape[0]
 
     ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
     y_m0 = (y_m * ys).detach().cpu().numpy()
     idx_m = ro.detach().cpu().numpy()
 
-    # dense parameter s in [0, RO-1] and interpolate trajectory
+    # dense param interp
     s = torch.linspace(0, RO - 1, n_s, device=device)
     s0 = torch.floor(s).long().clamp(0, RO - 1)
     s1 = (s0 + 1).clamp(0, RO - 1)
@@ -147,7 +148,7 @@ def plot_rings_kxy_train_vs_val_dense_flat(
     *,
     x_all, y_all,
     spoke_id_all, ro_id_all,
-    train_idx, val_idx,          # point indices into x_all/y_all
+    train_idx, val_idx,
     ro_list,
     y_scale=1.0,
     n_theta: int = 1024,
@@ -161,13 +162,13 @@ def plot_rings_kxy_train_vs_val_dense_flat(
     ys = float(y_scale.detach().cpu().item()) if torch.is_tensor(y_scale) else float(y_scale)
 
     def get_points(point_idx, ro_idx):
-        # select subset points at this ring (ro == ro_idx)
+        # ring subset
         rid = ro_id_all[point_idx]
         m = (rid == int(ro_idx))
         idx = point_idx[m]
 
-        x = x_all[idx][:, :2]              # (K,2)
-        y = y_all[idx] * ys                # unscale
+        x = x_all[idx][:, :2]
+        y = y_all[idx] * ys
 
         th = torch.atan2(x[:, 1], x[:, 0])
         order = torch.argsort(th)
@@ -181,12 +182,12 @@ def plot_rings_kxy_train_vs_val_dense_flat(
         return th, re, im, mag
 
     for ro_idx in ro_list:
-        # estimate radius from ALL spokes at this ro_idx (median)
+        # median radius
         m_all = (ro_id_all == int(ro_idx))
         x_ring = x_all[m_all][:, :2]
         r0 = torch.median(torch.sqrt(x_ring[:,0]**2 + x_ring[:,1]**2)).item()
 
-        # dense prediction around ring
+        # dense ring
         th = torch.linspace(-np.pi, np.pi, n_theta, device=device)
         x_dense = torch.stack([
             torch.tensor(r0, device=device) * torch.cos(th),
@@ -200,11 +201,11 @@ def plot_rings_kxy_train_vs_val_dense_flat(
         mag_p = np.sqrt(re_p**2 + im_p**2)
         th_np = th.detach().cpu().numpy()
 
-        # measured points at this ring for train/val subsets
+        # train val points
         th_tr, re_tr, im_tr, mag_tr = get_points(train_idx, ro_idx)
         th_va, re_va, im_va, mag_va = get_points(val_idx, ro_idx)
 
-        # Re
+        # re
         plt.figure(figsize=(10,4))
         plt.plot(th_np, re_p, label="pred Re (dense ring)")
         plt.scatter(th_tr, re_tr, s=18, label="train points Re")
@@ -215,7 +216,7 @@ def plot_rings_kxy_train_vs_val_dense_flat(
             plt.yscale("symlog")
         plt.legend(); plt.tight_layout(); plt.show()
 
-        # Im
+        # im
         plt.figure(figsize=(10,4))
         plt.plot(th_np, im_p, label="pred Im (dense ring)")
         plt.scatter(th_tr, im_tr, s=18, label="train points Im")
@@ -226,7 +227,7 @@ def plot_rings_kxy_train_vs_val_dense_flat(
             plt.yscale("symlog")
         plt.legend(); plt.tight_layout(); plt.show()
 
-        # Mag
+        # mag
         plt.figure(figsize=(10,4))
         plt.plot(th_np, mag_p, label="pred |y| (dense ring)")
         plt.scatter(th_tr, mag_tr, s=18, label="train points |y|")
@@ -250,7 +251,7 @@ def make_plot_callback_all_flat(
     coord_adapter=None,
     log_scale: bool = False,
 ):
-    # choose defaults
+    # defaults
     if ro_list is None:
         RO = int(ro_id_all.max().item()) + 1
         ro_list = [RO//4, RO//2, int(0.8*RO)]
@@ -268,7 +269,7 @@ def make_plot_callback_all_flat(
                                      y_scale=y_scale, title_prefix=f"[train] step {step}", coord_adapter=coord_adapter)
             plot_error_maps_kxy_flat(model, x_sub=x_all[val_idx], y_sub=y_all[val_idx],
                                      y_scale=y_scale, title_prefix=f"[val] step {step}", coord_adapter=coord_adapter)
-    
+
             # spoke zoom
             plot_spoke_zoom_kxy_dense_flat(model,
                 x_all=x_all, y_all=y_all,

@@ -1,12 +1,4 @@
-# Step 3a: Fourier-Feature families (ff_relu, ff_siren)
-#
-# Sweep k_sigma to find optimal bandwidth of the random Fourier encoding.
-# Extended depth range [3,4,6,8] to test whether FF models benefit from
-# more depth than originally assumed.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step3_ff_models.toml
-#   sbatch gpu_job_sweep.sh config/step3_ff_models.toml SWEEP_ID [COUNT]
+# step 3a, ff models
 
 [experiment]
 name = "Step 3a: FF models"
@@ -16,7 +8,7 @@ description = "Sweep k_sigma and depth for Fourier-feature models (ff_relu, ff_s
 file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
 t_frame = 0
 coil_idx = 0
-z_slice_idx = -1          # -1 = middle slice (auto)
+z_slice_idx = -1
 val_frac = 0.1
 
 [model]

@@ -1,16 +1,4 @@
-# nik_metrics.py
-"""
-Image-space quality metrics for NIK SIREN baseline.
-
-Provides PSNR, SSIM, and NRMSE between reconstructed and reference images.
-All functions accept 2-D numpy arrays (single-image) or batches via the
-convenience wrapper ``compute_image_metrics``.
-
-Also provides perceptual image quality metrics (DISTS, HaarPSI, VSI, LPIPS)
-validated for MRI via the ``piq`` library (Kastryulin et al. 2022).
-
-Also provides k-space validation metrics broken down by spoke and frame.
-"""
+"""image and kspace metrics"""
 import numpy as np
 import torch
 from scipy.ndimage import uniform_filter
@@ -18,28 +6,10 @@ from scipy.ndimage import uniform_filter
 _PIQ_DISTS_METRIC = None
 
 
-# ---------------------------------------------------------------------------
-# PSNR
-# ---------------------------------------------------------------------------
+# psnr
 
 def psnr(img_pred: np.ndarray, img_ref: np.ndarray, data_range: float = None) -> float:
-    """
-    Peak Signal-to-Noise Ratio.
-
-    PSNR = 10 * log10(data_range^2 / MSE)
-
-    Parameters
-    ----------
-    img_pred : 2-D array  – reconstructed image (magnitude).
-    img_ref  : 2-D array  – reference / ground-truth image (magnitude).
-    data_range : float, optional
-        Dynamic range of the reference image.  When *None* it is set to
-        ``img_ref.max() - img_ref.min()``.
-
-    Returns
-    -------
-    float – PSNR in dB.  Returns ``inf`` when images are identical.
-    """
+    """psnr db"""
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
 
@@ -52,9 +22,7 @@ def psnr(img_pred: np.ndarray, img_ref: np.ndarray, data_range: float = None) ->
     return float(10.0 * np.log10(data_range ** 2 / mse))
 
 
-# ---------------------------------------------------------------------------
-# SSIM  (Wang et al. 2004, simplified single-scale)
-# ---------------------------------------------------------------------------
+# ssim, single scale
 
 def ssim(
     img_pred: np.ndarray,
@@ -62,25 +30,7 @@ def ssim(
     data_range: float = None,
     win_size: int = 7,
 ) -> float:
-    """
-    Structural Similarity Index (mean SSIM over the image).
-
-    Uses a uniform (box) filter of size ``win_size`` for the local statistics,
-    following the Wang et al. 2004 formulation:
-
-        SSIM(x,y) = (2*mu_x*mu_y + C1)(2*sigma_xy + C2)
-                    / ((mu_x^2 + mu_y^2 + C1)(sigma_x^2 + sigma_y^2 + C2))
-
-    Parameters
-    ----------
-    img_pred, img_ref : 2-D arrays of same shape.
-    data_range : float, optional – defaults to max − min of img_ref.
-    win_size : int – side length of the averaging window (must be odd).
-
-    Returns
-    -------
-    float – mean SSIM in [−1, 1].
-    """
+    """mean ssim, box filter"""
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
 
@@ -109,7 +59,7 @@ def ssim(
 
     ssim_map = num / den
 
-    # Crop border (half-window) to avoid edge effects before averaging
+    # border crop
     pad = win_size // 2
     if pad > 0:
         ssim_map = ssim_map[pad:-pad, pad:-pad]
@@ -117,30 +67,14 @@ def ssim(
     return float(ssim_map.mean())
 
 
-# ---------------------------------------------------------------------------
-# NRMSE
-# ---------------------------------------------------------------------------
+# nrmse
 
 def nrmse(
     img_pred: np.ndarray,
     img_ref: np.ndarray,
     normalization: str = "euclidean",
 ) -> float:
-    """
-    Normalized Root Mean Square Error.
-
-    Parameters
-    ----------
-    img_pred, img_ref : 2-D arrays of same shape.
-    normalization : str
-        ``"euclidean"`` – RMSE / ||img_ref||_2  (norm of the reference).
-        ``"min-max"``   – RMSE / (max − min) of the reference.
-        ``"mean"``      – RMSE / mean of the reference.
-
-    Returns
-    -------
-    float – NRMSE (lower is better, 0 = identical).
-    """
+    """nrmse"""
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
 
@@ -161,9 +95,7 @@ def nrmse(
     return float(rmse_val / denom)
 
 
-# ---------------------------------------------------------------------------
-# Convenience: compute all three metrics at once
-# ---------------------------------------------------------------------------
+# combined wrapper
 
 def compute_image_metrics(
     img_pred: np.ndarray,
@@ -172,21 +104,7 @@ def compute_image_metrics(
     ssim_win_size: int = 7,
     nrmse_norm: str = "euclidean",
 ) -> dict:
-    """
-    Compute PSNR, SSIM, and NRMSE between two 2-D images.
-
-    Parameters
-    ----------
-    img_pred : (H, W) magnitude image from the model.
-    img_ref  : (H, W) ground-truth / reference magnitude image.
-    data_range : float, optional – defaults to max − min of img_ref.
-    ssim_win_size : int – SSIM window size (default 7).
-    nrmse_norm : str – NRMSE normalisation mode (default ``"euclidean"``).
-
-    Returns
-    -------
-    dict with keys ``"psnr_db"``, ``"ssim"``, ``"nrmse"``.
-    """
+    """psnr ssim nrmse"""
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
 
@@ -200,12 +118,10 @@ def compute_image_metrics(
     }
 
 
-# ---------------------------------------------------------------------------
-# Perceptual image quality metrics (piq library)
-# ---------------------------------------------------------------------------
+# perceptual metrics, piq
 
 def _to_piq_tensor(img: np.ndarray, n_channels: int = 1) -> torch.Tensor:
-    """Convert 2-D numpy array to (1, C, H, W) float32 tensor on CPU."""
+    """piq tensor"""
     t = torch.from_numpy(np.asarray(img, dtype=np.float32))
     t = t.unsqueeze(0).unsqueeze(0)  # (1, 1, H, W)
     if n_channels == 3:
@@ -218,33 +134,14 @@ def compute_perceptual_metrics(
     img_pred: np.ndarray,
     img_ref: np.ndarray,
 ) -> dict:
-    """
-    Evaluation-only perceptual image quality metrics. NOT for use as training loss.
-
-    Computed with no_grad on CPU. Do not backpropagate through these.
-
-    Metrics chosen based on Kastryulin et al. 2022 — "Image Quality Assessment
-    for Magnetic Resonance Imaging":
-      - DISTS (best for MRI, SRCC=0.76 on artifacts) — lower is better
-      - HaarPSI (second best, wavelet-based) — higher is better
-      - VSI (third best, saliency-based) — higher is better
-      - PSNR, SSIM from piq as baselines
-
-    Parameters
-    ----------
-    img_pred, img_ref : 2-D numpy arrays (magnitude images, any value range).
-
-    Returns
-    -------
-    dict with metric names as keys and float values.
-    """
+    """perceptual metrics, eval only"""
     import piq
     global _PIQ_DISTS_METRIC
 
     img_pred = np.asarray(img_pred, dtype=np.float64)
     img_ref = np.asarray(img_ref, dtype=np.float64)
 
-    # Normalize both to [0, 1] using the same scale
+    # shared 0,1 scale
     vmax = max(img_pred.max(), img_ref.max())
     if vmax == 0:
         return {
@@ -254,7 +151,7 @@ def compute_perceptual_metrics(
     img_pred_n = img_pred / vmax
     img_ref_n = img_ref / vmax
 
-    # Build tensors — all on CPU
+    # cpu tensors
     pred_1ch = _to_piq_tensor(img_pred_n, n_channels=1)
     ref_1ch = _to_piq_tensor(img_ref_n, n_channels=1)
     pred_3ch = _to_piq_tensor(img_pred_n, n_channels=3)
@@ -262,31 +159,29 @@ def compute_perceptual_metrics(
 
     results = {}
 
-    # PSNR (higher is better)
+    # psnr higher better
     results["PSNR"] = float(piq.psnr(pred_1ch, ref_1ch, data_range=1.0).item())
 
-    # SSIM (higher is better)
+    # ssim higher better
     results["SSIM"] = float(piq.ssim(pred_1ch, ref_1ch, data_range=1.0).item())
 
-    # HaarPSI (higher is better) — works on grayscale natively
+    # haarpsi higher better
     results["HaarPSI"] = float(piq.haarpsi(pred_1ch, ref_1ch, data_range=1.0).item())
 
-    # DISTS (lower is better) — needs 3-channel
+    # dists lower better, 3ch
     if _PIQ_DISTS_METRIC is None:
         _PIQ_DISTS_METRIC = piq.DISTS()
     results["DISTS"] = float(_PIQ_DISTS_METRIC(pred_3ch, ref_3ch).item())
 
-    # VSI (higher is better) — needs 3-channel
+    # vsi higher better, 3ch
     results["VSI"] = float(piq.vsi(pred_3ch, ref_3ch, data_range=1.0).item())
 
     return results
 
 
-# ---------------------------------------------------------------------------
-# Formatting and comparison utilities
-# ---------------------------------------------------------------------------
+# formatting utils
 
-# Direction indicators: True = higher is better
+# higher better flags
 _METRIC_DIRECTION = {
     "psnr_db": True, "ssim": True, "nrmse": False,
     "PSNR": True, "SSIM": True, "DISTS": False,
@@ -295,22 +190,7 @@ _METRIC_DIRECTION = {
 
 
 def format_metrics_table(metrics_dict: dict, label: str = "") -> str:
-    """
-    Format a metrics dict into a readable string with direction arrows.
-
-    Parameters
-    ----------
-    metrics_dict : dict
-        May contain keys from compute_image_metrics (psnr_db, ssim, nrmse)
-        and/or compute_perceptual_metrics (PSNR, SSIM, DISTS, HaarPSI, VSI).
-    label : str, optional
-        Context label, e.g. "vs NUFFT proxy (not ground truth)" or
-        "vs Ground Truth".
-
-    Returns
-    -------
-    str — formatted table.
-    """
+    """metrics table, arrows"""
     basic_keys = ["psnr_db", "ssim", "nrmse"]
     perceptual_keys = ["DISTS", "HaarPSI", "VSI", "PSNR", "SSIM"]
 
@@ -344,26 +224,14 @@ def compare_reconstructions(
     labels: list,
     csv_path: str = None,
 ) -> str:
-    """
-    Compare multiple reconstruction methods side-by-side.
-
-    Parameters
-    ----------
-    metrics_list : list of dicts — one per method.
-    labels : list of str — method names.
-    csv_path : optional path to save CSV.
-
-    Returns
-    -------
-    str — formatted comparison table with best values highlighted.
-    """
+    """side by side compare"""
     all_keys = []
     for m in metrics_list:
         for k in m:
             if k not in all_keys:
                 all_keys.append(k)
 
-    # Column widths
+    # column widths
     label_w = max(len(l) for l in labels)
     col_w = max(12, label_w + 2)
 
@@ -375,7 +243,7 @@ def compare_reconstructions(
         vals = [m.get(k) for m in metrics_list]
         higher_better = _METRIC_DIRECTION.get(k, True)
 
-        # Find best index
+        # best index
         valid = [(i, v) for i, v in enumerate(vals) if v is not None]
         best_i = None
         if valid:
@@ -406,9 +274,7 @@ def compare_reconstructions(
     return table
 
 
-# ---------------------------------------------------------------------------
-# K-space validation metrics broken down by spoke / frame
-# ---------------------------------------------------------------------------
+# kspace metrics, per spoke and frame
 
 @torch.no_grad()
 def per_spoke_mse(
@@ -418,23 +284,7 @@ def per_spoke_mse(
     spoke_id_all: torch.Tensor,
     idx: torch.Tensor = None,
 ) -> dict:
-    """Compute MSE broken down by spoke index.
-
-    Args:
-        model: network with forward(x) → (N, 2)
-        x_all:        (N, D) coordinates (first 2 cols used as kx, ky)
-        y_all:        (N, 2) target [Re, Im]
-        spoke_id_all: (N,) spoke index per point
-        idx:          optional subset indices (e.g., val_idx)
-
-    Returns:
-        dict with:
-            "per_spoke": {spoke_id: mse_float, ...}
-            "mean":      mean over all spokes
-            "std":       std over all spokes
-            "worst_spoke": spoke_id with highest MSE
-            "best_spoke":  spoke_id with lowest MSE
-    """
+    """per spoke mse"""
     if idx is not None:
         x = x_all[idx][:, :2]
         y = y_all[idx]
@@ -450,7 +300,7 @@ def per_spoke_mse(
     spokes = spokes.to(device)
 
     y_pred = model(x)
-    err_sq = (y_pred - y).pow(2).sum(dim=1)  # (N,)
+    err_sq = (y_pred - y).pow(2).sum(dim=1)
 
     unique_spokes = torch.unique(spokes)
     per_spoke = {}
@@ -478,23 +328,7 @@ def per_frame_mse(
     frame_id_all: torch.Tensor,
     idx: torch.Tensor = None,
 ) -> dict:
-    """Compute MSE broken down by time frame.
-
-    Args:
-        model: network with forward(x) → (N, 2)
-        x_all:         (N, D) coordinates (first 2 cols used as kx, ky)
-        y_all:         (N, 2) target [Re, Im]
-        frame_id_all:  (N,) frame index per point
-        idx:           optional subset indices (e.g., val_idx)
-
-    Returns:
-        dict with:
-            "per_frame": {frame_id: mse_float, ...}
-            "mean":      mean over all frames
-            "std":       std over all frames
-            "worst_frame": frame_id with highest MSE
-            "best_frame":  frame_id with lowest MSE
-    """
+    """per frame mse"""
     if idx is not None:
         x = x_all[idx][:, :2]
         y = y_all[idx]
@@ -510,7 +344,7 @@ def per_frame_mse(
     frames = frames.to(device)
 
     y_pred = model(x)
-    err_sq = (y_pred - y).pow(2).sum(dim=1)  # (N,)
+    err_sq = (y_pred - y).pow(2).sum(dim=1)
 
     unique_frames = torch.unique(frames)
     per_frame = {}
@@ -539,25 +373,7 @@ def spoke_angle_error_distribution(
     idx: torch.Tensor = None,
     n_angle_bins: int = 36,
 ) -> dict:
-    """Compute error distribution as a function of spoke angle.
-
-    Bins spokes by their angle theta and reports MSE per bin.
-    Useful for diagnosing angular bias in the model.
-
-    Args:
-        model: network with forward(x) → (N, 2)
-        x_all:        (N, D) coordinates (first 2 cols = kx, ky)
-        y_all:        (N, 2) target [Re, Im]
-        spoke_id_all: (N,) spoke index per point
-        idx:          optional subset indices
-        n_angle_bins: number of angular bins over (-pi, pi]
-
-    Returns:
-        dict with:
-            "bin_edges":  (n_bins+1,) bin edges in radians
-            "bin_mse":    (n_bins,) mean MSE per angular bin
-            "bin_counts": (n_bins,) number of points per bin
-    """
+    """angular error bins"""
     if idx is not None:
         x = x_all[idx][:, :2]
         y = y_all[idx]
@@ -570,12 +386,12 @@ def spoke_angle_error_distribution(
     y = y.to(device)
 
     y_pred = model(x)
-    err_sq = (y_pred - y).pow(2).sum(dim=1).cpu().numpy()  # (N,)
+    err_sq = (y_pred - y).pow(2).sum(dim=1).cpu().numpy()
 
-    # Compute angle for each point
+    # per point angle
     kx = x[:, 0].cpu().numpy()
     ky = x[:, 1].cpu().numpy()
-    theta = np.arctan2(ky, kx)  # (-pi, pi]
+    theta = np.arctan2(ky, kx)
 
     bin_edges = np.linspace(-np.pi, np.pi, n_angle_bins + 1)
     bin_mse = np.zeros(n_angle_bins)

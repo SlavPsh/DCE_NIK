@@ -1,11 +1,4 @@
-# Step 3b: Plain models (siren, relu) — no Fourier features
-#
-# Baseline sweep over architecture (hidden, depth) for plain siren and relu.
-# No k_sigma sweep needed — these models don't use Fourier feature encoding.
-#
-# Usage:
-#   sbatch gpu_job_sweep.sh config/step3_plain_models.toml
-#   sbatch gpu_job_sweep.sh config/step3_plain_models.toml SWEEP_ID [COUNT]
+# step 3b, plain siren relu
 
 [experiment]
 name = "Step 3b: Plain models"
@@ -15,7 +8,7 @@ description = "Baseline architecture sweep for plain siren and relu (no FF encod
 file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat"
 t_frame = 0
 coil_idx = 0
-z_slice_idx = -1          # -1 = middle slice (auto)
+z_slice_idx = -1
 val_frac = 0.1
 
 [model]

@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze local sweep results from DCE_NIK runs directory.
-
-Usage:
-    python analyze_sweeps.py                          # all runs
-    python analyze_sweeps.py --runs-dir runs          # custom dir
-    python analyze_sweeps.py --filter-family siren    # single family
-    python analyze_sweeps.py --filter-date 20260313   # single date
-    python analyze_sweeps.py --csv results.csv        # export to CSV
-"""
+"""local sweep analysis"""
 
 import argparse
 import re
@@ -15,22 +7,22 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-# ---- Parsing ----
+# parsing
 
-# New format: Model: family=siren, hidden=256, depth=4, w0=30.0, k_freq=64, k_sigma=6.0, wd=0.0, params=...
+# new format
 _MODEL_NEW_RE = re.compile(
     r"Model: family=(\w+), hidden=(\d+), depth=(\d+), "
     r"w0=([\d.]+)(?:, k_freq=(\d+))?(?:, k_sigma=([\d.]+))?(?:, wd=([\d.eE+-]+))?"
 )
-# Old format: Model: hidden=128, depth=5, w0=15.0, params=...
+# old format
 _MODEL_OLD_RE = re.compile(
     r"Model: hidden=(\d+), depth=(\d+), w0=([\d.]+)"
 )
 _BEST_RE = re.compile(r"best_val_loss=([\d.eE+-]+)")
 _SKIP_RE = re.compile(r"Skipping: (.+)")
-# Extract model_family from config line (old sweeps that had no family= in Model line)
+# family fallback
 _FAMILY_RE = re.compile(r"'model_family':\s*'(\w+)'")
-# Image-space metrics
+# image metrics
 _CONJ_RE = re.compile(r"Constraints:.*conj_weight=([\d.eE+-]+)")
 _DENSITY_RE = re.compile(r"Constraints:.*density_weight=([\d.eE+-]+)")
 _PSNR_MEAS_RE = re.compile(r"Metrics vs measured:.*PSNR=([\d.eE+-]+) dB")
@@ -42,7 +34,7 @@ _NRMSE_GT_RE = re.compile(r"Metrics vs GT:.*NRMSE=([\d.eE+-]+)")
 
 
 def _parse_image_metrics(text: str) -> dict:
-    """Extract image-space metrics from log text. Returns dict with None for missing."""
+    """log image metrics"""
     def _match_float(regex, txt):
         m = regex.search(txt)
         return float(m.group(1)) if m else None
@@ -64,25 +56,25 @@ def parse_run(run_dir: Path):
 
     text = log.read_text()
 
-    # Check skipped
+    # skipped
     m_skip = _SKIP_RE.search(text)
     if m_skip:
         return {"skipped": True, "skip_reason": m_skip.group(1), "run": run_dir.name}
 
-    # Parse best val loss
+    # best val
     m_best = _BEST_RE.search(text)
     if not m_best:
         return None
 
     img_metrics = _parse_image_metrics(text)
 
-    # Parse constraint weights (new step 13+ logs)
+    # constraint weights
     m_conj = _CONJ_RE.search(text)
     m_dens = _DENSITY_RE.search(text)
     conj_weight = float(m_conj.group(1)) if m_conj else 0.0
     density_weight = float(m_dens.group(1)) if m_dens else 0.0
 
-    # Try new format first
+    # new format first
     m_model = _MODEL_NEW_RE.search(text)
     if m_model:
         return {
@@ -102,10 +94,10 @@ def parse_run(run_dir: Path):
             **img_metrics,
         }
 
-    # Try old format
+    # old format
     m_old = _MODEL_OLD_RE.search(text)
     if m_old:
-        # Try to get family from config line, default to "siren" (old runs were all siren)
+        # family fallback siren
         m_fam = _FAMILY_RE.search(text)
         family = m_fam.group(1) if m_fam else "siren"
         return {
@@ -126,7 +118,7 @@ def parse_run(run_dir: Path):
     return None
 
 
-# ---- Display ----
+# display
 
 def print_table(rows: list, columns: list, title: str = ""):
     if not rows:
@@ -137,7 +129,7 @@ def print_table(rows: list, columns: list, title: str = ""):
         print(f"  {title}")
         print(f"{'='*60}")
 
-    # Column widths
+    # column widths
     widths = {c: max(len(c), max(len(fmt_val(r.get(c))) for r in rows)) for c in columns}
     header = " | ".join(c.rjust(widths[c]) for c in columns)
     sep = "-+-".join("-" * widths[c] for c in columns)
@@ -168,7 +160,7 @@ def analyze(runs, filter_family=None):
 
     print(f"\nTotal runs: {len(runs)}  |  Completed: {len(completed)}  |  Skipped: {len(skipped)}")
 
-    # ---- Best per family ----
+    # best per family
     by_family = defaultdict(list)
     for r in completed:
         by_family[r["family"]].append(r)
@@ -183,7 +175,7 @@ def analyze(runs, filter_family=None):
             "psnr_meas", "ssim_meas", "nrmse_meas", "date"]
     print_table(best_per_family, cols, "Best Run Per Family (by k-space val loss)")
 
-    # ---- Best per family by image PSNR ----
+    # best per family by psnr
     has_img = [r for r in completed if r.get("psnr_meas") is not None]
     if has_img:
         by_family_img = defaultdict(list)
@@ -196,7 +188,7 @@ def analyze(runs, filter_family=None):
         best_img.sort(key=lambda r: r["psnr_meas"], reverse=True)
         print_table(best_img, cols, "Best Run Per Family (by image PSNR vs measured)")
 
-    # ---- Top 10 overall ----
+    # top 10
     top10 = sorted(completed, key=lambda r: r["best_val_loss"])[:10]
     print_table(top10, cols, "Top 10 Runs Overall (by k-space val loss)")
 
@@ -204,7 +196,7 @@ def analyze(runs, filter_family=None):
         top10_img = sorted(has_img, key=lambda r: r["psnr_meas"], reverse=True)[:10]
         print_table(top10_img, cols, "Top 10 Runs Overall (by image PSNR vs measured)")
 
-    # ---- Depth analysis per family ----
+    # depth per family
     for fam in sorted(by_family):
         fam_runs = by_family[fam]
         depth_groups = defaultdict(list)
@@ -228,7 +220,7 @@ def analyze(runs, filter_family=None):
         dcols = ["depth", "n_runs", "min_loss", "mean_loss", "best_hidden", "best_w0", "best_k_sigma"]
         print_table(depth_rows, dcols, f"Depth Analysis: {fam}")
 
-    # ---- k_sigma analysis for FF families ----
+    # ksigma per ff
     for fam in sorted(by_family):
         if not fam.startswith("ff_"):
             continue
@@ -254,7 +246,7 @@ def analyze(runs, filter_family=None):
         scols = ["k_sigma", "n_runs", "min_loss", "mean_loss"]
         print_table(sigma_rows, scols, f"k_sigma Analysis: {fam}")
 
-    # ---- w0 analysis for siren ----
+    # w0 per siren
     if "siren" in by_family:
         siren_runs = by_family["siren"]
         w0_groups = defaultdict(list)
@@ -275,7 +267,7 @@ def analyze(runs, filter_family=None):
             print_table(w0_rows, ["w0", "n_runs", "min_loss", "mean_loss"],
                         "w0 Analysis: siren")
 
-    # ---- Weight decay analysis per family ----
+    # weight decay per family
     wd_families = defaultdict(lambda: defaultdict(list))
     for r in completed:
         wd_families[r["family"]][r.get("weight_decay", 0.0)].append(r)
@@ -321,7 +313,7 @@ def export_csv(runs: list, path: str):
     print(f"Exported {len(completed)} runs to {path}")
 
 
-# ---- Main ----
+# main
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze DCE_NIK sweep results")
@@ -336,7 +328,7 @@ def main():
         print(f"Error: {runs_dir} is not a directory", file=sys.stderr)
         sys.exit(1)
 
-    # Parse all runs
+    # parse runs
     runs = []
     for d in sorted(runs_dir.iterdir()):
         if not d.is_dir():

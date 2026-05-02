@@ -1,4 +1,4 @@
-# nik_io.py
+"""h5 io, xcat eric data"""
 import itertools
 import h5py
 import numpy as np
@@ -51,12 +51,7 @@ PATH_META_PREFIX = "/results/kspace/meta/"
 
 
 def load_event(file_path: str, load_images: bool = False, load_coil_maps: bool = False):
-    """
-    Returns:
-      k_np    : complex64 (RO,S,C,T)
-      traj_np : float32  (RO,S,3,T)
-      optional: gt_img, rc_img, gt_tim, rc_tim, coil_maps
-    """
+    """radial event loader"""
     k_np  = h5_load(file_path, PATH_K_DCE)
     traj_np = h5_load(file_path, PATH_TRAJ)
 
@@ -78,21 +73,13 @@ def load_event(file_path: str, load_images: bool = False, load_coil_maps: bool =
 
 
 def load_cartesian_kspace(file_path: str, load_images: bool = False, load_coil_maps: bool = True):
-    """
-    Load fully-sampled Cartesian k-space from XCAT-ERIC simulation.
-
-    Returns dict with:
-      k_cart    : complex64 (T, C, kz, ky, kx)
-      coil_maps : float64  (C, kz, ky_img, kx_img)  if load_coil_maps
-      meta      : dict with matrixRL, matrixAP, matrixFH
-      gt_img    : float32 (n_gt, kz, kx_img, ky_img) if load_images
-    """
+    """cartesian event loader"""
     k_np = h5_load(file_path, PATH_K_DCE)
     k_np = k_np.astype(np.complex64, copy=False)
 
     out = {"k_cart": k_np}
 
-    # Load metadata
+    # metadata
     meta = {}
     with h5py.File(file_path, "r") as f:
         for key in ["matrixRL", "matrixAP", "matrixFH"]:
