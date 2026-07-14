@@ -429,12 +429,13 @@ def main(config_path, data):
 
         train_loss = float(loss.item())
 
-        # validation
+        # validation: plain unweighted MSE so cells with different training
+        # losses remain directly comparable
         if step % eval_every == 0 or step == steps:
             model.eval()
             with torch.no_grad():
                 val_pred = model(x_val)
-                last_val_loss = float(loss_fn(val_pred, y_val).item())
+                last_val_loss = float(F.mse_loss(val_pred, y_val).item())
             model.train()
 
             if last_val_loss < best_val_loss:

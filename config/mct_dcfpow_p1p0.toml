@@ -1,0 +1,68 @@
+[experiment]
+name = "MCT dcf_power=1.0 (dcf on): high-band retention"
+description = "dcf_power sweep to fix model low-pass behavior. dcf_power=1.0 rebalances loss toward k-space periphery. Measures high-band retention vs GT/CS."
+
+[data]
+radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+subsample_frac = 0.7
+
+[model]
+model_family = "wire_coil_t"
+hidden = 384
+depth = 8
+w0 = 62.0
+s0 = 15.0
+coil_embed_dim = 8
+dropout = 0.0
+
+[training]
+steps = 40000
+batch_size = 65536
+optimizer = "Adam"
+lr = 1e-5
+grad_clip = 1.0
+eval_every = 200
+seed = 0
+weight_decay = 0.003
+warmup_steps = 2000
+scheduler_type = "plateau"
+scheduler_patience = 30
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-7
+image_metric_every = 40000
+
+[training.plot]
+plot_every = 40000
+log_scale = true
+
+[loss]
+use_envelope     = true
+use_dcf          = true
+dcf_power        = 1.0
+use_focal        = false
+focal_alpha      = 0.0
+focal_normalize  = true
+focal_log_matrix = false
+focal_warmup_steps = 5000
+
+[normalization]
+dcf_method = "simple_ramp"
+envelope_bins = 128
+envelope_statistic = "weighted_rms"
+envelope_smooth_method = "moving_average"
+envelope_smooth_width = 5
+envelope_floor_fraction = 1e-3
+global_scale_method = "weighted_rms"
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 2000
+
+[wandb]
+watch_interval = 0

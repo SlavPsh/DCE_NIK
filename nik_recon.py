@@ -851,3 +851,193 @@ def coil_combine_sense(coil_images, sensitivity_maps):
 def coil_combine_rss(coil_images):
     """rss combine"""
     return np.sqrt(np.sum(np.abs(coil_images) ** 2, axis=0))
+
+
+def make_multicoil_time_radial_dataset(
+    k_img_space,
+    traj_t,
+    scales,
+    dims,
+    *,
+    z_slice_idx: int = 0,
+    n_slices: int = None,
+    compute_device: str = "cuda",
+    spoke_timing_dce=None,
+    t_max_ms: float = None,
+):
+    """multicoil radial across all time frames
+
+    layout:
+        x_all:        (N, 2)   kx, ky (radial-scaled, same as single-frame builder)
+        t_all:        (N,)     normalized time in [-1, 1]
+        coil_all:     (N,)     coil index 0..C-1 (long)
+        y_all:        (N, 2)   Re/Im (raw, pre-normalization)
+        spoke_id_all: (N,)     unique spoke id per frame (same spoke across t/c keeps same id)
+        ro_id_all:    (N,)
+        frame_id_all: (N,)     frame index 0..T-1 (useful for splits if needed)
+
+    time encoding:
+        if spoke_timing_dce is provided (shape (S, T) in ms), each spoke uses its actual
+        continuous acquisition time, normalized by t_max_ms to [-1, 1]. all RO points within
+        a spoke share that time (spoke is acquired in one TR).
+        otherwise falls back to bin-index time: t_norm = (t_idx / (T-1)) * 2 - 1.
+    """
+    sx, sy, _ = scales
+    T, S, C, RO = dims
+    dev_data = k_img_space.device
+    dev_compute = torch.device(compute_device)
+
+    if n_slices is None:
+        kz_vals = traj_t[0, :, 2, 0]
+        n_slices = len(torch.unique(kz_vals))
+
+    z_slice_idx = int(max(0, min(int(z_slice_idx), int(n_slices - 1))))
+    indices = torch.arange(0, S, n_slices, device=traj_t.device)
+    n_ro_per_slice = int(indices.numel())
+
+    parts_x   = []
+    parts_t   = []
+    parts_c   = []
+    parts_y   = []
+    parts_sp  = []
+    parts_ro  = []
+    parts_fr  = []
+
+    spoke_grid = torch.arange(n_ro_per_slice, device=dev_data, dtype=torch.long)[:, None].expand(n_ro_per_slice, RO).reshape(-1)
+    ro_grid    = torch.arange(RO,             device=dev_data, dtype=torch.long)[None, :].expand(n_ro_per_slice, RO).reshape(-1)
+
+    # per-spoke continuous timing if available
+    use_continuous_t = spoke_timing_dce is not None
+    if use_continuous_t:
+        if isinstance(spoke_timing_dce, np.ndarray):
+            spoke_timing_dce_t = torch.from_numpy(spoke_timing_dce).to(dev_data, dtype=torch.float32)
+        else:
+            spoke_timing_dce_t = spoke_timing_dce.to(dev_data, dtype=torch.float32)
+        if t_max_ms is None or t_max_ms <= 0:
+            t_max_ms = float(spoke_timing_dce_t.max().item())
+
+    for t_idx in range(T):
+        kx = (traj_t[t_idx, indices, 0, :] / sx).reshape(-1)
+        ky = (traj_t[t_idx, indices, 1, :] / sy).reshape(-1)
+        N_tc = kx.numel()
+        if use_continuous_t:
+            # one time per spoke (all RO points share it), broadcast across RO axis
+            t_ms_per_spoke = spoke_timing_dce_t[indices, t_idx]                       # (n_ro_per_slice,)
+            t_norm_grid = (t_ms_per_spoke / t_max_ms) * 2.0 - 1.0                     # (n_ro_per_slice,)
+            t_col = t_norm_grid[:, None].expand(n_ro_per_slice, RO).reshape(-1)       # (n_ro_per_slice * RO,)
+        else:
+            t_norm = (float(t_idx) / max(T - 1, 1)) * 2.0 - 1.0
+            t_col = torch.full((N_tc,), t_norm, device=dev_data, dtype=torch.float32)
+        for c in range(C):
+            y_c = k_img_space[t_idx, :, c, z_slice_idx, :].reshape(-1)
+            parts_x.append(torch.stack([kx, ky], dim=1).float())
+            parts_t.append(t_col.clone().to(torch.float32))
+            parts_c.append(torch.full((N_tc,), c,      device=dev_data, dtype=torch.long))
+            parts_y.append(torch.view_as_real(y_c).float())
+            parts_sp.append(spoke_grid.clone())
+            parts_ro.append(ro_grid.clone())
+            parts_fr.append(torch.full((N_tc,), t_idx, device=dev_data, dtype=torch.long))
+
+    x_all        = torch.cat(parts_x,  dim=0)
+    t_all        = torch.cat(parts_t,  dim=0)
+    coil_all     = torch.cat(parts_c,  dim=0)
+    y_all        = torch.cat(parts_y,  dim=0)
+    spoke_id_all = torch.cat(parts_sp, dim=0)
+    ro_id_all    = torch.cat(parts_ro, dim=0)
+    frame_id_all = torch.cat(parts_fr, dim=0)
+
+    non_block = (dev_data.type == "cuda" and dev_compute.type == "cuda")
+    x_all        = x_all.to(dev_compute,        non_blocking=non_block)
+    t_all        = t_all.to(dev_compute,        non_blocking=non_block)
+    coil_all     = coil_all.to(dev_compute,     non_blocking=non_block)
+    y_all        = y_all.to(dev_compute,        non_blocking=non_block)
+    spoke_id_all = spoke_id_all.to(dev_compute, non_blocking=non_block)
+    ro_id_all    = ro_id_all.to(dev_compute,    non_blocking=non_block)
+    frame_id_all = frame_id_all.to(dev_compute, non_blocking=non_block)
+
+    meta = {
+        "T": int(T), "n_coils": int(C),
+        "z_slice_idx": int(z_slice_idx), "n_slices": int(n_slices),
+        "n_ro_per_slice": n_ro_per_slice, "RO": int(RO),
+        "N": int(x_all.shape[0]),
+        "use_continuous_t": bool(use_continuous_t),
+        "t_max_ms": float(t_max_ms) if use_continuous_t else None,
+    }
+    return x_all, t_all, coil_all, y_all, spoke_id_all, ro_id_all, frame_id_all, meta
+
+
+def make_multicoil_time_cartesian_dataset(
+    k_cart_z,
+    *,
+    z_slice_idx: int = 0,
+    scales_radial,
+    compute_device: str = "cuda",
+    frame_times_ms=None,
+    t_max_ms: float = None,
+):
+    """multicoil cartesian eval across all time frames
+
+    layout matches make_multicoil_time_radial_dataset
+
+    time encoding:
+        if frame_times_ms is provided (1-D, length T, in ms), each frame's t_norm is its
+        DCE-bin center time normalized by t_max_ms. used to match the continuous time axis
+        the radial side uses. otherwise falls back to bin-index time.
+    """
+    sx, sy, _ = scales_radial
+    dev = torch.device(compute_device)
+
+    T, C, nz, nky, nkx = k_cart_z.shape
+    z_slice_idx = int(max(0, min(int(z_slice_idx), nz - 1)))
+
+    # true FFT grid (matches the fftshift(fftn(...)) used in synthesis and the
+    # validated single-coil make_cartesian_eval_dataset). NOT linspace(-0.5,0.5,N):
+    # that grid is endpoint-inclusive (spacing 1/(N-1), no DC sample, half-sample
+    # offset) and warps the recon -> sharp center, blurred periphery.
+    kx_lin = torch.fft.fftshift(torch.fft.fftfreq(nkx, device=dev, dtype=torch.float32))
+    ky_lin = torch.fft.fftshift(torch.fft.fftfreq(nky, device=dev, dtype=torch.float32))
+    KY, KX = torch.meshgrid(ky_lin, kx_lin, indexing="ij")
+    sx_f = float(sx.item()) if torch.is_tensor(sx) else float(sx)
+    sy_f = float(sy.item()) if torch.is_tensor(sy) else float(sy)
+    x_grid = torch.stack([KX.reshape(-1) / sx_f, KY.reshape(-1) / sy_f], dim=1).float().to(dev)
+    N_per_tc = x_grid.shape[0]
+
+    parts_x = []
+    parts_t = []
+    parts_c = []
+    parts_y = []
+    parts_fr = []
+
+    use_continuous_t = frame_times_ms is not None and t_max_ms is not None and t_max_ms > 0
+    if use_continuous_t:
+        if isinstance(frame_times_ms, np.ndarray):
+            frame_times_ms_t = torch.from_numpy(frame_times_ms).reshape(-1).to(dev, dtype=torch.float32)
+        else:
+            frame_times_ms_t = frame_times_ms.reshape(-1).to(dev, dtype=torch.float32)
+
+    for t_idx in range(T):
+        if use_continuous_t:
+            t_norm = float((frame_times_ms_t[t_idx] / t_max_ms) * 2.0 - 1.0)
+        else:
+            t_norm = (float(t_idx) / max(T - 1, 1)) * 2.0 - 1.0
+        for c in range(C):
+            k_slice = k_cart_z[t_idx, c, z_slice_idx, :, :].reshape(-1)
+            parts_x.append(x_grid)
+            parts_t.append(torch.full((N_per_tc,), t_norm, device=dev, dtype=torch.float32))
+            parts_c.append(torch.full((N_per_tc,), c,      device=dev, dtype=torch.long))
+            parts_y.append(torch.view_as_real(k_slice).float().to(dev))
+            parts_fr.append(torch.full((N_per_tc,), t_idx, device=dev, dtype=torch.long))
+
+    x_cart        = torch.cat(parts_x,  dim=0)
+    t_cart        = torch.cat(parts_t,  dim=0)
+    coil_cart     = torch.cat(parts_c,  dim=0)
+    y_cart        = torch.cat(parts_y,  dim=0)
+    frame_id_cart = torch.cat(parts_fr, dim=0)
+
+    meta = {
+        "nky": int(nky), "nkx": int(nkx), "nz": int(nz),
+        "n_coils": int(C), "T": int(T), "z_slice_idx": int(z_slice_idx),
+        "N_per_tc": int(N_per_tc),
+        "N": int(x_cart.shape[0]),
+    }
+    return x_cart, t_cart, coil_cart, y_cart, frame_id_cart, meta

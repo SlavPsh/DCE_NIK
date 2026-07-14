@@ -1,0 +1,71 @@
+[experiment]
+name = "MCT new-file h384: continuous-t, alpha=0, vs GT/CS"
+description = "First real run on the 181-frame continuous-time sim. Winning recipe: env on, dcf off, no focal, lr=1e-5, h=384 d=8. Eval = model/NUFFT/CS vs bare GT, with summary + per-frame tables."
+
+[data]
+radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+subsample_frac = 0.7
+
+[model]
+model_family = "wire_coil_t"
+hidden = 384
+depth = 8
+w0 = 62.0
+s0 = 15.0
+coil_embed_dim = 8
+dropout = 0.0
+
+[training]
+# batch bumped 16384 -> 65536 (4x). model is launch-bound at small batch, so the
+# bigger batch is near-free per step; steps cut 4x to match total samples seen
+# (150000*16384 == ~40000*65536) -> faster wall-clock for equal data exposure.
+steps = 40000
+batch_size = 65536
+optimizer = "Adam"
+lr = 1e-5                 # back to 1e-5: 2e-5 overfit the sparse per-frame data too fast
+grad_clip = 1.0
+eval_every = 200
+seed = 0
+weight_decay = 0.003
+warmup_steps = 2000       # best-state gate lowered so we capture the early heldout minimum
+scheduler_type = "plateau"
+scheduler_patience = 30
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-7
+image_metric_every = 40000
+
+[training.plot]
+plot_every = 40000
+log_scale = true
+
+[loss]
+use_envelope     = true
+use_dcf          = false
+dcf_power        = 0.0
+use_focal        = false
+focal_alpha      = 0.0
+focal_normalize  = true
+focal_log_matrix = false
+focal_warmup_steps = 5000
+
+[normalization]
+dcf_method = "simple_ramp"
+envelope_bins = 128
+envelope_statistic = "weighted_rms"
+envelope_smooth_method = "moving_average"
+envelope_smooth_width = 5
+envelope_floor_fraction = 1e-3
+global_scale_method = "weighted_rms"
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 2000
+
+[wandb]
+watch_interval = 0

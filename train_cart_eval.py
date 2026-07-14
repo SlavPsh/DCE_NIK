@@ -17,7 +17,7 @@ from utils.io_utils import (
 )
 from utils.wandb_utils import WandbLogger
 
-from nik_io import load_event, load_cartesian_kspace
+from nik_io import load_event, synthesize_cartesian_from_radial
 from nik_model import (
     NIK_SIREN_KXY_REIM,
     NIK_SIREN_KXY_FF_REIM,
@@ -33,6 +33,7 @@ from nik_loss import get_loss_fn
 from nik_train import prepare_tensors
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 from losses import weighted_complex_mse
+from nik_focal_loss import composable_kspace_loss, split_residual_norm_by_k, _residual_magsq
 from nik_recon import (
     ifft1d_kz_to_z,
     make_fixed_frame_zslice_coil_dataset,
@@ -52,7 +53,6 @@ def load_data(config):
     """radial train, cart eval data"""
     data_cfg = config['data']
     radial_file = data_cfg['radial_file']
-    cart_file = data_cfg['cartesian_file']
     t_frame = data_cfg['t_frame']
     coil_idx = data_cfg['coil_idx']
     z_slice_raw = data_cfg['z_slice_idx']
@@ -112,9 +112,9 @@ def load_data(config):
     print(f"Spoke subsampling: {n_train_spokes}/{n_unique_spokes} spokes "
           f"({subsample_frac:.0%}), {train_idx.shape[0]} points", flush=True)
 
-    # cartesian data
-    print(f"Loading Cartesian data from {cart_file} ...", flush=True)
-    cart_event = load_cartesian_kspace(cart_file, load_images=True, load_coil_maps=True)
+    # cartesian data: synthesize from radial gt_img + coil_maps + SP
+    print(f"Synthesizing Cartesian k-space from radial file ({T} DCE bins) ...", flush=True)
+    cart_event = synthesize_cartesian_from_radial(radial_file, T_target=T, event=event)
     k_cart_np = cart_event["k_cart"]
     coil_maps_cart = cart_event.get("coil_maps")
 
@@ -194,6 +194,7 @@ def main(config_path, data):
         "n_angular_modes": config['model'].get('n_angular_modes', 16),
         "radial_type": config['model'].get('radial_type', 'wire'),
         "dropout": config['model'].get('dropout', 0.0),
+        "envelope_smooth_method": config.get('normalization', {}).get('envelope_smooth_method', 'moving_average'),
         "optimizer": config['training']['optimizer'],
         "lr": config['training']['lr'],
         "batch_size": config['training']['batch_size'],
@@ -269,12 +270,26 @@ def main(config_path, data):
     nky, nkx = meta_cart["nky"], meta_cart["nkx"]
     ref_img_slice = data.get("ref_img_slice")
 
-    # normalization
-    use_envelope = bool(getattr(wc, "use_envelope", config.get('normalization', {}).get('use_envelope', True)))
-    use_dcf = bool(getattr(wc, "use_dcf", config.get('normalization', {}).get('use_dcf', True)))
+    # loss + normalization config
+    # priority: [loss] block (new), then [normalization] block (legacy), then defaults
+    loss_cfg = config.get('loss', {})
     norm_cfg = config.get('normalization', {})
+
+    def _loss_or_norm(name, default):
+        # prefer wandb.config sweep override, then [loss], then [normalization]
+        return getattr(wc, name, loss_cfg.get(name, norm_cfg.get(name, default)))
+
+    use_envelope     = bool(_loss_or_norm('use_envelope', True))
+    use_dcf          = bool(_loss_or_norm('use_dcf', True))
+    dcf_power        = float(_loss_or_norm('dcf_power', 0.0))
+    use_focal        = bool(_loss_or_norm('use_focal', False))
+    focal_alpha      = float(_loss_or_norm('focal_alpha', 1.0))
+    focal_normalize  = bool(_loss_or_norm('focal_normalize', True))
+    focal_log_matrix = bool(_loss_or_norm('focal_log_matrix', False))
+    focal_warmup_steps = int(_loss_or_norm('focal_warmup_steps', 1000))
     dcf_method = norm_cfg.get('dcf_method', 'simple_ramp')
-    dcf_power = float(getattr(wc, "dcf_power", norm_cfg.get('dcf_power', 0.7)))
+    envelope_smooth_method = str(getattr(wc, "envelope_smooth_method",
+        norm_cfg.get('envelope_smooth_method', 'moving_average')))
 
     # resubsample
     if subsample_frac != data["subsample_frac"]:
@@ -306,7 +321,7 @@ def main(config_path, data):
             kcoords_train, y_train_raw_for_norm, dcf=dcf_train_for_norm,
             envelope_bins=norm_cfg.get('envelope_bins', 128),
             envelope_statistic=norm_cfg.get('envelope_statistic', 'weighted_rms'),
-            envelope_smooth_method=norm_cfg.get('envelope_smooth_method', 'moving_average'),
+            envelope_smooth_method=envelope_smooth_method,
             envelope_smooth_width=norm_cfg.get('envelope_smooth_width', 5),
             envelope_floor_fraction=norm_cfg.get('envelope_floor_fraction', 1e-3),
             global_scale_method=norm_cfg.get('global_scale_method', 'weighted_rms'),
@@ -331,10 +346,16 @@ def main(config_path, data):
     logging.info(
         f"Normalization: fit_on_train_only=True, use_envelope={use_envelope}, "
         f"use_dcf={use_dcf}, dcf_power={dcf_power}, "
+        f"use_focal={use_focal}, focal_alpha={focal_alpha}, "
+        f"focal_log_matrix={focal_log_matrix}, focal_normalize={focal_normalize}, "
+        f"focal_warmup_steps={focal_warmup_steps}, "
         f"global_scale={normalizer.global_scale:.4f}"
     )
     wandb.config.update({
         "use_envelope": use_envelope, "use_dcf": use_dcf, "dcf_power": dcf_power,
+        "use_focal": use_focal, "focal_alpha": focal_alpha,
+        "focal_normalize": focal_normalize, "focal_log_matrix": focal_log_matrix,
+        "focal_warmup_steps": focal_warmup_steps,
         "normalizer_fit_on_train_only": True,
     }, allow_val_change=True)
 
@@ -486,7 +507,8 @@ def main(config_path, data):
 
     # training loop
     model.train()
-    best_cart_loss = float("inf")
+    best_heldout_loss = float("inf")
+    best_step = -1
     best_cart_loss_in_disk = float("inf")
     best_state = None
     last_cart_loss = None
@@ -497,6 +519,7 @@ def main(config_path, data):
                  f"eval on {meta_cart['N']} Cartesian points "
                  f"({n_cart_in_disk} in-disk)")
 
+    diag_every = max(1, eval_every)
     for step in range(1, steps + 1):
         # train step
         idx = torch.randint(0, N_train, (batch_size,), device=device)
@@ -506,7 +529,30 @@ def main(config_path, data):
 
         opt.zero_grad(set_to_none=True)
         y_pred = model(x)
-        loss = weighted_complex_mse(y_pred, y, weights=w, power=dcf_power)
+
+        focal_progress = (
+            min(1.0, step / float(focal_warmup_steps)) if focal_warmup_steps > 0 else 1.0
+        )
+        want_diag = (step % diag_every == 0 or step == steps or step == 1)
+        if want_diag:
+            loss, focal_diag = composable_kspace_loss(
+                y_pred, y,
+                dcf=w, use_dcf=use_dcf, dcf_power=dcf_power,
+                use_focal=use_focal, focal_alpha=focal_alpha,
+                focal_normalize=focal_normalize, focal_log_matrix=focal_log_matrix,
+                focal_warmup_progress=focal_progress,
+                return_diagnostics=True,
+            )
+        else:
+            loss = composable_kspace_loss(
+                y_pred, y,
+                dcf=w, use_dcf=use_dcf, dcf_power=dcf_power,
+                use_focal=use_focal, focal_alpha=focal_alpha,
+                focal_normalize=focal_normalize, focal_log_matrix=focal_log_matrix,
+                focal_warmup_progress=focal_progress,
+                return_diagnostics=False,
+            )
+            focal_diag = None
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         opt.step()
@@ -533,19 +579,34 @@ def main(config_path, data):
                     last_heldout_loss = None
             model.train()
 
-            # post warmup checkpoint
+            # post warmup checkpoint, heldout selection
             warmup_steps = config['training'].get('warmup_steps', steps // 5)
-            if step >= warmup_steps and last_cart_loss_in_disk < best_cart_loss:
-                best_cart_loss = last_cart_loss_in_disk
+            if (step >= warmup_steps and last_heldout_loss is not None
+                    and last_heldout_loss < best_heldout_loss):
+                best_heldout_loss = last_heldout_loss
+                best_step = step
                 best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
             if step >= warmup_steps:
                 best_cart_loss_in_disk = min(best_cart_loss_in_disk, last_cart_loss_in_disk)
 
             if scheduler is not None and scheduler_type == "plateau":
-                scheduler.step(last_cart_loss_in_disk)
+                # prefer heldout spoke loss (same signal as best-state restore);
+                # fall back to cart-eval-in-disk when subsample_frac=1.0 leaves no heldout
+                sched_metric = last_heldout_loss if last_heldout_loss is not None else last_cart_loss_in_disk
+                scheduler.step(sched_metric)
 
         # logging
         log_dict = {"train/train_loss": train_loss}
+        if focal_diag is not None:
+            for k, v in focal_diag.items():
+                log_dict[f"train/{k}"] = v
+            log_dict["train/focal_progress"] = focal_progress
+            # low/high |k| residual split (using batch kcoords)
+            with torch.no_grad():
+                r_magsq = _residual_magsq(y_pred.detach(), y)
+                kr_split = split_residual_norm_by_k(r_magsq, x[:, :2])
+                for k_, v_ in kr_split.items():
+                    log_dict[f"train/{k_}"] = v_
         if step % eval_every == 0 or step == steps:
             log_dict["train/cart_eval_loss"] = last_cart_loss
             log_dict["train/cart_eval_loss_full"] = last_cart_loss
@@ -678,6 +739,9 @@ def main(config_path, data):
     # restore best, eval
     if best_state is not None:
         model.load_state_dict(best_state)
+        logging.info(f"Loaded best model from step {best_step}, heldout_loss={best_heldout_loss:.4e}")
+    else:
+        logging.info("No best checkpoint, using final state")
     model.eval()
 
     # normalizer reuse
@@ -897,7 +961,8 @@ def main(config_path, data):
     # save model
     wandb_logger.save_model(model, "model_best.pth", opt, steps, output_dir)
 
-    wandb.run.summary["cart_eval_loss"] = best_cart_loss
+    wandb.run.summary["best_heldout_spoke_loss"] = best_heldout_loss
+    wandb.run.summary["best_step"] = best_step
     wandb.run.summary["best_cart_eval_loss_in_disk"] = best_cart_loss_in_disk
     wandb.run.summary["final_cart_eval_loss"] = final_cart_loss
     wandb.run.summary["final_cart_eval_loss_in_disk"] = final_cart_loss_in_disk
@@ -907,7 +972,7 @@ def main(config_path, data):
     wandb.run.summary["total_steps"] = steps
 
     logging.info(
-        f"Done. best_cart_eval_loss={best_cart_loss:.3e}  "
+        f"Done. best_heldout_spoke_loss={best_heldout_loss:.3e}  "
         f"best_cart_eval_loss_in_disk={best_cart_loss_in_disk:.3e}"
     )
     wandb_logger.finish()

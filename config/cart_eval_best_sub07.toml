@@ -1,6 +1,6 @@
 [experiment]
-name = "best wire single coil, sub 0.7"
-description = "single frame single coil wire fit, best params from prior sweep, heldout and cartesian validation"
+name = "wire shallow high w0, sub 0.3, 30k steps"
+description = "single frame single coil wire, shallow depth 4 6, high w0 55 77 100, sub 0.3, no dropout"
 
 [data]
 radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
@@ -8,22 +8,23 @@ cartesian_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_2
 t_frame = 0
 coil_idx = 0
 z_slice_idx = -1
-subsample_frac = 0.7
+subsample_frac = 0.5
 
 [model]
 model_family = "wire"
 hidden = 64
-depth = 6
-w0 = 55.0
-s0 = 18.0
+depth = 4
+w0 = 77.0
+s0 = 14.0
+dropout = 0.0
 
 [training]
-steps = 8000
+steps = 10000
 batch_size = 4096
 optimizer = "Adam"
 lr = 1e-4
 grad_clip = 1.0
-eval_every = 100
+eval_every = 200
 seed = 0
 loss_type = "mse"
 weight_decay = 0.003
@@ -33,7 +34,7 @@ scheduler_factor = 0.5
 scheduler_min_lr = 1e-6
 
 [training.plot]
-plot_every = 5000
+plot_every = 1000
 log_scale = true
 
 [normalization]
@@ -59,15 +60,21 @@ console_every = 100
 watch_interval = 0
 
 [sweep]
-name = "best wire single coil at sub 0.7, 2 seeds"
+name = "wire shallow high w0, sub 0.5, 30k steps"
 entity = "spshenov-university-of-amsterdam"
 project = "NIK-DCE-MRI-CartEval"
 method = "grid"
-run_cap = 2
+run_cap = 12
 
 [sweep.metric]
 name = "cart_eval_loss"
 goal = "minimize"
 
-[sweep.parameters.seed]
-values = [0, 1]
+[sweep.parameters.depth]
+values = [4, 6]
+
+[sweep.parameters.w0]
+values = [55.0, 77.0, 100.0]
+
+[sweep.parameters.s0]
+values = [14.0, 18.0]

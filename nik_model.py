@@ -130,6 +130,102 @@ class WIRE_KXY_REIM(nn.Module):
         return self.head(h)
 
 
+class WIRE_KXY_COIL_T_REIM(nn.Module):
+    """wire kspace with coil embedding and time, reim output
+
+    forward signature:
+        kcoords:  (N, 2)        kx, ky in radial-scaled units
+        t:        (N,)          normalized time in [-1, 1]
+        coil_idx: (N,) long     coil index in [0, n_coils)
+
+    returns:  (N, 2)  Re/Im of predicted single-coil k-space value
+    """
+    def __init__(
+        self,
+        *,
+        n_coils: int,
+        coil_embed_dim: int = 8,
+        hidden: int = 64,
+        depth: int = 8,
+        w0: float = 20.0,
+        s0: float = 10.0,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        if n_coils < 1:
+            raise ValueError(f"n_coils must be >= 1, got {n_coils}")
+        self.n_coils = int(n_coils)
+        self.coil_embed_dim = int(coil_embed_dim)
+
+        self.coil_embed = nn.Embedding(self.n_coils, self.coil_embed_dim)
+        nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
+
+        in_dim = 2 + 1 + self.coil_embed_dim   # kx, ky, t, coil_embed
+        self.backbone_model = WIRE_KXY_REIM(
+            in_dim=in_dim, hidden=hidden, depth=depth,
+            w0=w0, s0=s0, out_dim=2, dropout=dropout,
+        )
+
+    def forward(self, kcoords: torch.Tensor, t: torch.Tensor, coil_idx: torch.Tensor) -> torch.Tensor:
+        if kcoords.ndim != 2 or kcoords.shape[-1] != 2:
+            raise ValueError(f"kcoords must be (N, 2), got {tuple(kcoords.shape)}")
+        N = kcoords.shape[0]
+        t = t.reshape(N, 1).to(kcoords.dtype)
+        ce = self.coil_embed(coil_idx.long())          # (N, coil_embed_dim)
+        x = torch.cat([kcoords, t, ce], dim=-1)        # (N, 2 + 1 + coil_embed_dim)
+        return self.backbone_model(x)
+
+
+class WIRE_KXYZ_COIL_T_REIM(nn.Module):
+    """wire kspace with kz coordinate, coil embedding and time, reim output
+
+    3D stack-of-stars variant of WIRE_KXY_COIL_T_REIM. takes kz as a network input
+    (no separable kz to z ifft beforehand), so it fits rotated stacks where the
+    in-plane angle depends on the partition.
+
+    forward signature:
+        kcoords:  (N, 3)        kx, ky, kz in normalized units (each in [-0.5, 0.5])
+        t:        (N,)          normalized time (pipeline uses [-1, 1])
+        coil_idx: (N,) long     coil index in [0, n_coils)
+
+    returns:  (N, 2)  Re/Im of predicted single-coil k-space value
+    """
+    def __init__(
+        self,
+        *,
+        n_coils: int,
+        coil_embed_dim: int = 8,
+        hidden: int = 64,
+        depth: int = 8,
+        w0: float = 20.0,
+        s0: float = 10.0,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        if n_coils < 1:
+            raise ValueError(f"n_coils must be >= 1, got {n_coils}")
+        self.n_coils = int(n_coils)
+        self.coil_embed_dim = int(coil_embed_dim)
+
+        self.coil_embed = nn.Embedding(self.n_coils, self.coil_embed_dim)
+        nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
+
+        in_dim = 3 + 1 + self.coil_embed_dim   # kx, ky, kz, t, coil_embed
+        self.backbone_model = WIRE_KXY_REIM(
+            in_dim=in_dim, hidden=hidden, depth=depth,
+            w0=w0, s0=s0, out_dim=2, dropout=dropout,
+        )
+
+    def forward(self, kcoords: torch.Tensor, t: torch.Tensor, coil_idx: torch.Tensor) -> torch.Tensor:
+        if kcoords.ndim != 2 or kcoords.shape[-1] != 3:
+            raise ValueError(f"kcoords must be (N, 3), got {tuple(kcoords.shape)}")
+        N = kcoords.shape[0]
+        t = t.reshape(N, 1).to(kcoords.dtype)
+        ce = self.coil_embed(coil_idx.long())          # (N, coil_embed_dim)
+        x = torch.cat([kcoords, t, ce], dim=-1)        # (N, 3 + 1 + coil_embed_dim)
+        return self.backbone_model(x)
+
+
 class NIK_SIREN(nn.Module):
     def __init__(self, n_coils, k_freq=96, t_freq=16, k_sigma=6.0, t_sigma=3.0,
                  coil_emb=16, hidden=256, depth=7, w0=30.0):

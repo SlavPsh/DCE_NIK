@@ -1,0 +1,65 @@
+[experiment]
+name = "FFL ablation C: full stack (env=on, dcf=on, focal=on)"
+description = "Cell C: envelope=true, dcf=true (power=1), focal=true, log_matrix=false."
+
+[data]
+radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260326T114914_rad.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+subsample_frac = 0.7
+
+[model]
+model_family = "wire"
+hidden = 64
+depth = 8
+w0 = 62.0
+s0 = 10.0
+
+[training]
+steps = 20000
+batch_size = 4096
+optimizer = "Adam"
+lr = 1e-4
+grad_clip = 1.0
+eval_every = 100
+seed = 0
+loss_type = "mse"
+weight_decay = 0.003
+warmup_steps = 4000
+scheduler_patience = 50
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-6
+
+[training.plot]
+plot_every = 2000
+log_scale = true
+
+[loss]
+use_envelope     = true
+use_dcf          = true
+dcf_power        = 1.0
+use_focal        = true
+focal_alpha      = 1.0
+focal_normalize  = true
+focal_log_matrix = false
+focal_warmup_steps = 1000
+
+[normalization]
+dcf_method = "simple_ramp"
+envelope_bins = 128
+envelope_statistic = "weighted_rms"
+envelope_smooth_method = "moving_average"
+envelope_smooth_width = 5
+envelope_floor_fraction = 1e-3
+global_scale_method = "weighted_rms"
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 100
+
+[wandb]
+watch_interval = 0

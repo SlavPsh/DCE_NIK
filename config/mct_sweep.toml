@@ -1,0 +1,91 @@
+[experiment]
+name = "MCT sweep: width/depth/s0/w0"
+description = "Multicoil+time NIK, fixed cell-D loss (env=on, dcf=off, focal=on, alpha=1.5). Grid sweep over WIRE capacity (hidden, depth) and activation params (s0, w0). lr=3e-4, plateau scheduler, 50k steps."
+
+[data]
+radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260511T113026.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+subsample_frac = 0.7
+
+[model]
+model_family = "wire_coil_t"
+hidden = 128
+depth = 8
+w0 = 45.0
+s0 = 10.0
+coil_embed_dim = 8
+dropout = 0.0
+
+[training]
+steps = 50000
+batch_size = 16384
+optimizer = "Adam"
+lr = 3e-4
+grad_clip = 1.0
+eval_every = 200
+seed = 0
+weight_decay = 0.003
+warmup_steps = 10000
+scheduler_type = "plateau"
+scheduler_patience = 50
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-6
+image_metric_every = 5000
+
+[training.plot]
+plot_every = 10000
+log_scale = true
+
+[loss]
+use_envelope     = true
+use_dcf          = false
+dcf_power        = 0.0
+use_focal        = true
+focal_alpha      = 1.5
+focal_normalize  = true
+focal_log_matrix = false
+focal_warmup_steps = 2000
+
+[normalization]
+dcf_method = "simple_ramp"
+envelope_bins = 128
+envelope_statistic = "weighted_rms"
+envelope_smooth_method = "moving_average"
+envelope_smooth_width = 5
+envelope_floor_fraction = 1e-3
+global_scale_method = "weighted_rms"
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 500
+
+[wandb]
+watch_interval = 0
+
+# 2 x 2 x 2 x 2 = 16-config grid over capacity + activation params
+[sweep]
+name = "MCT width/depth/s0/w0 grid"
+entity = "spshenov-university-of-amsterdam"
+project = "DCE_NIK"
+method = "grid"
+
+[sweep.metric]
+name = "model_psnr_mean"
+goal = "maximize"
+
+[sweep.parameters.hidden]
+values = [128, 192]
+
+[sweep.parameters.depth]
+values = [8, 10]
+
+[sweep.parameters.s0]
+values = [10.0, 15.0]
+
+[sweep.parameters.w0]
+values = [45.0, 62.0]

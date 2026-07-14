@@ -1,0 +1,68 @@
+[experiment]
+name = "MCT v3 array: h=128 d=8 lr=3e-5"
+description = "MCT array job, fresh GPU per task. Cell-D loss alpha=1.5, w0=62 s0=15, batch=16384, 80k steps, plateau scheduler on heldout. Move toward promising direction: lower lr, more capacity, more steps."
+
+[data]
+radial_file = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260511T113026.mat"
+t_frame = 0
+coil_idx = 0
+z_slice_idx = -1
+subsample_frac = 0.7
+
+[model]
+model_family = "wire_coil_t"
+hidden = 128
+depth = 8
+w0 = 62.0
+s0 = 15.0
+coil_embed_dim = 8
+dropout = 0.0
+
+[training]
+steps = 80000
+batch_size = 16384
+optimizer = "Adam"
+lr = 3e-05
+grad_clip = 1.0
+eval_every = 500
+seed = 0
+weight_decay = 0.003
+warmup_steps = 16000
+scheduler_type = "plateau"
+scheduler_patience = 30
+scheduler_factor = 0.5
+scheduler_min_lr = 1e-7
+image_metric_every = 10000
+
+[training.plot]
+plot_every = 20000
+log_scale = true
+
+[loss]
+use_envelope     = true
+use_dcf          = false
+dcf_power        = 0.0
+use_focal        = true
+focal_alpha      = 1.5
+focal_normalize  = true
+focal_log_matrix = false
+focal_warmup_steps = 3000
+
+[normalization]
+dcf_method = "simple_ramp"
+envelope_bins = 128
+envelope_statistic = "weighted_rms"
+envelope_smooth_method = "moving_average"
+envelope_smooth_width = 5
+envelope_floor_fraction = 1e-3
+global_scale_method = "weighted_rms"
+
+[output]
+base_path = "/scratch/rnga/vvpshenov/DCE_NIK/runs"
+
+[logging]
+level = "INFO"
+console_every = 1000
+
+[wandb]
+watch_interval = 0
