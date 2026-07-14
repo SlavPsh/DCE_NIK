@@ -241,6 +241,10 @@ class KSpaceNormalizer:
     def __init__(self):
         self.envelope: Optional[RadialEnvelope] = None
         self.global_scale: float = 1.0
+        # envelope whitening strength. divide by a(r)^alpha. 1.0 = full whitening (every
+        # radial shell forced to unit rms, amplifies the noisy high-|k| periphery). <1.0 =
+        # softer, leaves the low-snr periphery at lower scale so it carries less loss weight.
+        self.envelope_exponent: float = 1.0
         self._fitted = False
 
     def fit(
@@ -253,10 +257,12 @@ class KSpaceNormalizer:
         envelope_smooth_method: str = "moving_average",
         envelope_smooth_width: int = 5,
         envelope_floor_fraction: float = 1e-3,
+        envelope_exponent: float = 1.0,
         global_scale_method: str = "weighted_rms",
         eps: float = 1e-8,
     ):
         """fit normalizer"""
+        self.envelope_exponent = float(envelope_exponent)
         y_c = _to_complex(y_radial)
         # rss for envelope
         y_mag_for_envelope = _rss_magnitude(y_c)
@@ -274,9 +280,9 @@ class KSpaceNormalizer:
             eps=eps,
         )
 
-        # step 2, envelope divide
+        # step 2, envelope divide (soft: a(r)^alpha)
         r = compute_radius(kcoords_radial)
-        a_r = self.envelope.evaluate(r).to(y_c.device)
+        a_r = self.envelope.evaluate(r).to(y_c.device) ** self.envelope_exponent
         y_env_corrected_mag = y_mag_for_envelope / (a_r + eps)
 
         # step 3, global scale
@@ -296,7 +302,7 @@ class KSpaceNormalizer:
         y_c = _to_complex(y)
 
         r = compute_radius(kcoords)
-        a_r = self.envelope.evaluate(r).to(y_c.device)
+        a_r = self.envelope.evaluate(r).to(y_c.device) ** self.envelope_exponent
         pointwise_scale = a_r * self.global_scale
 
         # multicoil broadcast
@@ -315,7 +321,7 @@ class KSpaceNormalizer:
         y_c = _to_complex(y_tilde)
 
         r = compute_radius(kcoords)
-        a_r = self.envelope.evaluate(r).to(y_c.device)
+        a_r = self.envelope.evaluate(r).to(y_c.device) ** self.envelope_exponent
         pointwise_scale = a_r * self.global_scale
 
         # multicoil broadcast
@@ -329,7 +335,7 @@ class KSpaceNormalizer:
         """pointwise scale"""
         assert self._fitted, "Call fit() first"
         r = compute_radius(kcoords)
-        a_r = self.envelope.evaluate(r).to(kcoords.device)
+        a_r = self.envelope.evaluate(r).to(kcoords.device) ** self.envelope_exponent
         return a_r * self.global_scale
 
 
