@@ -1218,3 +1218,83 @@ class WIRE_FF_RES_KXY_COIL_T_REIM(nn.Module):
         for blk in self.blocks:
             h = h + blk(h)                                                            # residual skip
         return self.head(h)
+
+
+# ---------------------------------------------------------------------------
+# Factorized (low-rank) NIK -- experimental. Mirrors CS's PCA temporal subspace,
+# but learned + continuous in t. Rank R is the temporal-DoF knob (sweep R > 5).
+# Does NOT replace WIRE_FF_RES (the working model); it is a separate class.
+# ---------------------------------------------------------------------------
+class WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(nn.Module):
+    """k(x,y,t,coil) = sum_{r=1..R} A_r(x,y,coil) * Phi_r(t)   (complex, rank R).
+
+    A_r  : complex spatial-amplitude maps  -- WIRE(+FF, +residual) backbone on
+           FF(kx,ky) + coil embedding, head -> 2R (R complex amplitudes).
+    Phi_r: complex temporal basis          -- small SIREN on FF(t), head -> 2R.
+           continuous in t, so any frame rate renders for free (like the joint model).
+    forward(kcoords(N,2), t(N,), coil_idx(N,)) -> (N,2) Re/Im  via complex dot over R.
+
+    R -> inf recovers a full-rank model; R small = CS-style denoising. Warm-start
+    Phi from the k-center PCA basis with warmstart_phi() for stable optimization.
+    """
+    def __init__(self, n_coils, coil_embed_dim=8, rank=12, hidden=512, depth=12,
+                 w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5,
+                 ff_seed=0, residual=True, phi_hidden=64, phi_depth=3, phi_w0=30.0):
+        super().__init__()
+        self.rank = int(rank)
+        self.residual = bool(residual)
+        self.coil_embed = nn.Embedding(int(n_coils), int(coil_embed_dim))
+        nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
+        self.ff_k = FourierFeatures(2, n_freq=int(k_freq), sigma=k_sigma, seed=ff_seed)
+        self.ff_t = FourierFeatures(1, n_freq=int(t_freq), sigma=t_sigma, seed=ff_seed)
+        # spatial amplitude net (WIRE Gabor backbone -> 2R)
+        a_in = 2 * int(k_freq) + int(coil_embed_dim)
+        self.a_first = GaborLayer(a_in, hidden, w0=w0, s0=s0, is_first=True)   # -> 2*hidden
+        self.a_blocks = nn.ModuleList([GaborLayer(2 * hidden, hidden, w0=w0, s0=s0)
+                                       for _ in range(max(0, depth - 2))])
+        self.a_head = nn.Linear(2 * hidden, 2 * self.rank)
+        # temporal basis net (small SIREN on FF(t) -> 2R)
+        t_in = 2 * int(t_freq)
+        phi_layers = [SineLayer(t_in, phi_hidden, w0=phi_w0, is_first=True)]
+        for _ in range(max(0, phi_depth - 2)):
+            phi_layers.append(SineLayer(phi_hidden, phi_hidden, w0=phi_w0))
+        self.phi_body = nn.Sequential(*phi_layers)
+        self.phi_head = nn.Linear(phi_hidden, 2 * self.rank)
+
+    def amplitudes(self, kcoords, coil_idx):
+        ec = self.coil_embed(coil_idx.long())
+        h = self.a_first(torch.cat([self.ff_k(kcoords), ec], dim=-1))
+        for blk in self.a_blocks:
+            h = h + blk(h) if self.residual else blk(h)
+        return self.a_head(h).view(-1, self.rank, 2)            # [N,R,2] complex
+
+    def basis(self, t):
+        h = self.phi_body(self.ff_t(t.view(-1, 1)))
+        return self.phi_head(h).view(-1, self.rank, 2)          # [N,R,2] complex
+
+    def forward(self, kcoords, t, coil_idx):
+        A = self.amplitudes(kcoords, coil_idx)
+        P = self.basis(t)
+        a_re, a_im = A[..., 0], A[..., 1]
+        p_re, p_im = P[..., 0], P[..., 1]
+        out_re = (a_re * p_re - a_im * p_im).sum(-1)            # complex dot over R
+        out_im = (a_re * p_im + a_im * p_re).sum(-1)
+        return torch.stack([out_re, out_im], dim=-1)           # [N,2]
+
+
+def warmstart_phi(model, t_frames, phi_pca, steps=800, lr=1e-3, device="cpu"):
+    """Warm-start the temporal-basis net so basis(t) ~ the k-center PCA basis (Option 3 init).
+    t_frames: (F,) normalized frame times in the model's t convention (e.g. 2*ft-1).
+    phi_pca : (F, R) complex target temporal basis. Fits phi_body+phi_head only. In-place."""
+    import torch as _t
+    tt = _t.as_tensor(t_frames, dtype=_t.float32, device=device).view(-1)
+    tgt = _t.stack([_t.as_tensor(phi_pca.real, dtype=_t.float32, device=device),
+                    _t.as_tensor(phi_pca.imag, dtype=_t.float32, device=device)], dim=-1)  # (F,R,2)
+    params = list(model.phi_body.parameters()) + list(model.phi_head.parameters())
+    opt = _t.optim.Adam(params, lr=lr)
+    for _ in range(steps):
+        opt.zero_grad(set_to_none=True)
+        pred = model.basis(tt)                                  # (F,R,2)
+        loss = _t.mean((pred - tgt) ** 2)
+        loss.backward(); opt.step()
+    return float(loss.item())

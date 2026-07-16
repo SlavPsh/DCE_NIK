@@ -32,17 +32,24 @@ torch.set_float32_matmul_precision("high")
 sys.path.insert(0, '/scratch/rnga/vvpshenov/grasp_pro_py')   # nik_output_recon
 import nik_adapter as A
 from nik_model import (WIRE_KXY_COIL_T_REIM, WIRE_FF_KXY_COIL_T_REIM,
-                       WIRE_FF_RES_KXY_COIL_T_REIM)
+                       WIRE_FF_RES_KXY_COIL_T_REIM, WIRE_FF_SUBSPACE_KXY_COIL_T_REIM)
 from kspace_normalization import compute_dcf_radial, compute_radius, KSpaceNormalizer
 from nik_focal_loss import composable_kspace_loss
 from nik_output_recon import recon_nik_cart
 
 
 def build_model(args, ncc):
-    """winning recipe = wire_ff_res (E1-E8 ablation). wire/wire_ff kept for comparison."""
+    """winning recipe = wire_ff_res (E1-E8 ablation). wire/wire_ff kept for comparison.
+    wire_ff_subspace = experimental factorized low-rank model (rank = temporal-DoF knob)."""
     if args.model == 'wire':
         return WIRE_KXY_COIL_T_REIM(n_coils=ncc, coil_embed_dim=args.coil_embed_dim,
                                     hidden=args.hidden, depth=args.depth, w0=args.w0, s0=args.s0)
+    if args.model == 'wire_ff_subspace':
+        return WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(
+            n_coils=ncc, coil_embed_dim=args.coil_embed_dim, rank=args.rank, hidden=args.hidden,
+            depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma,
+            t_freq=args.t_freq, t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True,
+            phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0)
     cls = WIRE_FF_RES_KXY_COIL_T_REIM if args.model == 'wire_ff_res' else WIRE_FF_KXY_COIL_T_REIM
     return cls(n_coils=ncc, coil_embed_dim=args.coil_embed_dim, hidden=args.hidden,
                depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma,
@@ -167,7 +174,13 @@ def main():
     # WIRE + Fourier features + residual skips, depth 12, hidden 512.
     # held-out 0.323, contrast swing 51%, nav-corr 0.885 (CS-70 swing = 37.5%).
     # model
-    ap.add_argument('--model', default='wire_ff_res', choices=['wire', 'wire_ff', 'wire_ff_res'])
+    ap.add_argument('--model', default='wire_ff_res',
+                    choices=['wire', 'wire_ff', 'wire_ff_res', 'wire_ff_subspace'])
+    # factorized low-rank model (--model wire_ff_subspace). rank = temporal-DoF knob (sweep > 5).
+    ap.add_argument('--rank', type=int, default=12, help='subspace rank R (temporal DoF)')
+    ap.add_argument('--phi-hidden', type=int, default=64, help='temporal-basis net width')
+    ap.add_argument('--phi-depth', type=int, default=3, help='temporal-basis net depth')
+    ap.add_argument('--phi-w0', type=float, default=30.0, help='temporal-basis SIREN w0')
     ap.add_argument('--hidden', type=int, default=512)
     ap.add_argument('--depth', type=int, default=12)     # d12 = sweet spot (d16 gains ~0, loses swing)
     ap.add_argument('--w0', type=float, default=62.0)
@@ -212,7 +225,8 @@ def main():
     logging.basicConfig(level=logging.INFO, format='%(message)s')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'device={device}', flush=True)
-    print(f'model={args.model} h{args.hidden} d{args.depth} w0{args.w0:g} | '
+    rank_str = f' rank{args.rank}' if args.model == 'wire_ff_subspace' else ''
+    print(f'model={args.model}{rank_str} h{args.hidden} d{args.depth} w0{args.w0:g} | '
           f'FF k{args.k_freq}/{args.k_sigma:g} t{args.t_freq}/{args.t_sigma:g} | '
           f'dcf_pow {args.dcf_power:g} env {args.envelope_exponent:g} | '
           f'{args.steps} steps, batch {args.batch_size}, split {args.subsample_frac:g}', flush=True)
