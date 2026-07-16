@@ -100,8 +100,22 @@ def train_one_slice(out_dir, slc, sh, args, device):
         opt, mode='min', factor=0.5, patience=args.scheduler_patience, min_lr=args.scheduler_min_lr)
 
     best_heldout, best_state = float('inf'), None
+    ckpt_path = os.path.join(args.save_dir, f'ckpt_slice_{slc:02d}.pt')
+    start_step = 1
+    if args.resume and os.path.exists(ckpt_path):                       # continue a timed-out run
+        ck = torch.load(ckpt_path, map_location=device)
+        model.load_state_dict(ck['model']); opt.load_state_dict(ck['opt']); sched.load_state_dict(ck['sched'])
+        best_heldout, best_state, start_step = ck['best_heldout'], ck['best_state'], ck['step'] + 1
+        print(f'    resumed slice {slc:02d} from step {ck["step"]} (best heldout {best_heldout:.3e})', flush=True)
+
+    def save_ckpt(step):                                                # atomic: tmp then rename
+        tmp = ckpt_path + '.tmp'
+        torch.save(dict(step=step, model=model.state_dict(), opt=opt.state_dict(),
+                        sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state), tmp)
+        os.replace(tmp, ckpt_path)
+
     model.train()
-    for step in range(1, args.steps + 1):
+    for step in range(start_step, args.steps + 1):
         idx = torch.randint(0, N_train, (args.batch_size,), device=device)
         opt.zero_grad(set_to_none=True)
         y_pred = model(xtr[idx], ttr[idx], ctr[idx])
@@ -125,6 +139,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                 if step >= args.warmup_steps and hl < best_heldout:
                     best_heldout = hl
                     best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+                save_ckpt(step)                                        # survive wall-clock timeout
                 if step % args.console_every == 0 or step == args.steps:
                     print(f'    step {step:6d}  train {float(loss):.3e}  heldout {hl:.3e}', flush=True)
             elif step % args.console_every == 0 or step == args.steps:
@@ -175,6 +190,8 @@ def main():
     ap.add_argument('--subsample-frac', type=float, default=0.7,
                     help='fraction of spokes for train; rest are heldout for model selection')
     ap.add_argument('--seed', type=int, default=0)
+    ap.add_argument('--resume', action='store_true',
+                    help='resume each slice from save_dir/ckpt_slice_XX.pt if present (survives timeouts)')
     # loss / norm
     ap.add_argument('--use-dcf', type=int, default=1)
     ap.add_argument('--dcf-method', default='simple_ramp')
