@@ -152,7 +152,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
 
     cart = A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type,
                                    shared=sh, support_radius=args.support_radius, verbose=False)
-    return recon_nik_cart(cart, b1, bas)
+    img = recon_nik_cart(cart, b1, bas)
+    if os.path.exists(ckpt_path):
+        os.remove(ckpt_path)                          # slice done -> drop its checkpoint
+    return img
 
 
 def main():
