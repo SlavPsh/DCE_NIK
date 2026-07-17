@@ -32,10 +32,29 @@ torch.set_float32_matmul_precision("high")
 sys.path.insert(0, '/scratch/rnga/vvpshenov/grasp_pro_py')   # nik_output_recon
 import nik_adapter as A
 from nik_model import (WIRE_KXY_COIL_T_REIM, WIRE_FF_KXY_COIL_T_REIM,
-                       WIRE_FF_RES_KXY_COIL_T_REIM, WIRE_FF_SUBSPACE_KXY_COIL_T_REIM)
+                       WIRE_FF_RES_KXY_COIL_T_REIM, WIRE_FF_SUBSPACE_KXY_COIL_T_REIM,
+                       warmstart_phi)
 from kspace_normalization import compute_dcf_radial, compute_radius, KSpaceNormalizer
 from nik_focal_loss import composable_kspace_loss
 from nik_output_recon import recon_nik_cart
+
+
+def compute_pca_phi(out_dir, slc, sh, rank, n_frames=100):
+    """K=rank temporal PCA basis from the k-center navigator (same construction as grasp's
+    front-end / build_phi), plus the frame times in the model's t convention (2*view_time-1).
+    returns (frame_t[F] float32, Phi[F,rank] complex64) for warmstart_phi (Option 3 init)."""
+    sl = np.load(os.path.join(out_dir, f'slice_{slc:02d}.npz'))
+    krad = np.asarray(sl['kdata_radial'])                        # [nx, nspokes, nc]
+    vt = np.asarray(sh['view_time']).ravel()
+    nx, nsp, nc = krad.shape
+    F = int(min(n_frames, nsp // 5))                             # keep >=5 spokes/frame
+    nline = nsp // F; use = F * nline; c0 = nx // 2
+    nav = np.abs(krad[c0 - 2:c0 + 3, :use, :]).reshape(5, nline, F, nc, order='F').mean(1)  # (5,F,nc)
+    ds = nav.transpose(0, 2, 1).reshape(5 * nc, F, order='F')    # (5nc, F)
+    w, PC = np.linalg.eigh(np.cov(ds, rowvar=False))
+    Phi = PC[:, np.argsort(-w)][:, :rank].astype(np.complex64)   # (F, rank), real modes (imag 0)
+    ft = np.array([vt[j * nline:(j + 1) * nline].mean() for j in range(F)], dtype=np.float32)
+    return (2.0 * ft - 1.0).astype(np.float32), Phi
 
 
 def build_model(args, ncc):
@@ -97,6 +116,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
 
     torch.manual_seed(args.seed)
     model = build_model(args, ncc).to(device)
+    if args.model == 'wire_ff_subspace' and args.warmstart:       # Option-3 init: Phi <- k-center PCA basis
+        ft, phi = compute_pca_phi(out_dir, slc, sh, args.rank)
+        err = warmstart_phi(model, ft, phi, steps=args.warmstart_steps, lr=1e-3, device=device.type)
+        print(f'    warmstarted Phi from PCA basis (rank {args.rank}, {len(ft)} frames, fit MSE {err:.3e})', flush=True)
     if args.compile and device.type == 'cuda':
         try:
             model = torch.compile(model)
@@ -181,6 +204,10 @@ def main():
     ap.add_argument('--phi-hidden', type=int, default=64, help='temporal-basis net width')
     ap.add_argument('--phi-depth', type=int, default=3, help='temporal-basis net depth')
     ap.add_argument('--phi-w0', type=float, default=30.0, help='temporal-basis SIREN w0')
+    ap.add_argument('--warmstart', dest='warmstart', action='store_true', default=True,
+                    help='(subspace) init Phi from k-center PCA basis -- stabilizes the bilinear fit')
+    ap.add_argument('--no-warmstart', dest='warmstart', action='store_false')
+    ap.add_argument('--warmstart-steps', type=int, default=800)
     ap.add_argument('--hidden', type=int, default=512)
     ap.add_argument('--depth', type=int, default=12)     # d12 = sweet spot (d16 gains ~0, loses swing)
     ap.add_argument('--w0', type=float, default=62.0)
