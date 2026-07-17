@@ -28,6 +28,16 @@
    - **aorta ROI** for dynamics (sharp arterial bolus = best temporal-resolution test)
    - **CS held-out MSE** as the bar (anchor NIK's held-out number vs CS on same spokes)
 
+## Architecture variants to test (independent of rank)
+- **Coils as OUTPUT, not input.** Currently coil is an INPUT (coil embedding). Test the
+  alternative: drop the coil encoding entirely and have the network predict all coils at
+  once -- output dim 2*n_coils (Re/Im per coil), one forward per (kx,ky,t). The coil
+  dimension becomes a multi-head output instead of a conditioning input. Applies to both
+  the joint model and the factorized model (there: A_r -> per-coil amplitudes,
+  A shape [N, n_coils, R, 2], Phi shared across coils). Rationale: coil sensitivities are
+  a fixed linear mixing, maybe cleaner as parallel outputs than as a learned input code;
+  also cheaper (one forward covers all coils vs one per coil).
+
 ## Bigger picture (ranked, after the factorized model)
 1. Factorized low-rank (above) — attacks the spatial grain, the one measured gap vs CS.
    (Alternative if it's too rigid: E9 soft nuclear-norm penalty on the joint model.)
