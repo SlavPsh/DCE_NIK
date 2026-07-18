@@ -28,6 +28,25 @@
    - **aorta ROI** for dynamics (sharp arterial bolus = best temporal-resolution test)
    - **CS held-out MSE** as the bar (anchor NIK's held-out number vs CS on same spokes)
 
+## KEY FINDING (2026-07-17): the spatial gap is BLUR, not denoising
+- R-sweep DONE (R=2..32). Factorized low-rank: held-out 0.18-0.29 (vs full-rank 0.325)
+  -- big generalization gain, dynamics INTACT. Knee at R~6: R=5 swing 39% (=CS rank-5 cap),
+  R>=6 swing 43-45% (recovers dynamics CS can't). Sweet spot R~10-20. Thesis CONFIRMED.
+- BUT visual/perceptual: ALL ranks look identical to full-rank and all far below CS
+  (HaarPSI ~0.92 vs CS-70 0.976). The held-out gain did NOT improve the image.
+- Radial power spectrum: NIK has ~3% of CS's high-spatial-freq energy (~30x deficit).
+  => NIK's spatial deficit is BLUR (missing high-freq structure), NOT noise/grain.
+  A denoiser (TV, low-rank) canNOT fix blur. Temporal rank is orthogonal to it.
+- This EXPLAINS the held-out paradox: NIK predicts attenuated/smooth high-|k| -> blurry
+  image BUT low held-out MSE (high-|k| targets are noise-dominated=small, so predicting
+  small scores well). CS recovers high-|k| structure -> sharp image but higher held-out.
+  Blur and the held-out paradox are the SAME thing. (CS-held-out job cs_heldout_loss.py
+  tests this: expect CS held-out > NIK.)
+- => The spatial fix is a HIGH-FREQUENCY REPRESENTATION problem, not denoising, not rank:
+  1. Hash-grid (Instant-NGP) encoding -- known INR high-freq fix, most promising.
+  2. Higher FF bandwidth (k_sigma up) -- cheap first test, risks noise.
+  3. Check the render (recon_nik_cart gridding/support_radius) -- may be low-passing.
+
 ## Architecture variants to test (independent of rank)
 - **Coils as OUTPUT, not input.** Currently coil is an INPUT (coil embedding). Test the
   alternative: drop the coil encoding entirely and have the network predict all coils at
