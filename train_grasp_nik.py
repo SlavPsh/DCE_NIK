@@ -251,7 +251,7 @@ def main():
     ap.add_argument('--envelope-exponent', type=float, default=0.75,
                     help='0.75 = soft whitening. 1.0 (full) amplifies noisy high-|k| periphery.')
     ap.add_argument('--use-focal', type=int, default=0)
-    ap.add_argument('--support-radius', type=float, default=0.5)
+    ap.add_argument('--support-radius', type=float, default=1.0)
     ap.add_argument('--no-compile', dest='compile', action='store_false')
     args = ap.parse_args()
     args.use_dcf = bool(args.use_dcf); args.use_focal = bool(args.use_focal)
