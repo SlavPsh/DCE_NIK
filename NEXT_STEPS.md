@@ -46,6 +46,12 @@
   1. Hash-grid (Instant-NGP) encoding -- known INR high-freq fix, most promising.
   2. Higher FF bandwidth (k_sigma up) -- cheap first test, risks noise.
   3. Check the render (recon_nik_cart gridding/support_radius) -- may be low-passing.
+  4. **Radial coordinate warping** (|k|-dependent FF): warp kcoords by (1+alpha*|k|) before
+     FF so the periphery gets finer encoding resolution (capacity allocation by |k|).
+     NOTE the physics caveat: k-space oscillation rate is ~uniform in |k| (set by FOV);
+     only the AMPLITUDE decays (envelope handles that). So high-|k| is noise-dominated ->
+     expect this to add GRAIN more than sharpness unless paired with a structure prior.
+     Being tested now (wire_ff_res_radial, alpha sweep) as a diagnostic of the blur cause.
 
 ## Architecture variants to test (independent of rank)
 - **Coils as OUTPUT, not input.** Currently coil is an INPUT (coil embedding). Test the

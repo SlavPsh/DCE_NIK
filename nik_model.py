@@ -1298,3 +1298,36 @@ def warmstart_phi(model, t_frames, phi_pca, steps=800, lr=1e-3, device="cpu"):
         loss = _t.mean((pred - tgt) ** 2)
         loss.backward(); opt.step()
     return float(loss.item())
+
+
+# ---------------------------------------------------------------------------
+# |k|-dependent FF (radial coordinate warping) -- DIAGNOSTIC for the blur cause.
+# Warp kcoords by (1 + radial_alpha*|k|) before the Fourier features, so the k-space
+# periphery gets finer encoding resolution. radial_alpha=0 == WIRE_FF_RES exactly.
+# Physics caveat: k-space oscillation rate is ~uniform in |k|; high-|k| is noise-dominated,
+# so expect grain more than sharpness. Separate class -- does NOT touch the working model.
+# ---------------------------------------------------------------------------
+class WIRE_FF_RES_RADIAL_KXY_COIL_T_REIM(nn.Module):
+    def __init__(self, n_coils, coil_embed_dim=8, hidden=512, depth=12, w0=62.0, s0=15.0,
+                 k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, dropout=0.0,
+                 radial_alpha=1.0):
+        super().__init__()
+        self.radial_alpha = float(radial_alpha)
+        self.coil_embed = nn.Embedding(int(n_coils), int(coil_embed_dim))
+        nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
+        self.ff_k = FourierFeatures(2, n_freq=int(k_freq), sigma=k_sigma, seed=ff_seed)
+        self.ff_t = FourierFeatures(1, n_freq=int(t_freq), sigma=t_sigma, seed=ff_seed)
+        in_dim = 2 * int(k_freq) + 2 * int(t_freq) + int(coil_embed_dim)
+        self.first = GaborLayer(in_dim, hidden, w0=w0, s0=s0, is_first=True)
+        self.blocks = nn.ModuleList([GaborLayer(2 * hidden, hidden, w0=w0, s0=s0)
+                                     for _ in range(max(0, depth - 2))])
+        self.head = nn.Linear(2 * hidden, 2)
+
+    def forward(self, kcoords, t, coil_idx):
+        r = torch.linalg.norm(kcoords, dim=-1, keepdim=True)           # |k| per sample
+        kw = kcoords * (1.0 + self.radial_alpha * r)                   # radial warp -> finer FF at high |k|
+        tt = t.view(-1, 1); ec = self.coil_embed(coil_idx.long())
+        h = self.first(torch.cat([self.ff_k(kw), self.ff_t(tt), ec], dim=-1))
+        for blk in self.blocks:
+            h = h + blk(h)
+        return self.head(h)
