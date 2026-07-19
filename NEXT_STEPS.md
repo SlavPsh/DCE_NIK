@@ -12,13 +12,22 @@ k-space = the high-freq half -> ~2x blur.
   spatially", the "held-out paradox", the 30x power-spectrum deficit, and the urgency of
   hash-grid / FF-bandwidth / SENSE as BLUR fixes. NIK was fitting high-|k| all along.
 
-## Corrected picture (post-fix, freq/depth sweep, rank-16, slice 13)
-- Perceptual vs CS-100: DISTS 0.09 -> **0.024**, HaarPSI 0.92 -> **0.96** (CS-70 = 0.018 / 0.976).
-  NIK is now a near-spatial-PEER to CS; residual gap = minor streaking/grain, NOT blur.
-- Temporal win STANDS (R-sweep, unaffected by render): R=5 swing 39% (=CS rank-5 cap),
-  R>=6 swing 43-45% (dynamics CS's rank-5 can't represent). Sweet spot R~10-20.
-- freq/depth barely move quality -> the render fix was the lever, recipe is settled:
-  wire_ff_subspace rank ~16, k_sigma 1.5-2.5, w0 62-80, depth 12, dcf0, env0.75.
+## SETTLED baseline (re-baseline at support=1.0, slice 13, 2026-07-18)
+Recipe: **wire_ff_subspace rank 16**, k_sigma 2.5, w0 62, depth 12, dcf0, env0.75, 40k, 70/30.
+Numbers (held / swing% / navcorr / HF-vs-CS / DISTS / HaarPSI, perceptual vs CS-100):
+  full-rank 0.325 / 47.5 / .983 / .62 / .030 / .964   (highest swing but OVERFITS: worst held)
+  R=5       0.199 / 38.2 / .958 / .71 / .035 / .956   (= CS rank-5 cap: swing ~= CS 37.5)
+  R=10      0.189 / 43.8 / .972 / .70 / .034 / .958
+  R=16      0.188 / 43.5 / .969 / .70 / .024 / .964   <-- PICK (best perceptual + balance)
+  R=20      0.182 / 43.2 / .973 / .69 / .033 / .963
+  CS-70       -   / 37.5 / .982 /1.03 / .018 / .976
+  CS-100      -   / 37.5 / .989 /1.00 / .000 /1.000
+Conclusions (all render-corrected):
+- SPATIAL: NIK ~= CS-70 now (HaarPSI .96 vs .976, DISTS .024 vs .018). Small residual grain, NOT blur.
+- TEMPORAL: DoF knee holds -- R=5 swing 38%(=CS cap), R>=10 swing 43-44%(>CS). Nav-corr high.
+- GENERALIZATION: factorized (held .18-.20) >> full-rank (.325).
+- CAVEAT: this is STATIC (temporal-mean) vs CS-100, slice 13. The temporal-resolution CLAIM
+  is still UNPROVEN until the aorta bolus test (item 1 below).
 
 ## In flight
 - **Re-baseline at support=1.0** (results_rebase_*, waiter): full-rank + R=5/10/16/20 vs
