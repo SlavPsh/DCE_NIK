@@ -50,6 +50,29 @@ k-space = the high-freq half -> ~2x blur.
    forward (over-determination via fixed coil maps), or the temporal low-rank we already have.
 6. Hardening: end-frame DC instability (k=0 dip at t=1).
 
+## MAJOR THREAD: pharmacokinetic (bolus-shape) temporal prior -- downstream of the aorta test
+Idea: encode the KNOWN physiology (contrast curves = "sharp rise, slow fall") instead of a
+generic low-rank/free temporal basis. Reuses the factorized model k=sum_r A_r(x,y)*Phi_r(t):
+replace the free temporal net with PHYSICALLY-SHAPED atoms.
+- FORMS: (a) Phi_r(t) = gamma-variate A*(t-t0)^alpha*exp(-(t-t0)/beta) or difference-of-sigmoids,
+  learnable arrival t0 / rise alpha / fall beta -> R bolus templates at different times, mixed
+  spatially by A_r; OR (b) fully parametric: predict per-voxel PK params (baseline, amplitude,
+  arrival, rise, fall) and curve = baseline + amp*g(t; params).
+- TIME NET NOTE: currently a SIREN (global sines) -- WRONG shape for a localized bolus transient.
+  WIRE/Gabor atoms (localized bump) or explicit bolus atoms are the natural fit. (Spatial A_r is
+  WIRE; temporal Phi_r is the small SIREN -- swapping Phi to WIRE/bolus atoms aligns with this.)
+- WHY (for the goal): temporal DoF set by PHYSICS (~3-5 params/voxel), not an ad-hoc rank ->
+  very strong temporal regularizer -> clean dynamics from FAR fewer spokes (the actual goal),
+  plus interpretable PK maps (arrival time, rise rate) = what quantitative DCE wants.
+- CRITICAL SEQUENCING: a bolus-shape prior UNDERMINES the aorta test as validation -- if we
+  impose "sharp rise", NIK renders a sharp aorta trivially (circular; proves nothing about
+  resolving it from data). So: (1) run the aorta test on the FLEXIBLE model FIRST (honest
+  temporal-resolution proof); (2) THEN pursue the PK model for the fewer-spokes goal, where
+  imposing the shape is a feature. OR make the prior SOFT (broad shape family + learned residual)
+  so sharpness stays data-driven.
+- RISK: model mismatch -- aorta(sharp AIF)/liver(slow)/kidney differ. Mitigate: flexible family
+  + per-voxel params + residual term for real deviations (motion, recirculation, multiphasic).
+
 ## DE-PRIORITIZED (were blur fixes; blur was the render)
 - Hash-grid encoding, higher FF bandwidth, radial |k|-warp (wire_ff_res_radial): all aimed
   at blur that was a render artifact. freq/depth sweep confirms they don't move quality much.
