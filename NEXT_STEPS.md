@@ -25,9 +25,23 @@ k-space = the high-freq half -> ~2x blur.
   CS-70/CS-100, unified table (held-out/swing/nav/HF/DISTS/HaarPSI). Confirms NIK~=CS + temporal win.
 
 ## OPEN next steps (ranked, corrected)
-1. **Step-response / sharp-bolus test** -- NOW THE TOP ITEM. The temporal claim rests on the
-   navigator NIK trains on (circular). Inject a known temporal signal / find the sharp bolus
-   and show NIK resolves it -> distinguishes real temporal resolution from smooth interpolation.
+1. **AORTA BOLUS TEST -- THE TOP ITEM.** Breaks the nav-corr circularity (NIK trains on the
+   k=0 navigator, so nav-corr just grades NIK on its own training signal; the navigator is
+   also too smooth to test fast dynamics). The aortic first-pass bolus (~5-10s, far faster
+   than the 31s/frame binning) is a real sharp temporal feature to resolve.
+   DESIGN (fairness): define the aorta ROI ONCE on a method-neutral reference (CS-100), erode
+   it (interior voxels only, avoid partial-volume), apply the SAME mask to NIK and CS. Do NOT
+   let NIK define its own ROI. Region across frames, not one voxel.
+   SEGMENTATION (ranked): (1) early-enhancement map [(arterial frame - baseline)] + connected-
+   component + circularity + eroded -- recommended; (2) temporal-signature clustering of voxel
+   time-courses; (3) Hough circle on the peak-arterial frame; (4) seeded region-grow (fallback).
+   METRIC on the ROI-mean curve: upslope (max dS/dt), time-to-peak, first-pass FWHM. NIK (R>5,
+   continuous-t) should give steeper upslope / narrower peak than CS (rank-5 + binning).
+   FIRST STEP: visualize the early-enhancement map + candidate aorta ROI on CS-100 slice 13 to
+   confirm the aorta is cleanly segmentable and shows a distinct sharp rise (feasibility).
+   SECOND ORGAN (later): liver parenchyma (slow portal-phase) as the counterpoint -- NIK should
+   beat CS on the SHARP aorta while both match on the SLOW liver -> isolates temporal-resolution
+   as the win. (Kidney cortex = optional second fast target.)
 2. **Spoke-reduction frontier** -- the ACTUAL GOAL ("fewer spokes"). Everything is at 70%.
    Now reachable since spatial quality is fixed. Push below 70%, find where NIK holds and CS breaks.
 3. **Aorta ROI** for dynamics -- cheap eval upgrade (sharp arterial bolus = best temporal test).
