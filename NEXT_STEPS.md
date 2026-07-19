@@ -33,8 +33,34 @@ Conclusions (all render-corrected):
 - **Re-baseline at support=1.0** (results_rebase_*, waiter): full-rank + R=5/10/16/20 vs
   CS-70/CS-100, unified table (held-out/swing/nav/HF/DISTS/HaarPSI). Confirms NIK~=CS + temporal win.
 
+## AORTA BOLUS TEST -- DONE, and it's a NEGATIVE for the temporal claim (2026-07-18)
+The non-circular temporal-resolution check: apply fixed aorta+liver ROIs (segmented on CS-100,
+saved aorta_roi/liver_roi.npy) to NIK vs CS, compare the recovered bolus.
+RESULT: NIK at fine temporal res (R=5 AND R=16) is AS NOISY AS CS-fine at the aorta -- it does
+NOT resolve the sharp bolus more cleanly. R=5 is WORSE (noisiest). Only CS-coarse is clean (but
+temporally smeared). aorta noise: NIK-R16 0.071, CS-fine 0.069 (equal); NIK-R5 0.23 (worse).
+=> NIK has NO demonstrated temporal-resolution advantage as-is. The nav-corr "win" was the
+circularity + smooth-navigator artifact. NIK's extra temporal DoF is largely NOISE (matches the
+DoF-is-partly-noise finding). Rank constrains #patterns, NOT temporal smoothness of a voxel curve.
+MECHANISM: temporal encoding (t_freq 32, t_sigma 1.5) + flexible SIREN Phi has enough temporal
+bandwidth to fit frame-to-frame noise.
+=> A temporal win REQUIRES an explicit temporal DENOISER: the PK/bolus-shape prior (soft, so
+sharpness stays data-driven) or a temporal-smoothness regularizer / lower t bandwidth. The PK
+model is now the CRITICAL PATH, not optional.
+CAVEATS: one small ROI (21 vox, noisy), one slice, 2 ranks -- but the RELATIVE comparison is fair
+(same ROI), NIK is simply not cleaner than CS. NIK used 70% spokes vs CS 100%.
+
+## CURRENT HONEST STATUS
+- SPATIAL: NIK ~= CS peer (render fix), better generalization. REAL, stands.
+- TEMPORAL: NO demonstrated advantage yet. Needs a temporal prior (PK/smoothness) -> critical path.
+
 ## OPEN next steps (ranked, corrected)
-1. **AORTA BOLUS TEST -- THE TOP ITEM.** Breaks the nav-corr circularity (NIK trains on the
+0. **PK / temporal-smoothness prior -- NOW THE CRITICAL PATH** (see the PK thread below). It is
+   what could produce a clean sharp DATA-DRIVEN bolus that CS-fine can't -> the temporal win.
+   Try: (a) soft temporal-smoothness reg (penalize d2/dt2 of the curve), cheap; (b) lower t_sigma
+   (less temporal bandwidth -> smoother, but E8 showed it costs swing -- find the balance);
+   (c) the bolus-shape basis (gamma-variate) as a SOFT prior + residual. Re-run the aorta test after.
+1. **AORTA BOLUS TEST -- DONE (negative). Re-run after the temporal prior** to see if it flips. Breaks the nav-corr circularity (NIK trains on the
    k=0 navigator, so nav-corr just grades NIK on its own training signal; the navigator is
    also too smooth to test fast dynamics). The aortic first-pass bolus (~5-10s, far faster
    than the 31s/frame binning) is a real sharp temporal feature to resolve.
