@@ -33,9 +33,18 @@ sy, sx = np.unravel_index(int(np.argmax(log_m)), log_m.shape)              # aor
 aorta = ((yy-sy)**2 + (xx-sx)**2) <= 2.4**2                                # small disk (r=2.4)
 print(f"aorta ROI: {int(aorta.sum())} vox (LoG blob), center ({sy},{sx})", flush=True)
 
-# liver ROI: large slow-enhancing region (late ttp), eroded
-slow = body & (ttp >= nC-4); l2, m = ndi.label(slow)
-liver = ndi.binary_erosion(l2 == (1+int(np.argmax(ndi.sum(np.ones_like(l2),l2,range(1,m+1))))), iterations=3) if m else np.zeros_like(body)
+# liver ROI: one compact disk in the largest HOMOGENEOUS slow-enhancing organ (liver, not bowel).
+lm = ndi.uniform_filter(mean, 9); lvar = np.sqrt(np.maximum(ndi.uniform_filter(mean**2, 9) - lm**2, 0))
+homog = body & (lvar < np.quantile(lvar[body], 0.35)) & (mean > np.quantile(mean[body], 0.45)) & (ttp >= 5)
+homog = ndi.binary_opening(homog, iterations=2)                            # drop specks/thin bowel
+ll, nl = ndi.label(homog)
+if nl:
+    big = ll == (1 + int(np.argmax(ndi.sum(np.ones_like(ll), ll, range(1, nl + 1)))))
+    dt = ndi.distance_transform_edt(big); ly, lx = np.unravel_index(int(np.argmax(dt)), dt.shape)  # deepest = liver core
+    liver = ((yy - ly) ** 2 + (xx - lx) ** 2) <= 9 ** 2                    # single compact disk
+else:
+    liver = np.zeros_like(body)
+print(f"liver ROI: {int(liver.sum())} vox disk at ({ly},{lx})", flush=True)
 
 def cv(vol, m): return np.array([vol[..., i][m].mean() for i in range(vol.shape[-1])])
 def nrm(c, b): return (c - b) / (c.max() - b + 1e-9)
