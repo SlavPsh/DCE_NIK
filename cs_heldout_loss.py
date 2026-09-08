@@ -97,10 +97,11 @@ for tag, views in [("CS-100", np.arange(ntv)), ("CS-70", train_v)]:
     Xf, b1, ft_cs = cs_complex(views)
     if CONV is None:                               # detect convention ONCE, on 3 probe frames (cheap)
         probe = sorted({0, len(ft_cs) // 2, len(ft_cs) - 1}); best = None
+        fr = np.argmin(np.abs(vt[None, :] - ft_cs[:, None]), axis=0)
+        probe_views = np.where(np.isin(fr, probe))[0]
+        m = tr_s & np.isin(sid.numpy(), probe_views)               # train samples in probe frames
         for conv in [(-1, True), (1, True), (-1, False), (1, False)]:
             yp = forward(Xf, b1, ft_cs, conv, only_frames=probe); ys = to_samples(yp)
-            fr = np.argmin(np.abs(vt[None, :] - ft_cs[:, None]), axis=0)
-            pv = np.isin(fr, probe); m = tr_s & np.tile(pv, ncc)   # train samples in probe frames
             a, b = ys[m], y_raw.numpy()[m]
             corr = np.corrcoef(a.ravel(), b.ravel())[0, 1]
             if best is None or corr > best[1]: best = (conv, corr)

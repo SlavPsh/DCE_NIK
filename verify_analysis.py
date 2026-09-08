@@ -5,7 +5,7 @@ import sys, re, glob, numpy as np
 D = "/scratch/rnga/vvpshenov/DCE_NIK"
 # argv: [recon_dir] [log_glob]   defaults = the port-verify run
 recon_dir = sys.argv[1] if len(sys.argv) > 1 else f"{D}/results_nik_verify"
-log_glob = sys.argv[2] if len(sys.argv) > 2 else f"{D}/slurm-nik-verify-*.out"
+log_glob = sys.argv[2] if len(sys.argv) > 2 else f"{D}/logs/slurm-nik-verify-*.out"
 recon = np.abs(np.load(f"{recon_dir}/nik_slice_13.npy"))               # [bas,bas,nt]
 nt = recon.shape[-1]
 

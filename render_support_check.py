@@ -7,6 +7,7 @@ from nik_output_recon import recon_nik_cart
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 import nik_model as NM
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+from figpath import fig as fpath
 
 OUT = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; dev = "cuda" if torch.cuda.is_available() else "cpu"
 sh = NA.load_shared(OUT); ds = NA.make_radial_dataset(OUT, 13, compute_device=dev, shared=sh)
@@ -43,5 +44,5 @@ fig, ax = plt.subplots(1, 3, figsize=(12, 4.2))
 for a, (lab, im) in zip(ax, [("NIK support=0.5 (current)", imgs[0.5]), ("NIK support=1.0 (fix)", imgs[1.0]), ("CS-100", cs)]):
     a.imshow(np.rot90(im), cmap="gray", vmin=0, vmax=np.percentile(im, 99.5)); a.set_title(lab, fontsize=11); a.axis("off")
 fig.suptitle("Render-mask check: support_radius 0.5 vs 1.0 on the SAME NIK model", fontweight="bold")
-fig.tight_layout(); fig.savefig("/scratch/rnga/vvpshenov/DCE_NIK/support_check.png", bbox_inches="tight", dpi=140)
+fig.tight_layout(); fig.savefig(fpath("support_check.png"), bbox_inches="tight", dpi=140)
 print("wrote support_check.png")

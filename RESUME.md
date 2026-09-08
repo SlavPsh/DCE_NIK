@@ -1,0 +1,63 @@
+# dce_nik resume (2026-09-08). read this first in a new chat.
+
+## question
+does a k-space inr (nik) beat compressed sensing (grasp pro, classic grasp v2) for radial dce-mri: images and contrast curves. phantom (xcat, truth) + in vivo (meas_p3_dce, slices 18/19/21, no truth).
+
+## deliverables (the presentation)
+- `results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_GRASPv2_combined_report.ipynb` (92 cells, 0 errors): nik vs grasp v2 + section 10 tofts vs patlak. lowercase, no dashes.
+- `results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_CS_combined_report.ipynb` (61 cells): nik vs grasp pro (k12 cv-fair), sections 1 to 8 shared with the v2 notebook.
+- `results/tofts_vs_patlak/REPORT.md`, `MANIFEST.md`, `REPRO.md`: tofts arm.
+- `CONSOLIDATED_REPORT.md`, `report.md`: older text summaries, superseded where they disagree with the notebooks.
+
+## established, with the number and where it lives
+| fact | number | source |
+|---|---|---|
+| single fair setting vs grasp v2: 25 spf lam 0.25 on phantom (ideal-corner rule), carried to in vivo as nline 12; matched spokes (1720 / 1368) | | v2 nb sec 9, `v2_sweep/final_single_setting.json` |
+| phantom images at that setting: tie | haarpsi 0.902 grasp vs 0.899 nik-sub16; sharpness_rel 1.004 vs 0.858 at equal bg noise; grasp psnr +1.6 db | `v2_sweep/image_metrics_panel.json` |
+| phantom tissue curves: nik-free wins | cortex 0.011 vs 0.073, medulla 0.014 vs 0.051; aorta 0.081 vs 0.102 | `v2_sweep/frontier.json` |
+| phantom bolus peak | nik +4 to +7%, grasp v2 -19% (lam 0.25), -7% (lam 0.02) | same |
+| tuned grasp v2 (40 spf lam 0.02) beats nik on everything on the phantom | haarpsi 0.966, aorta 0.059 | v2 nb sec 9 |
+| in vivo k80 pair (1368 spokes both): grasp v2 ahead on the model-free curve ruler | aorta 0.153 vs 0.234, cortex 0.084 vs 0.196 | `v2_sweep_invivo/v2_vs_nik_invivo_k80.json` |
+| that ruler is biased: physical bound | aorta fwhm grasp v2 k80 53 s, nik 23 s, model-free 17 s, truth aif 12.5 s | `invivo_neutral_ruler.py` |
+| nik vs grasp pro (k12 cv-fair) phantom | haarpsi 0.90 vs 0.87, psnr 37.4 vs 38.5, ssim 0.92 vs 0.95, aorta curve 0.08 vs 0.16 | cs nb sec 1, `l3_rebaseline*.csv` |
+| in vivo temporal denoising real (cs oscillation = broadband noise) | nik 15 to 50x less oscillation | cs nb sec 2, `task_S*.json` |
+| in vivo pk inter-slice consistency supports quantification | vp cov nik 2 to 5 vs cs 11 to 37 | `task2*.json` |
+| output-coil beats input-coil on phantom, parity in vivo, 8x cheaper | psnr 37.2 vs 36.1 | cs nb sec 3 |
+| tofts basis vs patlak, phantom no-motion | ssim 0.84 to 0.94, psnr +6 db, cortex 0.109 to 0.015, held-out k 13x; aorta dc offset +0.02 | `results/tofts_vs_patlak/phantom_nomotion.md` |
+| tofts vs patlak, motion phantom | psnr +1.9 db, cortex 0.164 to 0.112, aorta worse | `phantom_motion.md` |
+| tofts vs patlak, in vivo | kidney curves better, cortex/medulla identity broken (0.998 to 0.7 to 0.9), aorta peak 0.5 vs 0.9 (patlak by construction), held-out k 8% worse globally (k centre), better at |k|>0.19 | `invivo.md` |
+
+## retracted, do not resurrect
+- "cs wins at every spoke fraction": pca basis leak (basis from all spokes). fair: level, nik ahead at 50%.
+- "grasp v2 aif damping is structural": lam artifact; lam 0.02 fixes it.
+- "grasp v2 6.7x worse than pro": 5 spf operating-point artifact (v2 nb section 1 still shows it, known, left as is).
+- "nik and grasp use different b1": noise probe outside the body; in-body diff 1e-4.
+- "nik overshoots cortex" and "cs over-reads cortex 12%": per-roi peak-normalization artifacts; use raw + affine.
+- "render is a lossy readout, feed spokes to mcnufft": wrong, non-realizability is not readout loss.
+- "output-coil under-reads bolus 14%": baseline-norm artifact; calibrated equal.
+- "aif time grid mismatch 0.44 s": grids only; all axes share view_time.
+
+## tested, negative, do not repeat
+temporal tv on atoms (phi_tv) and on k-space (ktv21, l2,1): null. sense-forward a (image inr + b1): works, loses to sub16. gaussian activation: bad at every w0. rank knob: saturates (realized rank ~5). dcf_power 1.0: fits noise. per-frame data consistency: strictly hurts. binning-free pk differentiator: not real at 5 to 15 spf. spirit on nik: inert. post-hoc tv: no.
+
+## open
+- neutral in-vivo ruler: held-out spokes for cs need complex-valued grasp saves (`grasp_v2_real.py` saves magnitude). the one thing that would settle in-vivo curves.
+- sense-b (k-space model + b1 factorization in k-space): only untested item on the image axis. kernel study done (r=2 taps capture 58%, factorization residual 8 db), training not run.
+- tofts in vivo: k-centre held-out worse (overfit with 488 spokes); aorta atom tautology; try rank 8 or a soft prior on the extra coefficients.
+- v2 notebook section 1 still at 5 spf (~3 h to repoint).
+- fwhm bound on slices 18/19/20 for grasp v2.
+
+## pipeline facts that bite
+- coords: in vivo x in [-1,1] (traj_norm*2), phantom kx in [-0.5,0.5] (`_dataset` doubles). radius bins: check the range.
+- render: 2x oversample + rot180 with 1px roll (even grid) + support radius 1.0. three render bugs were found this way; any new image-vs-truth number goes through `recon_asserts.check_recon`.
+- `--spoke-keep-file` alone disables early stopping and lr schedule; add `--keep-heldout` or `--spoke-heldout-file`.
+- in-vivo run variants: `results_sl21_k80` is the fair one; `results_full_sl21_matched` had no early stop; `results_spoke_full_slice21` is random 70%.
+- metrics: masked haarpsi/ssim, same window-averaged truth for every method, one global ls scale, roi mean on the same masks (`xph_common.rois`, `consolidated.slice_ctx`). curves vs model-free: raw + affine.
+- time axis in vivo: everything derives from `view_time = v/1709` times 375 s.
+- `srun --jobid=<session>` runs 2 tasks; add `--ntasks=1`. system python3 is 3.6; use the torch29 python.
+- gpu: luna-01 only; mig 1g (phantom, 5 gb) / 4g (in vivo, 12 gb); 2g slices often unschedulable when 1g are full.
+
+## reproduce
+- v2 notebook: `build_gv2_nb.py` clones the cs notebook and patches sections 9; section 10 and the prose rewrite of 2026-09-08 were applied to the ipynb directly (rebuild from the builder would lose them; patch the builder before rebuilding).
+- tofts: `results/tofts_vs_patlak/REPRO.md`.
+- phantom nik: `xph_train.py` / `xph_eval.py`, `XPH_SIM=motion` for the motion sim. grasp v2 phantom: `xph_v2_sweep.py <G>` with `LAM_FRAC`. in vivo grasp v2: `grasp_v2/grasp_v2_real.py` (NLINE, LAM_FRAC, KEEP80).

@@ -12,6 +12,7 @@ nC, nF = clean.shape[-1], fine.shape[-1]
 
 # --- navigator (data k=0), independent bolus-timing reference ---
 import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); import nik_adapter as NA
+from figpath import fig as fpath
 sh = NA.load_shared(GP); sl = NA.load_slice(GP, 13); krad = np.asarray(sl["kdata_radial"]); vt = np.asarray(sh["view_time"]).ravel()
 c0 = krad.shape[0]//2; dc = np.sqrt((np.abs(krad[c0])**2).sum(-1)); o = np.argsort(vt); ts = vt[o]
 navr = np.clip(dc[o], np.percentile(dc,1), np.percentile(dc,99))
@@ -64,7 +65,7 @@ ax[2].plot(tF, nrm(acF,bF), "-", color="tab:red", lw=1.3, label="aorta (CS 187-f
 ax[2].plot(tC, nrm(acC,bC), "s-", color="darkred", lw=2, ms=5, label="aorta (CS 12-frame)")
 ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("norm. enh."); ax[2].set_title("fine CS is noisy = NIK's opportunity", fontsize=10); ax[2].legend(fontsize=8); ax[2].grid(alpha=.3)
 fig.suptitle("Aorta bolus test -- feasibility v2 (slice 13)", fontweight="bold")
-fig.tight_layout(); fig.savefig(f"{D}/aorta_feasibility.png", bbox_inches="tight", dpi=140)
+fig.tight_layout(); fig.savefig(fpath(f"aorta_feasibility.png"), bbox_inches="tight", dpi=140)
 np.save(f"{D}/aorta_roi.npy", aorta); np.save(f"{D}/liver_roi.npy", liver)
 print(f"aorta clean upslope {np.gradient(nrm(acC,bC), tC).max():.4f}/s | peak-to-plateau ratio {acC.max()/acC[-3:].mean():.2f}")
 print("wrote aorta_feasibility.png")

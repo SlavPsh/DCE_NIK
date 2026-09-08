@@ -1,0 +1,5 @@
+method,test_NMSE(mean+-sd),test_outer_k,note
+NIK-F0,8.750e-03+-5e-05,2.501e-01,direct model k-query on untouched test spokes
+NIK-sub5,1.946e-04+-4e-06,6.749e-02,direct model k-query on untouched test spokes
+NIK-free,4.116e-04+-6e-05,1.490e-01,direct model k-query on untouched test spokes
+GRASP-Pro,n/a,n/a,frame-based subspace: no comparable held-out spoke prediction

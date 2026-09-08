@@ -1,0 +1,72 @@
+{
+ "table": [
+  {
+   "method": "truth",
+   "frames": 344,
+   "aorta_nrmse": 9.447066948910095e-08,
+   "cortex_nrmse": 3.6522867189472005e-07,
+   "medulla_nrmse": 2.8118139019492424e-07,
+   "aorta_peak": 0.8044663667678833,
+   "aorta_peak_err_pct": -1.4818428316001206e-05,
+   "aorta_ttp": 27.400800704956055
+  },
+  {
+   "method": "NIK-sub16",
+   "frames": 344,
+   "aorta_nrmse": 0.14309485598086322,
+   "cortex_nrmse": 0.04832299707515506,
+   "medulla_nrmse": 0.04497105088541505,
+   "aorta_peak": 0.8370675444602966,
+   "aorta_peak_err_pct": 4.052506729789219,
+   "aorta_ttp": 28.444639205932617
+  },
+  {
+   "method": "NIK-free",
+   "frames": 344,
+   "aorta_nrmse": 0.08055887255481227,
+   "cortex_nrmse": 0.01110247746765516,
+   "medulla_nrmse": 0.014193171056454804,
+   "aorta_peak": 0.8641613721847534,
+   "aorta_peak_err_pct": 7.4204317082358155,
+   "aorta_ttp": 27.922719955444336
+  },
+  {
+   "method": "GRASP-v2 25spf lam0.25",
+   "frames": 68,
+   "aorta_nrmse": 0.10195195220144178,
+   "cortex_nrmse": 0.0728802228331369,
+   "medulla_nrmse": 0.050251872338119494,
+   "aorta_peak": 0.6496973034309472,
+   "aorta_peak_err_pct": -19.238735888199237,
+   "aorta_ttp": 27.400800704956055
+  },
+  {
+   "method": "GRASP-v2 40spf lam0.02",
+   "frames": 43,
+   "aorta_nrmse": 0.06032165851077705,
+   "cortex_nrmse": 0.03730428379383637,
+   "medulla_nrmse": 0.026223888065442614,
+   "aorta_peak": 0.7439906716081539,
+   "aorta_peak_err_pct": -7.517505753587723,
+   "aorta_ttp": 27.400800704956055
+  }
+ ],
+ "selected": {
+  "0.25": {
+   "spokes_per_frame": 25,
+   "n_frames": 68,
+   "lam_frac": 0.25,
+   "haarpsi": 0.9022717370706446,
+   "c_aorta": 0.10074000889105768,
+   "aorta_pk": 0.6511830044214976
+  },
+  "0.02": {
+   "spokes_per_frame": 40,
+   "n_frames": 43,
+   "lam_frac": 0.02,
+   "haarpsi": 0.9658826423245807,
+   "c_aorta": 0.05884816155376804,
+   "aorta_pk": 0.7470279136801016
+  }
+ }
+}

@@ -8,7 +8,7 @@ BASE = dict(held=0.3245, swing=45.5, nav=0.985)     # full-rank wire_ff_res
 
 # held-out per rank from the sweep logs
 held = {}
-for lg in glob.glob(f"{D}/slurm-nik-subR*-*.out"):
+for lg in glob.glob(f"{D}/logs/slurm-nik-subR*-*.out"):
     txt = open(lg).read()
     mr = re.search(r"model=wire_ff_subspace rank(\d+)", txt)
     mh = re.search(r"restored best \(heldout ([\d.eE+-]+)\)", txt)
@@ -17,6 +17,7 @@ for lg in glob.glob(f"{D}/slurm-nik-subR*-*.out"):
 
 # navigator + ROI for swing/nav-corr
 import numpy as np
+from figpath import fig as fpath
 sl = np.load(f"{GP}/slice_13.npz"); sh = np.load(f"{GP}/shared.npz")
 krad = np.asarray(sl["kdata_radial"]); vt = np.asarray(sh["view_time"]).ravel()
 c0 = krad.shape[0] // 2
@@ -58,5 +59,5 @@ if done:
         a.axhline(base, color="tab:red", ls="--", lw=1.5, label="full-rank baseline")
         a.set_xlabel("rank R"); a.set_title(lab); a.grid(alpha=.3); a.legend(fontsize=9)
     fig.suptitle("Factorized low-rank NIK: R-sweep vs full-rank baseline (slice 13)", fontweight="bold")
-    fig.tight_layout(); fig.savefig(f"{D}/sweep_R.png", bbox_inches="tight", dpi=140)
+    fig.tight_layout(); fig.savefig(fpath(f"sweep_R.png"), bbox_inches="tight", dpi=140)
     print(f"\nwrote {D}/sweep_R.png  ({len(done)} ranks)")

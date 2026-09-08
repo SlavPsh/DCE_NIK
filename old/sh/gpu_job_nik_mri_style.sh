@@ -15,7 +15,7 @@ nvidia-smi || true
 
 export PATH="/scratch/rnga/vvpshenov/micromamba/bin:$PATH"
 export MAMBA_ROOT_PREFIX="/scratch/rnga/vvpshenov/micromamba"
-PYTHON_BIN="/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python"
+PYTHON_BIN="${PY:-/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python}"
 
 export MPLCONFIGDIR="/home/rnga/vvpshenov/tmp/mpl"
 mkdir -p "$MPLCONFIGDIR"

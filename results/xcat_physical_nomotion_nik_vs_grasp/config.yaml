@@ -1,0 +1,15 @@
+task: physical no-motion NIK vs GRASP-Pro (clean baseline before breathing)
+dataset: XCAT-ERIC/results/simulation_results_20260816T210718.mat (respPeriod N/A, physical SPGR truth)
+slice: zi=10; matrix 220; 8 coils; 344 frames x 7 angles x 16 partitions (aligned stack-of-stars)
+common_inputs: identical train k-space / traj / coils / matrix / noise for both methods
+eval: magnitude coil-combined, ONE global truth-derived scale, body mask, at GRASP frame centres
+image_metrics: masked NRMSE + SSIM + PSNR + HaarPSI (body/anatomy)
+curve_metrics: aorta/cortex/medulla NRMSE + aorta peak-time/FWHM (physical seconds)
+methods:
+  GRASP-Pro: K=5 PCA + SP-TV0.0005 + T-TV0.001
+  NIK-F0:    rank-3 fixed Patlak (coefficient lane), width768 ks2.5, seeds 0/1/2
+  NIK-sub5:  rank-5 free subspace PCA-warmstart (image lane), width768, seeds 0/1/2
+  NIK-free:  fully-free continuous (upper bound), width768, seed 0
+selection: NIK hyperparameters by validation kNMSE ONLY (width 768, k_sigma 2.5); truth post-selection
+execution: SLURM, mix of full-A100 + MIG slices (1g.10gb/2g.20gb/4g.40gb)
+status: RESULT REQUIRES REVIEW

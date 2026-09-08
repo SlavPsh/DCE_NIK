@@ -6,6 +6,7 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 REPO = "/scratch/rnga/vvpshenov/nik-autoresearch"
 sys.path.insert(0, f"{REPO}/baseline_cs"); sys.path.insert(0, f"{REPO}/glue")
 import eval as E
+from figpath import fig as fpath
 D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
 
 def static(path, key=None):
@@ -43,5 +44,5 @@ for j, (name, img) in enumerate(items):
 ax[0, 0].set_ylabel("static", fontsize=10); ax[1, 0].set_ylabel("zoom", fontsize=10)
 fig.suptitle("Factorized rank vs full-rank vs CS — static image (temporal mean), slice 13",
              fontsize=13, fontweight="bold")
-fig.tight_layout(); fig.savefig(f"{D}/rank_visual.png", bbox_inches="tight", dpi=150)
+fig.tight_layout(); fig.savefig(fpath(f"rank_visual.png"), bbox_inches="tight", dpi=150)
 print(f"\nwrote {D}/rank_visual.png")

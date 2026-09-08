@@ -1,0 +1,11 @@
+# GRASP-Pro configuration (physical no-motion XCAT) - established, NOT tuned on truth
+algorithm: k-centre-navigator PCA temporal subspace + spatial-TV + temporal-TV CS
+K_pca: 5                    # temporal subspace rank (matches NIK-sub5)
+spatial_tv: 0.0005          # Weight2
+temporal_tv: 0.001          # Weight1
+iterations: 15              # ~5 inner x 3 outer NLCG-equivalent (FISTA)
+coil_combine: adjoint SENSE (conj(b1))
+operator: cufinufft SENSE-NUFFT (repo GROG gridding replaced by NUFFT - documented implementation diff)
+input_spokes: train mask (5 angles/frame = Proj5), identical to NIK
+output_domain: magnitude coil-combined signal, native frame times
+orientation: identity to truth (verified static-image corr 0.976)

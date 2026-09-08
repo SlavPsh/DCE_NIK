@@ -1,0 +1,88 @@
+{
+ "3a forward_vs_ODE relL2 (worst of 5, 0.5 s grid trapezoid)": {
+  "value": 5.380703610493878e-05,
+  "thr": 0.02,
+  "pass_": true
+ },
+ "3a forward_vs_ODE relL2 fine grid (0.05 s)": {
+  "value": 1.2867153250296073e-06,
+  "thr": 0.002,
+  "pass_": true
+ },
+ "3b kep->0: residual outside Patlak span at kep=1e-3": {
+  "value": 1.920738159565473e-06,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3b kep->0: |tofts-patlak| at kep=1e-3": {
+  "value": 8.718168602422192e-06,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c atoms orthonormality |B^T B - I|max": {
+  "value": 5.745914144483777e-08,
+  "thr": 0.0001,
+  "pass_": true
+ },
+ "3c Patlak span preserved |Q R - P|max": {
+  "value": 1.3226523884468655e-07,
+  "thr": 0.0001,
+  "pass_": true
+ },
+ "3c fresh-dict projection err total (rank 16)": {
+  "value": 0.0028711556505628365,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c fresh-dict projection err first-pass": {
+  "value": 0.005582618091942051,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c fresh-dict projection err washout": {
+  "value": 0.0008967585862293076,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c sl21 fresh-dict projection err total (rank 12)": {
+  "value": 0.0020641733099649303,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c phantom pkLUT curves (cortex/medulla/aorta) projection err": {
+  "value": 0.0024714446103265278,
+  "thr": 0.01,
+  "pass_": true
+ },
+ "3c same curves onto Patlak span (rank 3) [expected FAIL = motivation]": {
+  "value": 0.3485381950202217,
+  "thr": 0.01,
+  "pass_": false
+ },
+ "3d converted model output agreement relL2 (ck_26000.pt, N=20000 random k,t,coil)": {
+  "value": 0.00016581953968852758,
+  "thr": 0.001,
+  "pass_": true,
+  "note": "float32 head transform; basis relation exact 7.8e-7"
+ },
+ "3d basis relation |Phi_patlak - Phi_tofts[:, :3] R|max": {
+  "value": 7.830411377085511e-07,
+  "thr": 0.0001,
+  "pass_": true
+ },
+ "3d extra atoms untouched (|a_head rows 3:|max == 0)": {
+  "value": 0.0,
+  "thr": 0.0,
+  "pass_": true
+ },
+ "3d rank / params": {
+  "value": 16.0,
+  "thr": 0,
+  "pass_": true
+ },
+ "3e smoke finite + non-increasing (last10/first10)": {
+  "value": 0.8346260826641323,
+  "thr": 1.0,
+  "pass_": true
+ }
+}

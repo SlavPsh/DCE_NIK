@@ -1,0 +1,38 @@
+[
+ {
+  "method": "NIK k80 +heldout",
+  "fwhm_s": 23.09384164222874,
+  "ttp_s": 64.88269794721407,
+  "neg_frac": 0.0,
+  "rise_monotone_frac": 1.0,
+  "frames": 342,
+  "heldout_nmse": 0.7495284814032068
+ },
+ {
+  "method": "GRASP-v2 n12 k80",
+  "fwhm_s": 53.191489361702125,
+  "ttp_s": 63.829787234042556,
+  "neg_frac": 0.0,
+  "rise_monotone_frac": 1.0,
+  "frames": 142,
+  "heldout_nmse": 0.7464558448120977
+ },
+ {
+  "method": "GRASP-v2 n12 lam0.25",
+  "fwhm_s": 37.234042553191486,
+  "ttp_s": 63.829787234042556,
+  "neg_frac": 0.0,
+  "rise_monotone_frac": 1.0,
+  "frames": 142,
+  "heldout_nmse": 0.7451264656309377
+ },
+ {
+  "method": "GRASP-v2 n12 lam0.02",
+  "fwhm_s": 15.957446808510639,
+  "ttp_s": 63.829787234042556,
+  "neg_frac": 0.0,
+  "rise_monotone_frac": 1.0,
+  "frames": 142,
+  "heldout_nmse": 0.7490533746385336
+ }
+]

@@ -1,0 +1,59 @@
+{
+ "setting": {
+  "phantom_spf": 25,
+  "phantom_frames": 68,
+  "lam": 0.25,
+  "s_per_frame": 5.22,
+  "invivo_NLINE": 12
+ },
+ "phantom": [
+  {
+   "method": "NIK-sub16",
+   "frames": 344,
+   "aorta": 0.14309485598086322,
+   "cortex": 0.04832299707515506,
+   "medulla": 0.04497105088541505,
+   "peak": 0.8370675444602966,
+   "peak_err_pct": 4.052506729789219,
+   "haarpsi": 0.898534004177366
+  },
+  {
+   "method": "NIK-free",
+   "frames": 344,
+   "aorta": 0.08055887255481227,
+   "cortex": 0.01110247746765516,
+   "medulla": 0.014193171056454804,
+   "peak": 0.8641613721847534,
+   "peak_err_pct": 7.4204317082358155,
+   "haarpsi": 0.8895455283277175
+  },
+  {
+   "method": "GRASP-v2 25spf lam0.25",
+   "frames": 68,
+   "aorta": 0.1007399951192542,
+   "cortex": 0.07199620179491248,
+   "medulla": 0.049774476430545264,
+   "peak": 0.6511830088059216,
+   "peak_err_pct": -19.054053816183554,
+   "haarpsi": 0.9022718624157064
+  }
+ ],
+ "invivo": [
+  {
+   "method": "NIK k80 (1368 spokes, heldout ES)",
+   "frames": 342,
+   "aorta": 0.2342893046371417,
+   "cortex": 0.19621211536001698,
+   "medulla": 0.13008852830101147,
+   "peak_ratio": 0.7134712359034193
+  },
+  {
+   "method": "GRASP-v2 NLINE 12 k80 lam0.25",
+   "frames": 142,
+   "aorta": 0.15288971126334758,
+   "cortex": 0.08427235180310362,
+   "medulla": 0.058211298045103804,
+   "peak_ratio": 0.7097347856038708
+  }
+ ]
+}

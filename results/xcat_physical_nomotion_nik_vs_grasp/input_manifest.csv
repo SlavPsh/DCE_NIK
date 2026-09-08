@@ -1,0 +1,13 @@
+item,value
+xcat_nomotion_file,simulation_results_20260816T210718.mat
+slice_zi,10
+frames,344
+angles_per_frame,7
+partitions,16
+coils,8
+matrix,220
+time_range_s,0.26-179.28
+TR_ms,4.66
+FA_deg,18
+ROIs,aorta36/cortex13/medulla37
+truth,GroundTruth.img (physical SPGR)

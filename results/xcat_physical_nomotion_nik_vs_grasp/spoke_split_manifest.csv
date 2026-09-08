@@ -1,0 +1,4 @@
+set,angles,spokes,role
+train,0-4 (5/frame=Proj5),1720,recon input (both methods)
+validation,5,344,NIK checkpoint selection (kNMSE)
+test,6,344,"untouched, final k-space eval"

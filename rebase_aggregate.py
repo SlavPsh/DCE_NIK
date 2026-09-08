@@ -33,11 +33,11 @@ def metrics(st, h):
     m=E.image_metrics(st.mean(-1), csm, roi)
     return h, sw, nc, hf(st.mean(-1))/cshf, m.get("DISTS",np.nan), m.get("HaarPSI",np.nan)
 rows=[]
-specs=[("full-rank", f"{D}/results_rebase_fullrank/nik_slice_13.npy", f"{D}/slurm-nik-rebase-{jmap.get('fullrank','X')}.out"),
-       ("R=5",  f"{D}/results_rebase_r5/nik_slice_13.npy",  f"{D}/slurm-nik-rebase-{jmap.get('r5','X')}.out"),
-       ("R=10", f"{D}/results_rebase_r10/nik_slice_13.npy", f"{D}/slurm-nik-rebase-{jmap.get('r10','X')}.out"),
-       ("R=16", f"{D}/results_freq_base/nik_slice_13.npy",  f"{D}/slurm-nik-freq-{freqmap.get('base','X')}.out"),
-       ("R=20", f"{D}/results_rebase_r20/nik_slice_13.npy", f"{D}/slurm-nik-rebase-{jmap.get('r20','X')}.out")]
+specs=[("full-rank", f"{D}/results_rebase_fullrank/nik_slice_13.npy", f"{D}/logs/slurm-nik-rebase-{jmap.get('fullrank','X')}.out"),
+       ("R=5",  f"{D}/results_rebase_r5/nik_slice_13.npy",  f"{D}/logs/slurm-nik-rebase-{jmap.get('r5','X')}.out"),
+       ("R=10", f"{D}/results_rebase_r10/nik_slice_13.npy", f"{D}/logs/slurm-nik-rebase-{jmap.get('r10','X')}.out"),
+       ("R=16", f"{D}/results_freq_base/nik_slice_13.npy",  f"{D}/logs/slurm-nik-freq-{freqmap.get('base','X')}.out"),
+       ("R=20", f"{D}/results_rebase_r20/nik_slice_13.npy", f"{D}/logs/slurm-nik-rebase-{jmap.get('r20','X')}.out")]
 print(f"{'model':10} {'held':>7} {'swing%':>7} {'navcorr':>8} {'HF/CS':>6} {'DISTS':>6} {'HaarPSI':>7}  (vs CS-100)")
 for name, npy, lg in specs:
     try:

@@ -1,5 +1,101 @@
 # DCE_NIK — next steps (rewritten 2026-07-18 after the render-bug finding)
 
+## 2026-07-22 NUFFT REFERENCES (method-neutral) — biggest finding so far
+
+Built finufft references for slice 13 so NEITHER method defines the target (fixes the
+"HaarPSI vs CS only measures CS-likeness" flaw). nufft_reference.py / nufft_bolus.py.
+Sign convention SETTLED: finufft frame is 180deg vs grasp -> use sign=-1 (corr 0.9990 vs
+CS mean; sign=+1 gives 0.317). DCF = ramp |k| with floor; SENSE-combined with the SAME b1.
+
+### A/B spatial: CS is genuinely closer to the neutral reference
+  all-spokes NUFFT vs temporal mean : NIK 35.80 dB / HaarPSI .955 | CS 40.84 dB / .985
+  pre-contrast NUFFT (240 sp, t<53s): NIK 33.15 dB / .888        | CS 35.37 dB / .918
+So the earlier reference-bias caveat is GONE and CS still wins spatially (~5 dB, ~2 dB).
+
+### Temporal GT in the pre-contrast window (truth = ZERO drift): NIK wins
+  spurious drift  NIK +0.041 %/s (resid 2.22%)  vs  CS +0.090 %/s (resid 3.01%)
+First non-circular temporal number in the project. Narrow but clean.
+
+### C. MODEL-FREE bolus (sliding-window NUFFT) => BOTH METHODS SMEAR THE BOLUS ~7-10x
+Reference self-validates: window widths 21/41/81 spokes (4.6/9.0/17.8 s) give the SAME
+shape (rise ~50s, peak 62s, fall to 0.3 by 80s, recirculation bump ~92s).
+  FWHM   reference 14.0s | NIK full-rank 45.1s | CS(K=5) 96.1s | NIK R=16 139.7s | R=5 130.9s
+  TTP    reference 62.3s | full-rank 63.8s     | CS 68.2s      | R=16 69.3s      | R=5 77.0s
+=> **THE RANK CAGE IS THE MAIN CAUSE OF THE SMEARING.** Removing it (full-rank) cuts FWHM
+140s->45s and nails TTP. Verified VISUALLY (figures/bolus_rank_cage.png): full-rank really
+descends after the peak and even shows the recirculation bump; R=16/CS plateau high through
+75-125s. Not a noise artifact, and full-rank is SMOOTHER than R=16 here.
+=> Confirms the mechanism predicted from the navigator analysis: Phi is built from the
+bulk-dominated k=0 navigator, so the aorta's sharp spike is a minority variance mode and is
+not representable. NIK inherits this via its PCA warm-start + a k-space loss dominated by
+bulk signal (the aorta contributes ~nothing to the objective).
+
+### CONSEQUENCE: our baseline choice was driven by a metric we KNEW was misleading
+We picked the factorized low-rank model as baseline on held-out MSE (0.188 vs 0.325) and
+swing. Against a neutral reference the WORST held-out model (full-rank) has BY FAR the best
+bolus. This is exactly the warning in train_grasp_nik's docstring. Baseline NOT changed yet
+(2026-07-22) -- pending full-rank image-quality check vs the NUFFT references.
+Residual gap: full-rank is still 45s vs true 14s. Suspects: temporal encoding bandwidth
+(t_freq/t_sigma) and the bulk-dominated k-space loss.
+CAVEATS: slice 13, 21-voxel aorta ROI, single seed; pre-contrast reference uses 240 spokes
+(below the ~302 Nyquist) so it carries some streaking.
+
+## 2026-07-21 CONCLUSIONS (spoke frontier + metric corrections + rank semantics)
+
+### A. "NIK ~= CS spatially" was measured on the TEMPORAL MEAN and is inflated
+Same NIK, same reference, two ways of scoring:
+  temporal-mean image  HaarPSI 0.964   <- what we had been quoting
+  per-frame, averaged  HaarPSI 0.709   <- the relevant number for a DYNAMIC method
+Reproduces across both code paths (piq + eval.image_metrics) and both CS references
+(12-frame arm1 and 122-frame f100), so it is NOT a normalization/reference artifact.
+The mean averages away per-frame differences. Standard spatial metric is now PER-FRAME
+HaarPSI (mean + worst frame), resampled to a common frame grid.
+CAVEAT: reference is CS itself -> measures CS-LIKENESS. A non-CS method cannot reach 1.0,
+and per-frame CS-100 is itself noisy, so 0.709 is not "29% wrong".
+
+### B. Spoke-reduction frontier (100/71/50/36/29 %, IDENTICAL spokes, slice 13)
+Harness: shared keep-file (first m=round(14*frac) spokes per frame); NIK trains on ALL
+acquired spokes with NO heldout, so NIK and CS consume the same data. CS reconstructed
+from saved arrays (no twixtools), validated corr 1.000 vs cs_recon_3s.
+Per-frame HaarPSI vs CS-100:  NIK 0.709/0.709/0.697/0.619/0.631
+                              CS  1.000/0.922/0.857/0.810/0.785
+- CS is HIGHER at every fraction. No crossover in the tested range.
+- Images and metric DISAGREE: at 29% CS visibly streaks while NIK stays coherent, yet CS
+  scores higher. Unresolved -- do not present either as a result.
+- DO NOT quote "NIK -11% vs CS -21% degradation": CS starts at 1.000 by construction
+  (self-comparison), so its drop is inflated. That comparison is invalid.
+- NIK barely changes 100%->29% => output is PRIOR-DOMINATED (not using the extra spokes);
+  "graceful degradation" and "over-regularized" are indistinguishable here.
+
+### C. Rank R in NIK is SOFT; K in CS is HARD (important, changes earlier comparisons)
+NIK's Phi comes from a free SIREN: warm-started from the PCA basis but then trained with
+NO orthonormality/scale constraint. Factorization is only defined up to an invertible RxR
+transform (A M^-1)(M Phi), so individual Phi_r are not interpretable and scale is arbitrary.
+Effective rank (SVD of the recon, 99% energy):
+  CS (K=5)      5   <- exact, data is PROJECTED into a fixed 5-D subspace
+  NIK R=5      12   <- exceeds its nominal rank
+  NIK R=16     13
+  NIK full     27
+=> "R" is a nominal upper bound, not a real DoF cage. When R=5 matched CS's 38% swing the
+two were NOT equally constrained (NIK used ~12 effective dims). Any rank-vs-K comparison
+made before this is suspect. FIX (untried): orthonormalize Phi (QR/Gram-Schmidt or a
+penalty) so R means the same thing in both.
+
+### D. GRASP-Pro facts established (for reference)
+- Spatial quality is INDEPENDENT of temporal binning: unknowns are the K coefficient maps,
+  not nt frames. Verified: 342 vs 122 vs 12 frames -> HaarPSI 0.992/1.000/0.990, same
+  sharpness, and SVD rank identical (3 @90%, 4 @99%). Finer binning adds NO information.
+- Binning is a temporal-resolution vs navigator-SNR tradeoff on a fixed 0.219 s stream
+  (one k=0 sample per spoke, boxcar-averaged over nline). Also: nt x nt covariance from
+  100*nc rows becomes ill-conditioned if nt grows too large.
+- Phi is GLOBAL (one basis for all 27 slices) but coefficients are per-voxel/per-slice, so
+  slices/voxels still differ (aorta vs liver in slice 13: correlation 0.22). The real limit
+  is that all time courses must lie in the shared 5-D span.
+- Navigator = k=0 sample of every spoke -> FFT along kz (zero-padded 32->100, pure
+  interpolation, no new information) -> magnitude (phase DISCARDED) -> PCA over time.
+  It is bulk-signal dominated, so small structures (aorta) barely contribute to the basis.
+- Partial Fourier here: 22 of 32 kz partitions acquired (69%), 10 zero-filled (31%).
+
 ## HEADLINE: the "NIK is blurry" story was a RENDER BUG, now fixed
 `reconstruct_cartesian` masks |k| > support_radius at render time. It must equal the
 sampled-disk radius ~1.0 (model coords = 2*traj_norm, data reaches |x|=0.997). It was set

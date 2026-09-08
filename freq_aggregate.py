@@ -22,7 +22,7 @@ def hf(img):
 cshf = hf(csm)
 def heldout(tag):
     try:
-        for line in open(f"{D}/slurm-nik-freq-{jmap[tag]}.out"):
+        for line in open(f"{D}/logs/slurm-nik-freq-{jmap[tag]}.out"):
             m=re.search(r"restored best \(heldout ([\d.eE+-]+)\)", line)
             if m: return float(m.group(1))
     except Exception: pass

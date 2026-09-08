@@ -6,7 +6,7 @@ D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation
 ALPHAS = [0.0, 0.5, 1.0, 2.0]
 
 held = {}
-for lg in glob.glob(f"{D}/slurm-nik-radial-*.out"):
+for lg in glob.glob(f"{D}/logs/slurm-nik-radial-*.out"):
     txt = open(lg).read()
     ma = re.search(r"radial_alpha=([\d.]+)", txt); mh = re.search(r"restored best \(heldout ([\d.eE+-]+)\)", txt)
     if ma and mh: held[float(ma.group(1))] = float(mh.group(1))

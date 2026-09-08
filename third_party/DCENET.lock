@@ -1,0 +1,4 @@
+# reproducible pin for the DCENET dependency. re-create with:  bash third_party/fetch_dcenet.sh
+url=https://github.com/oliverchampion/DCENET.git
+sha=6c320ff99e2f5f990a299db8170ff36a06636ca1
+cite=Ottens et al., Medical Image Analysis 80, 102512 (2022). https://doi.org/10.1016/j.media.2022.102512

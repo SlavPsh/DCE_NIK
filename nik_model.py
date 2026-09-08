@@ -1239,10 +1239,16 @@ class WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(nn.Module):
     """
     def __init__(self, n_coils, coil_embed_dim=8, rank=12, hidden=512, depth=12,
                  w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5,
-                 ff_seed=0, residual=True, phi_hidden=64, phi_depth=3, phi_w0=30.0):
+                 ff_seed=0, residual=True, phi_hidden=64, phi_depth=3, phi_w0=30.0,
+                 ortho=False, ortho_grid=342):
         super().__init__()
         self.rank = int(rank)
         self.residual = bool(residual)
+        # ortho: hard QR orthonormalization of Phi over a fixed t-grid, gauge fixed, zero
+        # expressiveness cost (any invertible transform absorbed into A). t in [-1,1].
+        self.ortho = bool(ortho)
+        self.register_buffer('t_grid', torch.linspace(-1.0, 1.0, int(ortho_grid)))
+        self.last_gram_cond = 0.0                                # logged for stability
         self.coil_embed = nn.Embedding(int(n_coils), int(coil_embed_dim))
         nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
         self.ff_k = FourierFeatures(2, n_freq=int(k_freq), sigma=k_sigma, seed=ff_seed)
@@ -1268,9 +1274,24 @@ class WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(nn.Module):
             h = h + blk(h) if self.residual else blk(h)
         return self.a_head(h).view(-1, self.rank, 2)            # [N,R,2] complex
 
-    def basis(self, t):
+    def _raw_basis(self, t):
         h = self.phi_body(self.ff_t(t.view(-1, 1)))
         return self.phi_head(h).view(-1, self.rank, 2)          # [N,R,2] complex
+
+    def basis(self, t):
+        P = self._raw_basis(t)
+        if not self.ortho:
+            return P
+        # QR of the raw basis on the fixed grid -> R; orthonormal basis = Phi_raw @ inv(R).
+        # exact on the grid, continuous off it. gradient flows through inv(R) (unstable if
+        # the raw columns are near-dependent, which the constraint itself prevents).
+        Pg = torch.view_as_complex(self._raw_basis(self.t_grid).contiguous())    # [F,R]
+        Rm = torch.linalg.qr(Pg).R                                              # [R,R] upper-tri
+        with torch.no_grad():
+            self.last_gram_cond = float(torch.linalg.cond(Pg.mH @ Pg).real)
+        Pc = torch.view_as_complex(P.contiguous())                              # [N,R]
+        Po = Pc @ torch.linalg.inv(Rm)                                          # [N,R] orthonormal
+        return torch.view_as_real(Po)                                          # [N,R,2]
 
     def forward(self, kcoords, t, coil_idx):
         A = self.amplitudes(kcoords, coil_idx)
@@ -1331,3 +1352,160 @@ class WIRE_FF_RES_RADIAL_KXY_COIL_T_REIM(nn.Module):
         for blk in self.blocks:
             h = h + blk(h)
         return self.head(h)
+
+
+# ---------------------------------------------------------------------------
+# PK / gamma-variate temporal basis (P3). Factorized model k = sum_r A_r * Phi_r,
+# but Phi_r are PHYSICALLY-SHAPED bolus atoms instead of a free SIREN, so temporal
+# DoF is set by physiology (~3 params/atom) not an ad-hoc bandwidth. Kept SOFT: a
+# few free residual atoms remain, so sharpness stays partly data-driven and the
+# aorta test is not fully circular. pk_free-only (n_pk gamma) = the hard prior.
+# ---------------------------------------------------------------------------
+class WIRE_FF_PK_KXY_COIL_T_REIM(WIRE_FF_SUBSPACE_KXY_COIL_T_REIM):
+    """Same as WIRE_FF_SUBSPACE but the R temporal atoms are:
+      - n_pk gamma-variate bolus atoms  g(t;t0,alpha,beta), learnable arrival/rise/decay
+      - 1    baseline (DC) atom = 1      (pre-contrast tissue level)
+      - n_free = R-n_pk-1 free SIREN atoms  (soft residual: recirculation/motion/mismatch)
+    gamma+baseline are REAL (imag 0); complex k-space modulation comes from complex A_r.
+    Peak-normalized gamma so atoms are O(1). Set n_pk=R-1 (n_free=0) for the HARD prior."""
+    def __init__(self, n_coils, coil_embed_dim=8, rank=12, hidden=512, depth=12,
+                 w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5,
+                 ff_seed=0, residual=True, phi_hidden=64, phi_depth=3, phi_w0=30.0,
+                 n_pk=None):
+        super().__init__(n_coils, coil_embed_dim=coil_embed_dim, rank=rank, hidden=hidden,
+                         depth=depth, w0=w0, s0=s0, k_freq=k_freq, k_sigma=k_sigma,
+                         t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual,
+                         phi_hidden=phi_hidden, phi_depth=phi_depth, phi_w0=phi_w0)
+        R = self.rank
+        if n_pk is None:
+            n_pk = max(1, R - 1 - max(1, R // 3))     # default ~2/3 gamma, ~1/3 free, +1 baseline
+        n_pk = int(max(1, min(n_pk, R - 1)))          # keep >=1 baseline slot, <=R-1 gamma
+        self.n_pk = n_pk
+        self.n_free = R - n_pk - 1                     # remaining after gamma + baseline
+        # learnable gamma params: spread arrivals across the acquisition, sharp-ish rise, slow decay
+        self.pk_t0 = nn.Parameter(torch.linspace(-0.9, 0.5, n_pk))
+        self.pk_log_alpha = nn.Parameter(torch.full((n_pk,), math.log(3.0)))   # rise sharpness
+        self.pk_log_beta = nn.Parameter(torch.full((n_pk,), math.log(0.2)))    # decay time
+        # free residual atoms reuse phi_body; resize head to 2*n_free (0 -> drop)
+        if self.n_free > 0:
+            self.phi_head = nn.Linear(self.phi_head.in_features, 2 * self.n_free)
+        else:
+            self.phi_body = None
+            self.phi_head = None
+
+    def _gamma(self, t):
+        """peak-normalized gamma-variate atoms in [0,1]. t (N,) -> (N, n_pk)."""
+        tau = t.view(-1, 1) - self.pk_t0.view(1, -1)              # (N, n_pk)
+        alpha = self.pk_log_alpha.exp().view(1, -1)
+        beta = self.pk_log_beta.exp().view(1, -1)
+        pos = torch.relu(tau); eps = 1e-6
+        # divide by peak g(tau*=alpha*beta) = (alpha*beta)^alpha e^-alpha  -> unit peak
+        log_g = alpha * torch.log(pos + eps) - pos / beta \
+            - (alpha * torch.log(alpha * beta + eps) - alpha)
+        return torch.exp(log_g) * (tau > 0).to(t.dtype)
+
+    def basis(self, t):
+        N = t.numel(); dev = t.device
+        g = self._gamma(t)                                        # (N, n_pk) real
+        real = torch.cat([g, torch.ones(N, 1, device=dev, dtype=g.dtype)], dim=1)  # +baseline
+        P = torch.zeros(N, self.rank, 2, device=dev, dtype=g.dtype)
+        P[:, :self.n_pk + 1, 0] = real                            # gamma+baseline -> real channel
+        if self.n_free > 0:
+            h = self.phi_body(self.ff_t(t.view(-1, 1)))
+            P[:, self.n_pk + 1:, :] = self.phi_head(h).view(-1, self.n_free, 2)     # complex residual
+        return P                                                  # (N, R, 2)
+
+
+# ---------------------------------------------------------------------------
+# PATLAK temporal basis (P3, hard structural prior). Phi = [AIF(t), integral AIF(t),
+# baseline] FIXED from the measured arterial input, + n_free free SIREN atoms for graceful
+# degradation. amplitudes A_0, A_1 ARE vp and Ktrans (linear Patlak), no image-domain fit.
+# non-physiological curves are simply unrepresentable. F=0 -> pure Patlak (R=3).
+# ---------------------------------------------------------------------------
+class WIRE_FF_PATLAK_KXY_COIL_T_REIM(WIRE_FF_SUBSPACE_KXY_COIL_T_REIM):
+    """Fixed Patlak basis. aif_tgrid/aif_vals/iaif_vals are on the model t-grid ([-1,1]),
+    peak/max-normalized to O(1). rank = 3 + n_free. gamma/AIF atoms REAL; complex k-space
+    modulation from complex A_r. columns: 0=AIF (vp), 1=integral AIF (Ktrans), 2=baseline."""
+    def __init__(self, n_coils, aif_tgrid, aif_vals, iaif_vals, n_free=0,
+                 coil_embed_dim=8, hidden=512, depth=12, w0=62.0, s0=15.0,
+                 k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, residual=True,
+                 phi_hidden=64, phi_depth=3, phi_w0=30.0):
+        super().__init__(n_coils, coil_embed_dim=coil_embed_dim, rank=3 + int(n_free),
+                         hidden=hidden, depth=depth, w0=w0, s0=s0, k_freq=k_freq, k_sigma=k_sigma,
+                         t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual,
+                         phi_hidden=phi_hidden, phi_depth=phi_depth, phi_w0=phi_w0)
+        self.n_fixed = 3; self.n_free = int(n_free)
+        self.register_buffer('aif_tgrid', torch.as_tensor(aif_tgrid, dtype=torch.float32))
+        self.register_buffer('aif_vals', torch.as_tensor(aif_vals, dtype=torch.float32))
+        self.register_buffer('iaif_vals', torch.as_tensor(iaif_vals, dtype=torch.float32))
+        if self.n_free > 0:
+            self.phi_head = nn.Linear(self.phi_head.in_features, 2 * self.n_free)
+        else:
+            self.phi_body = None; self.phi_head = None
+
+    def _interp(self, t, vals):                                   # linear interp of a fixed grid at t
+        xg = self.aif_tgrid; G = xg.numel()
+        tc = t.clamp(float(xg[0]), float(xg[-1]))
+        idx = torch.searchsorted(xg, tc).clamp(1, G - 1)
+        x0 = xg[idx - 1]; x1 = xg[idx]; w = (tc - x0) / (x1 - x0 + 1e-9)
+        return vals[idx - 1] * (1 - w) + vals[idx] * w
+
+    def basis(self, t):
+        N = t.numel(); dev = t.device; t = t.view(-1)
+        aif = self._interp(t, self.aif_vals); iaif = self._interp(t, self.iaif_vals)
+        real = torch.stack([aif, iaif, torch.ones(N, device=dev, dtype=aif.dtype)], dim=1)  # (N,3)
+        P = torch.zeros(N, self.rank, 2, device=dev, dtype=real.dtype)
+        P[:, :self.n_fixed, 0] = real                            # AIF/iAIF/baseline -> real channel
+        if self.n_free > 0:
+            h = self.phi_body(self.ff_t(t.view(-1, 1)))
+            P[:, self.n_fixed:, :] = self.phi_head(h).view(-1, self.n_free, 2)
+        return P                                                  # (N, R, 2)
+
+
+class WIRE_FF_TOFTS_KXY_COIL_T_REIM(WIRE_FF_SUBSPACE_KXY_COIL_T_REIM):
+    """Fixed AIF-conditioned extended-Tofts temporal subspace (nik_tofts_subspace).
+    atoms [G,R] real, built OFFLINE by nik_tofts_basis.py: columns 0..2 = orthonormalized Patlak
+    span [AIF, intAIF, 1] (Q of P=QR), columns 3.. = SVD of the ext-Tofts dictionary projected out
+    of that span. so span(Patlak) is preserved exactly and a Patlak model converts losslessly
+    (a_new = R_patlak a_old, zeros elsewhere; see patlak_to_tofts). the amplitude net, the coil
+    embedding, the loss and the k-space training loop are untouched. no learned temporal net.
+    off-grid t: linear interp of the stored atoms (same rule as the Patlak class)."""
+    def __init__(self, n_coils, atom_tgrid, atoms, R_patlak=None, coil_embed_dim=8, hidden=512, depth=12,
+                 w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, residual=True):
+        atoms = torch.as_tensor(np.asarray(atoms), dtype=torch.float32)
+        super().__init__(n_coils, coil_embed_dim=coil_embed_dim, rank=int(atoms.shape[1]),
+                         hidden=hidden, depth=depth, w0=w0, s0=s0, k_freq=k_freq, k_sigma=k_sigma,
+                         t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual)
+        self.n_fixed = int(atoms.shape[1]); self.n_free = 0
+        self.phi_body = None; self.phi_head = None                     # no temporal net at all
+        self.register_buffer('atom_tgrid', torch.as_tensor(np.asarray(atom_tgrid), dtype=torch.float32))
+        self.register_buffer('atoms', atoms)                            # [G,R]
+        self.register_buffer('R_patlak', torch.as_tensor(np.eye(3) if R_patlak is None else np.asarray(R_patlak), dtype=torch.float32))
+
+    def basis(self, t):
+        t = t.view(-1); xg = self.atom_tgrid; G = xg.numel()
+        tc = t.clamp(float(xg[0]), float(xg[-1]))
+        idx = torch.searchsorted(xg, tc).clamp(1, G - 1)
+        x0 = xg[idx - 1]; x1 = xg[idx]; w = ((tc - x0) / (x1 - x0 + 1e-9)).unsqueeze(1)
+        real = self.atoms[idx - 1] * (1 - w) + self.atoms[idx] * w       # [N,R]
+        P = torch.zeros(t.numel(), self.rank, 2, device=t.device, dtype=real.dtype)
+        P[:, :, 0] = real                                                # real atoms, complex A_r
+        return P
+
+
+def patlak_to_tofts(patlak_sd, tofts_model):
+    """copy a trained WIRE_FF_PATLAK (n_free=0) into a WIRE_FF_TOFTS model whose first 3 atoms are
+    Q with P_patlak = Q R (R = tofts_model.R_patlak). exact: k = sum_j a_j p_j = sum_r (R a)_r q_r.
+    a_head rows are laid out (r, re/im) as in amplitudes().view(-1, R, 2)."""
+    R = tofts_model.R_patlak.cpu().double(); Rk = tofts_model.rank
+    sd = {k: v for k, v in tofts_model.state_dict().items()}
+    for k, v in patlak_sd.items():
+        if k.startswith(('aif_', 'iaif_', 'phi_')): continue
+        if k in ('a_head.weight', 'a_head.bias'): continue
+        assert k in sd and sd[k].shape == v.shape, (k, sd[k].shape if k in sd else None, v.shape)
+        sd[k] = v.clone()
+    Wo = patlak_sd['a_head.weight'].double().view(3, 2, -1); bo = patlak_sd['a_head.bias'].double().view(3, 2)
+    Wn = torch.zeros(Rk, 2, Wo.shape[-1], dtype=torch.float64); bn = torch.zeros(Rk, 2, dtype=torch.float64)
+    Wn[:3] = torch.einsum('rj,jcf->rcf', R, Wo); bn[:3] = R @ bo
+    sd['a_head.weight'] = Wn.reshape(2 * Rk, -1).float(); sd['a_head.bias'] = bn.reshape(2 * Rk).float()
+    tofts_model.load_state_dict(sd); return tofts_model

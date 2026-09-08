@@ -8,6 +8,7 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
 aroi = np.load(f"{D}/aorta_roi.npy"); lroi = np.load(f"{D}/liver_roi.npy")
 import os
+from figpath import fig as fpath
 recons = {}
 for tag, path, col, ls in [
     ("NIK R16 (fine)",   f"{D}/results_freq_base/nik_slice_13.npy", "tab:blue", "-"),
@@ -60,5 +61,5 @@ ax[2].set_xticks(x); ax[2].set_xticklabels(names, fontsize=7, rotation=20)
 ax[2].set_title("aorta metrics (lower noise + higher sharpness = better)", fontsize=10)
 ax[2].legend(fontsize=8); ax[2].grid(alpha=.3, axis="y")
 fig.suptitle("Aorta bolus test — does NIK resolve the sharp bolus cleaner than CS at fine temporal res? (slice 13)", fontweight="bold")
-fig.tight_layout(); fig.savefig(f"{D}/aorta_test.png", bbox_inches="tight", dpi=140)
+fig.tight_layout(); fig.savefig(fpath(f"aorta_test.png"), bbox_inches="tight", dpi=140)
 print("\nwrote aorta_test.png")
