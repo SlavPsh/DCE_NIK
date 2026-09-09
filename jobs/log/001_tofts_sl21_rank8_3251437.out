@@ -1,0 +1,25 @@
+2026-09-09 22:55:33 host gpu03.cluster job 3251437 task 0 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+  MIG 2g.24gb     Device  0: (UUID: MIG-7fdc2adf-8d97-57e9-a2a9-0e63797cb117)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+SAVED results/tofts_vs_patlak/basis_sl21_r8_tmp.npz atoms (342, 8)
+BASIS_DONE
+[W909 22:55:35.772412560 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+Submitted batch job 3251439
+eval chained afterany 3251436
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 40000 steps, batch 65536, split 0.7
+    explicit heldout: 123 VAL spokes
+    spoke-reduction: 488 acquired spokes, 1499136 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 110vltlz
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo/tofts8_sl21_s0/wandb_runs/wandb/run-20260909_225539-110vltlz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/110vltlz
+[wandb] gnik_tofts8_sl21_s0_s21: mode online

@@ -1,5 +1,5 @@
 queue 001_tofts_sl21_rank8
 jid 3251436
 submitted 2026-09-09 22:55:32
-state PENDING None
+state PENDING QOSMaxGRESPerUser
 log jobs/log/001_tofts_sl21_rank8_3251436.out

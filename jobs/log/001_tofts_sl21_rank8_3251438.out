@@ -1,0 +1,20 @@
+2026-09-09 22:55:33 host gpu02.cluster job 3251438 task 1 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 2g.24gb     Device  0: (UUID: MIG-281c0c74-ddae-5f82-9b91-3e7d8a855877)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 40000 steps, batch 65536, split 0.7
+    explicit heldout: 123 VAL spokes
+    spoke-reduction: 488 acquired spokes, 1499136 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run cak3f9r9
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo/tofts8_sl21_s1/wandb_runs/wandb/run-20260909_225557-cak3f9r9
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl21_s1_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/cak3f9r9
+[wandb] gnik_tofts8_sl21_s1_s21: mode online
