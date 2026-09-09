@@ -1,0 +1,41 @@
+host worker02.cluster  2026-09-09 22:45:06  user P101440
+
+== results/tofts_vs_patlak (125 files, 3.0G)
+total 21491
+drwxrwx---  4 P101440 P101440       26 Sep  9 16:04 .
+drwxr-x---  6 P101440 P101440        4 Sep  9 15:55 ..
+-rw-rw----  1 P101440 P101440     2798 Sep  9 15:56 MANIFEST.md
+-rw-r-----  1 P101440 P101440 21623878 Sep  8 08:54 NIK_vs_GRASPv2_combined_report.ipynb.bak_20260908
+-rw-rw----  1 P101440 P101440     9114 Sep  9 15:56 REPORT.md
+-rw-rw----  1 P101440 P101440     1827 Sep  9 16:04 REPRO.md
+-rw-rw----  1 P101440 P101440     1823 Sep  9 15:56 REPRO.md.bak
+-rw-r-----  1 P101440 P101440     2633 Sep  7 23:10 basis_3103526.log
+-rw-rw----  1 P101440 P101440    32444 Sep  9 15:56 basis_sl18.npz
+-rw-rw----  1 P101440 P101440    32452 Sep  9 15:56 basis_sl19.npz
+-rw-rw----  1 P101440 P101440    32360 Sep  9 15:56 basis_sl21.npz
+-rw-rw----  1 P101440 P101440    38060 Sep  9 15:56 basis_xph.npz
+-rw-rw----  1 P101440 P101440    38200 Sep  9 15:56 basis_xph_spgr.npz
+drwxrwx--- 20 P101440 P101440       18 Sep  9 15:55 invivo
+-rw-rw----  1 P101440 P101440    41466 Sep  9 15:56 invivo.json
+-rw-rw----  1 P101440 P101440     7985 Sep  9 15:56 invivo.md
+-rw-rw----  1 P101440 P101440       32 Sep  9 15:56 jobids.txt
+drwxrwx---  2 P101440 P101440       47 Sep  9 15:55 logs
+-rw-r-----  1 P101440 P101440    55236 Sep  7 23:15 nik_model.py.bak
+-rw-rw----  1 P101440 P101440    11765 Sep  9 15:56 phantom_motion.json
+-rw-rw----  1 P101440 P101440     2590 Sep  9 15:56 phantom_motion.md
+-rw-rw----  1 P101440 P101440    11848 Sep  9 15:56 phantom_nomotion.json
+-rw-rw----  1 P101440 P101440     2563 Sep  9 15:56 phantom_nomotion.md
+-rw-r-----  1 P101440 P101440    30662 Sep  7 23:15 train_grasp_nik.py.bak
+-rw-rw----  1 P101440 P101440     2135 Sep  9 15:56 verify.json
+-rw-r-----  1 P101440 P101440     2027 Sep  7 23:17 verify_3103529.log
+-rw-r-----  1 P101440 P101440    11271 Sep  7 23:15 xph_pipeline.py.bak
+-rw-r-----  1 P101440 P101440     2449 Sep  7 23:15 xph_train.py.bak
+
+== results/xcat_physical_motion_nik_vs_grasp (22 files, 1015M)
+total 3
+drwxrwx--- 6 P101440 P101440 4 Sep  9 15:56 .
+drwxr-x--- 6 P101440 P101440 4 Sep  9 15:55 ..
+drwxrwx--- 2 P101440 P101440 7 Sep  9 15:55 arrays
+drwxrwx--- 8 P101440 P101440 6 Sep  9 15:55 checkpoints
+drwxrwx--- 2 P101440 P101440 1 Sep  9 15:56 figures
+drwxrwx--- 2 P101440 P101440 2 Sep  9 15:56 v2_sweep
