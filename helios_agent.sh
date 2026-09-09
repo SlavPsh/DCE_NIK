@@ -94,13 +94,13 @@ track_jobs() {
   [ -s "$J/agent/active" ] || return 0
   while read -r jid n; do
     [ -n "${jid:-}" ] || continue
-    st=$(squeue -h -j "$jid" -o '%T %r' 2>/dev/null | head -1); st=${st//&/\&}
+    st=$(squeue -h -j "$jid" -o '%T %r' 2>/dev/null | sort | uniq -c | awk '{$1=$1; print}' | paste -sd, - | sed 's/,/, /g'); st=${st//&/\&}   # arrays: per state counts
     if [ -n "$st" ]; then
       keep+="$jid $n"$'\n'
       cur=$(sed -n 's/^state //p' "$J/done/$n" 2>/dev/null)
       [ "$cur" = "$st" ] || { sed -i "s|^state .*|state $st|" "$J/done/$n"; changed=1; }
     else
-      fin=$(sacct -n -X -j "$jid" -o State,Elapsed,MaxRSS 2>/dev/null | head -1 | xargs); [ -n "$fin" ] || fin="ENDED (no sacct)"
+      fin=$(sacct -n -X -j "$jid" -o State,Elapsed 2>/dev/null | awk '{$1=$1; print}' | sort | uniq -c | awk '{$1=$1; print}' | paste -sd, - | sed 's/,/, /g'); [ -n "$fin" ] || fin="ENDED (no sacct)"
       sed -i "s|^state .*|state $fin|" "$J/done/$n"; echo "ended $(date '+%F %T')" >> "$J/done/$n"
       log "ended $n ($jid): $fin"; changed=1
     fi
@@ -153,7 +153,7 @@ main() {
       log "STOP present, exit without resubmit"; write_status; commit_push "$D" jobs results; exit 0
     fi
     run_probes; run_queue; track_jobs
-    [ "$changed" = 1 ] && write_status
+    [ "$changed" = 1 ] || [ "$cycle" = 1 ] && write_status
     commit_push "$D" jobs results
     commit_push "$ROOT/grasp_v2" results
     commit_push "$ROOT/grasp_pro_py" results
