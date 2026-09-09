@@ -28,6 +28,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 torch.set_float32_matmul_precision("high")
+import nik_wandb as W
 
 sys.path.insert(0, '/net/beegfs/users/P101440/grasp_pro_py')   # nik_output_recon
 import nik_adapter as A
@@ -232,6 +233,11 @@ def train_one_slice(out_dir, slc, sh, args, device):
     if has_heldout:
         xhe, the, che, yhe = x[heldout_idx], t[heldout_idx], c[heldout_idx], y[heldout_idx]
     N_train = xtr.shape[0]
+    t_slice = time.time()
+    yhe_energy = float(yhe.pow(2).mean()) if has_heldout else 1.0
+    grp = os.path.basename(os.path.normpath(args.save_dir))
+    run = W.Run(f'gnik_{grp}_s{slc:02d}', config=dict(vars(args), slice=slc), group=grp, tags=[args.model],
+                local_json=os.path.join(args.save_dir, 'wandb_runs', f'slice_{slc:02d}.json'), enabled=not args.no_wandb)
 
     torch.manual_seed(args.seed)
     model = build_model(args, ncc).to(device)
@@ -281,19 +287,20 @@ def train_one_slice(out_dir, slc, sh, args, device):
     sched = torch.optim.lr_scheduler.ReduceLROnPlateau(
         opt, mode='min', factor=0.5, patience=args.scheduler_patience, min_lr=args.scheduler_min_lr)
 
-    best_heldout, best_state = float('inf'), None
+    best_heldout, best_state, best_step = float('inf'), None, 0
     ckpt_path = os.path.join(args.save_dir, f'ckpt_slice_{slc:02d}.pt')
     start_step = 1
     if args.resume and os.path.exists(ckpt_path):                       # continue a timed-out run
         ck = torch.load(ckpt_path, map_location=device)
         model.load_state_dict(ck['model']); opt.load_state_dict(ck['opt']); sched.load_state_dict(ck['sched'])
         best_heldout, best_state, start_step = ck['best_heldout'], ck['best_state'], ck['step'] + 1
+        best_step = ck.get('best_step', 0)
         print(f'    resumed slice {slc:02d} from step {ck["step"]} (best heldout {best_heldout:.3e})', flush=True)
 
     def save_ckpt(step):                                                # atomic: tmp then rename
         tmp = ckpt_path + '.tmp'
         torch.save(dict(step=step, model=model.state_dict(), opt=opt.state_dict(),
-                        sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state), tmp)
+                        sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state, best_step=best_step), tmp)
         os.replace(tmp, ckpt_path)
 
     model.train()
@@ -334,11 +341,16 @@ def train_one_slice(out_dir, slc, sh, args, device):
                 if step >= args.warmup_steps and hl < best_heldout:
                     best_heldout = hl
                     best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+                    best_step = step
                 save_ckpt(step)                                        # survive wall-clock timeout
+                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+                             best_step=best_step, lr=opt.param_groups[0]['lr'], wall_s=time.time() - t_slice,
+                             peak_gpu_mb=W.peak_gpu_mb()), step=step)
                 if step % args.console_every == 0 or step == args.steps:
                     print(f'    step {step:6d}  train {float(loss):.3e}  heldout {hl:.3e}', flush=True)
             elif step % args.console_every == 0 or step == args.steps:
                 print(f'    step {step:6d}  train {float(loss):.3e}', flush=True)
+                run.log(dict(loss=float(loss), wall_s=time.time() - t_slice, peak_gpu_mb=W.peak_gpu_mb()), step=step)
 
     if best_state is not None:
         model.load_state_dict({k: v.to(device) for k, v in best_state.items()})
@@ -360,6 +372,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
     if device.type == 'cuda':
         print(f'    RESOURCES slice {slc:02d}: peak_gpu_MB {torch.cuda.max_memory_allocated()/2**20:.0f} '
               f'params {sum(p.numel() for p in model.parameters())} best_heldout {best_heldout:.4e}', flush=True)
+    run.finish(best_heldout_mse=best_heldout, best_step=best_step, params=sum(p.numel() for p in model.parameters()),
+               peak_gpu_mb=W.peak_gpu_mb(), wall_s=time.time() - t_slice)
     if os.path.exists(ckpt_path):
         os.remove(ckpt_path)                          # resume ckpt only; final weights saved above
     return img
@@ -454,6 +468,7 @@ def main():
     ap.add_argument('--use-focal', type=int, default=0)
     ap.add_argument('--support-radius', type=float, default=1.0)
     ap.add_argument('--no-compile', dest='compile', action='store_false')
+    ap.add_argument('--no-wandb', action='store_true', help='skip wandb (project dce_nik, offline fallback)')
     args = ap.parse_args()
     args.use_dcf = bool(args.use_dcf); args.use_focal = bool(args.use_focal)
 

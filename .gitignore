@@ -31,3 +31,5 @@ results/**/animations/
 !spoke_masks/*.npy
 !aif_*.npz
 !results/tofts_vs_patlak/basis_*.npz
+results/_wandb/runs.json
+results/_wandb/history/
