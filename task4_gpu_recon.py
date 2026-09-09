@@ -5,7 +5,7 @@ Produces direct-discrete, CS-reconstruct-then-fit (identity basis), and NUFFT-sa
 usage: python task4_gpu_recon.py [--frac f25|f100|both]"""
 import warnings; warnings.filterwarnings("ignore")
 import argparse, sys, time, numpy as np, cupy as cp, cufinufft
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"; SIGN = -1.0
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"; SIGN = -1.0
 ap = argparse.ArgumentParser(); ap.add_argument("--frac", default="both", choices=["f25", "f100", "both"]); A = ap.parse_args()
 S = np.load(f"{OUT}/arrays/sim.npz"); Phi0 = S["Phi"]; b1n = S["b1"]; kx = S["kx"]; ky = S["ky"]; keep = S["keep_f25"]
 F, NA, RO = kx.shape; C = b1n.shape[-1]; N = RO; EPS = 1e-5

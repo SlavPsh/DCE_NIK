@@ -5,7 +5,7 @@ import json, shutil, sys, os
 import nbformat as nbf
 from nbclient import NotebookClient
 
-B = "/scratch/rnga/vvpshenov/DCE_NIK"
+B = "/net/beegfs/users/P101440/DCE_NIK"
 NB = f"{B}/results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_CS_combined_report.ipynb"
 
 OLD_FRONTIER = "### spoke-fraction frontier. cs-favored, nuanced. nik haarpsi vs cs flat ~0.71, below cs every fraction. cs-likeness, no gt"

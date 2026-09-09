@@ -18,8 +18,8 @@ import numpy as np, torch, json, os
 import scipy.ndimage as ndi
 from masked_metrics import haarpsi_masked, ssim_masked
 
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; NUF = f"{D}/results_nufft"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+D = "/net/beegfs/users/P101440/DCE_NIK"; NUF = f"{D}/results_nufft"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 TA = 375.0; dev = "cuda" if torch.cuda.is_available() else "cpu"
 meta = json.load(open(f"{NUF}/meta.json")); T_PRE = meta["t_pre_s"]
 SPOKES = {"f100": 240, "f70": 172, "f50": 121, "f25": 70}          # pre-contrast spokes/fraction

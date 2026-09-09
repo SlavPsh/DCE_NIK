@@ -1,7 +1,7 @@
 # XCAT physical no-motion NIK-vs-GRASP-Pro — RESUME / progress ledger
 
 ## Dataset (FROZEN)
-- NO-MOTION: /scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260816T210718.mat
+- NO-MOTION: /net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260816T210718.mat
   (respPeriod=[78 47 65]="N/A"). Breathing file (223443, respPeriod=5) NOT used here.
 - Geometry: DCE (344 frames, 8 coils, 112=7ang x 16part, 220 RO). Aligned stack-of-stars.
   trajDCE[:,2]=partition idx (1..16, centric). Recon frame times 0.26..179.3s (0.52s).

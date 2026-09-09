@@ -7,11 +7,11 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, sys
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"; TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; TA = 375.0
 SLICES = [18, 19, 21]; ROIS = ["aorta", "cortex", "medulla", "liver"]
 def nikpath(kind, Z):
     if kind == "NIK_R16": return f"{D}/results_batch/nik_r16_sl{Z}/nik_slice_{Z}_cplx.npy"

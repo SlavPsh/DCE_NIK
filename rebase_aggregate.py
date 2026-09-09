@@ -1,14 +1,14 @@
 """Unified re-baseline (render fix support=1.0): full-rank + factorized R vs CS.
 held-out + swing + nav-corr + HF/CS + DISTS/HaarPSI vs CS-100."""
 import re, sys, numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/nik-autoresearch/glue"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/nik-autoresearch/glue"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import eval as E, nik_adapter as NA
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
 jmap = dict(l.split() for l in open(f"{D}/rebase_jids.txt"))
 freqmap = dict(l.split() for l in open(f"{D}/freq_jids.txt"))
 cs100 = np.abs(np.load(f"{A}/arm1_cs100_sl13.npy")); cs70 = np.abs(np.load(f"{A}/arm1_cs70_sl13.npy")); csm = cs100.mean(-1)
 roi = csm > np.quantile(csm, 0.55)
-sh = NA.load_shared(f"/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"); sl = NA.load_slice(f"/scratch/rnga/vvpshenov/grasp_pro_py/results_ref", 13)
+sh = NA.load_shared(f"/net/beegfs/users/P101440/grasp_pro_py/results_ref"); sl = NA.load_slice(f"/net/beegfs/users/P101440/grasp_pro_py/results_ref", 13)
 krad = np.asarray(sl["kdata_radial"]); vt = np.asarray(sh["view_time"]).ravel(); c0 = krad.shape[0]//2
 dc = np.sqrt((np.abs(krad[c0]) ** 2).sum(-1)); o = np.argsort(vt); ts = vt[o]
 dcs = np.clip(dc[o], np.percentile(dc,1), np.percentile(dc,99))

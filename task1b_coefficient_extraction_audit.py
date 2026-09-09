@@ -7,10 +7,10 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, csv, torch, scipy.ndimage as ndi
 from types import SimpleNamespace
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
 from train_grasp_nik import build_model
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 OUT = f"{D}/results/task1b_coefficient_extraction"
 for s in ["figures", "arrays", "logs", "script_snapshot"]: os.makedirs(f"{OUT}/{s}", exist_ok=True)
 SLICES = [18, 19, 21]; CFGS = [("F0", 0), ("F2", 2)]

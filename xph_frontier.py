@@ -14,7 +14,7 @@ out: v2_sweep/frontier.json + figures/fig_v2_frontier.png
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 from masked_metrics import haarpsi_masked, ssim_masked
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt

@@ -4,7 +4,7 @@ default ls=1e-3, lt=1e-3), NOT tuned on truth. usage: python task4_baselines.py 
 import warnings; warnings.filterwarnings("ignore")
 import argparse, os, sys, numpy as np, finufft
 sys.path.insert(0, "."); from cs_nufft import NufftSubspace, recon as cs_recon, frames_from_coeff
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"; SIGN = -1.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"; SIGN = -1.0
 ap = argparse.ArgumentParser(); ap.add_argument("--frac", required=True, choices=["f100", "f25"]); a = ap.parse_args()
 S = np.load(f"{OUT}/arrays/sim.npz"); Phi = S["Phi"]; b1 = S["b1"]; kx = S["kx"]; ky = S["ky"]; keep = S["keep_f25"]
 F, NA, RO = kx.shape; C = b1.shape[-1]; N = RO

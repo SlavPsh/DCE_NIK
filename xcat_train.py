@@ -5,7 +5,7 @@ import argparse, os, json, time, sys
 import numpy as np, torch
 import torch.nn.functional as F
 torch.set_float32_matmul_precision("high")
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import xcat_adapter as X
 from nik_model import (WIRE_FF_RES_KXY_COIL_T_REIM, WIRE_FF_SUBSPACE_KXY_COIL_T_REIM, warmstart_phi)
 from kspace_normalization import KSpaceNormalizer

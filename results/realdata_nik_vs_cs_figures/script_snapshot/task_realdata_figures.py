@@ -6,7 +6,7 @@ consistency / CS-likeness, not accuracy. Labelled as such."""
 import warnings; warnings.filterwarnings("ignore")
 import os, json, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; GP = "/scratch/rnga/vvpshenov/grasp_pro_py"
+B = "/net/beegfs/users/P101440/DCE_NIK"; GP = "/net/beegfs/users/P101440/grasp_pro_py"
 OUT = f"{B}/results/realdata_nik_vs_cs_figures"; os.makedirs(f"{OUT}/figures", exist_ok=True)
 def J(p): return json.load(open(p)) if os.path.exists(p) else None
 

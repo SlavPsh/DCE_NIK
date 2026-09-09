@@ -8,7 +8,7 @@ import numpy as np, torch, piq
 from scipy.ndimage import fourier_shift
 from scipy.interpolate import interp1d
 import recon_asserts as RA
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+D = "/net/beegfs/users/P101440/DCE_NIK"; CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 ref = np.abs(np.load(f"{CSD}/cs_slice13_f100.npy")).astype(np.float32); NT = ref.shape[-1]        # [192,192,122]
 rm = ref.mean(-1); body = rm > np.quantile(rm, 0.55); cm = rm
 def resample_t(v, nt):

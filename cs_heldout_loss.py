@@ -7,7 +7,7 @@ then normalized with NIK's KSpaceNormalizer. A validation gate checks the forwar
 reproduces measured data on TRAIN spokes before trusting held-out numbers.
 """
 import sys, numpy as np, torch, finufft
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as NA
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 from grog import get_gx_gy, grog_dictionary_interp
@@ -17,7 +17,7 @@ from fftc import ifft2c_mri
 from coilmaps import adapt_array_2d
 import precompute_ref as pr
 
-OUT = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; SLC = 13
+OUT = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; SLC = 13
 NT_CS = 34                                        # CS temporal binning for the recon
 pr.Weight1 = 0.001; pr.Weight2 = 0.0005
 

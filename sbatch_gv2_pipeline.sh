@@ -1,17 +1,17 @@
 #!/bin/bash
 #SBATCH -J gv2pipe
-#SBATCH -p luna-cpu-short
+#SBATCH -p defq
 #SBATCH -c 8
 #SBATCH --mem 48G
 #SBATCH -t 7:00:00
-#SBATCH -o /scratch/rnga/vvpshenov/DCE_NIK/gv2pipe_%j.log
+#SBATCH -o /net/beegfs/users/P101440/DCE_NIK/gv2pipe_%j.log
 # regenerate every reference-method product with classic grasp v2 instead of grasp-pro.
 # identical inputs, only the recon algorithm differs. defaults of every script are untouched.
-cd /scratch/rnga/vvpshenov/DCE_NIK
-export CSD=/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2
+cd /net/beegfs/users/P101440/DCE_NIK
+export CSD=/net/beegfs/users/P101440/grasp_v2/results_grasp_v2
 export CSPRE=gv2
 export TAG=_gv2
-P=${PY:-/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python}
+P=${PY:-/net/beegfs/users/P101440/micromamba/envs/torch29/bin/python}
 
 echo "=== inputs present ==="; ls -1 $CSD | sed 's/^/  /'
 # gate: all 19 matched recons must exist before regenerating anything
@@ -25,12 +25,12 @@ done
 [ $MISSING -eq 1 ] && { echo "ABORT: incomplete matched set, refusing to build a half-swapped notebook"; exit 1; }
 echo "  all 19 matched recons present"
 echo; echo "=== QC vs grasp-pro ==="
-$P -u /scratch/rnga/vvpshenov/grasp_v2/qc_gv2_vs_pro.py || echo "QC FAILED"
+$P -u /net/beegfs/users/P101440/grasp_v2/qc_gv2_vs_pro.py || echo "QC FAILED"
 
 echo; echo "=== f80match fairness + period-5 ripple check ==="
 # v2 has no DCF/DCF_U compensation, so the variable 10-12 spokes/frame could leak into intensity.
 # pro's ripple check does NOT carry over and has to be redone here.
-$P -u /scratch/rnga/vvpshenov/grasp_v2/check_f80.py || echo "F80 CHECK FAILED"
+$P -u /net/beegfs/users/P101440/grasp_v2/check_f80.py || echo "F80 CHECK FAILED"
 run () { echo; echo "=== $* ==="; $P -u "$@" || echo "FAILED: $*"; }
 
 run haarpsi_spoke.py            # -> haarpsi_spoke_gv2.json

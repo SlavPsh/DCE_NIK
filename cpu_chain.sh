@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Serial CPU orchestrator for Task 4 non-neural recons (avoid thrash on the loaded node).
 # Order: [running] direct+nufft f25 -> csfit f25 -> direct+nufft f100 -> csfit f100
-cd /scratch/rnga/vvpshenov/DCE_NIK
+cd /net/beegfs/users/P101440/DCE_NIK
 L=results/task4_xcat_nomotion_pilot/logs
 export OMP_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8
 run() { echo "[chain] $(date +%H:%M) START $1"; micromamba run -n torch29 python -u $2 > $L/$1.log 2>&1; echo "[chain] $(date +%H:%M) END   $1 ($(grep -c DONE $L/$1.log) done-marker)"; }

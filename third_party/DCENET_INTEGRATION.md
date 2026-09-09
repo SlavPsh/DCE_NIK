@@ -6,7 +6,7 @@ Cite: Ottens et al., *Medical Image Analysis* 80, 102512 (2022). https://doi.org
 
 **import** (never `import functions`; the bare name collides)
 ```python
-import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+import sys; sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import dcenet_adapter as D
 ct = D.ext_tofts_cosine4(t_min, D.phantom_aif4(), ke, dt, ve, vp, device="cuda")   # [N,T] concentration
 ```

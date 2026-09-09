@@ -12,12 +12,12 @@ out: figures/fig_v2_vs_nik_invivo.png + v2_sweep_invivo/v2_vs_nik_invivo.json
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 from masked_metrics import haarpsi_masked
 import consolidated as C
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; GV = "/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2"
+B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"
 OUTD = f"{B}/v2_sweep_invivo"; FIG = f"{B}/results/realdata_nik_vs_cs_figures/figures"
 os.makedirs(OUTD, exist_ok=True)
 TA, NTV = 375.0, 1710

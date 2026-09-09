@@ -10,13 +10,13 @@ metric is not informative. in vivo reports contrast curves only.
 import warnings; warnings.filterwarnings("ignore")
 import sys, os, json
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 import consolidated as C
 
 A = f"{P.OUT}/arrays"; SW = f"{P.OUT}/v2_sweep"
-GV = "/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2"
-B = "/scratch/rnga/vvpshenov/DCE_NIK"
+GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"
+B = "/net/beegfs/users/P101440/DCE_NIK"
 G_SEL, LAM_SEL, NLINE_SEL = 5, 0.25, 12          # 25 spokes/frame phantom, NLINE 12 in vivo
 out = {"setting": dict(phantom_spf=5*G_SEL, phantom_frames=344//G_SEL, lam=LAM_SEL,
                        s_per_frame=round(5*G_SEL*344/1720*0.1044*10, 2), invivo_NLINE=NLINE_SEL)}

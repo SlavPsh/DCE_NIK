@@ -7,10 +7,10 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, os, sys, scipy.ndimage as ndi
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C                                   # reuse slice_ctx, spatial_eval, norm
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; TA = 375.0; Z = 21
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; TA = 375.0; Z = 21
 
 # fixed Patlak basis on the 342 render grid (same as training)
 az = np.load(f"{D}/aif_slice21.npz"); tg = np.linspace(0, TA, 342)

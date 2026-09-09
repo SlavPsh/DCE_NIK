@@ -5,13 +5,13 @@ import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob, re
 import numpy as np, torch
 from types import SimpleNamespace
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import consolidated as C, nik_adapter as A
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 from train_grasp_nik import build_model
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"; REFD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-GV = "/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2"; GP = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"; REFD = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 TA = 375.0; NTV = 1710; ROIS = ("aorta", "cortex", "medulla", "liver"); EDGES = np.linspace(0, 1, 17)
 KEEP = np.load(f"{B}/spoke_masks/keep_f25.npy"); VAL = np.load(f"{B}/spoke_masks/val_f25c_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_f25c_m9.npy")
 sh = A.load_shared(REFD)

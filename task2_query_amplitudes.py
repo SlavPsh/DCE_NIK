@@ -5,12 +5,12 @@ Saves complex a_rc [bas,bas,R,ncc], b1_crop, Phi(frame_t), and scale constants. 
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, torch, json
 from types import SimpleNamespace
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
 from fftc import ifft2c_mri, crop_img
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 OUT = f"{D}/results/task2_scaling_coil_audit"; os.makedirs(f"{OUT}/arrays", exist_ok=True); os.makedirs(f"{OUT}/logs", exist_ok=True)
 sh = np.load(f"{REF}/shared.npz"); TA = float(sh["TA"]); nx, nt, ncc, bas = int(sh["nx"]), int(sh["nt"]), int(sh["ncc"]), int(sh["bas"])
 frame_t = torch.tensor((2.0 * sh["frame_time"] - 1.0).astype(np.float32)); dev = "cpu"

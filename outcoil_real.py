@@ -4,7 +4,7 @@ differs. No ground truth -> compare on HELD-OUT spoke NMSE (generalization) + re
 Spoke split: train/val(early-stop)/test held out. usage: --coilmode input|output"""
 import warnings; warnings.filterwarnings("ignore")
 import argparse, time, os, sys, copy, math, numpy as np, torch, torch.nn as nn
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A
 from nik_model import FourierFeatures, GaborLayer, SineLayer
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
@@ -20,8 +20,8 @@ class GaussianLayer(nn.Module):
             else: b = math.sqrt(6/in_f)/w0; self.lin.weight.uniform_(-b, b)
             self.lin.bias.uniform_(-math.pi, math.pi)                              # phase spread so bumps tile time
     def forward(self, x): h = self.w0*self.lin(x); return torch.exp(-0.5*(self.s*h)**2)
-_HS = "/home/rnga/vvpshenov/refstage_home"                                # luna-01 cold reads: /home ~2.4x faster than /scratch while FS degraded
-REF = _HS if os.path.exists(f"{_HS}/shared.npz") else "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+_HS = "/home/P101440/refstage_home"                                # luna-01 cold reads: /home ~2.4x faster than /scratch while FS degraded
+REF = _HS if os.path.exists(f"{_HS}/shared.npz") else "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 FIX = dict(depth=12, w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5)
 
 class Backbone(nn.Module):
@@ -107,7 +107,7 @@ def main():
     Yn = norm(coords, Yc)                                                                               # [M,C] normalized
     aifd = None
     if a.model in ("f0", "f2"):
-        az = np.load(f"/scratch/rnga/vvpshenov/DCE_NIK/aif_slice{a.slice}.npz"); TA = float(az["tC"][-1])
+        az = np.load(f"/net/beegfs/users/P101440/DCE_NIK/aif_slice{a.slice}.npz"); TA = float(az["tC"][-1])
         aif = az["aif_frame"].astype(np.float64); aif = aif/(aif.max()+1e-9)
         iaif = np.concatenate([[0.0], np.cumsum(0.5*(aif[1:]+aif[:-1])*np.diff(az["tC"]))]); iaif = iaif/(iaif.max()+1e-9)
         aifd = dict(tgrid=2.0*(az["tC"]/TA)-1.0, aif=aif, iaif=iaif)
@@ -169,7 +169,7 @@ def main():
             outs.append(g)
         img = np.concatenate(outs, -1)                                                                   # [bas,bas,nt]
     print(f"  render {img.shape} in {time.time()-rt:.0f}s (GPU)", flush=True)
-    np.save(f"/scratch/rnga/vvpshenov/DCE_NIK/results/realdata_nik_vs_cs_figures/outcoil_{a.model}_{a.coilmode}{a.tag}_slice{a.slice}.npy", img.astype(np.float32))
+    np.save(f"/net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/outcoil_{a.model}_{a.coilmode}{a.tag}_slice{a.slice}.npy", img.astype(np.float32))
     print(f"REAL-{a.model}-{a.coilmode.upper()} slice{a.slice}: TEST held-out NMSE {test_nmse:.4e} | recon {img.shape} saved", flush=True)
     print("DONE_OCREAL", flush=True)
 

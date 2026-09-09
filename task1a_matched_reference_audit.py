@@ -6,11 +6,11 @@ No retraining, no model/extraction change. out: results/task1a_matched_reference
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, csv, json, torch, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
 from masked_metrics import haarpsi_masked
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"; TA = 375.0; SLICES = [18, 19, 21]
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; TA = 375.0; SLICES = [18, 19, 21]
 OUT = f"{D}/results/task1a_matched_reference"
 for sub in ["figures", "arrays", "logs"]: os.makedirs(f"{OUT}/{sub}", exist_ok=True)
 

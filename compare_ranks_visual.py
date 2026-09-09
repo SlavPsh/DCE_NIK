@@ -3,11 +3,11 @@ Static (temporal-mean) images isolate spatial quality. Perceptual vs CS-100 stat
 out: rank_visual.png"""
 import sys, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-REPO = "/scratch/rnga/vvpshenov/nik-autoresearch"
+REPO = "/net/beegfs/users/P101440/nik-autoresearch"
 sys.path.insert(0, f"{REPO}/baseline_cs"); sys.path.insert(0, f"{REPO}/glue")
 import eval as E
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
 
 def static(path, key=None):
     v = np.abs(np.load(path)); return v.mean(-1)

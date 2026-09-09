@@ -11,7 +11,7 @@ import os, re, sys
 import nbformat as nbf
 from nbclient import NotebookClient
 
-B = "/scratch/rnga/vvpshenov/DCE_NIK"
+B = "/net/beegfs/users/P101440/DCE_NIK"
 PH = f"{B}/results/xcat_physical_nomotion_nik_vs_grasp"
 SRC = f"{PH}/NIK_vs_CS_combined_report.ipynb"
 DST = f"{PH}/NIK_vs_GRASPv2_combined_report.ipynb"

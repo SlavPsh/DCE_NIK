@@ -7,12 +7,12 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, torch
 from types import SimpleNamespace
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C, nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
 from nik_output_recon import recon_nik_cart
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; OUT = f"{D}/results/task1b_coefficient_extraction"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; OUT = f"{D}/results/task1b_coefficient_extraction"
 Z, F = 21, 2; dev = "cpu"
 sh = np.load(f"{REF}/shared.npz"); TA = float(sh["TA"]); nx, nt, ncc = int(sh["nx"]), int(sh["nt"]), int(sh["ncc"]); bas = int(sh["bas"])
 frame_t = torch.tensor((2.0 * sh["frame_time"] - 1.0).astype(np.float32))

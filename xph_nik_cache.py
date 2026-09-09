@@ -6,7 +6,7 @@ out: arrays/nik_fine_<tag>.npy  [RO,RO,F] magnitude, truth-frame, unscaled
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, glob
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")

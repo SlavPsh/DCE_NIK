@@ -4,10 +4,10 @@ LS-scaled PSNR. references: each method's own f100 AND the CS-f100 gold standard
 masked_metrics.haarpsi_masked / ssim_masked (no new metric code)."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, sys, os, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
 from masked_metrics import haarpsi_masked, ssim_masked
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"; TA = 375.0; SLICES = [18, 19, 21]
+D = "/net/beegfs/users/P101440/DCE_NIK"; CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; TA = 375.0; SLICES = [18, 19, 21]
 def bpinv(Z, nt):
     az = np.load(f"{D}/aif_slice{Z}.npz"); tg = np.linspace(0, TA, nt)
     aif = np.interp(tg, np.asarray(az["tC"]), np.asarray(az["aif_frame"])); aif /= (aif.max()+1e-9)

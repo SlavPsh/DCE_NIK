@@ -6,10 +6,10 @@ recons: full-rank NIK (best temporal expressiveness) f25, slices 18,19,21. out: 
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, sys, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; TA = 375.0
 SLICES = [18, 19, 21]; ROIS = ["aorta", "cortex", "medulla", "liver"]
 NIK = {18: f"{D}/results_batch/full_sl18/nik_slice_18_cplx.npy", 19: f"{D}/results_batch/full_sl19/nik_slice_19_cplx.npy",
        21: f"{D}/results_batch/full_sl21f25/nik_slice_21_cplx.npy"}

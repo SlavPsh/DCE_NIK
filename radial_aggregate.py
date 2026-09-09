@@ -2,7 +2,7 @@
 + high-freq power ratio (blur proxy) + swing. The question: does the warp raise HF energy
 (reduce blur) or just move held-out / add grain? Baseline: full-rank NIK HF-ratio ~0.03."""
 import re, glob, numpy as np
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
 ALPHAS = [0.0, 0.5, 1.0, 2.0]
 
 held = {}
@@ -20,9 +20,9 @@ def hf_ratio(img):                                  # fraction of spatial power 
 cs = hf_ratio(np.abs(np.load(f"{A}/arm1_cs100_sl13.npy")).mean(-1))
 
 refs = None
-import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+import sys; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as NA
-sh = NA.load_shared("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"); sl = NA.load_slice("...".replace("...", "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"), 13)
+sh = NA.load_shared("/net/beegfs/users/P101440/grasp_pro_py/results_ref"); sl = NA.load_slice("...".replace("...", "/net/beegfs/users/P101440/grasp_pro_py/results_ref"), 13)
 krad = np.asarray(sl["kdata_radial"]); vt = np.asarray(sh["view_time"]).ravel()
 c0 = krad.shape[0] // 2; dc = np.sqrt((np.abs(krad[c0, :, :]) ** 2).sum(-1))
 o = np.argsort(vt); ts = vt[o]; dcs = np.clip(dc[o], np.percentile(dc, 1), np.percentile(dc, 99))

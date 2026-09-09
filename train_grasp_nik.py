@@ -29,7 +29,7 @@ import torch
 import torch.nn.functional as F
 torch.set_float32_matmul_precision("high")
 
-sys.path.insert(0, '/scratch/rnga/vvpshenov/grasp_pro_py')   # nik_output_recon
+sys.path.insert(0, '/net/beegfs/users/P101440/grasp_pro_py')   # nik_output_recon
 import nik_adapter as A
 from nik_model import (WIRE_KXY_COIL_T_REIM, WIRE_FF_KXY_COIL_T_REIM,
                        WIRE_FF_RES_KXY_COIL_T_REIM, WIRE_FF_SUBSPACE_KXY_COIL_T_REIM,
@@ -367,8 +367,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--out-dir', default='/scratch/rnga/vvpshenov/grasp_pro_py/results_ref')
-    ap.add_argument('--save-dir', default='/scratch/rnga/vvpshenov/grasp_pro_py/results_nik')
+    ap.add_argument('--out-dir', default='/net/beegfs/users/P101440/grasp_pro_py/results_ref')
+    ap.add_argument('--save-dir', default='/net/beegfs/users/P101440/grasp_pro_py/results_nik')
     ap.add_argument('--slices', default='13', help='"13" | "0:27" | "all" | "3,13,20"')
     # ---- WINNING RECIPE (nik-autoresearch E1-E8 ablation, slice 13) ----
     # WIRE + Fourier features + residual skips, depth 12, hidden 512.
@@ -377,7 +377,7 @@ def main():
     ap.add_argument('--model', default='wire_ff_res',
                     choices=['wire', 'wire_ff', 'wire_ff_res', 'wire_ff_subspace',
                              'wire_ff_res_radial', 'wire_ff_pk', 'wire_ff_patlak', 'wire_ff_tofts'])
-    ap.add_argument('--aif-file', default='/scratch/rnga/vvpshenov/DCE_NIK/aif_slice21.npz')
+    ap.add_argument('--aif-file', default='/net/beegfs/users/P101440/DCE_NIK/aif_slice21.npz')
     ap.add_argument('--tofts-basis', default=None, help='basis npz from nik_tofts_basis.py (model wire_ff_tofts)')
     ap.add_argument('--patlak-free', type=int, default=0, help='F free SIREN atoms appended to the fixed Patlak basis')
     ap.add_argument('--bin-spokes', type=int, default=0, help='Task1 ARM B: quantize acquired-spoke times to bin-centres, N spokes/bin (0=continuous ARM A)')
@@ -396,7 +396,7 @@ def main():
     ap.add_argument('--phi-tv-grid', type=int, default=256, help='dense t-grid size for the TV penalty')
     # A0 SPIRiT k-space coil-consistency prior. 0 = off.
     ap.add_argument('--spirit-weight', type=float, default=0.0, help='SPIRiT ||(G-I)x||^2 weight; 0 = off')
-    ap.add_argument('--spirit-kernel', default='/scratch/rnga/vvpshenov/DCE_NIK/spirit_kernel.npz')
+    ap.add_argument('--spirit-kernel', default='/net/beegfs/users/P101440/DCE_NIK/spirit_kernel.npz')
     ap.add_argument('--spirit-patch', type=int, default=24, help='cartesian patch size for the SPIRiT penalty')
     ap.add_argument('--radial-alpha', type=float, default=1.0,
                     help='(wire_ff_res_radial) |k|-dependent FF warp strength; 0 = no warp')

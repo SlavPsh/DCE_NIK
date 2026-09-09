@@ -14,7 +14,7 @@ PATH_SP             = "/results/kspace/SP"
 PATH_SPOKE_TIMING_DCE = "/results/kspace/spokeTimingDCE"
 
 # fallback path for slice profile when not saved in the radial file
-SP_FALLBACK_PATH = "/scratch/rnga/vvpshenov/XCAT-ERIC/utilities/sampling/SliceProfile.mat"
+SP_FALLBACK_PATH = "/net/beegfs/users/P101440/XCAT-ERIC/utilities/sampling/SliceProfile.mat"
 
 
 def h5_tree(file_path: str, max_items: int = 250) -> None:

@@ -14,7 +14,7 @@ from nik_model import WIRE_KXY_COIL_T_REIM
 
 dev="cpu"; seed=0; sub=0.7
 H,D,W0,S0,CE = 384,8,62.0,15.0,8
-fp='/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260527T175428.mat'
+fp='/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260527T175428.mat'
 ckpt='runs/20260529_161643_lyrical-amaranth-kiwi_mct_carteval/model_best.pth'  # p0 dcf-off
 NB=12
 

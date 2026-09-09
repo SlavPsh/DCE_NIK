@@ -1,6 +1,6 @@
 """TASK 5: emit the tabular audit files (clean CSV quoting) from the four-subsystem code map."""
 import csv, os
-O = "/scratch/rnga/vvpshenov/DCE_NIK/results/task5_evaluation_code_audit"
+O = "/net/beegfs/users/P101440/DCE_NIK/results/task5_evaluation_code_audit"
 def W(name, header, rows):
     with open(f"{O}/{name}", "w", newline="") as f:
         w = csv.writer(f); w.writerow(header); [w.writerow(r) for r in rows]

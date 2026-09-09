@@ -2,7 +2,7 @@
 import os
 import time
 
-FIGDIR = "/scratch/rnga/vvpshenov/DCE_NIK/figures"
+FIGDIR = "/net/beegfs/users/P101440/DCE_NIK/figures"
 
 
 def fig(name, figdir=FIGDIR):

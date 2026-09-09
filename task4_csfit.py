@@ -7,7 +7,7 @@ usage: python task4_csfit.py --frac f25"""
 import warnings; warnings.filterwarnings("ignore")
 import argparse, sys, numpy as np; sys.path.insert(0, ".")
 from cs_nufft import NufftSubspace, recon as cs_recon
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"
 ap = argparse.ArgumentParser(); ap.add_argument("--frac", required=True, choices=["f100", "f25"]); a = ap.parse_args()
 S = np.load(f"{OUT}/arrays/sim.npz"); Phi = S["Phi"]; b1 = S["b1"]; kx = S["kx"]; ky = S["ky"]; keep = S["keep_f25"]
 F, NA, RO = kx.shape; C = b1.shape[-1]; N = RO

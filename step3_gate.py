@@ -10,9 +10,9 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, scipy.ndimage as ndi, sys
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 TA = 375.0; SL = [18, 19, 20, 21]
 
 def norm(t, c):

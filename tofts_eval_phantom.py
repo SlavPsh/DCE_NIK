@@ -4,11 +4,11 @@ import argparse, os, sys, json, glob
 ap = argparse.ArgumentParser(); ap.add_argument("--sim", default="nomotion"); a = ap.parse_args()
 os.environ["XPH_SIM"] = a.sim
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 from masked_metrics import haarpsi_masked, ssim_masked
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-OUT = P.OUT; A = f"{OUT}/arrays"; SW = f"{OUT}/v2_sweep"; RES = "/scratch/rnga/vvpshenov/DCE_NIK/results/tofts_vs_patlak"
+OUT = P.OUT; A = f"{OUT}/arrays"; SW = f"{OUT}/v2_sweep"; RES = "/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak"
 d = P.data(); tq = d["times"]; body = d["labels"] > 0; Tr = X.truth_at(P.ZI, tq); F = len(tq); Rz = X.rois(P.ZI, d["labels"])
 G = 5                                                        # 25 spf single setting: 344 -> 68 frames (time-matched CS grid)
 EDGES = np.linspace(0, 1, 17)

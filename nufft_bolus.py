@@ -5,8 +5,8 @@ Compare NIK and CS bolus shapes against it. out: figures/nufft_bolus.png"""
 import numpy as np, finufft, json, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 SL = 13
 meta = json.load(open(f"{D}/results_nufft/meta.json")); SIGN = meta["sign"]
 

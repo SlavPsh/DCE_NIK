@@ -3,7 +3,7 @@ NUFFT -> coil images -> FFT -> cartesian k-space center 24x24 -> calibrate_spiri
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, finufft, json
 from spirit import calibrate_spirit
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; D = "/scratch/rnga/vvpshenov/DCE_NIK"; Z = 21; ACS = 24; KS = 5
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; D = "/net/beegfs/users/P101440/DCE_NIK"; Z = 21; ACS = 24; KS = 5
 sh = np.load(f"{REF}/shared.npz"); traj = np.asarray(sh["traj_norm"]).astype(np.complex64); nx = int(sh["nx"])
 sl = np.load(f"{REF}/slice_{Z:02d}.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64); ncc = kdata.shape[2]
 meta = json.load(open(f"{D}/results_nufft_slice{Z}/meta.json")); SIGN = meta["sign"]

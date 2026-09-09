@@ -5,10 +5,10 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, scipy.ndimage as ndi, finufft, json, sys
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"; TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; TA = 375.0
 Phi5 = np.load(f"{D}/navK5_Phi5.npy")
 
 # --- recons ---

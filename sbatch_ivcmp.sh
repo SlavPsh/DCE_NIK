@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -J ivcmp
-#SBATCH -p luna-gpu-short
-#SBATCH --gres gpu:1g.10gb:1
+#SBATCH -p gpu
+#SBATCH --gres gpu:1g.12gb:1
 #SBATCH -c 4
 #SBATCH --mem 24G
 #SBATCH -t 2:00:00
-#SBATCH -o /scratch/rnga/vvpshenov/DCE_NIK/ivcmp_%j.log
-cd /scratch/rnga/vvpshenov/DCE_NIK
-${PY:-/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python} -u invivo_v2_vs_nik.py
+#SBATCH -o /net/beegfs/users/P101440/DCE_NIK/ivcmp_%j.log
+cd /net/beegfs/users/P101440/DCE_NIK
+${PY:-/net/beegfs/users/P101440/micromamba/envs/torch29/bin/python} -u invivo_v2_vs_nik.py

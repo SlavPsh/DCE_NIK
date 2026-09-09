@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH -J tbasis
-#SBATCH -p luna-cpu-short
+#SBATCH -p defq
 #SBATCH -c 4
 #SBATCH --mem 16G
 #SBATCH -t 0:30:00
-#SBATCH -o /scratch/rnga/vvpshenov/DCE_NIK/results/tofts_vs_patlak/basis_%j.log
-cd /scratch/rnga/vvpshenov/DCE_NIK; P=${PY:-/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python}; O=results/tofts_vs_patlak
+#SBATCH -o /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/basis_%j.log
+cd /net/beegfs/users/P101440/DCE_NIK; P=${PY:-/net/beegfs/users/P101440/micromamba/envs/torch29/bin/python}; O=results/tofts_vs_patlak
 echo "### phantom, linear signal proxy (PRIMARY)"; $P -u nik_tofts_basis.py --aif aif_xph.npz --out $O/basis_xph.npz
 echo; echo "### phantom, analytic signal via SPGR (secondary check: cost of the linear approximation)"
 $P -u nik_tofts_basis.py --aif aif_xph.npz --out $O/basis_xph_spgr.npz --spgr 1400,4.66,18,3.5

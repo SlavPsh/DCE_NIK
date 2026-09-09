@@ -2,7 +2,7 @@
 Report the measured peak offset for each path independently (paths did NOT agree - that is the point).
 No model needed: centering lives in the FFT/crop/rot/NUFFT ops, tested with a delta."""
 import warnings; warnings.filterwarnings("ignore")
-import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+import sys; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import numpy as np, cupy as cp, cufinufft
 import fftc, xph_pipeline as P, xph_common as X, xph_grasp_nufft as GN
 import recon_asserts as RA

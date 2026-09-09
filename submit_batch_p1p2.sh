@@ -1,9 +1,9 @@
 #!/bin/bash
 # submits P1 (R16+full on sl18,19,20) and P2 (R8,16,32,64,full on sl21), all at f25.
 # one sbatch per run so a single failure never aborts the rest. weights + complex recon saved.
-cd /scratch/rnga/vvpshenov/DCE_NIK
-KEEP=/scratch/rnga/vvpshenov/DCE_NIK/spoke_masks/keep_f25.npy
-LOGD=/home/rnga/vvpshenov/my-scratch/tmp
+cd /net/beegfs/users/P101440/DCE_NIK
+KEEP=/net/beegfs/users/P101440/DCE_NIK/spoke_masks/keep_f25.npy
+LOGD=/net/beegfs/users/P101440/tmp
 
 submit () {
   local name="$1" model="$2" rank="$3" slice="$4" dir="$5"
@@ -13,18 +13,18 @@ submit () {
   cat > "$jf" <<EOF
 #!/bin/bash
 #SBATCH --job-name=$name
-#SBATCH --partition=luna-gpu-short
-#SBATCH --gres=gpu:a100:1
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:h100:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=03:00:00
 #SBATCH --output=$LOGD/batch_${name}_%j.log
-cd /scratch/rnga/vvpshenov/DCE_NIK
+cd /net/beegfs/users/P101440/DCE_NIK
 eval "\$(micromamba shell hook --shell bash)"
 micromamba run -n torch29 python train_grasp_nik.py \\
   --model $model $extra --slices $slice \\
   --spoke-keep-file $KEEP \\
-  --save-dir /scratch/rnga/vvpshenov/DCE_NIK/results_batch/$dir
+  --save-dir /net/beegfs/users/P101440/DCE_NIK/results_batch/$dir
 echo "DONE $name"
 EOF
   sbatch "$jf"

@@ -1,7 +1,7 @@
 """step 3 verification for nik_tofts_subspace. all checks print PASS/FAIL with numbers."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, json, glob, time, numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import dcenet_adapter as D
 from scipy.integrate import solve_ivp
 from nik_model import WIRE_FF_TOFTS_KXY_COIL_T_REIM, patlak_to_tofts

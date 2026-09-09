@@ -12,7 +12,7 @@ validated vs images.Recon: geometry corr 0.965, aorta TTP 25.2s / FWHM 43.6s (tr
 import h5py
 import numpy as np
 
-SIM = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
+SIM = "/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
 AORTA_LABEL = 36
 NPART = 11
 NANG = 9
@@ -70,7 +70,7 @@ def true_kinetics(path=SIM, zi=5):
 
 # --- NIK training interface (mirrors nik_adapter.make_radial_dataset / reconstruct_cartesian) ---
 import sys, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from nik_output_recon import recon_nik_cart
 
 

@@ -7,7 +7,7 @@ import numpy as np, glob, os
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
 aroi = np.load(f"{D}/aorta_roi.npy"); lroi = np.load(f"{D}/liver_roi.npy")
 TA = 374.0
 

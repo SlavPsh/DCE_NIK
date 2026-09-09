@@ -3,7 +3,7 @@ in vivo: model-free | patlak | tofts | grasp v2 f25 + curves vs model-free. seed
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"
+B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"
 COL = {"truth": "k", "model-free": "k", "patlak": "#0369a1", "tofts": "#c0392b", "grasp": "#e67e22"}
 
 def panel(M, phases, rois, tgrid_ref, fig_path, title, curve_t=None, ylab="enhancement"):
@@ -62,7 +62,7 @@ def invivo(Z):
     M = [("model-free nufft ref (31-spoke window)", mfv, tmf)]
     for arm in ("patlak", "tofts"):
         v = np.abs(np.load(f"{RES}/invivo/{arm}_sl{Z}_s0/nik_slice_{Z:02d}_cplx.npy")).astype(np.float32); M.append((f"{arm} nik s0 (keep_f25, 488 sp, rank {3 if arm=='patlak' else 12})", sc(v), ft(v.shape[-1])))
-    g = f"/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2/gv2_slice{Z}_f25.npy"
+    g = f"/net/beegfs/users/P101440/grasp_v2/results_grasp_v2/gv2_slice{Z}_f25.npy"
     if os.path.exists(g): v = np.abs(np.load(g)).astype(np.float32); M.append(("grasp v2 f25 (488 sp, 122 fr, lam0.25)", sc(v), ft(v.shape[-1])))
     rois["_body"] = body
     panel(M, [("pre ~20s", 20.0), ("peak ~65s", 65.0), ("late ~250s", 250.0)], rois, tmf,

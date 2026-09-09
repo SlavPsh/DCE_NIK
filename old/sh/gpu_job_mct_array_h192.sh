@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=nik-mct-v3-h192
-#SBATCH --gres=gpu:4g.40gb:1
-#SBATCH --partition=luna-gpu-short
+#SBATCH --gres=gpu:4g.47gb:1
+#SBATCH --partition=gpu
 #SBATCH --mem=48G
 #SBATCH --cpus-per-task=1
 #SBATCH --time=0-03:00
@@ -14,12 +14,12 @@ echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 echo "ARRAY_TASK_ID=$SLURM_ARRAY_TASK_ID"
 nvidia-smi || true
 
-export PATH="/scratch/rnga/vvpshenov/micromamba/bin:$PATH"
-export MAMBA_ROOT_PREFIX="/scratch/rnga/vvpshenov/micromamba"
-eval "$(/scratch/rnga/vvpshenov/micromamba/bin/micromamba shell hook -s bash)"
+export PATH="/net/beegfs/users/P101440/micromamba/bin:$PATH"
+export MAMBA_ROOT_PREFIX="/net/beegfs/users/P101440/micromamba"
+eval "$(/net/beegfs/users/P101440/micromamba/bin/micromamba shell hook -s bash)"
 micromamba activate torch29
 
-cd /scratch/rnga/vvpshenov/DCE_NIK
+cd /net/beegfs/users/P101440/DCE_NIK
 
 CONFIGS=(
     config/mct_v3_h192_d8_lr1e-5.toml

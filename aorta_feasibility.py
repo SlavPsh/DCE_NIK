@@ -4,14 +4,14 @@ round, central, early-enhancing blob), then show its curve at 12-frame (clean/co
 noisy is CS-fine (= NIK's opportunity)? out: aorta_feasibility.png"""
 import numpy as np, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-A = "/scratch/rnga/vvpshenov/presentation/assets"; D = "/scratch/rnga/vvpshenov/DCE_NIK"
-GP = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+A = "/net/beegfs/users/P101440/presentation/assets"; D = "/net/beegfs/users/P101440/DCE_NIK"
+GP = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 clean = np.abs(np.load(f"{A}/arm1_cs100_sl13.npy")).astype(np.float32)      # [x,y,12] clean
 fine = np.abs(np.load(f"{A}/arm_temporal_cs100_187.npy")).astype(np.float32)  # [x,y,187]
 nC, nF = clean.shape[-1], fine.shape[-1]
 
 # --- navigator (data k=0), independent bolus-timing reference ---
-import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); import nik_adapter as NA
+import sys; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); import nik_adapter as NA
 from figpath import fig as fpath
 sh = NA.load_shared(GP); sl = NA.load_slice(GP, 13); krad = np.asarray(sl["kdata_radial"]); vt = np.asarray(sh["view_time"]).ravel()
 c0 = krad.shape[0]//2; dc = np.sqrt((np.abs(krad[c0])**2).sum(-1)); o = np.argsort(vt); ts = vt[o]

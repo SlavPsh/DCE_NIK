@@ -6,7 +6,7 @@ KNOWN truth (structural geometry+basis check, PSF-limited). (3) short bounded di
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, sys, json, time; sys.path.insert(0, ".")
 from cs_nufft import NufftSubspace, recon as cs_recon
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"
 S = np.load(f"{OUT}/arrays/sim.npz"); Phi = S["Phi"]; b1 = S["b1"]; kx = S["kx"]; ky = S["ky"]
 F, NA, RO = kx.shape; C = b1.shape[-1]; N = RO; th = S["theta_true"]; labels = S["labels"]
 body = labels > 0; aorta = labels == 36

@@ -4,9 +4,9 @@ Consumes per-coil fields from task2_query_amplitudes.py. Read-only. out: results
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, csv, json, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; OUT = f"{D}/results/task2_scaling_coil_audit"; AR = f"{OUT}/arrays"
+D = "/net/beegfs/users/P101440/DCE_NIK"; OUT = f"{D}/results/task2_scaling_coil_audit"; AR = f"{OUT}/arrays"
 SLICES = [18, 19, 21]; CFGS = [("F0", 0), ("F2", 2)]; FIXED = {0: "AIF", 1: "intAIF", 2: "baseline"}; eps = 1e-8
 scales = json.load(open(f"{AR}/scales.json"))
 def sense(a_rc_r, b1c): return np.sum(np.conj(b1c) * a_rc_r, -1) / (np.sum(np.abs(b1c) ** 2, -1) + eps)  # [X,Y]

@@ -2,8 +2,8 @@
 recons) for each rank, vs the full-rank baseline. Table + plots. out: sweep_R.png"""
 import re, glob, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-D = "/scratch/rnga/vvpshenov/DCE_NIK"
-GP = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"
+GP = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 BASE = dict(held=0.3245, swing=45.5, nav=0.985)     # full-rank wire_ff_res
 
 # held-out per rank from the sweep logs

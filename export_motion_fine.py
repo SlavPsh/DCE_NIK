@@ -6,14 +6,14 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
 from figpath import fig as fpath
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; FIG = "/scratch/rnga/vvpshenov/DCE_NIK/figures"; TA = 375.0
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; FIG = "/net/beegfs/users/P101440/DCE_NIK/figures"; TA = 375.0
 VOX = (3.0, 3.0, 4.0)
 
 # ---- (1) SAGITTAL through the aorta, 3s volume ----
-vol = np.abs(np.load("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref_3s/cs_recon_3s.npy")).astype(np.float32)  # [X,Y,Z,T]
+vol = np.abs(np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref_3s/cs_recon_3s.npy")).astype(np.float32)  # [X,Y,Z,T]
 X, Y, Z, T = vol.shape; t3 = np.linspace(0, TA, T)
 rois21 = C.slice_ctx(21)["rois"]; ax_col, ay_col = np.where(rois21["aorta"])
 xcol = int(np.round(ax_col.mean()))                                              # aorta in-plane X (sagittal plane)

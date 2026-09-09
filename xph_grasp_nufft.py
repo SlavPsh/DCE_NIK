@@ -4,7 +4,7 @@ from the file + ramp dcf. GROG replaced (needs coil phase the phantom lacks); re
 operator is power-iteration-normalized so ||E.H E||~1 (stable NLCG)."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, copy, numpy as np, cupy as cp, cufinufft
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import precompute_ref as pr
 import xph_pipeline as P, xph_common as X
 K = 5; NITE = 5; NOUTER = 3; SIGN = -1.0; EPS = 1e-5

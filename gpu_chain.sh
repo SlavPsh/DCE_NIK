@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # GPU orchestrator: use the single MIG slice without memory conflict.
 # [running] NIK f25 -> (gap) GPU non-neural recons all fracs -> NIK f100.
-cd /scratch/rnga/vvpshenov/DCE_NIK
+cd /net/beegfs/users/P101440/DCE_NIK
 L=results/task4_xcat_nomotion_pilot/logs; A=results/task4_xcat_nomotion_pilot/arrays
 export CUDA_VISIBLE_DEVICES=0 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True OMP_NUM_THREADS=4
 

@@ -10,12 +10,12 @@ and measure how much WORSE the fit to the MEASURED spokes becomes.
 import warnings; warnings.filterwarnings("ignore")
 import sys, os, argparse
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A, train_grasp_nik as T
 from fftc import ifft2c_mri, fft2c_mri
 
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results_sl21_k80"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results_sl21_k80"
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 sh = A.load_shared(REF); ds = A.make_radial_dataset(REF, 21, shared=sh)
@@ -33,7 +33,7 @@ print(f"model {ck['model']} loaded", flush=True)
 # rebuild the normalizer exactly as the trainer does, fit on the SAME train spokes (v%10<8)
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 x = ds["x_all"]; y_raw = ds["y_all_raw"]; spoke = ds["spoke_id_all"]
-keep = torch.as_tensor(np.load("/scratch/rnga/vvpshenov/DCE_NIK/spoke_masks/keep_f80match.npy"),
+keep = torch.as_tensor(np.load("/net/beegfs/users/P101440/DCE_NIK/spoke_masks/keep_f80match.npy"),
                        device=x.device, dtype=spoke.dtype)
 tr_idx = torch.where(torch.isin(spoke, keep))[0]
 dcf = compute_dcf_radial(x, method="simple_ramp")

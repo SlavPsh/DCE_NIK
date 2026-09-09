@@ -3,7 +3,7 @@ GROG grid-to-Cartesian (self-calibrated) + Emat_GROG2Dksp + cs_l1_nlcg_sptv (NLC
 replaces the task4_gpu_recon direct-NUFFT + plain-FISTA path (blurred: no dcf, under-converged)."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import precompute_ref as pr
 import xph_pipeline as P, xph_common as X
 K = 5; NITE = 5; NOUTER = 3

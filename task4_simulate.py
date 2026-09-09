@@ -4,10 +4,10 @@ own SENSE-NUFFT operator (so the direct-discrete recon is forward-identical). Fi
 Saves truth maps/dynamic, k-space, input/non-input masks, timestamps, traj, coils, ROIs, basis."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, json, csv, scipy.ndimage as ndi
-sys.path.insert(0, "."); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "."); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import xcat_adapter as X
 from cs_nufft import NufftSubspace
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"
+D = "/net/beegfs/users/P101440/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"
 for s in ["figures", "arrays", "logs", "checkpoints", "script_snapshot"]: os.makedirs(f"{OUT}/{s}", exist_ok=True)
 ZI = 5; N = 220; AORTA_LABEL = 36; F25_KEEP_ANGLES = 2; NOISE_REL = 0.02; SEED = 20260813
 

@@ -8,9 +8,9 @@ the SAME fixed ROI for all. References are method-neutral full-spoke NUFFT.
 out: figures/compare_all_images.png, compare_all_bolus.png, compare_all_metrics.json"""
 import numpy as np, finufft, torch, piq, json, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; NUF = f"{D}/results_nufft"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
+D = "/net/beegfs/users/P101440/DCE_NIK"; NUF = f"{D}/results_nufft"
 SL = 13; TA = 375.0
 meta = json.load(open(f"{NUF}/meta.json")); SIGN = meta["sign"]; t_pre = meta["t_pre_s"]
 dev = "cuda" if torch.cuda.is_available() else "cpu"

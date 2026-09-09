@@ -5,8 +5,8 @@ held-out(coef-forward) k-NMSE 0.0037."""
 import warnings; warnings.filterwarnings("ignore")
 import json, numpy as np, torch, sys
 import task4c_common as K
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
-CK = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot/checkpoints/nik_F0_f25_seed0.pt"
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
+CK = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot/checkpoints/nik_F0_f25_seed0.pt"
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 S, M = K.load()
 _, _, _, _, nz, dims = K.build_train(S, dev); C = dims[3]

@@ -14,7 +14,7 @@ so the Tofts arm has identical AIF information access.
 """
 import argparse, hashlib, json, os, sys
 import numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import dcenet_adapter as D
 
 PRIOR = dict(ke_min=0.05, ke_max=3.0,      # k_ep, min^-1, log-uniform. covers phantom pkLUT 0.42-1.66

@@ -3,12 +3,12 @@ frozen Task-4C recipe; only hidden width, k_sigma (spatial bandwidth) and seed v
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np, torch
 from types import SimpleNamespace
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A, xph_common as X
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
 from fftc import ifft2c_mri, crop_img
-AIF = "/scratch/rnga/vvpshenov/DCE_NIK/aif_xph.npz"
+AIF = "/net/beegfs/users/P101440/DCE_NIK/aif_xph.npz"
 OUT = X.OUT; ZI = 15
 OVERSAMPLE = 2   # k-space grid oversampling for the image render: single-FOV iFFT of the coordinate
 #                network aliases (L2/L3); query on OVERSAMPLE*RO grid, iFFT, crop central RO. L3 gate:
@@ -60,7 +60,7 @@ def make_model(width, k_sigma, seed, ncc, dev):
         **{k: FIX[k] for k in ["depth", "w0", "s0", "k_freq", "t_freq", "t_sigma", "coil_embed_dim"]})
     return build_model(args, ncc).to(dev)
 
-TOFTS_BASIS = "/scratch/rnga/vvpshenov/DCE_NIK/results/tofts_vs_patlak/basis_xph.npz"
+TOFTS_BASIS = "/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/basis_xph.npz"
 def make_model_tofts(width, k_sigma, seed, ncc, dev, basis_file=None):
     """nik_tofts_subspace: same backbone/FIX as make_model (F0), fixed ext-Tofts atoms instead of Patlak."""
     torch.manual_seed(seed)

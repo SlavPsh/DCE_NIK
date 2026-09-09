@@ -5,7 +5,7 @@ usage: python xcat_cs.py [--slice 5]  -> results_xcat_cs/{cs_slice.npy, metrics.
 import argparse, os, json, sys, warnings
 warnings.filterwarnings("ignore")
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import precompute_ref as pr
 import xcat_adapter as X
 

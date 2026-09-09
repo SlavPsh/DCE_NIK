@@ -8,14 +8,14 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, scipy.ndimage as ndi, json, os, sys, torch
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
 from masked_metrics import haarpsi_masked, ssim_masked
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 # reference-method plumbing. defaults = grasp-pro (unchanged). CSD/CSPRE swap in grasp v2.
 # NOTE: ROI anatomy stays on grasp-pro cs_img on purpose, so both notebooks score the SAME rois.
 # only the reference-METHOD image (ctx["cs_meth"]) follows CSPRE.
-CSD = os.environ.get("CSD", "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs")
+CSD = os.environ.get("CSD", "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs")
 CSPRE = os.environ.get("CSPRE", "cs")
 BATCH = f"{D}/results_batch"; TA = 375.0
 dev = "cuda" if torch.cuda.is_available() else "cpu"

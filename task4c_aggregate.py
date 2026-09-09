@@ -4,8 +4,8 @@ reference (never used to select a NIK capacity)."""
 import warnings; warnings.filterwarnings("ignore")
 import os, glob, csv, json, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4c_nik_capacity_audit"; FIG = f"{OUT}/figures"
-T4 = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4c_nik_capacity_audit"; FIG = f"{OUT}/figures"
+T4 = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"
 S = np.load(f"{T4}/arrays/sim.npz"); labels = S["labels"]; th = S["theta_true"]; Phi = S["Phi"]; times = S["times"]
 body = labels > 0; aorta = labels == 36; LAB = {256: "small", 512: "current", 768: "large"}
 # Task-4 direct-discrete f25 fixed descriptive reference

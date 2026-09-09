@@ -4,8 +4,8 @@
 Density-compensated adjoint NUFFT per coil + SENSE combine with the SAME b1 as CS/NIK.
 out: results_nufft/nufft_all.npy, nufft_pre.npy (+ meta)"""
 import numpy as np, finufft, os, json
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results_nufft"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results_nufft"
 os.makedirs(OUT, exist_ok=True)
 SL = 13
 

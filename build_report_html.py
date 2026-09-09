@@ -1,5 +1,5 @@
 import base64, os
-SC = "/home/rnga/vvpshenov/tmp/claude-8186/-scratch-rnga-vvpshenov/df07c4f6-69fb-4088-a73f-eea680358422/scratchpad"
+SC = "/home/P101440/tmp/claude-8186/-scratch-rnga-vvpshenov/df07c4f6-69fb-4088-a73f-eea680358422/scratchpad"
 def uri(p): return "data:image/png;base64,"+base64.b64encode(open(p, "rb").read()).decode() if os.path.exists(p) else ""
 REAL = uri("results/realdata_nik_vs_cs_figures/figures/outcoil_report.png")
 PHAN = uri("results/xcat_physical_nomotion_nik_vs_grasp/figures/outcoil_compare.png")

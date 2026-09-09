@@ -1,7 +1,7 @@
 """Render the SAME NIK model at support_radius=0.5 (current) vs 1.0 (proposed fix) to prove
 the render mask is the blur. out: support_check.png + HF-ratio for each."""
 import sys, numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as NA
 from nik_output_recon import recon_nik_cart
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
@@ -9,7 +9,7 @@ import nik_model as NM
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
 
-OUT = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; dev = "cuda" if torch.cuda.is_available() else "cpu"
+OUT = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; dev = "cuda" if torch.cuda.is_available() else "cpu"
 sh = NA.load_shared(OUT); ds = NA.make_radial_dataset(OUT, 13, compute_device=dev, shared=sh)
 x, t, c, y_raw, sid = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"], ds["spoke_id_all"]
 b1 = ds["b1"]; ncc = ds["meta"]["ncc"]; bas = ds["meta"]["bas"]
@@ -38,7 +38,7 @@ for sr in (0.5, 1.0):
     im = np.abs(recon_nik_cart(cart, b1, bas))[..., 0]
     imgs[sr] = im; print(f"support_radius={sr}: HF-ratio {hf(im):.4g}", flush=True)
 
-cs = np.abs(np.load("/scratch/rnga/vvpshenov/presentation/assets/arm1_cs100_sl13.npy")).mean(-1)
+cs = np.abs(np.load("/net/beegfs/users/P101440/presentation/assets/arm1_cs100_sl13.npy")).mean(-1)
 print(f"CS-100 (reference):  HF-ratio {hf(cs):.4g}")
 fig, ax = plt.subplots(1, 3, figsize=(12, 4.2))
 for a, (lab, im) in zip(ax, [("NIK support=0.5 (current)", imgs[0.5]), ("NIK support=1.0 (fix)", imgs[1.0]), ("CS-100", cs)]):

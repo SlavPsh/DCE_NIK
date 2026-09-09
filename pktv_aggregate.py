@@ -1,10 +1,10 @@
 """Multi-metric cross-check for the P0/P3 batch: does the aorta noise-win survive on
 held-out / swing / nav-corr / perceptual? held-out parsed from logs (verified ordering)."""
 import re, sys, numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/nik-autoresearch/glue"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/nik-autoresearch/glue"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import eval as E, nik_adapter as NA
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
-GP = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
+GP = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 cs100 = np.abs(np.load(f"{A}/arm1_cs100_sl13.npy")); csm = cs100.mean(-1)
 cs70p = f"{A}/arm1_cs70_sl13.npy"; cs70 = np.abs(np.load(cs70p)) if __import__("os").path.exists(cs70p) else None
 roi = csm > np.quantile(csm, 0.55)

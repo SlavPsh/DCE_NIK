@@ -6,7 +6,7 @@
 import warnings; warnings.filterwarnings("ignore")
 import sys, json, glob, os
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 
 SW = f"{P.OUT}/v2_sweep"; A = f"{P.OUT}/arrays"

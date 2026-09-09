@@ -6,9 +6,9 @@ out: task_spirit.json + printed table."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, os, sys
 from scipy.signal import savgol_filter
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; TA = 375.0; Z = 21; ROIS = ["aorta", "cortex", "medulla", "liver"]
+D = "/net/beegfs/users/P101440/DCE_NIK"; TA = 375.0; Z = 21; ROIS = ["aorta", "cortex", "medulla", "liver"]
 RUNS = [("w0_base", f"{D}/results_batch/full_sl21f25/nik_slice_21_cplx.npy"),
         ("w0.01", f"{D}/results_batch/spirit_w0.01_sl21/nik_slice_21_cplx.npy"),
         ("w0.1", f"{D}/results_batch/spirit_w0.1_sl21/nik_slice_21_cplx.npy")]

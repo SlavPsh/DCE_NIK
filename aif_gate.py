@@ -5,9 +5,9 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, scipy.ndimage as ndi, json
 from scipy.signal import savgol_filter, find_peaks
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-import sys; sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+import sys; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; D = "/scratch/rnga/vvpshenov/DCE_NIK"; TA = 375.0
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; D = "/net/beegfs/users/P101440/DCE_NIK"; TA = 375.0
 Z = int(sys.argv[1]) if len(sys.argv) > 1 else 21
 
 d = np.load(f"{D}/step2_slice{Z}.npz"); mf = d["mf"]; tmf = d["tmf"]

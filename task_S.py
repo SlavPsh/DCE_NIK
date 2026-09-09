@@ -9,12 +9,12 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, sys
 from scipy.signal import savgol_filter
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 import os
-CSD = os.environ.get("CSD", "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs")
+CSD = os.environ.get("CSD", "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs")
 CSPRE = os.environ.get("CSPRE", "cs"); TAG = os.environ.get("TAG", ""); TA = 375.0
 SLICES = [18, 19, 21]; ROIS = ["aorta", "cortex", "medulla", "liver"]
 def nfull(Z): return f"{D}/results_batch/full_sl{Z}{'f25' if Z==21 else ''}/nik_slice_{Z}_cplx.npy"

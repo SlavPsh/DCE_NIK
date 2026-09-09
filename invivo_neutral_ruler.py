@@ -15,12 +15,12 @@ two rulers avoid that.
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_v2")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_v2")
 import consolidated as C
 from grasp_v2_py import MCNUFFT
 
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; GV = "/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2"
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 TA, NTV = 375.0, 1710
 ISIGN = -1
 

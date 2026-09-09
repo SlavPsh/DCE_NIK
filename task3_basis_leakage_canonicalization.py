@@ -5,12 +5,12 @@ re-query, no retrain. out: results/task3_basis_leakage/."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os, sys, csv, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; T2 = f"{D}/results/task2_scaling_coil_audit/arrays"; OUT = f"{D}/results/task3_basis_leakage"
+D = "/net/beegfs/users/P101440/DCE_NIK"; T2 = f"{D}/results/task2_scaling_coil_audit/arrays"; OUT = f"{D}/results/task3_basis_leakage"
 for s in ["figures", "arrays", "logs", "script_snapshot"]: os.makedirs(f"{OUT}/{s}", exist_ok=True)
 SLICES = [18, 19, 21]
-sh = np.load("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref/shared.npz"); TA = float(sh["TA"])
+sh = np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref/shared.npz"); TA = float(sh["TA"])
 ft_sec = np.asarray(sh["frame_time"]).ravel().astype(float) * TA                      # true frame_time in seconds
 # trapezoidal quadrature weights from actual sample times (Part 2)
 w = np.zeros_like(ft_sec); w[1:-1] = 0.5 * (ft_sec[2:] - ft_sec[:-2]); w[0] = 0.5 * (ft_sec[1] - ft_sec[0]); w[-1] = 0.5 * (ft_sec[-1] - ft_sec[-2])

@@ -13,7 +13,7 @@ reaches NIK's best, which is the fair comparison.
 import warnings; warnings.filterwarnings("ignore")
 import json, glob, os, sys
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P
 
 SW = f"{P.OUT}/v2_sweep"

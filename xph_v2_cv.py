@@ -11,8 +11,8 @@ TEST is reported afterwards as the untouched check.
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_v2")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_v2")
 import xph_pipeline as P, xph_common as X
 from grasp_v2_py import MCNUFFT
 

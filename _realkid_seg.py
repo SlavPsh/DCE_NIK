@@ -2,7 +2,7 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from scipy import ndimage as ndi
-B = "/scratch/rnga/vvpshenov/DCE_NIK"
+B = "/net/beegfs/users/P101440/DCE_NIK"
 z = np.load(f"{B}/step2_slice21.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0); tmf = z["tmf"]; body = z["body"]
 T = mf.shape[2]; dt = np.median(np.diff(tmf))
 pre = tmf < 50; base = mf[:, :, pre].mean(2); peak = mf.max(2); enh = (peak - base) / (base + 1e-6)

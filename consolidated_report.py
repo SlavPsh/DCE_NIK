@@ -4,8 +4,8 @@ agreement with a conventional Patlak fit of the CS recon. writes 3 figures + rep
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, os, sys
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; TA = 375.0
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); from figpath import fig as fpath
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; TA = 375.0
 rows = json.load(open(f"{D}/report_data.json"))
 def get(Z, cfg): return next((r for r in rows if r["slice"] == Z and r["cfg"] == cfg and "spatial" in r), None)
 

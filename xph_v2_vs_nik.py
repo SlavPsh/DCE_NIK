@@ -10,7 +10,7 @@ out: figures/fig_v2_vs_nik.png  (images at 3 phases, contrast curves, spokes/fra
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob
 import numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 

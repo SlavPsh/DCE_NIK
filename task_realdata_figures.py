@@ -6,10 +6,10 @@ consistency / CS-likeness, not accuracy. Labelled as such."""
 import warnings; warnings.filterwarnings("ignore")
 import os, json, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; GP = "/scratch/rnga/vvpshenov/grasp_pro_py"
+B = "/net/beegfs/users/P101440/DCE_NIK"; GP = "/net/beegfs/users/P101440/grasp_pro_py"
 OUT = f"{B}/results/realdata_nik_vs_cs_figures"; os.makedirs(f"{OUT}/figures", exist_ok=True)
 # reference-method plumbing. defaults = grasp-pro (unchanged). grasp v2:
-#   CSD=/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
+#   CSD=/net/beegfs/users/P101440/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
 _CSD = os.environ.get("CSD", f"{GP}/results_spoke_cs")
 _CSPRE = os.environ.get("CSPRE", "cs"); TAG = os.environ.get("TAG", "")
 def J(p): return json.load(open(p)) if os.path.exists(p) else None

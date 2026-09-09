@@ -6,7 +6,7 @@ import numpy as np, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.animation import FuncAnimation, PillowWriter
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; OUT = f"{B}/results/realdata_nik_vs_cs_figures/figures"; os.makedirs(OUT, exist_ok=True)
+B = "/net/beegfs/users/P101440/DCE_NIK"; OUT = f"{B}/results/realdata_nik_vs_cs_figures/figures"; os.makedirs(OUT, exist_ok=True)
 z = np.load(f"{B}/step2_slice21.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0); tmf = z["tmf"]; body = z["body"]
 rk = np.load(f"{B}/realkid_slice21.npz"); cortex = np.asarray(rk["cortex"]); medulla = np.asarray(rk["medulla"])
 ao = np.asarray(np.load(f"{B}/aif_slice21.npz")["ao"])

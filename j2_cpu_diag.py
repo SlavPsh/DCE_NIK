@@ -53,7 +53,7 @@ cp, pp = radprofile(mag, rp)
 sig_ph = np.nanmean(pp[cp < 0.1]); flr_ph = np.nanmean(pp[cp > 0.85])
 print(f"phantom  center-RMS {sig_ph:.3e}  outer-RMS(r>0.85) {flr_ph:.3e}  dynamic range {sig_ph/flr_ph:.1f}x ({20*np.log10(sig_ph/flr_ph):.1f} dB)")
 # in-vivo
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 sh = np.load(f"{REF}/shared.npz"); s13 = np.load(f"{REF}/slice_13.npz")
 tn = np.asarray(sh["traj_norm"]); kdr = np.asarray(s13["kdata_radial"])          # [nx,1710,ncc]
 r01v = (np.abs(tn)/np.abs(tn).max())                                            # [nx,1710]

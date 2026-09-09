@@ -9,8 +9,8 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 RD = "results/realdata_nik_vs_cs_figures"; TA = 375.0; OUT = sys.argv[1] if len(sys.argv) > 1 else "sweep"
 import os as _os
 # reference-method plumbing. defaults = grasp-pro (unchanged). grasp v2:
-#   CSD=/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
-_CSD = _os.environ.get("CSD", "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs")
+#   CSD=/net/beegfs/users/P101440/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
+_CSD = _os.environ.get("CSD", "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs")
 _CSPRE = _os.environ.get("CSPRE", "cs"); _TAG = _os.environ.get("TAG", "")
 
 ao = np.load("aif_slice21.npz")["ao"].astype(bool); kd = np.load("realkid_slice21.npz"); cx = kd["cortex"].astype(bool); md = kd["medulla"].astype(bool)

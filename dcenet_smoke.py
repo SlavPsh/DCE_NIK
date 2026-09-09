@@ -3,7 +3,7 @@ plausible params from upstream hyperparams (kep 0.1-2, ve 0.01-0.7, vp 0.001-0.0
 deliberately probes the unstable branches. NaN gradients are REPORTED, never hidden."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np, torch
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import dcenet_adapter as D
 import aif_gt                                                # our numpy Cosine4 (same functional form)
 dev = "cuda" if torch.cuda.is_available() else "cpu"

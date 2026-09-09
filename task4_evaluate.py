@@ -7,7 +7,7 @@ import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, csv, numpy as np; sys.path.insert(0, ".")
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from cs_nufft import NufftSubspace
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"; FIG = f"{OUT}/figures"; os.makedirs(FIG, exist_ok=True)
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"; FIG = f"{OUT}/figures"; os.makedirs(FIG, exist_ok=True)
 S = np.load(f"{OUT}/arrays/sim.npz"); R = np.load(f"{OUT}/arrays/rois.npz")
 Phi = S["Phi"]; b1 = S["b1"]; kx = S["kx"]; ky = S["ky"]; keep = S["keep_f25"]; times = S["times"]
 F, NA, RO = kx.shape; C = b1.shape[-1]; N = RO

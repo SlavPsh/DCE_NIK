@@ -2,7 +2,7 @@
 Confirms ROIs sit on the intended structures (and shows the slice-13 aorta_roi.npy mistake)."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B="/scratch/rnga/vvpshenov/DCE_NIK"; OUT=f"{B}/results/realdata_nik_vs_cs_figures/figures"
+B="/net/beegfs/users/P101440/DCE_NIK"; OUT=f"{B}/results/realdata_nik_vs_cs_figures/figures"
 fig,ax=plt.subplots(1,2,figsize=(11,5.2))
 # --- real slice 21 ---
 z=np.load(f"{B}/step2_slice21.npz"); mf=np.abs(z["mf"]); anat=mf[np.argmin(abs(z["tmf"]-64))]  # peak frame

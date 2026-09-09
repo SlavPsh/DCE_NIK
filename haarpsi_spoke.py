@@ -6,10 +6,10 @@ import numpy as np, json, os, torch, piq
 from scipy.interpolate import interp1d
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"
+D = "/net/beegfs/users/P101440/DCE_NIK"
 # reference-method plumbing. defaults = grasp-pro (unchanged). set CSD/CSPRE/TAG to swap in grasp v2:
-#   CSD=/scratch/rnga/vvpshenov/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
-CSD = os.environ.get("CSD", "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs")
+#   CSD=/net/beegfs/users/P101440/grasp_v2/results_grasp_v2 CSPRE=gv2 TAG=_gv2
+CSD = os.environ.get("CSD", "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs")
 CSPRE = os.environ.get("CSPRE", "cs"); TAG = os.environ.get("TAG", "")
 LABS = [("f100", 100, 14), ("f70", 71, 10), ("f50", 50, 7), ("f35", 36, 5), ("f25", 29, 4)]
 dev = "cuda" if torch.cuda.is_available() else "cpu"

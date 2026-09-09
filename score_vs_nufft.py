@@ -6,8 +6,8 @@ Scale-matched (LS) PSNR + HaarPSI + SSIM on a body ROI. out: figures/score_vs_nu
 import numpy as np, json, torch, piq, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; NUF = f"{D}/results_nufft"
-CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+D = "/net/beegfs/users/P101440/DCE_NIK"; NUF = f"{D}/results_nufft"
+CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 meta = json.load(open(f"{NUF}/meta.json")); TA = 375.0; t_pre = meta["t_pre_s"]
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 

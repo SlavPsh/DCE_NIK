@@ -2,7 +2,7 @@
 autoresearch numbers on the SAME slice-13 data.
 target (e8_ts1p5_tf32): held-out ~0.323, swing ~51%, nav-corr ~0.885."""
 import sys, re, glob, numpy as np
-D = "/scratch/rnga/vvpshenov/DCE_NIK"
+D = "/net/beegfs/users/P101440/DCE_NIK"
 # argv: [recon_dir] [log_glob]   defaults = the port-verify run
 recon_dir = sys.argv[1] if len(sys.argv) > 1 else f"{D}/results_nik_verify"
 log_glob = sys.argv[2] if len(sys.argv) > 2 else f"{D}/logs/slurm-nik-verify-*.out"
@@ -18,10 +18,10 @@ for lg in sorted(glob.glob(log_glob)):
 print(f"[analysis] {recon_dir.split('/')[-1]}  held-out MSE = {best}   (full-rank baseline 0.3245)")
 
 # navigator (k=0 self-nav) + ROI, from the same slice-13 raw data
-sl = np.load("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref/slice_13.npz")
+sl = np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref/slice_13.npz")
 krad = np.asarray(sl["kdata_radial"]); cs = np.abs(np.asarray(sl["cs_img"]))
 # view_time / trajectory from shared
-sh = np.load("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref/shared.npz")
+sh = np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref/shared.npz")
 vt = np.asarray(sh["view_time"]).ravel()
 c0 = krad.shape[0] // 2
 dc = np.sqrt((np.abs(krad[c0, :, :]) ** 2).sum(-1))                     # |k=0| per spoke

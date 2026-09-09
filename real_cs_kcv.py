@@ -5,10 +5,10 @@ spokes (4/14), pick K* = argmin held-out NMSE. NUFFT-SENSE recon (TRUE coils + r
 grasp_pro_py NLCG solver), CPU finufft, coils batched. Ground truth NOT used (none exists in vivo)."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, copy, numpy as np, finufft
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import precompute_ref as pr
 KS = [3, 5, 8, 12, 16, 24, 32]; NLINE = 14; NITE = 4; NOUTER = 2; EPS = 1e-5
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 sh = np.load(f"{REF}/shared.npz"); s13 = np.load(f"{REF}/slice_13.npz")
 tn = np.asarray(sh["traj_norm"]); b1 = np.asarray(s13["b1"]).astype(np.complex64)
 kdr = np.asarray(s13["kdata_radial"]).astype(np.complex64)                                  # [nx,1710,ncc]
@@ -80,6 +80,6 @@ for K in KS:
 Kstar_inner = min(rows, key=lambda r: r[1])[0]; Kstar_all = min(rows, key=lambda r: r[4])[0]
 print(f"\nREAL CS CV: K* by LOW-|k| (informative, signal>noise) = {Kstar_inner}; K* by global = {Kstar_all}  (reference currently K=5)")
 import csv
-with open("/scratch/rnga/vvpshenov/DCE_NIK/results/realdata_nik_vs_cs_figures/real_cs_kcv.csv", "w", newline="") as fp:
+with open("/net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/real_cs_kcv.csv", "w", newline="") as fp:
     w = csv.writer(fp); w.writerow(["K", "inner_lowk", "mid", "outer", "all"]); [w.writerow([r[0], f"{r[1]:.6e}", f"{r[2]:.6e}", f"{r[3]:.6e}", f"{r[4]:.6e}"]) for r in rows]
 print("REAL_CS_KCV_DONE")

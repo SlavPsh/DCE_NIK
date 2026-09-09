@@ -1,6 +1,6 @@
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import precompute_ref as pr
 import xph_common as X
 d = X.load_slice(15); kx = d["kx"]; ky = d["ky"]; kdata = d["kdata"]; C, F, nang, RO = kdata.shape

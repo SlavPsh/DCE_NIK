@@ -2,7 +2,7 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, os
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from scipy import ndimage as ndi
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; GP = "/scratch/rnga/vvpshenov/grasp_pro_py"
+B = "/net/beegfs/users/P101440/DCE_NIK"; GP = "/net/beegfs/users/P101440/grasp_pro_py"
 z = np.load(f"{B}/step2_slice21.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0); tmf = z["tmf"]; body = z["body"]  # [192,192,T]
 gk = np.load(f"{B}/gate_slice21.npz"); cortex = np.asarray(gk["cortex"]); medulla = np.asarray(gk["medulla"])
 kid = cortex | medulla

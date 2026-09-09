@@ -24,7 +24,7 @@ def isotonic_decreasing(y):
     out = []
     for cv, cw, cc in stack: out.extend([cv] * cc)
     return -np.asarray(out)
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; A = "/scratch/rnga/vvpshenov/presentation/assets"
+D = "/net/beegfs/users/P101440/DCE_NIK"; A = "/net/beegfs/users/P101440/presentation/assets"
 aroi = np.load(f"{D}/aorta_roi.npy"); TA = 374.0
 
 def gamma(t, base, amp, t0, r, b):

@@ -5,7 +5,7 @@ out: spoke_frontier_sl13.png"""
 import numpy as np, os, glob
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from figpath import fig as fpath
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; CS = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+D = "/net/beegfs/users/P101440/DCE_NIK"; CS = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 SL = 13
 LABS = [("f100", "100% (14 sp/fr)"), ("f70", "71% (10)"), ("f50", "50% (7)"),
         ("f35", "36% (5)"), ("f25", "29% (4)")]

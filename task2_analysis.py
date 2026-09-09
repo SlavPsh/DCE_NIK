@@ -6,10 +6,10 @@ tissue, NIK-PK vs conventional CS-fit. out: task2.json + figures."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, json, os, sys, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; TA = 375.0
 import os as _os
 _TAG = _os.environ.get("TAG", "")   # "" = grasp-pro (unchanged)
 

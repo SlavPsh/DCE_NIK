@@ -9,7 +9,7 @@ import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, glob
 import numpy as np, torch, piq
 from masked_metrics import haarpsi_masked, ssim_masked
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 import xph_pipeline as P, xph_common as X
 
 A = f"{P.OUT}/arrays"; SW = f"{P.OUT}/v2_sweep"

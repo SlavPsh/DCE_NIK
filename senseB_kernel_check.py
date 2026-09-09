@@ -2,9 +2,9 @@
 per-coil prediction = (X * B_c)(k), so every kernel tap costs one extra network evaluation."""
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from fftc import fft2c_mri
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 b1 = np.asarray(np.load(f"{REF}/slice_21.npz")["b1"]); b1 = b1 / np.abs(b1).max()
 K = fft2c_mri(b1)                       # [x,y,C] in, FFT over the two SPATIAL axes
 E = (np.abs(K) ** 2).sum(-1); tot = E.sum(); c0 = E.shape[0] // 2

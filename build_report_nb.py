@@ -5,14 +5,14 @@ import os, nbformat as nbf
 from nbformat.v4 import new_notebook, new_markdown_cell, new_code_cell
 from nbclient import NotebookClient
 
-B = "/scratch/rnga/vvpshenov/DCE_NIK"
+B = "/net/beegfs/users/P101440/DCE_NIK"
 PH = f"{B}/results/xcat_physical_nomotion_nik_vs_grasp"; FP = f"{PH}/figures"
 RD = f"{B}/results/realdata_nik_vs_cs_figures/figures"
 C = []
 def md(s): C.append(new_markdown_cell(s))
 def code(s): C.append(new_code_cell(s))
 
-code("import os; os.chdir('/scratch/rnga/vvpshenov/DCE_NIK')\n"
+code("import os; os.chdir('/net/beegfs/users/P101440/DCE_NIK')\n"
      "import warnings; warnings.filterwarnings('ignore')\n"
      "import json, numpy as np, pandas as pd\n"
      "from IPython.display import Image, display\n"
@@ -46,7 +46,7 @@ code(f"display(Image('{FP}/fig_bias_locate.png'))")
 md("### render fix 2: single-fov ifft aliasing (this week)\n\n"
    "the render imaged the coordinate network on a single-fov k-grid, which aliases broadband. standard 2x oversampling (query on 2x grid, ifft, crop) fixes it: +1.7 to +5.3 db psnr vs truth on every seed, and it also collapsed the seed spread. this was the third render bug (support radius, 1px rot180, now aliasing), so most of the apparent nik-vs-grasp spatial gap was rendering, not the model.\n\n"
    "caveat: haarpsi is one metric (nik wins haarpsi, not 'beats grasp'); psnr and ssim still favour grasp. this is a correctness fix, not a modelling gain.")
-code("z = np.load('{}/arrays/compare_recons.npz'.format('/scratch/rnga/vvpshenov/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp'))\n"
+code("z = np.load('{}/arrays/compare_recons.npz'.format('/net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp'))\n"
      "import matplotlib.pyplot as plt\n"
      "pk = 1  # frames = [early, peak, late]\n"
      "body = z['body']; ys, xs = np.where(body); y0, y1, x0, x1 = ys.min(), ys.max()+1, xs.min(), xs.max()+1\n"
@@ -63,7 +63,7 @@ code("z = np.load('{}/arrays/compare_recons.npz'.format('/scratch/rnga/vvpshenov
      "    a.imshow(crop(im), cmap='gray', vmin=0, vmax=vmax); a.set_title(l, fontsize=11); a.axis('off')\n"
      "plt.tight_layout(); plt.show()\n"
      "# metrics, body-masked ruler, best nik (complex seed-avg) vs grasp\n"
-     "reb = pd.read_csv('{}/l3_rebaseline.csv'.format('/scratch/rnga/vvpshenov/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp'))\n"
+     "reb = pd.read_csv('{}/l3_rebaseline.csv'.format('/net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp'))\n"
      "nm = reb['name'].astype(str).str.strip(); gv = lambda name, col: float(reb[nm == name][col].iloc[0])\n"
      "fig, ax = plt.subplots(1, 2, figsize=(10, 3.3))\n"
      "for a, mt, col in zip(ax, ['HaarPSI (body-masked)', 'SSIM (body-masked)'], ['haarpsi', 'ssim']):\n"

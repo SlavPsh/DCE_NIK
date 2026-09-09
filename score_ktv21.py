@@ -1,8 +1,8 @@
 import warnings; warnings.filterwarnings("ignore")
 import sys, os, numpy as np
-sys.path.insert(0,"/scratch/rnga/vvpshenov/DCE_NIK")
+sys.path.insert(0,"/net/beegfs/users/P101440/DCE_NIK")
 import consolidated as C
-B="/scratch/rnga/vvpshenov/DCE_NIK"; TA=375.0
+B="/net/beegfs/users/P101440/DCE_NIK"; TA=375.0
 ctx=C.slice_ctx(21); rois=ctx["rois"]; body=ctx["BODY"]
 z=np.load(f"{B}/step2_slice21.npz"); mf=np.abs(z["mf"]).transpose(1,2,0).astype(np.float32); tmf=z["tmf"]
 ROIS=[r for r in ("aorta","cortex","medulla") if rois.get(r) is not None and rois[r].sum()>0]

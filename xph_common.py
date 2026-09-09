@@ -5,11 +5,11 @@ import warnings; warnings.filterwarnings("ignore")
 import h5py, numpy as np
 import os as _os
 _XPH = _os.environ.get("XPH_SIM", "nomotion")                 # env switch: nomotion (default) | motion (respPeriod 5.0 s, same layout)
-SIM = {"nomotion": "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260816T210718.mat",   # no-motion (respPeriod "N/A")
-       "motion": "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260816T223443.mat"}[_XPH]
+SIM = {"nomotion": "/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260816T210718.mat",   # no-motion (respPeriod "N/A")
+       "motion": "/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260816T223443.mat"}[_XPH]
 AORTA = 36
-OUT = {"nomotion": "/scratch/rnga/vvpshenov/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp",
-       "motion": "/scratch/rnga/vvpshenov/DCE_NIK/results/xcat_physical_motion_nik_vs_grasp"}[_XPH]
+OUT = {"nomotion": "/net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp",
+       "motion": "/net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_motion_nik_vs_grasp"}[_XPH]
 
 def _embed(a, N):                                    # center-embed the 152-dim into an N=220 grid (col-centered)
     a = a.T if a.shape[0] != N else a                # -> (N, 152)

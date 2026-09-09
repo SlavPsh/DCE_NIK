@@ -3,9 +3,9 @@ Aligned stack-of-stars: z-FFT across the 16 partitions is valid. Truth = GroundT
 (coil-combined magnitude) sampled at query times. XCAT is the only accuracy reference."""
 import warnings; warnings.filterwarnings("ignore")
 import h5py, numpy as np
-SIM = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260816T210718.mat"  # no-motion (respPeriod "N/A")
+SIM = "/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260816T210718.mat"  # no-motion (respPeriod "N/A")
 AORTA = 36
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp"
 
 def _embed(a, N):                                    # center-embed the 152-dim into an N=220 grid (col-centered)
     a = a.T if a.shape[0] != N else a                # -> (N, 152)

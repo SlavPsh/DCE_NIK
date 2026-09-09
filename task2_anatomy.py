@@ -5,11 +5,11 @@ reference, + body-interior gradient/detail energy). out: figure + table."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, sys, torch, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 from figpath import fig as fpath
 import consolidated as C
 from masked_metrics import ssim_masked
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; CSD = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"; TA = 375.0; dev = "cpu"
+D = "/net/beegfs/users/P101440/DCE_NIK"; CSD = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; TA = 375.0; dev = "cpu"
 SLICES = [18, 19, 21]
 
 def bpinv(Z, nt):

@@ -4,9 +4,9 @@ respiratory wobble the 3s binning averaged out. axial-over-time is the useful vi
 only 4 slices thick, so coronal/sagittal are thin). out: nifti_export/cs_dynamic_4d_fine_slab.nii.gz + labels."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, nibabel as nib, sys
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; OUT = "/scratch/rnga/vvpshenov/DCE_NIK/nifti_export"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; OUT = "/net/beegfs/users/P101440/DCE_NIK/nifti_export"
 SLAB = [18, 19, 20, 21]; ROI_SL = [18, 19, 21]; LAB = {"aorta": 1, "cortex": 2, "medulla": 3, "liver": 4}
 VOX = (3.0, 3.0, 4.0)
 cubes = [np.abs(np.load(f"{REF}/slice_{z:02d}.npz")["cs_img"]).astype(np.float32) for z in SLAB]  # each [192,192,342]

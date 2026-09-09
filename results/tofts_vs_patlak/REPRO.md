@@ -1,5 +1,5 @@
-# reproduction (all from /scratch/rnga/vvpshenov/DCE_NIK, env torch29, luna sbatch)
-PY=/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python
+# reproduction (all from /net/beegfs/users/P101440/DCE_NIK, env torch29, luna sbatch)
+PY=/net/beegfs/users/P101440/micromamba/envs/torch29/bin/python
 
 # 1 basis + rank study (cpu, 2 min)            -> results/tofts_vs_patlak/basis_{xph,xph_spgr,sl18,sl19,sl21}.npz, basis_*.log
 sbatch sbatch_tofts_basis.sh

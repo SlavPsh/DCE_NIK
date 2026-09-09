@@ -5,13 +5,13 @@ checkpoint touched. usage: python task4_nik.py --frac f25 --seed 0 --steps 40000
 import warnings; warnings.filterwarnings("ignore")
 import argparse, os, sys, time, numpy as np, torch
 from types import SimpleNamespace
-sys.path.insert(0, "."); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "."); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
 from nik_focal_loss import composable_kspace_loss
 from fftc import ifft2c_mri, crop_img
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"
+D = "/net/beegfs/users/P101440/DCE_NIK"; OUT = f"{D}/results/task4_xcat_nomotion_pilot"
 FIX = dict(hidden=512, depth=12, w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, coil_embed_dim=8, env=0.75)
 
 def main():

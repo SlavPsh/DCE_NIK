@@ -1,9 +1,9 @@
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np, inspect
-sys.path.insert(0,"/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0,"/net/beegfs/users/P101440/grasp_pro_py")
 from fftc import fft2c_mri
 print(inspect.getsource(fft2c_mri)[:300])
-REF="/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+REF="/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 b1=np.asarray(np.load(f"{REF}/slice_21.npz")["b1"]); b1=b1/np.abs(b1).max()
 K=fft2c_mri(b1); E=(np.abs(K)**2).sum(-1); c0=E.shape[0]//2
 pk=np.unravel_index(np.argmax(E),E.shape)

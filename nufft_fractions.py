@@ -3,8 +3,8 @@ shared keep-files as CS and NIK. Static recon (all kept spokes) + pre-contrast r
 (kept spokes inside the pre-contrast window). References stay the full-spoke versions.
 out: results_nufft/frac_{lab}.npy, frac_pre_{lab}.npy"""
 import numpy as np, finufft, json, os
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
-D = "/scratch/rnga/vvpshenov/DCE_NIK"; NUF = f"{D}/results_nufft"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"; NUF = f"{D}/results_nufft"
 SL = 13
 meta = json.load(open(f"{NUF}/meta.json")); SIGN = meta["sign"]
 LABS = ["f100", "f70", "f50", "f25"]

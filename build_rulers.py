@@ -3,7 +3,7 @@ B: all-spoke static temporal-mean), same construction as nufft_reference.py (sli
 out: results_nufft_slice{Z}/{nufft_all,nufft_pre,pre_view_idx}.npy + meta.json"""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, finufft, os, json
-REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"; D = "/scratch/rnga/vvpshenov/DCE_NIK"
+REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; D = "/net/beegfs/users/P101440/DCE_NIK"
 SLICES = [18, 19, 20, 21]
 sh = np.load(f"{REF}/shared.npz")
 traj = np.asarray(sh["traj_norm"]).astype(np.complex64); vt = np.asarray(sh["view_time"]).ravel().astype(np.float64)

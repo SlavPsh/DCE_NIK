@@ -2,14 +2,14 @@
 watches rawGramCond (QR conditioning) and gradnorm. no recon (too slow on CPU)."""
 import numpy as np, torch, sys, warnings; warnings.filterwarnings("ignore")
 torch.set_float32_matmul_precision("high")
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A
 from nik_model import WIRE_FF_SUBSPACE_KXY_COIL_T_REIM, warmstart_phi
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 from nik_focal_loss import composable_kspace_loss
 from train_grasp_nik import compute_pca_phi
 
-dev = torch.device("cpu"); REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+dev = torch.device("cpu"); REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 sh = A.load_shared(REF); ds = A.make_radial_dataset(REF, 13, compute_device=dev, shared=sh)
 x, t, c, yraw = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"]
 spoke = ds["spoke_id_all"]; ncc = ds["meta"]["ncc"]

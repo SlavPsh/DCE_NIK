@@ -3,14 +3,14 @@ Only hidden width and seed vary; everything else frozen to the Task-4 NIK-F0 f25
 import warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np, torch
 from types import SimpleNamespace
-sys.path.insert(0, "/scratch/rnga/vvpshenov/DCE_NIK"); sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py")
+sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
 from fftc import ifft2c_mri, crop_img
-T4 = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4c_nik_capacity_audit"
-AIF = "/scratch/rnga/vvpshenov/DCE_NIK/aif_xcat.npz"
+T4 = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4c_nik_capacity_audit"
+AIF = "/net/beegfs/users/P101440/DCE_NIK/aif_xcat.npz"
 FIX = dict(depth=12, w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, coil_embed_dim=8, env=0.75)
 CURRENT_W = 512; STEPS = 40000; BATCH = 16384; LR = 1e-5; WD = 3e-3  # frozen Task-4 optimizer (wd is existing, not added)
 

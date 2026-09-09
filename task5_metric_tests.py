@@ -5,7 +5,7 @@ NOTE: skimage absent in torch29 -> windowed SSIM implemented with scipy.ndimage 
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, csv
 from scipy.ndimage import uniform_filter, gaussian_filter, shift as ndshift
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task5_evaluation_code_audit"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task5_evaluation_code_audit"
 rng = np.random.default_rng(0)
 
 def nrmse(a, b, mask=None, rng_val=None):          # truth-range normalized, shared scale

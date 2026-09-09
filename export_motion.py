@@ -9,14 +9,14 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, nibabel as nib, os, sys, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
-sys.path.insert(0, "/scratch/rnga/vvpshenov/grasp_pro_py"); sys.path.insert(0, ".")
+sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py"); sys.path.insert(0, ".")
 import consolidated as C
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/nifti_export"; os.makedirs(OUT, exist_ok=True)
-FIG = "/scratch/rnga/vvpshenov/DCE_NIK/figures"; TA = 375.0
+OUT = "/net/beegfs/users/P101440/DCE_NIK/nifti_export"; os.makedirs(OUT, exist_ok=True)
+FIG = "/net/beegfs/users/P101440/DCE_NIK/figures"; TA = 375.0
 VOX = (3.0, 3.0, 4.0)                                        # APPROX mm (in-plane, in-plane, slice)
 ROI_SLICES = [18, 19, 21]; LAB = {"aorta": 1, "cortex": 2, "medulla": 3, "liver": 4}
 
-vol = np.abs(np.load("/scratch/rnga/vvpshenov/grasp_pro_py/results_ref_3s/cs_recon_3s.npy")).astype(np.float32)  # [X,Y,Z,T]
+vol = np.abs(np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref_3s/cs_recon_3s.npy")).astype(np.float32)  # [X,Y,Z,T]
 X, Y, Z, T = vol.shape; t = np.linspace(0, TA, T)
 aff = np.diag([VOX[0], VOX[1], VOX[2], 1.0])
 

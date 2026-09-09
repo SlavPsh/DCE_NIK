@@ -6,9 +6,9 @@ output as a missing dependency. No training, no reconstruction, no data generati
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, csv, os, h5py
 from scipy.ndimage import uniform_filter
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task5_evaluation_code_audit"
-MAT = "/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
-T4 = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot/arrays"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task5_evaluation_code_audit"
+MAT = "/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260527T175428.mat"
+T4 = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot/arrays"
 rows_pk, rows_sm = [], []
 def R(a, b, m):
     return float(np.sqrt(np.mean((np.abs(a)[m]-np.abs(b)[m])**2))/(np.abs(b)[m].max()-np.abs(b)[m].min()+1e-12))
@@ -86,7 +86,7 @@ add("aorta_ROI_voxels", int(aorta.sum()))
 # PK fit on truth: not runnable
 add("PK_fit_on_truth", "NOT RUN - no S->concentration->PK fitter exists (see pk_truth_recovery.csv)")
 # GRASP-Pro XCAT-domain output dependency
-gp = "/scratch/rnga/vvpshenov/grasp_pro_py/results_spoke_cs"
+gp = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 gp_exists = os.path.isdir(gp)
 add("grasppro_output_for_XCAT", "MISSING - on-disk GRASP-Pro outputs (%s) are IN-VIVO (real twix), not the XCAT sim" % ("present but in-vivo" if gp_exists else "absent"))
 with open(f"{OUT}/smoke_test_results.csv", "w", newline="") as fp:

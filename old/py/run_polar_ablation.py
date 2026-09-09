@@ -522,7 +522,7 @@ def save_results_json(results, output_dir):
 def main():
     parser = argparse.ArgumentParser(description="Polar k-space ablation study")
     parser.add_argument("--data-file", type=str,
-                        default="/scratch/rnga/vvpshenov/XCAT-ERIC/results/simulation_results_20260115T150400.mat")
+                        default="/net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260115T150400.mat")
     parser.add_argument("--steps", type=int, default=20000)
     parser.add_argument("--batch-size", type=int, default=4096)
     parser.add_argument("--eval-every", type=int, default=50)
@@ -530,7 +530,7 @@ def main():
     parser.add_argument("--device", type=str, default=None,
                         help="Force device (default: auto)")
     parser.add_argument("--output-dir", type=str,
-                        default="/scratch/rnga/vvpshenov/DCE_NIK/runs/polar_ablation")
+                        default="/net/beegfs/users/P101440/DCE_NIK/runs/polar_ablation")
     args = parser.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")

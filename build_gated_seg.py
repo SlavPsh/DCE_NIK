@@ -5,7 +5,7 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, finufft, json, os
 from scipy import ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/scratch/rnga/vvpshenov/DCE_NIK"; REF = "/scratch/rnga/vvpshenov/grasp_pro_py/results_ref"
+B = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
 sh = np.load(f"{REF}/shared.npz"); traj = np.asarray(sh["traj_norm"]).astype(np.complex64)
 vt = np.asarray(sh["view_time"]).ravel(); TA = float(sh["TA"]); nx = int(sh["nx"]); bas = int(sh["bas"])
 sl = np.load(f"{REF}/slice_21.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64); b1 = np.asarray(sl["b1"]).astype(np.complex64)

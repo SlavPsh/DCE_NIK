@@ -5,8 +5,8 @@ temporal block (frame): val = {2,4,6,8}, test = {3,5,7}. Whole spokes preserved 
 individual readout samples). Saves spoke arrays + masks + manifests, verifies disjointness."""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, csv, json
-T4 = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4_xcat_nomotion_pilot"
-OUT = "/scratch/rnga/vvpshenov/DCE_NIK/results/task4c_nik_capacity_audit"
+T4 = "/net/beegfs/users/P101440/DCE_NIK/results/task4_xcat_nomotion_pilot"
+OUT = "/net/beegfs/users/P101440/DCE_NIK/results/task4c_nik_capacity_audit"
 S = np.load(f"{T4}/arrays/sim.npz"); kx = S["kx"]; ky = S["ky"]; keep = S["keep_f25"]  # keep [F,9] bool
 F, NA, RO = kx.shape
 train_mask = keep.copy()                                   # angles 0,1 (EXACT Task-4 f25 input)
