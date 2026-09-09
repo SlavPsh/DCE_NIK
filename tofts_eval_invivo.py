@@ -15,6 +15,13 @@ GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/us
 TA = 375.0; NTV = 1710; ROIS = ("aorta", "cortex", "medulla", "liver"); EDGES = np.linspace(0, 1, 17)
 KEEP = np.load(f"{B}/spoke_masks/keep_f25.npy"); VAL = np.load(f"{B}/spoke_masks/val_f25c_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_f25c_m9.npy")
 sh = A.load_shared(REFD)
+import argparse
+_ap = argparse.ArgumentParser(); _ap.add_argument("--slices", default="18,19,21"); _ap.add_argument("--arms", default="patlak,tofts")
+_ap.add_argument("--suffix", default="", help="outputs invivo<suffix>.{json,md}"); _a = _ap.parse_args()
+SLICES = [int(z) for z in _a.slices.split(",")]; ARMS = _a.arms.split(","); SUF = _a.suffix
+LABEL = {"patlak": "Patlak", "tofts": "Tofts"}
+def basis_for(arm, Z):                                                          # tofts = rank rule basis, tofts<R> = forced rank R
+    return f"{RES}/basis_sl{Z}_r{arm[5:]}.npz" if arm.startswith("tofts") and arm != "tofts" else f"{RES}/basis_sl{Z}.npz"
 
 def bs(c): return c - np.median(c[:8])
 def ft(nt): e = np.linspace(0, TA, nt+1); return 0.5*(e[:-1]+e[1:])
@@ -51,13 +58,13 @@ def curves(v, t, ctx):
     return out
 
 @torch.no_grad()
-def heldout(run, Z):
+def heldout(run, Z, arm="tofts"):
     ck = torch.load(f"{run}/model_slice_{Z:02d}.pt", map_location=dev, weights_only=False)
     ds = A.make_radial_dataset(REFD, Z, compute_device=dev, shared=sh); x, t, c, y_raw, sid = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"], ds["spoke_id_all"]
     kept = torch.as_tensor(KEEP, device=dev, dtype=sid.dtype); tr = torch.where(torch.isin(sid, kept))[0]
     dcf = compute_dcf_radial(x, method="simple_ramp"); nz = KSpaceNormalizer(); nz.fit(x[tr], y_raw[tr], dcf=dcf[tr], envelope_exponent=0.75); y = nz.normalize(x, y_raw)
     args = SimpleNamespace(**{k: ck[k] for k in ("model", "rank", "hidden", "depth", "w0", "s0", "coil_embed_dim", "k_freq", "k_sigma", "t_freq", "t_sigma", "ff_seed")},
-                           patlak_free=0, aif_file=f"{B}/aif_slice{Z}.npz", tofts_basis=f"{RES}/basis_sl{Z}.npz", phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0)
+                           patlak_free=0, aif_file=f"{B}/aif_slice{Z}.npz", tofts_basis=basis_for(arm, Z), phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0)
     m = build_model(args, int(ck["ncc"])).to(dev); m.load_state_dict(ck["state_dict"]); m.eval()
     out = dict(rank=int(m.rank), params=int(sum(p.numel() for p in m.parameters())))
     for nm, spk in (("val", VAL), ("test", TEST), ("train", KEEP)):
@@ -72,6 +79,9 @@ def heldout(run, Z):
 
 def resources(Z, arm, s):
     """wall/peak mem from the slurm log (invivo_<array>_<i>.log, i = slice_idx*6 + model_idx*3 + seed)"""
+    wj = f"{IV}/{arm}_sl{Z}_s{s}/wandb_runs/slice_{Z:02d}.json"                  # nik_wandb summary, newer runs
+    if os.path.exists(wj):
+        j = json.load(open(wj)); return dict(wall_s=float(j.get("wall_s", np.nan)), peak_gpu_mb=float(j.get("peak_gpu_mb", np.nan)))
     i = {18: 0, 19: 1, 21: 2}[Z]*6 + (0 if arm == "patlak" else 1)*3 + s; out = dict(wall_s=np.nan, peak_gpu_mb=np.nan)
     for f in glob.glob(f"{RES}/logs/invivo_*_{i}.log"):
         s_ = open(f).read(); m1 = re.search(r"\((\d+)s\)", s_); m2 = re.search(r"peak_gpu_MB (\d+)", s_)
@@ -80,38 +90,42 @@ def resources(Z, arm, s):
     return out
 
 rows = []
-for Z in (18, 19, 21):
+for Z in SLICES:
     ctx = C.slice_ctx(Z); md = np.load(f"{B}/step2_slice{Z}.npz"); ctx["mf"] = md["mf"]; ctx["tmf"] = md["tmf"]   # model-free frames-first [240,192,192]
-    for arm in ("patlak", "tofts"):
+    for arm in ARMS:
         for s in (0, 1, 2):
             run = f"{IV}/{arm}_sl{Z}_s{s}"; f = f"{run}/nik_slice_{Z:02d}_cplx.npy"
             if not os.path.exists(f): print(f"  sl{Z} {arm} s{s}: MISSING"); rows.append(dict(slice=Z, arm=arm, seed=s, status="missing")); continue
             v = np.abs(np.load(f)).astype(np.float32); r = dict(slice=Z, arm=arm, seed=s, status="complete", frames=int(v.shape[-1]))
             r.update(curves(v, ft(v.shape[-1]), ctx))
             v122 = np.stack([np.interp(ft(122), ft(v.shape[-1]), v.reshape(-1, v.shape[-1])[i]) for i in range(v.shape[0]*v.shape[1])], 0).reshape(v.shape[0], v.shape[1], 122) if False else None
-            try: r.update(heldout(run, Z))
+            try: r.update(heldout(run, Z, arm))
             except Exception as e: r["heldout_error"] = str(e)[:120]; print("   heldout failed:", str(e)[:120])
             r.update(resources(Z, arm, s)); rows.append(r)
             print(f"  sl{Z} {arm} s{s}: aorta_aff {r.get('mf_aorta_affine', np.nan):.4f} cortex_aff {r.get('mf_cortex_affine', np.nan):.4f} fwhm {r.get('aorta_fwhm_s', np.nan):.1f}s | val {r.get('val_kNMSE', np.nan):.3e} test {r.get('test_kNMSE', np.nan):.3e}", flush=True)
     for lab, p in ((f"GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", f"{GV}/gv2_slice{Z}_f25.npy"), (f"GRASP-Pro f25 (488 spokes, 122 fr, K5)", f"{GP}/cs_slice{Z}_f25.npy")):
         if not os.path.exists(p): continue
         v = np.abs(np.load(p)).astype(np.float32); r = dict(slice=Z, arm=lab, seed=-1, status="complete", frames=int(v.shape[-1])); r.update(curves(v, ft(v.shape[-1]), ctx)); rows.append(r)
-json.dump(rows, open(f"{RES}/invivo.json", "w"), indent=1)
+json.dump(rows, open(f"{RES}/invivo{SUF}.json", "w"), indent=1)
 keys = ["mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "mf_aorta_scale", "mf_cortex_scale", "mf_medulla_scale", "aorta_peak_ratio_vs_mf",
         "aorta_fwhm_s", "aorta_ttp_s", "aorta_neg_frac", "aorta_rise_mono", "cortex_medulla_late_corr", "train_kNMSE", "val_kNMSE", "test_kNMSE", "wall_s", "peak_gpu_mb", "params"]
 lines = ["# in vivo (meas_p3_dce, slices 18/19/21, keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched)", "",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]
-for Z in (18, 19, 21):
-    lines += [f"## slice {Z}", "| metric | Patlak mean±SD (n) | Tofts mean±SD (n) | Δ Tofts−Patlak | GRASP-v2 f25 | GRASP-Pro f25 |", "|---|---|---|---|---|---|"]
+L = [LABEL.get(a, a) for a in ARMS]
+for Z in SLICES:
+    lines += [f"## slice {Z}", "| metric | " + " | ".join(f"{l} mean±SD (n)" for l in L) + " | " + " | ".join(f"Δ {l}−{L[0]}" for l in L[1:]) + " | GRASP-v2 f25 | GRASP-Pro f25 |",
+              "|" + "---|" * (2 * len(ARMS) + 2)]
     def ms(arm, k):
         v = np.array([r[k] for r in rows if r.get("slice") == Z and r.get("arm") == arm and r.get("status") == "complete" and k in r], float); return (np.nanmean(v), np.nanstd(v), v.size) if v.size else (np.nan, np.nan, 0)
     def cs(pre, k):
         v = [r.get(k, np.nan) for r in rows if r.get("slice") == Z and str(r.get("arm", "")).startswith(pre)]; return v[0] if v else np.nan
     for k in keys:
-        p, t = ms("patlak", k), ms("tofts", k)
-        lines.append(f"| {k} | {p[0]:.4g} ± {p[1]:.2g} ({p[2]}) | {t[0]:.4g} ± {t[1]:.2g} ({t[2]}) | {t[0]-p[0]:+.4g} | {cs('GRASP-v2', k):.4g} | {cs('GRASP-Pro', k):.4g} |")
+        M = [ms(a, k) for a in ARMS]
+        lines.append(f"| {k} | " + " | ".join(f"{m[0]:.4g} ± {m[1]:.2g} ({m[2]})" for m in M) + " | " + " | ".join(f"{m[0]-M[0][0]:+.4g}" for m in M[1:])
+                     + f" | {cs('GRASP-v2', k):.4g} | {cs('GRASP-Pro', k):.4g} |")
     mfw = [r.get("mf_aorta_fwhm_s") for r in rows if r.get("slice") == Z and "mf_aorta_fwhm_s" in r]; lines.append(f"\nmodel-free aorta FWHM (s): {mfw[0] if mfw else 'n/a'}\n")
-    pa = np.array([r["test_annuli"] for r in rows if r.get("slice") == Z and r.get("arm") == "patlak" and "test_annuli" in r]); ta = np.array([r["test_annuli"] for r in rows if r.get("slice") == Z and r.get("arm") == "tofts" and "test_annuli" in r])
-    if pa.size and ta.size:
-        lines += ["TEST-spoke k-space NMSE per |k| annulus:", "| annulus | Patlak | Tofts |", "|---|---|---|"] + [f"| {EDGES[i]:.2f}-{EDGES[i+1]:.2f} | {pa[:, i].mean():.3e} | {ta[:, i].mean():.3e} |" for i in range(16)] + [""]
-open(f"{RES}/invivo.md", "w").write("\n".join(lines)); print("\n".join(lines)); print("INVIVO_EVAL_DONE")
+    AN = [np.array([r["test_annuli"] for r in rows if r.get("slice") == Z and r.get("arm") == a and "test_annuli" in r]) for a in ARMS]
+    if all(x.size for x in AN):
+        lines += (["TEST-spoke k-space NMSE per |k| annulus:", "| annulus | " + " | ".join(L) + " |", "|" + "---|" * (len(ARMS) + 1)]
+                  + [f"| {EDGES[i]:.2f}-{EDGES[i+1]:.2f} | " + " | ".join(f"{x[:, i].mean():.3e}" for x in AN) + " |" for i in range(16)] + [""])
+open(f"{RES}/invivo{SUF}.md", "w").write("\n".join(lines)); print("\n".join(lines)); print("INVIVO_EVAL_DONE")
