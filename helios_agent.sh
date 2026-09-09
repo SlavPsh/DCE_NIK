@@ -128,8 +128,7 @@ commit_push() {
   [ -d "$r/.git" ] || return 0
   cd "$r" || return 0
   git ls-files -z --others --modified --exclude-standard -- "$@" 2>/dev/null | while IFS= read -r -d '' f; do
-    case "$f" in jobs/done/*|jobs/agent/*) ;; *) printf '%s
-' "$f" | grep -qE "$SMALL" || continue;; esac   # markers have no extension
+    case "$f" in jobs/done/*|jobs/agent/*) ;; *) printf '%s\n' "$f" | grep -qE "$SMALL" || continue;; esac   # markers have no extension
     printf '%s\n' "$f" | grep -qE "$ACTIVE_RE" && continue
     if [ -f "$f" ]; then kb=$(( $(stat -c %s "$f") / 1024 )); [ "$kb" -le "$MAXKB" ] || { log "skip large $f (${kb} kb)"; continue; }; fi
     git add -- "$f"
