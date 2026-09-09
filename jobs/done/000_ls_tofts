@@ -1,0 +1,6 @@
+probe 000_ls_tofts
+host worker02.cluster
+start 2026-09-09 22:45:06
+end 2026-09-09 22:45:06
+exit 0
+log jobs/log/probe_000_ls_tofts.out
