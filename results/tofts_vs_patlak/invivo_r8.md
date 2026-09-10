@@ -1,18 +1,3 @@
-2026-09-10 03:20:51 host gpu03.cluster job 3251439 task 0 stage eval
-GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
-  MIG 1g.12gb     Device  0: (UUID: MIG-e23bb79c-2a45-5a6e-91ca-fb5b8182ea07)
-GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
-GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
-GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
-  sl21 patlak s0: aorta_aff 0.0421 cortex_aff 0.1542 fwhm 16.9s | val 2.729e-01 test 2.868e-01
-  sl21 patlak s1: aorta_aff 0.0633 cortex_aff 0.1547 fwhm 16.9s | val 2.761e-01 test 2.891e-01
-  sl21 patlak s2: aorta_aff 0.0533 cortex_aff 0.1549 fwhm 16.9s | val 2.771e-01 test 2.921e-01
-  sl21 tofts s0: aorta_aff 0.1884 cortex_aff 0.1375 fwhm 58.4s | val 3.032e-01 test 3.106e-01
-  sl21 tofts s1: aorta_aff 0.1575 cortex_aff 0.1377 fwhm 24.6s | val 3.036e-01 test 3.118e-01
-  sl21 tofts s2: aorta_aff 0.1869 cortex_aff 0.1420 fwhm 129.0s | val 3.013e-01 test 3.119e-01
-  sl21 tofts8 s0: aorta_aff 0.1616 cortex_aff 0.1090 fwhm 107.5s | val 2.835e-01 test 2.912e-01
-  sl21 tofts8 s1: aorta_aff 0.1329 cortex_aff 0.1168 fwhm 82.9s | val 2.876e-01 test 2.952e-01
-  sl21 tofts8 s2: aorta_aff 0.1394 cortex_aff 0.1238 fwhm 82.9s | val 2.873e-01 test 2.961e-01
 # in vivo (meas_p3_dce, slices 18/19/21, keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched)
 
 rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
@@ -61,7 +46,3 @@ TEST-spoke k-space NMSE per |k| annulus:
 | 0.81-0.88 | 1.589e+00 | 1.187e+00 | 1.174e+00 |
 | 0.88-0.94 | 1.619e+00 | 1.216e+00 | 1.208e+00 |
 | 0.94-1.00 | 1.607e+00 | 1.228e+00 | 1.222e+00 |
-
-INVIVO_EVAL_DONE
-[W910 03:21:58.124301809 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
-EVAL_DONE exit 0
