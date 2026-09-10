@@ -17,8 +17,16 @@ KEEP = np.load(f"{B}/spoke_masks/keep_f25.npy"); VAL = np.load(f"{B}/spoke_masks
 sh = A.load_shared(REFD)
 import argparse
 _ap = argparse.ArgumentParser(); _ap.add_argument("--slices", default="18,19,21"); _ap.add_argument("--arms", default="patlak,tofts")
-_ap.add_argument("--suffix", default="", help="outputs invivo<suffix>.{json,md}"); _a = _ap.parse_args()
-SLICES = [int(z) for z in _a.slices.split(",")]; ARMS = _a.arms.split(","); SUF = _a.suffix
+_ap.add_argument("--suffix", default=None, help="outputs invivo<suffix>.{json,md}; default '' for f25, '_k80' for k80")
+_ap.add_argument("--spokes", default="f25", choices=["f25", "k80"], help="k80 = the standard: keep v%10<8 (1368 views), val v%10==8, test v%10==9, runs in invivo_k80/, grasp k80 refs"); _a = _ap.parse_args()
+SLICES = [int(z) for z in _a.slices.split(",")]; ARMS = _a.arms.split(",")
+if _a.spokes == "k80":
+    KEEP = np.load(f"{B}/spoke_masks/keep_f80match.npy"); VAL = np.load(f"{B}/spoke_masks/val_k80_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_k80_m9.npy"); IV = f"{RES}/invivo_k80"
+    REFS = (("GRASP-v2 k80 (1368 views, 142 fr, n12 lam0.25)", "{GV}/gv2_slice{Z}_n12_k80.npy"), ("GRASP-Pro f80match (1368 views, 122 fr, K5)", "{GP}/cs_slice{Z}_f80match.npy"))
+    SUF = "_k80" if _a.suffix is None else _a.suffix; SPK = "k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method"
+else:
+    REFS = (("GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", "{GV}/gv2_slice{Z}_f25.npy"), ("GRASP-Pro f25 (488 spokes, 122 fr, K5)", "{GP}/cs_slice{Z}_f25.npy"))
+    SUF = _a.suffix or ""; SPK = "keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched"
 LABEL = {"patlak": "Patlak", "tofts": "Tofts"}
 def basis_for(arm, Z):                                                          # tofts = rank rule basis, tofts<R> = forced rank R
     return f"{RES}/basis_sl{Z}_r{arm[5:]}.npz" if arm.startswith("tofts") and arm != "tofts" else f"{RES}/basis_sl{Z}.npz"
@@ -103,13 +111,14 @@ for Z in SLICES:
             except Exception as e: r["heldout_error"] = str(e)[:120]; print("   heldout failed:", str(e)[:120])
             r.update(resources(Z, arm, s)); rows.append(r)
             print(f"  sl{Z} {arm} s{s}: aorta_aff {r.get('mf_aorta_affine', np.nan):.4f} cortex_aff {r.get('mf_cortex_affine', np.nan):.4f} fwhm {r.get('aorta_fwhm_s', np.nan):.1f}s | val {r.get('val_kNMSE', np.nan):.3e} test {r.get('test_kNMSE', np.nan):.3e}", flush=True)
-    for lab, p in ((f"GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", f"{GV}/gv2_slice{Z}_f25.npy"), (f"GRASP-Pro f25 (488 spokes, 122 fr, K5)", f"{GP}/cs_slice{Z}_f25.npy")):
+    for lab, pt in REFS:
+        p = pt.format(GV=GV, GP=GP, Z=Z)
         if not os.path.exists(p): continue
         v = np.abs(np.load(p)).astype(np.float32); r = dict(slice=Z, arm=lab, seed=-1, status="complete", frames=int(v.shape[-1])); r.update(curves(v, ft(v.shape[-1]), ctx)); rows.append(r)
 json.dump(rows, open(f"{RES}/invivo{SUF}.json", "w"), indent=1)
 keys = ["mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "mf_aorta_scale", "mf_cortex_scale", "mf_medulla_scale", "aorta_peak_ratio_vs_mf",
         "aorta_fwhm_s", "aorta_ttp_s", "aorta_neg_frac", "aorta_rise_mono", "cortex_medulla_late_corr", "train_kNMSE", "val_kNMSE", "test_kNMSE", "wall_s", "peak_gpu_mb", "params"]
-lines = ["# in vivo (meas_p3_dce, slices 18/19/21, keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched)", "",
+lines = [f"# in vivo (meas_p3_dce, slices {'/'.join(map(str, SLICES))}, {SPK})", "",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]
 L = [LABEL.get(a, a) for a in ARMS]
 for Z in SLICES:

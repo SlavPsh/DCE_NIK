@@ -9,6 +9,9 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"
 GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
 TA = 375.0; ROIS = ("aorta", "cortex", "medulla", "liver")
+REFSETS = {"f25": (("grasp v2 f25 (488 sp, 122 fr, lam0.25)", "{GV}/gv2_slice{Z}_f25.npy"), ("grasp pro f25 (488 sp, 122 fr, K5)", "{GP}/cs_slice{Z}_f25.npy")),
+           "k80": (("grasp v2 k80 (1368 views, 142 fr, n12 lam0.25)", "{GV}/gv2_slice{Z}_n12_k80.npy"), ("grasp pro f80match (1368 views, 122 fr, K5)", "{GP}/cs_slice{Z}_f80match.npy"))}
+REFSET = "f25"; SPK_LABEL = "keep_f25 (488 of 1710 spokes)"                  # set by main (--refs)
 COL = {"model-free": "k", "patlak": "#0369a1", "tofts8": "#1e8449", "tofts": "#c0392b", "grasp v2": "#e67e22", "grasp pro": "#8e44ad"}
 PHASES = [("pre ~20s", 20.0), ("peak ~65s", 65.0), ("late ~250s", 250.0)]
 KEYS = ["mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "aorta_peak_ratio_vs_mf", "cortex_medulla_late_corr", "val_kNMSE", "test_kNMSE"]
@@ -45,7 +48,8 @@ class Slice:
             v = self.sc(np.abs(np.load(f)).astype(np.float32)); arms.setdefault(arm, {})[s] = (v, ft(v.shape[-1]))
         order = [a for a in ("patlak", "tofts", "tofts8") if a in arms] + sorted(a for a in arms if a not in ("patlak", "tofts", "tofts8"))
         refs = []
-        for nm, p in (("grasp v2 f25 (488 sp, 122 fr, lam0.25)", f"{GV}/gv2_slice{self.Z}_f25.npy"), ("grasp pro f25 (488 sp, 122 fr, K5)", f"{GP}/cs_slice{self.Z}_f25.npy")):
+        for nm, pt in REFSETS[REFSET]:
+            p = pt.format(GV=GV, GP=GP, Z=self.Z)
             if os.path.exists(p): v = self.sc(np.abs(np.load(p)).astype(np.float32)); refs.append((nm, v, ft(v.shape[-1])))
         return {a: arms[a] for a in order}, refs
 
@@ -63,7 +67,7 @@ def fig_panel(S, arms, refs):
         for mi, (nm, v, t) in enumerate(M): ax.plot(S.tmf, S.curve(v, t, r), color=col(nm), lw=2.2 if mi == 0 else 1.4, ls="-" if mi == 0 else "--", label=nm)
         ax.set_title(r, fontsize=9); ax.set_xlabel("time (s)", fontsize=8); ax.grid(alpha=.3); ax.tick_params(labelsize=7)
         if ri == 0: ax.legend(fontsize=6, loc="upper right")
-    fig.suptitle(f"in vivo slice {S.Z}: 3 phases, seed 0, one global scale vs model-free, keep_f25 (488 of 1710 spokes); curves baseline subtracted", fontsize=9); return fig
+    fig.suptitle(f"in vivo slice {S.Z}: 3 phases, seed 0, one global scale vs model-free, {SPK_LABEL}; curves baseline subtracted", fontsize=9); return fig
 
 def fig_rois(S):
     fig, ax = plt.subplots(figsize=(5.2, 5.2)); a = S.anat; ax.imshow(a, cmap="gray", vmin=0, vmax=float(np.percentile(a[S.body], 99.5))); ax.axis("off")
@@ -117,14 +121,16 @@ def fig_annuli(Z, rows):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="18,19,21"); ap.add_argument("--suffix", default="_r8", help="invivo<suffix>.json, falls back to invivo.json")
-    ap.add_argument("--tag", default=os.environ.get("SLURM_JOB_ID", "local")); ap.add_argument("--no-wandb", action="store_true"); a = ap.parse_args()
+    ap.add_argument("--tag", default=os.environ.get("SLURM_JOB_ID", "local")); ap.add_argument("--no-wandb", action="store_true")
+    ap.add_argument("--iv", default="invivo", help="run dir under results/tofts_vs_patlak: invivo (f25) or invivo_k80"); ap.add_argument("--refs", default="f25", choices=list(REFSETS)); a = ap.parse_args()
+    global IV, REFSET, SPK_LABEL; IV = f"{RES}/{a.iv}"; REFSET = a.refs; spk = "k80 (1368 of 1708 views, v%10<8)" if a.refs == "k80" else "keep_f25 (488 of 1710 spokes)"; SPK_LABEL = spk
     import nik_wandb as W
     jf = f"{RES}/invivo{a.suffix}.json"; jf = jf if os.path.exists(jf) else f"{RES}/invivo.json"; rows = json.load(open(jf)) if os.path.exists(jf) else []
     print("metrics from", jf, len(rows), "rows", flush=True); FB = f"{RES}/figures_wandb"
     for Z in [int(z) for z in a.slices.split(",")]:
         S = Slice(Z); arms, refs = S.load(); print(f"slice {Z}: arms {[(k, sorted(v)) for k, v in arms.items()]}, refs {[r[0] for r in refs]}", flush=True)
-        run = W.Run(f"figs_invivo_sl{Z}_{a.tag}", config=dict(slice=Z, arms=list(arms), seeds={k: sorted(v) for k, v in arms.items()}, refs=[r[0] for r in refs], metrics_json=jf),
-                    group="tofts_figs", tags=["invivo", f"sl{Z}"], local_json=f"{FB}/figs_sl{Z}_{a.tag}.json", enabled=not a.no_wandb)
+        run = W.Run(f"figs_{a.iv}_sl{Z}_{a.tag}", config=dict(slice=Z, arms=list(arms), seeds={k: sorted(v) for k, v in arms.items()}, refs=[r[0] for r in refs], metrics_json=jf, spokes=spk),
+                    group="tofts_figs", tags=["invivo", f"sl{Z}", a.refs], local_json=f"{FB}/figs_{a.iv}_sl{Z}_{a.tag}.json", enabled=not a.no_wandb)
         figs = {"panel": fig_panel(S, arms, refs), "roi_overlay": fig_rois(S), "curves_all_seeds": fig_curves(S, arms, refs), "peak_diff": fig_peakdiff(S, arms, refs)}
         if rows:
             figs["metrics"] = fig_metrics(Z, rows); an = fig_annuli(Z, rows)

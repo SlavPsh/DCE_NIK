@@ -1,5 +1,8 @@
 # dce_nik resume (2026-09-10). read this first in a new chat.
 
+## the in vivo standard input (2026-09-10, user rule)
+every method at k80: keep `spoke_masks/keep_f80match.npy` (v%10<8, 1368 of 1708 views), val `val_k80_m8.npy` (v%10==8), test `test_k80_m9.npy` (v%10==9); grasp v2 = `gv2_slice<Z>_n12_k80.npy`, grasp pro = `cs_slice<Z>_f80match.npy`; same binning, b1, crop, render, rois, rulers. the tofts vs patlak arms of section 10 were run at keep_f25 (488 spokes) and are NOT comparable to sub16 k80 or grasp k80; queue 005 reruns patlak / tofts / tofts8 at k80 (3 slices, 3 seeds, 3k steps, `results/tofts_vs_patlak/invivo_k80/`, eval `tofts_eval_invivo.py --spokes k80` -> `invivo_k80.md`, figures `--iv invivo_k80 --refs k80`), queue 006 makes the grasp k80 refs for 18/19 (`SLICES=18,19` in grasp_v2_real.py, `SLICE=` in cs_nikmatch.py). still missing at k80 on 18/19: sub16 output-coil (outcoil_real.py, slice 21 only so far).
+
 ## how work runs now (luna decommissioned, helios has no claude)
 laptop (claude, env `dce`) commits `jobs/queue/<n>.sh` (sbatch script) or `jobs/probe/<n>.sh` (inline, 60 s) -> `helios_agent.sh` (slurm defq, every 2 min) pulls, submits, commits `jobs/done/<n>`, `jobs/log/`, small results (json/md/png/csv) -> `python helios_fetch.py` on the laptop = git pull + jobs table + wandb (`dce_nik`) summaries in `results/_wandb/`. see `jobs/README.md`. training scripts log to wandb via `nik_wandb.py`. gpu quota: one 2g.24gb slice at a time (`QOSMaxGRESPerUser`), so arrays serialize.
 
