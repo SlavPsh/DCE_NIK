@@ -1,0 +1,61 @@
+2026-09-10 11:06:52 host gpu02.cluster job 3252575 task 3 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 3000 steps, batch 65536, split 0.7
+    explicit heldout: 123 VAL spokes
+    spoke-reduction: 488 acquired spokes, 1499136 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run vicg6og1
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo/tofts8_sl19_s0/wandb_runs/wandb/run-20260910_110656-vicg6og1
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl19_s0_s19
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/vicg6og1
+[wandb] gnik_tofts8_sl19_s0_s19: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:346: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+    step   1000  train 8.866e-01  heldout 5.508e-01
+    step   2000  train 6.616e-01  heldout 5.179e-01
+    step   3000  train 5.758e-01  heldout 5.290e-01
+    restored best (heldout 5.179e-01)
+    RESOURCES slice 19: peak_gpu_MB 12349 params 5531216 best_heldout 5.1786e-01
+wandb: uploading data; updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁
+wandb:        best_step ▁██
+wandb:      heldout_mse █▁▃
+wandb:             loss █▃▁
+wandb:               lr ▁▁▁
+wandb:      peak_gpu_mb ▁██
+wandb:        val_knmse █▁▃
+wandb:           wall_s ▁▅█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.51786
+wandb:        best_step 2000
+wandb:      heldout_mse 0.52904
+wandb:             loss 0.5758
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12349.33008
+wandb:        val_knmse 0.71594
+wandb:           wall_s 564.73297
+wandb:     wall_total_s 977.05897
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl19_s0_s19 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/vicg6og1
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/invivo/tofts8_sl19_s0/wandb_runs/wandb/run-20260910_110656-vicg6og1/logs
+slice 19  nik (192, 192, 342)  (979s)  vs CS: corr 0.957  nrmse 0.215
+done 979s -> results/tofts_vs_patlak/invivo/tofts8_sl19_s0
+[W910 11:23:14.288455568 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-10 11:23:14 TRAIN_DONE sl19 s0 exit 0

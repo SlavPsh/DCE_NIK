@@ -1,5 +1,6 @@
 queue 002_tofts_sl18_19_rank8_3k
 jid 3252558
 submitted 2026-09-10 10:49:35
-state 2 RUNNING None
+state 1 COMPLETED 00:16:23, 1 COMPLETED 00:16:24, 2 COMPLETED 00:16:32, 1 COMPLETED 00:16:53, 1 COMPLETED 00:16:58
 log jobs/log/002_tofts_sl18_19_rank8_3k_3252558.out
+ended 2026-09-10 11:40:29
