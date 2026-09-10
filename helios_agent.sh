@@ -20,7 +20,8 @@ D=$ROOT/DCE_NIK; J=$D/jobs
 PERIOD=${AGENT_PERIOD:-120}
 MARGIN=${AGENT_MARGIN:-900}
 MAXKB=${AGENT_MAXKB:-5120}
-SMALL='\.(json|md|png|csv|txt|out)$'
+NBKB=${AGENT_NBKB:-40960}
+SMALL='\.(json|md|png|csv|txt|out|ipynb)$'
 LIMIT_DEFAULT=43200
 ACTIVE_RE='^$'
 mkdir -p "$J/probe" "$J/queue" "$J/done" "$J/log" "$J/agent" "$D/logs"
@@ -130,7 +131,7 @@ commit_push() {
   git ls-files -z --others --modified --exclude-standard -- "$@" 2>/dev/null | while IFS= read -r -d '' f; do
     case "$f" in jobs/done/*|jobs/agent/*) ;; *) printf '%s\n' "$f" | grep -qE "$SMALL" || continue;; esac   # markers have no extension
     printf '%s\n' "$f" | grep -qE "$ACTIVE_RE" && continue
-    if [ -f "$f" ]; then kb=$(( $(stat -c %s "$f") / 1024 )); [ "$kb" -le "$MAXKB" ] || { log "skip large $f (${kb} kb)"; continue; }; fi
+    if [ -f "$f" ]; then kb=$(( $(stat -c %s "$f") / 1024 )); cap=$MAXKB; case "$f" in *.ipynb) cap=$NBKB;; esac; [ "$kb" -le "$cap" ] || { log "skip large $f (${kb} kb)"; continue; }; fi
     git add -- "$f"
   done
   git diff --cached --quiet && return 0
