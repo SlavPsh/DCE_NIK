@@ -1,0 +1,6 @@
+probe 002_restored_best
+host worker04.cluster
+start 2026-09-10 08:16:28
+end 2026-09-10 08:16:29
+exit 0
+log jobs/log/probe_002_restored_best.out
