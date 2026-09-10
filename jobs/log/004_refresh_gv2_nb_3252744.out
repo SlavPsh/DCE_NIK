@@ -1,0 +1,4 @@
+2026-09-10 13:26:16 host worker06.cluster job 3252744
+backup /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_GRASPv2_combined_report.ipynb.bak_20260910
+REFRESHED /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_GRASPv2_combined_report.ipynb: 99 cells, 0 error outputs, 25 s
+REFRESH exit 0
