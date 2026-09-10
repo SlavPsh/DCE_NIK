@@ -106,7 +106,7 @@ track_jobs() {
     fi
   done < "$J/agent/active"
   printf '%s' "$keep" > "$J/agent/active"
-  ACTIVE_RE=$(awk '{printf "_%s\.out$|", $1}' "$J/agent/active")'^$'
+  ACTIVE_RE=$(awk '{printf "^jobs/log/%s_|", $2}' "$J/agent/active")'^$'      # by script name: array tasks and chained jobs too
 }
 
 write_status() {
