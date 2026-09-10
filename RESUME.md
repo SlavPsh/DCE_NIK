@@ -34,6 +34,7 @@ seen 2026-09-10 (sl21): tofts arms have the right curve shape but only ~60% of t
 | tofts vs patlak, motion phantom | psnr +1.9 db, cortex 0.164 to 0.112, aorta worse | `phantom_motion.md` |
 | tofts vs patlak, in vivo | kidney curves better, cortex/medulla identity broken (0.998 to 0.7 to 0.9), aorta peak 0.5 vs 0.9 (patlak by construction), held-out k 8% worse globally (k centre), better at |k|>0.19 | `invivo.md` |
 | tofts rank 8 (forced) vs rank 12 (rule), in vivo sl21, 3 seeds, 2026-09-10 | test knmse 0.294 vs 0.311 (patlak 0.289): k-centre gap mostly closed (annulus 0 0.276 vs 0.294, patlak 0.270), best of the three on all 15 outer annuli; cortex/medulla affine 0.117/0.061 vs 0.139/0.075 (patlak 0.155/0.139); aorta affine 0.145 vs 0.178 (patlak 0.053, grasp v2 0.149); late corr -0.22 (model-free sign). basis rule not met at 8 (first-pass err 0.0285 > 0.01) | `results/tofts_vs_patlak/invivo_r8.md`, `jobs/queue/001_tofts_sl21_rank8.sh`, wandb `gnik_tofts8_sl21_s*` |
+| tofts rank 8 at 3k steps, slices 18/19, 3 seeds each (queue 002, 2026-09-10) | test knmse 0.3265 / 0.3289 = patlak 0.3271 / 0.3291 (rank 12: 0.349 / 0.356), k-centre annulus 0.297 / 0.288 = patlak; cortex affine 0.082 / 0.088 (r12 0.095 / 0.117, patlak 0.152), medulla 0.056 / 0.050 (r12 0.062 / 0.069, patlak 0.139); aorta affine 0.156 / 0.156 (patlak 0.060 / 0.037), peak ratio 0.57 / 0.56; wall 990 s vs 8000 s, same quality -> 3k steps is the in vivo protocol from now on | `results/tofts_vs_patlak/invivo_r8.md`, `jobs/queue/002_tofts_sl18_19_rank8_3k.sh`, wandb `gnik_tofts8_sl1*` |
 | every in vivo tofts_vs_patlak run (patlak, tofts r12, r8; slices 18/19/21; 3 seeds) restores the step 2000 weights | held-out mse rises monotonically from step 1000 (sl21 tofts 0.56 at 2k to 0.75 at 40k, patlak 0.62 to 0.88) while train falls; warmup 2000 pins the restored step; the reported wall_s 8000 is the 40k run, the evaluated model is ~400 s of training | `jobs/log/probe_002_restored_best.out` |
 
 ## retracted, do not resurrect
@@ -52,7 +53,7 @@ temporal tv on atoms (phi_tv) and on k-space (ktv21, l2,1): null. sense-forward 
 ## open
 - neutral in-vivo ruler: held-out spokes for cs need complex-valued grasp saves (`grasp_v2_real.py` saves magnitude). the one thing that would settle in-vivo curves.
 - sense-b (k-space model + b1 factorization in k-space): only untested item on the image axis. kernel study done (r=2 taps capture 58%, factorization residual 8 db), training not run.
-- tofts in vivo: rank 8 closes the k-centre gap (2026-09-10, sl21 only; 18/19 not run). aorta remains the weak point (peak ratio 0.61). next: in-vivo runs at 3k steps (early stop lands at 2000 anyway, 10x cheaper), rank 8 on 18/19, and whether the basis rule threshold (0.01) or rank 8 is right.
+- tofts in vivo: rank 8 closes the k-centre gap on all three slices (2026-09-10). open: the amplitude deficit of the tofts arms (aorta peak ~0.57 of model-free, late medulla ~0.65, see figures), the basis rule threshold (0.01 rejects rank 8), rank 5 (patlak span + 2) as the next point on the curve, and the roi masks (cortex/medulla 56 px, `liver` mask not liver).
 - v2 notebook section 1 still at 5 spf (~3 h to repoint).
 - fwhm bound on slices 18/19/20 for grasp v2.
 
