@@ -1,5 +1,5 @@
 queue 005_pk_arms_k80
 jid 3252773
 submitted 2026-09-10 14:06:14
-state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
+state 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None
 log jobs/log/005_pk_arms_k80_3252773.out
