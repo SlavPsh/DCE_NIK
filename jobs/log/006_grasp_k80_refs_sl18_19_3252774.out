@@ -1,0 +1,52 @@
+2026-09-10 14:06:15 host worker09.cluster job 3252774
+== grasp pro f80match slice 18 14:06:15
+slice 21: NLINE=14 NT=122 kept spokes 1368/1708 (80.1%)
+0   , obj: 0.000238, L-S: 0
+1   , obj: 0.000262, L-S: 6
+2   , obj: 0.000259, L-S: 6
+3   , obj: 0.000246, L-S: 4
+4   , obj: 0.000231, L-S: 1
+5   , obj: 0.000230, L-S: 2
+0   , obj: 0.000176, L-S: 2
+1   , obj: 0.000165, L-S: 1
+2   , obj: 0.000159, L-S: 3
+3   , obj: 0.000154, L-S: 2
+4   , obj: 0.000153, L-S: 1
+5   , obj: 0.000149, L-S: 1
+0   , obj: 0.000147, L-S: 2
+1   , obj: 0.000147, L-S: 6
+2   , obj: 0.000145, L-S: 2
+3   , obj: 0.000144, L-S: 1
+4   , obj: 0.000144, L-S: 2
+5   , obj: 0.000144, L-S: 1
+SAVED /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice21_f80match.npy (192, 192, 122) (239s) DONE_NIKMATCH
+exit 0
+== grasp pro f80match slice 19 14:10:15
+slice 21: NLINE=14 NT=122 kept spokes 1368/1708 (80.1%)
+0   , obj: 0.000238, L-S: 0
+1   , obj: 0.000262, L-S: 6
+2   , obj: 0.000259, L-S: 6
+3   , obj: 0.000246, L-S: 4
+4   , obj: 0.000231, L-S: 1
+5   , obj: 0.000230, L-S: 2
+0   , obj: 0.000176, L-S: 2
+1   , obj: 0.000165, L-S: 1
+2   , obj: 0.000159, L-S: 3
+3   , obj: 0.000154, L-S: 2
+4   , obj: 0.000153, L-S: 1
+5   , obj: 0.000149, L-S: 1
+0   , obj: 0.000147, L-S: 2
+1   , obj: 0.000147, L-S: 6
+2   , obj: 0.000145, L-S: 2
+3   , obj: 0.000144, L-S: 1
+4   , obj: 0.000144, L-S: 2
+5   , obj: 0.000144, L-S: 1
+SAVED /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice21_f80match.npy (192, 192, 122) (237s) DONE_NIKMATCH
+exit 0
+== grasp v2 n12 k80 slices 18,19 14:14:12
+  gv2_slice21_n12_k80.npy: cached
+DONE_GV2_REAL 0s -> /net/beegfs/users/P101440/grasp_v2/results_grasp_v2
+exit 0
+ls: cannot access '/net/beegfs/users/P101440/grasp_v2/results_grasp_v2/gv2_slice1[89]_n12_k80.npy': No such file or directory
+ls: cannot access '/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice1[89]_f80match.npy': No such file or directory
+REFS_DONE
