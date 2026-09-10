@@ -12,6 +12,10 @@ does a k-space inr (nik) beat compressed sensing (grasp pro, classic grasp v2) f
 - `results/tofts_vs_patlak/REPORT.md`, `MANIFEST.md`, `REPRO.md`: tofts arm.
 - `CONSOLIDATED_REPORT.md`, `report.md`: older text summaries, superseded where they disagree with the notebooks.
 
+## figures (wandb, group tofts_figs, refreshed by every 00x_tofts job's eval stage)
+https://wandb.ai/spshenov-university-of-amsterdam/dce_nik/groups/tofts_figs : per slice a run `figs_invivo_sl<Z>_<jid>` with panel (3 phases x arms + curves), roi overlay, all-seed curves vs model-free (raw scale), peak-frame difference, metric bars, test annuli. generator `tofts_figs_wandb.py`, queue `jobs/queue/003_tofts_figs.sh` (rename to rerun).
+seen 2026-09-10 (sl21): tofts arms have the right curve shape but only ~60% of the model-free amplitude in the aorta peak and ~65% in the late medulla, patlak has the amplitude but the wrong medulla shape; the affine ruler hides the amplitude deficit, the raw-scale curves show it. roi overlay: cortex and medulla masks are 56 px each, the `liver` mask (1974 px) sits posterior over spine and muscle, not on the liver.
+
 ## established, with the number and where it lives
 | fact | number | source |
 |---|---|---|
