@@ -4,3 +4,21 @@ GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
 GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
 GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
 GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+  sl18 patlak s0: aorta_aff 0.0674 cortex_aff 0.1533 fwhm 16.9s | val 3.083e-01 test 3.249e-01
+  sl18 patlak s1: aorta_aff 0.0642 cortex_aff 0.1518 fwhm 16.9s | val 3.086e-01 test 3.281e-01
+  sl18 patlak s2: aorta_aff 0.0476 cortex_aff 0.1518 fwhm 16.9s | val 3.078e-01 test 3.281e-01
+  sl18 tofts s0: aorta_aff 0.1893 cortex_aff 0.0921 fwhm 21.5s | val 3.352e-01 test 3.480e-01
+  sl18 tofts s1: aorta_aff 0.1844 cortex_aff 0.0967 fwhm 20.0s | val 3.362e-01 test 3.496e-01
+  sl18 tofts s2: aorta_aff 0.1855 cortex_aff 0.0977 fwhm 21.5s | val 3.354e-01 test 3.495e-01
+  sl18 tofts8 s0: aorta_aff 0.1583 cortex_aff 0.0786 fwhm 18.4s | val 3.141e-01 test 3.263e-01
+  sl18 tofts8 s1: aorta_aff 0.1375 cortex_aff 0.0833 fwhm 20.0s | val 3.147e-01 test 3.273e-01
+  sl18 tofts8 s2: aorta_aff 0.1723 cortex_aff 0.0839 fwhm 18.4s | val 3.128e-01 test 3.259e-01
+  sl19 patlak s0: aorta_aff 0.0352 cortex_aff 0.1530 fwhm 16.9s | val 3.114e-01 test 3.282e-01
+  sl19 patlak s1: aorta_aff 0.0386 cortex_aff 0.1517 fwhm 16.9s | val 3.113e-01 test 3.288e-01
+  sl19 patlak s2: aorta_aff 0.0369 cortex_aff 0.1523 fwhm 16.9s | val 3.150e-01 test 3.302e-01
+  sl19 tofts s0: aorta_aff 0.1803 cortex_aff 0.1136 fwhm 18.4s | val 3.407e-01 test 3.558e-01
+  sl19 tofts s1: aorta_aff 0.1637 cortex_aff 0.1191 fwhm 112.1s | val 3.402e-01 test 3.548e-01
+  sl19 tofts s2: aorta_aff 0.1720 cortex_aff 0.1172 fwhm 16.9s | val 3.410e-01 test 3.564e-01
+  sl19 tofts8 s0: aorta_aff 0.1616 cortex_aff 0.0888 fwhm 99.8s | val 3.155e-01 test 3.302e-01
+  sl19 tofts8 s1: aorta_aff 0.1471 cortex_aff 0.0879 fwhm 20.0s | val 3.133e-01 test 3.279e-01
+  sl19 tofts8 s2: aorta_aff 0.1581 cortex_aff 0.0874 fwhm 21.5s | val 3.120e-01 test 3.287e-01
