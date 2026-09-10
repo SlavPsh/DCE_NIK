@@ -1,0 +1,76 @@
+2026-09-10 10:49:36 host worker09.cluster job 3252559
+metrics from /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_r8.json 11 rows
+slice 18: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2])], refs ['grasp v2 f25 (488 sp, 122 fr, lam0.25)', 'grasp pro f25 (488 sp, 122 fr, K5)']
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run earyigml
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_104943-earyigml
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_sl18_3252559
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/earyigml
+[wandb] figs_invivo_sl18_3252559: mode online
+slice 18: 5 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/earyigml
+wandb: updating run metadata; uploading artifact run-earyigml-metrics_table
+wandb: uploading artifact run-earyigml-metrics_table
+wandb: uploading artifact run-earyigml-metrics_table; uploading media/images/panel_0_88ac8e3e42d05bc1469a.png; uploading media/images/roi_overlay_0_793895cfe7ea05cda844.png; uploading media/images/curves_all_seeds_0_74b1ef3cf14f1750bb96.png; uploading media/images/peak_diff_0_af3897e1dc8317135c59.png
+wandb: uploading history steps 0-1, summary, console lines 1-1
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 5
+wandb: wall_total_s 5.71362
+wandb: 
+wandb: 🚀 View run figs_invivo_sl18_3252559 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/earyigml
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 6 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_104943-earyigml/logs
+slice 19: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2])], refs ['grasp v2 f25 (488 sp, 122 fr, lam0.25)', 'grasp pro f25 (488 sp, 122 fr, K5)']
+wandb: setting up run 5tq4cp17
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_104953-5tq4cp17
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_sl19_3252559
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/5tq4cp17
+[wandb] figs_invivo_sl19_3252559: mode online
+slice 19: 5 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/5tq4cp17
+wandb: updating run metadata; uploading artifact run-5tq4cp17-metrics_table
+wandb: uploading artifact run-5tq4cp17-metrics_table
+wandb: uploading media/images/panel_0_ab2e6d38b6b1cc4c6f6a.png; uploading media/images/curves_all_seeds_0_f8002de4eddcb71afda4.png; uploading media/images/peak_diff_0_0ff0b811e687699abe4a.png; uploading media/images/roi_overlay_0_3a80132700f6f7db0314.png; uploading media/images/metrics_0_1e95b472495747a4bc8f.png
+wandb: uploading media/images/panel_0_ab2e6d38b6b1cc4c6f6a.png
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 5
+wandb: wall_total_s 3.66921
+wandb: 
+wandb: 🚀 View run figs_invivo_sl19_3252559 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/5tq4cp17
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 6 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_104953-5tq4cp17/logs
+slice 21: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2]), ('tofts8', [0, 1, 2])], refs ['grasp v2 f25 (488 sp, 122 fr, lam0.25)', 'grasp pro f25 (488 sp, 122 fr, K5)']
+wandb: setting up run g4rbymaj
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_105003-g4rbymaj
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_sl21_3252559
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/g4rbymaj
+[wandb] figs_invivo_sl21_3252559: mode online
+slice 21: 6 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/g4rbymaj
+wandb: updating run metadata; uploading artifact run-g4rbymaj-metrics_table
+wandb: uploading artifact run-g4rbymaj-metrics_table
+wandb: uploading artifact run-g4rbymaj-metrics_table; uploading wandb-metadata.json; uploading requirements.txt; uploading media/images/metrics_0_cc9546cdc087754f7bb3.png; uploading output.log (+ 2 more)
+wandb: uploading media/images/panel_0_609813891c394e197a29.png; uploading media/images/curves_all_seeds_0_d3ccfdbd4c87af452a61.png; uploading media/images/peak_diff_0_9ecf9e132c66d9438306.png
+wandb: uploading history steps 0-1, summary, console lines 1-1
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 6
+wandb: wall_total_s 4.22375
+wandb: 
+wandb: 🚀 View run figs_invivo_sl21_3252559 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/g4rbymaj
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260910_105003-g4rbymaj/logs
+FIGS_DONE
+FIGS exit 0

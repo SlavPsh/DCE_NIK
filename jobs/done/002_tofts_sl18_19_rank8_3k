@@ -1,5 +1,5 @@
 queue 002_tofts_sl18_19_rank8_3k
 jid 3252558
 submitted 2026-09-10 10:49:35
-state 1 PENDING None
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/002_tofts_sl18_19_rank8_3k_3252558.out
