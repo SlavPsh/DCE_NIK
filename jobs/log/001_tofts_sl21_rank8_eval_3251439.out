@@ -1,0 +1,10 @@
+2026-09-10 03:20:51 host gpu03.cluster job 3251439 task 0 stage eval
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 1g.12gb     Device  0: (UUID: MIG-e23bb79c-2a45-5a6e-91ca-fb5b8182ea07)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+  sl21 patlak s0: aorta_aff 0.0421 cortex_aff 0.1542 fwhm 16.9s | val 2.729e-01 test 2.868e-01
+  sl21 patlak s1: aorta_aff 0.0633 cortex_aff 0.1547 fwhm 16.9s | val 2.761e-01 test 2.891e-01
+  sl21 patlak s2: aorta_aff 0.0533 cortex_aff 0.1549 fwhm 16.9s | val 2.771e-01 test 2.921e-01
+  sl21 tofts s0: aorta_aff 0.1884 cortex_aff 0.1375 fwhm 58.4s | val 3.032e-01 test 3.106e-01

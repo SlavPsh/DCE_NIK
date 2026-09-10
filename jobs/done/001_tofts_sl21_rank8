@@ -1,5 +1,6 @@
 queue 001_tofts_sl21_rank8
 jid 3251436
 submitted 2026-09-09 22:55:32
-state RUNNING None
+state COMPLETED 02:12:25
 log jobs/log/001_tofts_sl21_rank8_3251436.out
+ended 2026-09-10 03:21:32
