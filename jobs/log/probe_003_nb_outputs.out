@@ -1,0 +1,63 @@
+-rw-rw---- 1 P101440 P101440 32917804 Sep 10 13:30 results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_GRASPv2_combined_report.ipynb
+-rw-rw---- 1 P101440 P101440 24878679 Sep 10 13:26 results/xcat_physical_nomotion_nik_vs_grasp/NIK_vs_GRASPv2_combined_report.ipynb.bak_20260910
+99 cells
+
+[90] md  ### rank 8 basis, in vivo, and the early stop fact (2026-09-10, laptop
+
+[91] code exec=48 "r8 = json.load(open('/net/beegfs/users/P101440/DCE_NIK/results/tofts_v"
+     outputs 6: ['stream', 'display_data/text/html', 'stream', 'display_data/text/html', 'stream', 'display_data/text/html']
+     | slice 18: tofts8 = forced rank 8; sl21 40k steps, sl18/19 3k steps; every arm restores its step 2000 weights
+     | metric patlak nik (3 seeds) tofts nik (3 seeds) tofts8 nik (3 seeds) grasp v2 f25 (ref) grasp pro f25 (ref)
+     | 0   aorta vs model-free, affine nrmse     0.05971 ± 0.0087     0.1864 ± 0.0021        0.156 ± 0.014             0.1402               0.298
+     | 1                cortex vs model-free     0.1523 ± 0.00071    0.09547 ± 0.0024     0.08192 ± 0.0024            0.05866             0.04505
+     | 2               medulla vs model-free     0.1386 ± 0.00031    0.06162 ± 0.0018     0.05588 ± 0.0025            0.04879             0.04185
+     | 3             aorta peak / model-free       0.8
+     | slice 19: tofts8 = forced rank 8; sl21 40k steps, sl18/19 3k steps; every arm restores its step 2000 weights
+
+[92] code exec=49 'E = np.linspace(0, 1, 17); cols = {}'
+     outputs 2: ['stream', 'display_data/text/html']
+     | test-spoke k-space nmse per |k| annulus, mean over slices 18/19/21 and 3 seeds; tofts8 = rank 8
+     | |k|/kmax  patlak  tofts  tofts8
+     | 0   0.00-0.06   0.286  0.309   0.287
+     | 1   0.06-0.12   0.574  0.592   0.566
+     | 2   0.12-0.19   0.657  0.680   0.662
+     | 3   0.19-0.25   0.814  0.845   0.830
+     | 4   0.25-0.31   0.882  0.915   0.905
+     | 5   0.31-0.38   0.778  0.848   0.833
+     | 6   0.38-0.44   0.646  0.762   0.733
+     | 7   0.44-0.50   0.906  0.917   0.904
+     | 8   0.50-0.56   1.017  0.979   0.971
+     | 9   0.56-0.62   0.858  0.875   0.852
+     | 10  0.62-0.69   1.030  0.962   0.955
+     | 11  0.69-0.75   1.123  1.004   0.992
+     | 12  0.75-0.81   1.120  1.004   0.
+
+[93] code exec=50 'import glob'
+     outputs 3: ['stream', 'stream', 'stream']
+     | early stop step of every in vivo run (probe 002 on the slurm logs; restored = the weights behind every number above)
+     | == restored best per run (old array logs: i = slice_idx*6 + model_idx*3 + seed; slices 18,19,21; patlak,tofts)
+     | invivo_3103545_0.log                     restored best (heldout 5.873e-01)  best_step 1000
+     | invivo_3103545_1.log                     restored best (heldout 5.950e-01)  best_step 1000
+     | invivo_3103545_10.log                    restored best (heldout 5.358e-01)  best_step 2000
+     | invivo_3103545_11.log                    restored best (heldout 
+     | tofts8_sl18_s2 best_step 2000 best 5.730e-01 last 5.961e-01 wall 986 s
+     | tofts8_sl19_s0 best_step 2000 best 5.179e-01 last 5.290e-01 wall 977 s
+     | tofts8_sl19_s1 best_step 2000 best 5.171e-01 last 5.270e-01 wall 978 s
+     | tofts8_sl19_s2 best_step 2000 best 5.093e-01 last 5.199e-01 wall 987 s
+     | tofts8_sl21_s0 best_step 2000 best 5.568e-01 last 7.138e-01 wall 7937 s
+     | tofts8_sl21_s1 best_step 2000 best 5.601e-01 last 7.155e-01 wall 8080 s
+     | tofts8_sl21_s2 best_step 2000 best 5.583e-01 last 7.087e-01 wall 7921 s
+
+[94] md  ### in vivo figures, all arms and seeds, inline (same code as the wand
+
+[95] code exec=51 "import sys, importlib, matplotlib.pyplot as plt; sys.path.insert(0, '/"
+     outputs 21: ['stream', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png', 'stream', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png', 'display_data/image/png']
+     | slice 18: arms {'patlak': [0, 1, 2], 'tofts': [0, 1, 2], 'tofts8': [0, 1, 2]} refs ['grasp v2 f25 (488 sp, 122 fr, lam0.25)', 'grasp pro f25 (488 sp, 122 fr, K5)']
+     | <Figure size 1800x1050 with 21 Axes>
+     | <Figure size 520x520 with 1 Axes>
+
+[96] md  read, section 10.
+
+[97] md  # summary
+
+[98] md  # big picture, 2026-09-10

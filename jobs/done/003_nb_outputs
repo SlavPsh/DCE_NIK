@@ -1,0 +1,6 @@
+probe 003_nb_outputs
+host worker05.cluster
+start 2026-09-10 13:30:24
+end 2026-09-10 13:30:25
+exit 0
+log jobs/log/probe_003_nb_outputs.out
