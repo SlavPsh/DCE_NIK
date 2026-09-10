@@ -70,6 +70,6 @@ temporal tv on atoms (phi_tv) and on k-space (ktv21, l2,1): null. sense-forward 
 - gpu: luna-01 only; mig 1g (phantom, 5 gb) / 4g (in vivo, 12 gb); 2g slices often unschedulable when 1g are full.
 
 ## reproduce
-- v2 notebook: `build_gv2_nb.py` clones the cs notebook and patches sections 9; section 10 and the prose rewrite of 2026-09-08 were applied to the ipynb directly (rebuild from the builder would lose them; patch the builder before rebuilding).
+- v2 notebook: `build_gv2_nb.py` clones the cs notebook and patches sections 9; section 10 and the prose rewrite of 2026-09-08 were applied to the ipynb directly (rebuild from the builder would lose them; patch the builder before rebuilding). 2026-09-10: rank 8 / early stop / inline figure cells (section 10), a summary row and a final `big picture` cell were also applied directly; the cs notebook got an `addendum` cell with the same big picture. re-execute with `refresh_gv2_nb.py` (queue `jobs/queue/004_refresh_gv2_nb.sh`, defq, ~30 min; backup `.bak_<date>` next to it), never `build_gv2_nb.py`. the agent commits ipynb up to 40 mb.
 - tofts: `results/tofts_vs_patlak/REPRO.md`.
 - phantom nik: `xph_train.py` / `xph_eval.py`, `XPH_SIM=motion` for the motion sim. grasp v2 phantom: `xph_v2_sweep.py <G>` with `LAM_FRAC`. in vivo grasp v2: `grasp_v2/grasp_v2_real.py` (NLINE, LAM_FRAC, KEEP80).
