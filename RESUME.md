@@ -1,4 +1,7 @@
-# dce_nik resume (2026-09-08). read this first in a new chat.
+# dce_nik resume (2026-09-10). read this first in a new chat.
+
+## how work runs now (luna decommissioned, helios has no claude)
+laptop (claude, env `dce`) commits `jobs/queue/<n>.sh` (sbatch script) or `jobs/probe/<n>.sh` (inline, 60 s) -> `helios_agent.sh` (slurm defq, every 2 min) pulls, submits, commits `jobs/done/<n>`, `jobs/log/`, small results (json/md/png/csv) -> `python helios_fetch.py` on the laptop = git pull + jobs table + wandb (`dce_nik`) summaries in `results/_wandb/`. see `jobs/README.md`. training scripts log to wandb via `nik_wandb.py`. gpu quota: one 2g.24gb slice at a time (`QOSMaxGRESPerUser`), so arrays serialize.
 
 ## question
 does a k-space inr (nik) beat compressed sensing (grasp pro, classic grasp v2) for radial dce-mri: images and contrast curves. phantom (xcat, truth) + in vivo (meas_p3_dce, slices 18/19/21, no truth).
@@ -26,6 +29,8 @@ does a k-space inr (nik) beat compressed sensing (grasp pro, classic grasp v2) f
 | tofts basis vs patlak, phantom no-motion | ssim 0.84 to 0.94, psnr +6 db, cortex 0.109 to 0.015, held-out k 13x; aorta dc offset +0.02 | `results/tofts_vs_patlak/phantom_nomotion.md` |
 | tofts vs patlak, motion phantom | psnr +1.9 db, cortex 0.164 to 0.112, aorta worse | `phantom_motion.md` |
 | tofts vs patlak, in vivo | kidney curves better, cortex/medulla identity broken (0.998 to 0.7 to 0.9), aorta peak 0.5 vs 0.9 (patlak by construction), held-out k 8% worse globally (k centre), better at |k|>0.19 | `invivo.md` |
+| tofts rank 8 (forced) vs rank 12 (rule), in vivo sl21, 3 seeds, 2026-09-10 | test knmse 0.294 vs 0.311 (patlak 0.289): k-centre gap mostly closed (annulus 0 0.276 vs 0.294, patlak 0.270), best of the three on all 15 outer annuli; cortex/medulla affine 0.117/0.061 vs 0.139/0.075 (patlak 0.155/0.139); aorta affine 0.145 vs 0.178 (patlak 0.053, grasp v2 0.149); late corr -0.22 (model-free sign). basis rule not met at 8 (first-pass err 0.0285 > 0.01) | `results/tofts_vs_patlak/invivo_r8.md`, `jobs/queue/001_tofts_sl21_rank8.sh`, wandb `gnik_tofts8_sl21_s*` |
+| every in vivo tofts_vs_patlak run (patlak, tofts r12, r8; slices 18/19/21; 3 seeds) restores the step 2000 weights | held-out mse rises monotonically from step 1000 (sl21 tofts 0.56 at 2k to 0.75 at 40k, patlak 0.62 to 0.88) while train falls; warmup 2000 pins the restored step; the reported wall_s 8000 is the 40k run, the evaluated model is ~400 s of training | `jobs/log/probe_002_restored_best.out` |
 
 ## retracted, do not resurrect
 - "cs wins at every spoke fraction": pca basis leak (basis from all spokes). fair: level, nik ahead at 50%.
@@ -43,7 +48,7 @@ temporal tv on atoms (phi_tv) and on k-space (ktv21, l2,1): null. sense-forward 
 ## open
 - neutral in-vivo ruler: held-out spokes for cs need complex-valued grasp saves (`grasp_v2_real.py` saves magnitude). the one thing that would settle in-vivo curves.
 - sense-b (k-space model + b1 factorization in k-space): only untested item on the image axis. kernel study done (r=2 taps capture 58%, factorization residual 8 db), training not run.
-- tofts in vivo: k-centre held-out worse (overfit with 488 spokes); aorta atom tautology; try rank 8 or a soft prior on the extra coefficients.
+- tofts in vivo: rank 8 closes the k-centre gap (2026-09-10, sl21 only; 18/19 not run). aorta remains the weak point (peak ratio 0.61). next: in-vivo runs at 3k steps (early stop lands at 2000 anyway, 10x cheaper), rank 8 on 18/19, and whether the basis rule threshold (0.01) or rank 8 is right.
 - v2 notebook section 1 still at 5 spf (~3 h to repoint).
 - fwhm bound on slices 18/19/20 for grasp v2.
 
@@ -51,6 +56,8 @@ temporal tv on atoms (phi_tv) and on k-space (ktv21, l2,1): null. sense-forward 
 - coords: in vivo x in [-1,1] (traj_norm*2), phantom kx in [-0.5,0.5] (`_dataset` doubles). radius bins: check the range.
 - render: 2x oversample + rot180 with 1px roll (even grid) + support radius 1.0. three render bugs were found this way; any new image-vs-truth number goes through `recon_asserts.check_recon`.
 - `--spoke-keep-file` alone disables early stopping and lr schedule; add `--keep-heldout` or `--spoke-heldout-file`.
+- in vivo early stop: `--warmup-steps 2000` means the restored model is the step 2000 one in every run so far; the 40k steps and the plateau scheduler never matter. any in vivo number is a 2000 step model.
+- agent: logs of running jobs must not be committed (a later pull rewrites the inode, slurm keeps writing to the old one); the agent defers by script name. changing `helios_agent.sh` needs `scancel -n helios-agent` + `sbatch` (slurm copies the script at submit).
 - in-vivo run variants: `results_sl21_k80` is the fair one; `results_full_sl21_matched` had no early stop; `results_spoke_full_slice21` is random 70%.
 - metrics: masked haarpsi/ssim, same window-averaged truth for every method, one global ls scale, roi mean on the same masks (`xph_common.rois`, `consolidated.slice_ctx`). curves vs model-free: raw + affine.
 - time axis in vivo: everything derives from `view_time = v/1709` times 375 s.
