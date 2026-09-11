@@ -224,3 +224,28 @@ wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam
 wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
 wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260911_171315-qhrtfde6/logs
 slice 21: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2]), ('tofts8', [0, 1, 2])], refs ['grasp v2 k80 (1368 views, 142 fr, n12 lam0.25)', 'grasp pro f80match (1368 views, 122 fr, K5)']
+wandb: setting up run en30wspm
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260911_171325-en30wspm
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_k80_sl21_3267648
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/en30wspm
+[wandb] figs_invivo_k80_sl21_3267648: mode online
+slice 21: 6 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/en30wspm
+wandb: updating run metadata; uploading artifact run-en30wspm-metrics_table
+wandb: uploading artifact run-en30wspm-metrics_table
+wandb: uploading artifact run-en30wspm-metrics_table; uploading media/images/curves_all_seeds_0_11dfcb10ee446967959a.png; uploading media/images/peak_diff_0_6130ec4496f598e8b570.png; uploading media/images/metrics_0_cb7aa3f5792b3db6bbfa.png; uploading output.log (+ 8 more)
+wandb: uploading media/images/peak_diff_0_6130ec4496f598e8b570.png; uploading media/images/panel_0_1977bedce0c7f0461406.png
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 6
+wandb: wall_total_s 4.74747
+wandb: 
+wandb: 🚀 View run figs_invivo_k80_sl21_3267648 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/en30wspm
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260911_171325-en30wspm/logs
+FIGS_DONE
+[W911 17:13:33.063842874 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+FIGS exit 0
