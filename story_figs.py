@@ -41,17 +41,19 @@ def panel(fig_path, title, M, rois, body, t_show, tref, ref_curves, ylab, note, 
         if metric_rows and nm in metric_rows:
             m = metric_rows[nm]; ax.text(0.5, -0.03, f"HaarPSI {m['haarpsi']:.3f}   SSIM {m['ssim']:.3f}\nPSNR {m['psnr']:.1f} dB", transform=ax.transAxes, ha="center", va="top", fontsize=10, linespacing=1.4)
     for r, roi in enumerate(ROIS):
-        ax = fig.add_subplot(gb[0, r]); ax.plot(tref, ref_curves[roi], "k", lw=2.6, label=M[0][0])
+        ax = fig.add_subplot(gb[0, r]); ax.plot(tref, ref_curves[roi], "k", lw=2.6, label=M[0][0]); lines = []
         for nm, v, t in M[1:]:
             c = np.array([v[..., i][rois[roi]].mean() for i in range(v.shape[-1])]); c = np.interp(tref, t, c)
             if ylab.startswith("enhancement"): c = c - np.median(c[:8])
-            ax.plot(tref, c, color=COL.get(nm, "0.5"), lw=1.8, ls="-" if nm.startswith("NIK") else "--", label=nm)
-        ax.set_title(roi, fontsize=12); ax.set_xlabel("time (s)", fontsize=11); ax.grid(alpha=.3); ax.tick_params(labelsize=9)
-        if r == 0: ax.set_ylabel(ylab, fontsize=11); ax.legend(fontsize=9, loc="upper right")
+            e = float(np.linalg.norm(c - ref_curves[roi]) / (np.linalg.norm(ref_curves[roi]) + 1e-12)); lines.append((nm, e))
+            ax.plot(tref, c, color=COL.get(nm, "0.5"), lw=1.8, ls="-" if nm.startswith("NIK") else "--", label=f"{nm}  ({e:.3f})")
+        ax.set_title(f"{roi}   (curve NRMSE vs {M[0][0]} in the legend)", fontsize=11); ax.set_xlabel("time (s)", fontsize=11); ax.grid(alpha=.3); ax.tick_params(labelsize=9)
+        ax.legend(fontsize=8.5, loc="upper right" if roi == "aorta" else "lower right")
+        if r == 0: ax.set_ylabel(ylab, fontsize=11)
     fig.suptitle(title, fontsize=15, fontweight="bold", y=0.97); fig.text(0.5, 0.015, note, ha="center", fontsize=10, color="#546e7a")
     fig.savefig(fig_path, dpi=150, facecolor="white"); plt.close(fig); print("saved", fig_path, flush=True)
 
-def phantom(t_show):
+def phantom(t_show, pro="k12", tag=""):
     os.environ.setdefault("XPH_SIM", "nomotion"); import xph_pipeline as P, xph_common as X
     d = P.data(); tq = np.asarray(d["times"]); body = d["labels"] > 0; Tr = X.truth_at(P.ZI, tq).astype(np.float32); Rz = X.rois(P.ZI, d["labels"]); A = f"{P.OUT}/arrays"; G = 5
     Tw = winavg(Tr, G); tw = np.array([tq[g*G:(g+1)*G].mean() for g in range(Tw.shape[-1])])
@@ -59,12 +61,16 @@ def phantom(t_show):
     src = {"NIK-free": (f"{A}/nik_fine_free.npy", None), "NIK-sub16": (f"{A}/nik_fine_sub16.npy", None),
            "NIK-patlak": (f"{A}/nik_eval_w768_ks2.5_s0.npz", "rec_best"), "NIK-tofts": (f"{A}/nik_eval_w768_ks2.5_s0_tofts16.npz", "rec_best")}
     def load(p, key): z = np.load(p, allow_pickle=True); return np.abs(z[key] if key else z).astype(np.float32)
-    gp = ls_scale(load(f"{A}/grasp_recon.npz", "rec"), Tr, body); gv = ls_scale(np.abs(np.load(f"{P.OUT}/v2_sweep/v2_G05.npy")).astype(np.float32), Tw, body)
-    mrows = {"GRASP-Pro": metrics(winavg(gp, G), Tw, body), "GRASP": metrics(gv, Tw, body)}
+    if pro == "k12":                                                             # k* = 12 by held-out cv, 5 spokes/frame, 344 frames (the report's grasp pro)
+        gp = ls_scale(load(f"{A}/grasp_recon.npz", "rec"), Tr, body); tgp = tq; gpm = metrics(winavg(gp, G), Tw, body); pro_lab = "GRASP-Pro K12, 5 spokes/frame"
+    else:                                                                        # library pathway, K = 5, 25 spokes/frame, 68 frames (xph_grasp_pro_k5.py)
+        gp = ls_scale(load(f"{A}/grasp_pro_K5_G5.npz", "rec"), Tw, body); tgp = tw; gpm = metrics(gp, Tw, body); pro_lab = "GRASP-Pro K5, 25 spokes/frame"
+    gv = ls_scale(np.abs(np.load(f"{P.OUT}/v2_sweep/v2_G05.npy")).astype(np.float32), Tw, body)
+    mrows = {"GRASP-Pro": gpm, "GRASP": metrics(gv, Tw, body)}
     for nm, (p, key) in src.items():
         v = ls_scale(load(p, key), Tr, body); mrows[nm] = metrics(winavg(v, G), Tw, body)
-        M = [("truth", Tr, tq), (nm, v, tq), ("GRASP-Pro", gp, tq), ("GRASP", gv, tw)]
-        panel(f"{P.OUT}/figures/story_phantom_{nm.split('-')[1]}.png", f"phantom, {nm} vs GRASP-Pro and GRASP, vs ground truth",
+        M = [("truth", Tr, tq), (nm, v, tq), ("GRASP-Pro", gp, tgp), ("GRASP", gv, tw)]
+        panel(f"{P.OUT}/figures/story_phantom_{nm.split('-')[1]}{tag}.png", f"phantom, {nm} vs {pro_lab} and GRASP 25 spokes/frame, vs ground truth",
               M, Rz, body, t_show, tq, truth_c, "signal", f"same input for every method: 5 of 7 spokes per frame (71%); image at t = {t_show:.0f} s; metrics on the 68-frame window, body-masked, one global scale", mrows)
     print("phantom metrics:", {k: {kk: round(vv, 3) for kk, vv in m.items()} for k, m in mrows.items()})
 
@@ -93,7 +99,8 @@ def invivo(t_show, tofts_arm):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--t-phantom", type=float, default=90.0); ap.add_argument("--t-invivo", type=float, default=90.0); ap.add_argument("--tofts", default="tofts"); ap.add_argument("--only", default="both")
+    ap.add_argument("--pro", default="k12", choices=["k12", "k5g5"], help="phantom grasp pro: k12 = report recon (5 spf), k5g5 = K 5 at 25 spf (in vivo-like)"); ap.add_argument("--tag", default="", help="suffix for the phantom figure names")
     a = ap.parse_args()
-    if a.only in ("both", "phantom"): phantom(a.t_phantom)
+    if a.only in ("both", "phantom"): phantom(a.t_phantom, a.pro, a.tag)
     if a.only in ("both", "invivo"): invivo(a.t_invivo, a.tofts)
     print("STORY_DONE")
