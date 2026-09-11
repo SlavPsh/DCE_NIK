@@ -21,7 +21,7 @@ PERIOD=${AGENT_PERIOD:-120}
 MARGIN=${AGENT_MARGIN:-900}
 MAXKB=${AGENT_MAXKB:-5120}
 NBKB=${AGENT_NBKB:-40960}
-SMALL='\.(json|md|png|csv|txt|out|ipynb)$'
+SMALL='\.(json|md|png|gif|csv|txt|out|ipynb)$'
 LIMIT_DEFAULT=43200
 ACTIVE_RE='^$'
 mkdir -p "$J/probe" "$J/queue" "$J/done" "$J/log" "$J/agent" "$D/logs"
