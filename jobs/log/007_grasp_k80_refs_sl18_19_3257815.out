@@ -1,0 +1,20 @@
+2026-09-11 15:13:02 host worker04.cluster job 3257815
+7fe56b3 cs_nikmatch: SLICE env for f80match refs on other slices
+== grasp pro f80match slice 18 15:13:02
+slice 18: NLINE=14 NT=122 kept spokes 1368/1708 (80.1%)
+SAVED /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice18_f80match.npy (192, 192, 122) (298s) DONE_NIKMATCH
+== grasp pro f80match slice 19 15:18:01
+slice 19: NLINE=14 NT=122 kept spokes 1368/1708 (80.1%)
+SAVED /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice19_f80match.npy (192, 192, 122) (244s) DONE_NIKMATCH
+f0ecdb8 SET=sweep: SLICES env for k80 refs on other slices
+== grasp v2 n12 k80 slices 18,19 15:22:05
+SAVED gv2_slice18_n12_k80.npy (192, 192, 142) (3274s)
+SAVED gv2_slice19_n12_k80.npy (192, 192, 142) (2986s)
+DONE_GV2_REAL 6260s -> /net/beegfs/users/P101440/grasp_v2/results_grasp_v2
+-rw-rw---- 1 P101440 P101440 17989760 Sep 11 15:18 /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice18_f80match.npy
+-rw-rw---- 1 P101440 P101440 17989760 Sep 11 15:22 /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice19_f80match.npy
+-rw-rw---- 1 P101440 P101440 20938880 Sep 11 16:16 /net/beegfs/users/P101440/grasp_v2/results_grasp_v2/gv2_slice18_n12_k80.npy
+-rw-rw---- 1 P101440 P101440 20938880 Sep 11 17:06 /net/beegfs/users/P101440/grasp_v2/results_grasp_v2/gv2_slice19_n12_k80.npy
+Submitted batch job 3267648
+k80 eval + figures chained
+REFS_DONE 2026-09-11 17:06:26

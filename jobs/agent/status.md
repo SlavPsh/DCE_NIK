@@ -1,22 +1,21 @@
 # helios agent
 
-updated 2026-09-11 16:30:37 on worker09.cluster, job 3255007, cycle 97
+updated 2026-09-11 17:07:16 on worker09.cluster, job 3255007, cycle 115
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3257815 | 007_grasp_k80_refs_sl18_19 | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 007_grasp_k80_refs_sl18_19 | 1 COMPLETED 01:53:25 |
 | 011_fig_kspace_space_vs_time | 1 COMPLETED 00:00:03 |
 | 010_fig_tradeoff_rows | 1 COMPLETED 00:00:28 |
 | 009_fig_tradeoff_rows | 1 COMPLETED 00:00:38 |
 | 008_fig_tradeoff_rows | 1 COMPLETED 00:01:55 |
-| 007_grasp_k80_refs_sl18_19 | 1 RUNNING None |
 | 007_set_upstream | exit 0 |
 | 006_gain_check | exit 0 |
 | 005_env_check | exit 0 |

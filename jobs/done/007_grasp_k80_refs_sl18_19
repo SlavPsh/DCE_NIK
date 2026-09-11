@@ -1,5 +1,6 @@
 queue 007_grasp_k80_refs_sl18_19
 jid 3257815
 submitted 2026-09-11 15:13:01
-state 1 RUNNING None
+state 1 COMPLETED 01:53:25
 log jobs/log/007_grasp_k80_refs_sl18_19_3257815.out
+ended 2026-09-11 17:07:16
