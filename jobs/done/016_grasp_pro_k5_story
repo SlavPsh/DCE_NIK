@@ -1,5 +1,6 @@
 queue 016_grasp_pro_k5_story
 jid 3275328
 submitted 2026-09-11 22:31:05
-state 1 RUNNING None
+state 1 COMPLETED 00:02:50
 log jobs/log/016_grasp_pro_k5_story_3275328.out
+ended 2026-09-11 22:35:12

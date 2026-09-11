@@ -1,0 +1,33 @@
+grog sx=220 RO=220 NLINE=25 NT=68 K=5
+0   , obj: 26840071677.759796, L-S: 4
+1   , obj: 13110920851.625704, L-S: 3
+2   , obj: 9363931872.313272, L-S: 2
+3   , obj: 8154614601.274866, L-S: 2
+4   , obj: 7751444184.956274, L-S: 2
+5   , obj: 7697610686.144553, L-S: 1
+  nlcg outer 1/3
+0   , obj: 7564486334.532082, L-S: 4
+1   , obj: 7532479933.600197, L-S: 2
+2   , obj: 7479743153.603565, L-S: 2
+3   , obj: 7441207408.892056, L-S: 2
+4   , obj: 7412630861.936202, L-S: 2
+5   , obj: 7354176208.983261, L-S: 3
+  nlcg outer 2/3
+0   , obj: 7335144857.024338, L-S: 3
+1   , obj: 7319888514.914668, L-S: 3
+2   , obj: 7257727133.347808, L-S: 2
+3   , obj: 7227813735.608614, L-S: 1
+4   , obj: 7220634618.452426, L-S: 3
+5   , obj: 7201304315.700757, L-S: 1
+  nlcg outer 3/3
+SAVED /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/arrays/grasp_pro_K5_G5.npz rec (220, 220, 68) orient id corr 0.116 imgNRMSE(mean) 0.3032 (118 s)
+GRASP_PRO_K5_DONE
+PRO exit 0
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_free_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_sub16_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_patlak_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_tofts_prok5.png
+phantom metrics: {'GRASP-Pro': {'haarpsi': 0.137, 'ssim': 0.089, 'psnr': np.float64(16.657)}, 'GRASP': {'haarpsi': 0.902, 'ssim': 0.92, 'psnr': np.float64(38.338)}, 'NIK-free': {'haarpsi': 0.885, 'ssim': 0.918, 'psnr': np.float64(37.319)}, 'NIK-sub16': {'haarpsi': 0.897, 'ssim': 0.925, 'psnr': np.float64(36.72)}, 'NIK-patlak': {'haarpsi': 0.716, 'ssim': 0.825, 'psnr': np.float64(30.431)}, 'NIK-tofts': {'haarpsi': 0.905, 'ssim': 0.937, 'psnr': np.float64(37.082)}}
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21.png
+STORY_DONE
+STORY exit 0

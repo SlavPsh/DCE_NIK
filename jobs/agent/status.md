@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-11 22:33:09 on worker09.cluster, job 3255007, cycle 275
+updated 2026-09-11 22:35:12 on worker09.cluster, job 3255007, cycle 276
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3275328 | 016_grasp_pro_k5_story | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 016_grasp_pro_k5_story | 1 RUNNING None |
+| 016_grasp_pro_k5_story | 1 COMPLETED 00:02:50 |
 | 015_story_figs | 1 COMPLETED 00:00:43 |
 | 014_story_figs | 1 COMPLETED 00:00:46 |
 | 008_ls_arrays | exit 0 |
