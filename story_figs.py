@@ -32,24 +32,24 @@ def metrics(img, ref, body):
 
 def panel(fig_path, title, M, rois, body, t_show, tref, ref_curves, ylab, note, metric_rows=None):
     """M: list of (name, vol[H,W,T], t[T]); first entry is the reference (truth or model-free)"""
-    n = len(M); fig = plt.figure(figsize=(3.3 * n, 8.6)); gs = fig.add_gridspec(2, n, height_ratios=[1, 0.95], hspace=0.3, wspace=0.05)
+    n = len(M); fig = plt.figure(figsize=(3.3 * n, 8.6))
+    gt = fig.add_gridspec(1, n, top=0.9, bottom=0.53, wspace=0.05); gb = fig.add_gridspec(1, 3, top=0.42, bottom=0.09, wspace=0.28, left=0.06, right=0.98)
     vmax = float(np.percentile(M[0][1][:, :, int(np.argmin(np.abs(M[0][2] - t_show)))][body], 99.5))
     for j, (nm, v, t) in enumerate(M):
-        ax = fig.add_subplot(gs[0, j]); i = int(np.argmin(np.abs(np.asarray(t) - t_show))); ax.imshow(v[:, :, i], cmap="gray", vmin=0, vmax=vmax); ax.axis("off")
+        ax = fig.add_subplot(gt[0, j]); i = int(np.argmin(np.abs(np.asarray(t) - t_show))); ax.imshow(v[:, :, i], cmap="gray", vmin=0, vmax=vmax); ax.axis("off")
         ax.set_title(nm, fontsize=13, fontweight="bold", color=COL.get(nm, "k"))
         if metric_rows and nm in metric_rows:
-            m = metric_rows[nm]; ax.text(0.5, -0.04, f"HaarPSI {m['haarpsi']:.3f}   PSNR {m['psnr']:.1f} dB   SSIM {m['ssim']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=10)
-    cols = max(1, n // 3)
+            m = metric_rows[nm]; ax.text(0.5, -0.03, f"HaarPSI {m['haarpsi']:.3f}   SSIM {m['ssim']:.3f}\nPSNR {m['psnr']:.1f} dB", transform=ax.transAxes, ha="center", va="top", fontsize=10, linespacing=1.4)
     for r, roi in enumerate(ROIS):
-        ax = fig.add_subplot(gs[1, r*cols:(r+1)*cols]); ax.plot(tref, ref_curves[roi], "k", lw=2.6, label=M[0][0])
+        ax = fig.add_subplot(gb[0, r]); ax.plot(tref, ref_curves[roi], "k", lw=2.6, label=M[0][0])
         for nm, v, t in M[1:]:
             c = np.array([v[..., i][rois[roi]].mean() for i in range(v.shape[-1])]); c = np.interp(tref, t, c)
             if ylab.startswith("enhancement"): c = c - np.median(c[:8])
             ax.plot(tref, c, color=COL.get(nm, "0.5"), lw=1.8, ls="-" if nm.startswith("NIK") else "--", label=nm)
         ax.set_title(roi, fontsize=12); ax.set_xlabel("time (s)", fontsize=11); ax.grid(alpha=.3); ax.tick_params(labelsize=9)
         if r == 0: ax.set_ylabel(ylab, fontsize=11); ax.legend(fontsize=9, loc="upper right")
-    fig.suptitle(title, fontsize=15, fontweight="bold", y=0.995); fig.text(0.5, 0.005, note, ha="center", fontsize=10, color="#546e7a")
-    fig.savefig(fig_path, dpi=150, facecolor="white", bbox_inches="tight"); plt.close(fig); print("saved", fig_path, flush=True)
+    fig.suptitle(title, fontsize=15, fontweight="bold", y=0.97); fig.text(0.5, 0.015, note, ha="center", fontsize=10, color="#546e7a")
+    fig.savefig(fig_path, dpi=150, facecolor="white"); plt.close(fig); print("saved", fig_path, flush=True)
 
 def phantom(t_show):
     os.environ.setdefault("XPH_SIM", "nomotion"); import xph_pipeline as P, xph_common as X
