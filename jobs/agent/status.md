@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-11 18:02:20 on worker09.cluster, job 3255007, cycle 142
+updated 2026-09-11 18:04:23 on worker09.cluster, job 3255007, cycle 143
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3268962 | 012_fig_kspace_space_vs_time | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 012_fig_kspace_space_vs_time | 1 PENDING None |
+| 012_fig_kspace_space_vs_time | 1 COMPLETED 00:00:05 |
 | 007_grasp_k80_refs_sl18_19 | 1 COMPLETED 01:53:25 |
 | 011_fig_kspace_space_vs_time | 1 COMPLETED 00:00:03 |
 | 010_fig_tradeoff_rows | 1 COMPLETED 00:00:28 |
