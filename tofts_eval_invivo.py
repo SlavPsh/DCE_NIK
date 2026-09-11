@@ -122,7 +122,7 @@ lines = [f"# in vivo (meas_p3_dce, slices {'/'.join(map(str, SLICES))}, {SPK})",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]
 L = [LABEL.get(a, a) for a in ARMS]
 for Z in SLICES:
-    lines += [f"## slice {Z}", "| metric | " + " | ".join(f"{l} mean±SD (n)" for l in L) + " | " + " | ".join(f"Δ {l}−{L[0]}" for l in L[1:]) + " | GRASP-v2 f25 | GRASP-Pro f25 |",
+    lines += [f"## slice {Z}", "| metric | " + " | ".join(f"{l} mean±SD (n)" for l in L) + " | " + " | ".join(f"Δ {l}−{L[0]}" for l in L[1:]) + " | " + " | ".join(l.split(" (")[0] for l, _ in REFS) + " |",
               "|" + "---|" * (2 * len(ARMS) + 2)]
     def ms(arm, k):
         v = np.array([r[k] for r in rows if r.get("slice") == Z and r.get("arm") == arm and r.get("status") == "complete" and k in r], float); return (np.nanmean(v), np.nanstd(v), v.size) if v.size else (np.nan, np.nan, 0)
