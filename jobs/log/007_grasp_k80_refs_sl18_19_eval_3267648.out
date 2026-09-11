@@ -15,3 +15,12 @@ GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
   sl18 tofts8 s2: aorta_aff 0.0782 cortex_aff 0.0713 fwhm 18.4s | val 2.761e-01 test 2.801e-01
   sl19 patlak s0: aorta_aff 0.0435 cortex_aff 0.1542 fwhm 16.9s | val 2.775e-01 test 2.810e-01
   sl19 patlak s1: aorta_aff 0.0338 cortex_aff 0.1529 fwhm 16.9s | val 2.786e-01 test 2.816e-01
+  sl19 patlak s2: aorta_aff 0.0445 cortex_aff 0.1533 fwhm 16.9s | val 2.796e-01 test 2.822e-01
+  sl19 tofts s0: aorta_aff 0.0846 cortex_aff 0.0758 fwhm 18.4s | val 2.715e-01 test 2.742e-01
+  sl19 tofts s1: aorta_aff 0.0791 cortex_aff 0.0711 fwhm 18.4s | val 2.716e-01 test 2.747e-01
+  sl19 tofts s2: aorta_aff 0.0900 cortex_aff 0.0751 fwhm 18.4s | val 2.752e-01 test 2.782e-01
+  sl19 tofts8 s0: aorta_aff 0.0646 cortex_aff 0.0631 fwhm 16.9s | val 2.716e-01 test 2.754e-01
+  sl19 tofts8 s1: aorta_aff 0.0676 cortex_aff 0.0558 fwhm 18.4s | val 2.727e-01 test 2.761e-01
+  sl19 tofts8 s2: aorta_aff 0.0732 cortex_aff 0.0594 fwhm 16.9s | val 2.749e-01 test 2.779e-01
+  sl21 patlak s0: aorta_aff 0.0422 cortex_aff 0.1543 fwhm 16.9s | val 2.438e-01 test 2.487e-01
+  sl21 patlak s1: aorta_aff 0.0432 cortex_aff 0.1581 fwhm 16.9s | val 2.477e-01 test 2.515e-01
