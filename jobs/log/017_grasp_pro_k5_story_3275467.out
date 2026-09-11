@@ -1,0 +1,33 @@
+K=5 G=5: 68 bins of 25 spokes | op-scale a=1.191e-02 | |recon|max 3.054e-01
+0   , obj: 126.541441, L-S: 0
+1   , obj: 22.204799, L-S: 0
+2   , obj: 13.502609, L-S: 1
+3   , obj: 12.574907, L-S: 1
+4   , obj: 12.443810, L-S: 3
+5   , obj: 11.187860, L-S: 2
+  nlcg outer 1/3 finite=True
+0   , obj: 9.609766, L-S: 0
+1   , obj: 8.935228, L-S: 2
+2   , obj: 7.938430, L-S: 3
+3   , obj: 7.414835, L-S: 1
+4   , obj: 7.263935, L-S: 1
+5   , obj: 7.164585, L-S: 1
+  nlcg outer 2/3 finite=True
+0   , obj: 7.029490, L-S: 0
+1   , obj: 7.020833, L-S: 6
+2   , obj: 6.635621, L-S: 2
+3   , obj: 6.551114, L-S: 1
+4   , obj: 6.478765, L-S: 2
+5   , obj: 6.387815, L-S: 2
+  nlcg outer 3/3 finite=True
+SAVED /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/arrays/grasp_pro_K5_G5.npz rec (220, 220, 68) orient id corr 1.000 imgNRMSE(mean) 0.0059 (73 s)
+GRASP_PRO_K5_DONE
+PRO exit 0
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_free_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_sub16_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_patlak_prok5.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_tofts_prok5.png
+phantom metrics: {'GRASP-Pro': {'haarpsi': 0.905, 'ssim': 0.96, 'psnr': np.float64(37.366)}, 'GRASP': {'haarpsi': 0.902, 'ssim': 0.92, 'psnr': np.float64(38.338)}, 'NIK-free': {'haarpsi': 0.885, 'ssim': 0.918, 'psnr': np.float64(37.319)}, 'NIK-sub16': {'haarpsi': 0.897, 'ssim': 0.925, 'psnr': np.float64(36.72)}, 'NIK-patlak': {'haarpsi': 0.716, 'ssim': 0.825, 'psnr': np.float64(30.431)}, 'NIK-tofts': {'haarpsi': 0.905, 'ssim': 0.937, 'psnr': np.float64(37.082)}}
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21.png
+STORY_DONE
+STORY exit 0
