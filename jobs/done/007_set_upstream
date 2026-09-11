@@ -1,0 +1,6 @@
+probe 007_set_upstream
+host worker09.cluster
+start 2026-09-11 15:10:54
+end 2026-09-11 15:10:56
+exit 0
+log jobs/log/probe_007_set_upstream.out

@@ -1,0 +1,8 @@
+branch 'main' set up to track 'origin/main'.
+grasp_pro_py: 7fe56b3 cs_nikmatch: SLICE env for f80match refs on other slices
+branch 'main' set up to track 'origin/main'.
+grasp_v2: f0ecdb8 SET=sweep: SLICES env for k80 refs on other slices
+branch 'main' set up to track 'origin/main'.
+DCE_NIK: f3ded1b probe 007: set upstream in the grasp checkouts (agent pull failed there every cycle); agent pulls origin <branch>; RESUME: probe 006 verdict
+11:SLICE = int(os.environ.get("SLICE", "21")); NLINE, K = 14, pr.K          # f80match refs for other slices: SLICE=18
+100:    _SL = [int(z) for z in os.environ.get("SLICES", "21").split(",")]      # k80 refs for other slices: SLICES=18,19
