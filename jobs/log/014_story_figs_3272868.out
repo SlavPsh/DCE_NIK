@@ -1,0 +1,8 @@
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_free.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_sub16.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_patlak.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/story_phantom_tofts.png
+phantom metrics: {'GRASP-Pro': {'haarpsi': 0.89, 'ssim': 0.958, 'psnr': np.float64(39.341)}, 'GRASP': {'haarpsi': 0.902, 'ssim': 0.92, 'psnr': np.float64(38.338)}, 'NIK-free': {'haarpsi': 0.885, 'ssim': 0.918, 'psnr': np.float64(37.319)}, 'NIK-sub16': {'haarpsi': 0.897, 'ssim': 0.925, 'psnr': np.float64(36.72)}, 'NIK-patlak': {'haarpsi': 0.716, 'ssim': 0.825, 'psnr': np.float64(30.431)}, 'NIK-tofts': {'haarpsi': 0.905, 'ssim': 0.937, 'psnr': np.float64(37.082)}}
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21.png
+STORY_DONE
+STORY exit 0
