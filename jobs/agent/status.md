@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-11 18:08:32 on worker09.cluster, job 3255007, cycle 145
+updated 2026-09-11 20:49:08 on worker09.cluster, job 3255007, cycle 224
 
 ## active
 
@@ -11,6 +11,7 @@ updated 2026-09-11 18:08:32 on worker09.cluster, job 3255007, cycle 145
 
 | name | state |
 |---|---|
+| 008_ls_arrays | exit 0 |
 | 013_fig_kspace_space_vs_time | 1 COMPLETED 00:00:31 |
 | 012_fig_kspace_space_vs_time | 1 COMPLETED 00:00:05 |
 | 007_grasp_k80_refs_sl18_19 | 1 COMPLETED 01:53:25 |
@@ -30,4 +31,3 @@ updated 2026-09-11 18:08:32 on worker09.cluster, job 3255007, cycle 145
 | 003_tofts_figs | 1 COMPLETED 00:00:35 |
 | 002_restored_best | exit 0 |
 | 001_tofts_sl21_rank8 | COMPLETED 02:12:25 |
-| 000_ls_tofts | exit 0 |

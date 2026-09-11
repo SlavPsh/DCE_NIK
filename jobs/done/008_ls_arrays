@@ -1,0 +1,6 @@
+probe 008_ls_arrays
+host worker09.cluster
+start 2026-09-11 20:49:08
+end 2026-09-11 20:49:08
+exit 0
+log jobs/log/probe_008_ls_arrays.out

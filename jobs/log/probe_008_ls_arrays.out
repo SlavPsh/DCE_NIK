@@ -1,0 +1,166 @@
+== results/xcat_physical_nomotion_nik_vs_grasp/arrays
+ 
+63 .
+50 ..
+2975704 compare_recons.npz
+2975704 compare_recons_gv2.npz
+66615530 envsweep_sub16_e050_w768_s0.npz
+66615530 envsweep_sub16_e050_w768_s1.npz
+66615530 envsweep_sub16_e050_w768_s2.npz
+66615530 envsweep_sub16_e060_w768_s0.npz
+66615530 envsweep_sub16_e060_w768_s1.npz
+66615530 envsweep_sub16_e060_w768_s2.npz
+66615530 envsweep_sub16_e065_w768_s0.npz
+66615530 envsweep_sub16_e065_w768_s1.npz
+66615530 envsweep_sub16_e065_w768_s2.npz
+66615530 envsweep_sub16_e070_w768_s0.npz
+66615530 envsweep_sub16_e070_w768_s1.npz
+66615530 envsweep_sub16_e070_w768_s2.npz
+66615530 envsweep_sub16_e075_w768_s0.npz
+66615530 envsweep_sub16_e075_w768_s1.npz
+66615530 envsweep_sub16_e075_w768_s2.npz
+66615530 envsweep_sub16_e100_w768_s0.npz
+66615530 envsweep_sub16_e100_w768_s1.npz
+66615530 envsweep_sub16_e100_w768_s2.npz
+66602400 grasp_fair_recon.npz
+66599404 grasp_ksweep_K12.npz
+66599404 grasp_ksweep_K16.npz
+66599404 grasp_ksweep_K24.npz
+66599404 grasp_ksweep_K3.npz
+66599404 grasp_ksweep_K32.npz
+66599404 grasp_ksweep_K5.npz
+66599404 grasp_ksweep_K8.npz
+66613156 grasp_lib_recon.npz
+66613160 grasp_nufft_recon.npz
+66599404 grasp_recon.npz
+66628786 grasp_recon_K5_pernav.npz
+66599404 grasp_recon_K5_variance.npz
+66628362 grasp_recon_OLD_task4fista.npz
+66600086 grasp_v2_recon.npz
+5520 hikdiag.npz
+66615470 img_eval_free_w768_s0.npz
+66615470 img_eval_free_w768_s1.npz
+66615470 img_eval_free_w768_s2.npz
+66615510 img_eval_sub12_w768_s0.npz
+66615510 img_eval_sub12_w768_s1.npz
+66615510 img_eval_sub12_w768_s2.npz
+66615510 img_eval_sub16_w768_s0.npz
+66615510 img_eval_sub16_w768_s1.npz
+66615506 img_eval_sub5_w768_s0.npz
+66615506 img_eval_sub5_w768_s1.npz
+66615506 img_eval_sub5_w768_s2.npz
+1514 j2e_seedavg.npz
+67778822 nik_eval_w768_ks2.5_s0.npz
+72812454 nik_eval_w768_ks2.5_s0_tofts16.npz
+67778822 nik_eval_w768_ks2.5_s1.npz
+72812454 nik_eval_w768_ks2.5_s1_tofts16.npz
+67778822 nik_eval_w768_ks2.5_s2.npz
+72812454 nik_eval_w768_ks2.5_s2_tofts16.npz
+66598528 nik_fine_free.npy
+66598528 nik_fine_sub16.npy
+66598660 outcoil_r16_s0.npz
+66599922 senseA_f10_r16_s0.npz
+66599922 senseA_f6_r16_s0.npz
+66599922 senseA_r16_s0.npz
+137 stageA_selection.json
+135 stageB_selection.json
+41241292 xph_slice_cache.npz
+== results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G01.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G01_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G02_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G03.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G03_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05_lam0.01.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05_lam0.05.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05_lam0.1.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G05_lam0.5.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.005.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.01.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.05.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.1.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.5.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G08_lam0.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12_lam0.005.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12_lam0.02.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12_lam0.05.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12_lam0.1.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G12_lam0.5.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G20.npy
+results/xcat_physical_nomotion_nik_vs_grasp/v2_sweep/v2_G20_lam0.02.npy
+== results_sl21_k80
+ 
+3 .
+933 ..
+22209849 model_slice_21.pt
+50430080 nik_slice_21.npy
+100860032 nik_slice_21_cplx.npy
+== outcoil files (sub16 k80 candidates)
+50430080 results/realdata_nik_vs_cs_figures/outcoil_f0_input_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_f0_output_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_f2_input_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_f2_output_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_output_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_input_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gabor_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gau10_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gau20_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gau30_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gau60_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gaus_s03_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gaus_s06_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gaus_s10_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gaus_s20_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_gaussian_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_pw120_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_pw60_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_pw90_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_pw90ts075_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_pw90ts3_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_r32_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_r32pw90_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_r48_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_raw_gabor_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_raw_gaus_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_raw_siren_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_slice21.npy
+50430080 results/realdata_nik_vs_cs_figures/outcoil_subspace_output_smoke_slice21.npy
+== invivo_k80 runs
+patlak_sl18_s0
+patlak_sl18_s1
+patlak_sl18_s2
+patlak_sl19_s0
+patlak_sl19_s1
+patlak_sl19_s2
+patlak_sl21_s0
+patlak_sl21_s1
+patlak_sl21_s2
+tofts8_sl18_s0
+tofts8_sl18_s1
+tofts8_sl18_s2
+tofts8_sl19_s0
+tofts8_sl19_s1
+tofts8_sl19_s2
+tofts8_sl21_s0
+tofts8_sl21_s1
+tofts8_sl21_s2
+tofts_sl18_s0
+tofts_sl18_s1
+tofts_sl18_s2
+tofts_sl19_s0
+tofts_sl19_s1
+tofts_sl19_s2
+tofts_sl21_s0
+tofts_sl21_s1
+tofts_sl21_s2
+== grasp refs k80 sl21
+17989760 /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs/cs_slice21_f80match.npy
+20938880 /net/beegfs/users/P101440/grasp_v2/results_grasp_v2/gv2_slice21_n12_k80.npy
+== outcoil_real.py usage notes
+Spoke split: train/val(early-stop)/test held out. usage: --coilmode input|output"""
