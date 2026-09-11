@@ -1,0 +1,6 @@
+probe 005_env_check
+host worker09.cluster
+start 2026-09-11 15:08:37
+end 2026-09-11 15:08:39
+exit 0
+log jobs/log/probe_005_env_check.out

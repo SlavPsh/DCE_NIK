@@ -1,0 +1,11 @@
+== grasp_pro_py: 8ea9485 Merge branch 'main' of https://github.com/SlavPsh/grasp_pro_py | status: 0 dirty | behind: 1
+== grasp_v2: 4241a50 helios paths and slurm directives | status: 0 dirty | behind: 1
+11:SLICE = 21; NLINE, K = 14, pr.K
+== env through micromamba run:
+SLICE = 18
+== agent log tail (pull failures?)
+[2026-09-11 15:04:24] pull FAILED grasp_pro_py: You asked to pull from the remote 'origin', but did not specify
+[2026-09-11 15:06:28] pull FAILED grasp_v2: You asked to pull from the remote 'origin', but did not specify
+[2026-09-11 15:06:29] pull FAILED grasp_pro_py: You asked to pull from the remote 'origin', but did not specify
+[2026-09-11 15:08:36] pull FAILED grasp_v2: You asked to pull from the remote 'origin', but did not specify
+[2026-09-11 15:08:37] pull FAILED grasp_pro_py: You asked to pull from the remote 'origin', but did not specify

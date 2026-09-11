@@ -1,0 +1,6 @@
+probe 006_gain_check
+host worker09.cluster
+start 2026-09-11 15:08:39
+end 2026-09-11 15:08:50
+exit 0
+log jobs/log/probe_006_gain_check.out
