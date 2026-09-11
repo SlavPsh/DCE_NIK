@@ -1,5 +1,6 @@
 queue 015_story_figs
 jid 3272964
 submitted 2026-09-11 20:57:25
-state 1 PENDING None
+state 1 COMPLETED 00:00:43
 log jobs/log/015_story_figs_3272964.out
+ended 2026-09-11 20:59:30

@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-11 20:57:25 on worker09.cluster, job 3255007, cycle 228
+updated 2026-09-11 20:59:30 on worker09.cluster, job 3255007, cycle 229
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3272964 | 015_story_figs | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 015_story_figs | 1 PENDING None |
+| 015_story_figs | 1 COMPLETED 00:00:43 |
 | 014_story_figs | 1 COMPLETED 00:00:46 |
 | 008_ls_arrays | exit 0 |
 | 013_fig_kspace_space_vs_time | 1 COMPLETED 00:00:31 |
