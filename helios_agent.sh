@@ -41,7 +41,8 @@ pull_all() {
   local r out
   for r in "${REPOS[@]}"; do
     [ -d "$ROOT/$r/.git" ] || { log "no repo $r"; continue; }
-    out=$(gitc "$ROOT/$r" pull --rebase --autostash -q origin 2>&1) || log "pull FAILED $r: $out"
+    br=$(git -C "$ROOT/$r" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)               # explicit branch: checkouts without upstream
+    out=$(gitc "$ROOT/$r" pull --rebase --autostash -q origin "$br" 2>&1) || log "pull FAILED $r: $out"
   done
 }
 
