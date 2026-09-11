@@ -1,5 +1,6 @@
 queue 009_fig_tradeoff_rows
 jid 3257826
 submitted 2026-09-11 15:23:20
-state 1 PENDING None
+state 1 COMPLETED 00:00:38
 log jobs/log/009_fig_tradeoff_rows_3257826.out
+ended 2026-09-11 15:25:24
