@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-12 20:57:13 on worker01.cluster, job 3281385, cycle 244
+updated 2026-09-12 21:01:19 on worker01.cluster, job 3281385, cycle 246
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3286693 | 020_joblib_pk_maps | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 020_joblib_pk_maps | 1 PENDING None |
 | 018_pk_maps_phantom | 1 COMPLETED 00:00:04 |
 | 019_pk_maps_phantom | 1 COMPLETED 00:00:03 |
 | 010_pk_lut | exit 137 |
@@ -30,4 +32,3 @@ updated 2026-09-12 20:57:13 on worker01.cluster, job 3281385, cycle 244
 | 007_set_upstream | exit 0 |
 | 006_gain_check | exit 0 |
 | 005_env_check | exit 0 |
-| 004_gif_grasp_pro_sl21 | exit 0 |
