@@ -30,7 +30,7 @@ def spgr_inverse(S, S0, T10_ms, TR_ms, fa_deg, r1):
 
 def fit(Ct, t_min, jobs):
     out = np.asarray(M.fit_tofts_model(Ct, t_min, AIF, jobs=jobs, model="Cosine4"))
-    return out if out.shape[0] == 4 else out.T                                                                # (4, n): ke, ve, vp, dt
+    return out if out.shape[0] == 4 else out.T                                                                # (4, n): ke, dt, ve, vp (verified on synthetic curves, not the X0 order)
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--jobs", type=int, default=8); ap.add_argument("--methods", default="truth,tofts,free,patlak,pro,grasp"); ap.add_argument("--max-vox", type=int, default=0)
@@ -61,7 +61,7 @@ def main():
         C = spgr_inverse(S, S0, T10.ravel()[idx][:, None], TR_ms, FA, R1X); C = np.nan_to_num(C, nan=0.0, posinf=0.0, neginf=0.0)
         ts = time.time(); par = fit(C, t / 60.0, a.jobs); print(f"{key}: fitted {idx.size} voxels on {len(t)} frames in {time.time() - ts:.0f} s", flush=True)
         mp = {}
-        for j, nm in enumerate(("ke", "ve", "vp", "dt")):
+        for j, nm in enumerate(("ke", "dt", "ve", "vp")):
             m = np.full(lab.size, np.nan); m[idx] = par[j]; mp[nm] = m.reshape(lab.shape)
         mp["ktrans"] = mp["ke"] * mp["ve"]; maps[key] = mp
     labs = [int(l) for l in np.unique(lab) if l > 0 and enh[lab == l].sum() > 30]
