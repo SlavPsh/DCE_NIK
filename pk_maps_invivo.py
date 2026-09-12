@@ -14,9 +14,15 @@ DAT = "/net/beegfs/users/P101440/dce_data/orig/meas_p3_dce.dat"; TA = 375.0; OUT
 NAMES = {"free": "NIK-free", "sub16": "NIK-sub16", "patlak": "NIK-patlak", "tofts": "NIK-tofts", "tofts8": "NIK-tofts8", "pro": "GRASP-Pro f80match", "grasp": "GRASP n12 k80"}
 
 def header_params():
-    txt = open(DAT, "rb").read(60_000_000).decode("latin-1")
-    tr = re.findall(r"alTR\[0\]\s*=\s*([0-9.]+)", txt); fa = re.findall(r"adFlipAngleDegree\[0\]\s*=\s*([0-9.]+)", txt)
-    return (float(tr[0]) / 1000.0 if tr else None), (float(fa[0]) if fa else None)                     # TR us -> ms
+    """TR (ms) and flip (deg) of the LAST measurement in the twix file (the dce scan; adjustment scans come first)"""
+    import struct
+    with open(DAT, "rb") as f:
+        head = f.read(10240); n = struct.unpack("<I", head[4:8])[0]
+        off = [struct.unpack("<Q", head[8 + 152 * k + 8: 8 + 152 * k + 16])[0] for k in range(n)]
+        f.seek(off[-1]); txt = f.read(8_000_000).decode("latin-1")
+    tr = re.findall(r"alTR\[0\]\s*=\s*([0-9.]+)", txt); fa = re.findall(r"adFlipAngleDegree\[0\]\s*=\s*([0-9.]+)", txt); seq = re.findall(r"tSequenceFileName\s*=\s*\"([^\"]*)\"", txt)
+    print(f"twix: {n} measurements, last at offset {off[-1]}, sequence {seq[-1] if seq else '?'}, TR matches {tr[:3]}, flip matches {fa[:3]}", flush=True)
+    return (float(tr[-1]) / 1000.0 if tr else None), (float(fa[-1]) if fa else None)                   # TR us -> ms
 
 def spgr_inverse(S, S0, T10_ms, TR_ms, fa_deg, r1):
     a = np.deg2rad(fa_deg); E10 = np.exp(-TR_ms / T10_ms); g = (1 - E10) / (1 - np.cos(a) * E10)
