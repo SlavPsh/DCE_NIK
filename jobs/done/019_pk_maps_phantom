@@ -1,5 +1,6 @@
 queue 019_pk_maps_phantom
 jid 3286692
 submitted 2026-09-12 20:55:10
-state 1 PENDING None
+state 1 COMPLETED 00:00:03
 log jobs/log/019_pk_maps_phantom_3286692.out
+ended 2026-09-12 20:57:13

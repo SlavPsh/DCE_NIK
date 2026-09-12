@@ -1,5 +1,6 @@
 queue 018_pk_maps_phantom
 jid 3286691
 submitted 2026-09-12 20:55:09
-state 1 RUNNING Prolog
+state 1 COMPLETED 00:00:04
 log jobs/log/018_pk_maps_phantom_3286691.out
+ended 2026-09-12 20:57:13

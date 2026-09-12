@@ -1,20 +1,18 @@
 # helios agent
 
-updated 2026-09-12 20:55:10 on worker01.cluster, job 3281385, cycle 243
+updated 2026-09-12 20:57:13 on worker01.cluster, job 3281385, cycle 244
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3286691 | 018_pk_maps_phantom | 1 RUNNING Prolog |
-| 3286692 | 019_pk_maps_phantom | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 018_pk_maps_phantom | 1 RUNNING Prolog |
-| 019_pk_maps_phantom | 1 PENDING None |
+| 018_pk_maps_phantom | 1 COMPLETED 00:00:04 |
+| 019_pk_maps_phantom | 1 COMPLETED 00:00:03 |
 | 010_pk_lut | exit 137 |
 | 017_grasp_pro_k5_story | 1 COMPLETED 00:02:03 |
 | 009_pro_k5_diag | exit 137 |
