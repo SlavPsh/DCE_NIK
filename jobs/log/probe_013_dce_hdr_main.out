@@ -1,0 +1,10 @@
+measurements (id, offset, length, protocol):
+   (512, 10240, 39479488, 'AdjCoilSens')
+   (3000006, 39490048, 4257218560, 'DCE_FA18_Rerun_1')
+tSequenceFileName      9 hits: ['tSequenceFileName">{ "%SiemensSeq%\\fl3d_vibe" }', 'tSequenceFileName">{ "%SiemensSeq%\\fl3d_vibe" }'] ... ['tSequenceFileName" "FillMiniHeaderData.SequenceFileName" ']
+adFlipAngleDegree[0]   2 hits: ['adFlipAngleDegree[0]\t = \t18.0', 'adFlipAngleDegree[0]\t = \t18.0'] ... 
+alTR[0]                2 hits: ['alTR[0]\t = \t4660', 'alTR[0]\t = \t4660'] ... 
+alTE[0]                2 hits: ['alTE[0]\t = \t1680', 'alTE[0]\t = \t1680'] ... 
+lRadialViews           5 hits: ['lRadialViews">{ 2302 }', 'lRadialViews\t = \t2302'] ... ['lRadialViews" "TrajectoryRadialFunctor.NumberOfViews" ']
+lTotalScanTimeSec      4 hits: ['lTotalScanTimeSec">{ 375 }', 'lTotalScanTimeSec\t = \t375'] ... ['lTotalScanTimeSec">{ 375 }']
+tProtocolName          11 hits: ['tProtocolName">{ "DCE_FA18" }', 'tProtocolName">{ "DCE_FA18" }'] ... ['tProtocolName" "FillMiniHeaderData.SequenceDescription" ']
