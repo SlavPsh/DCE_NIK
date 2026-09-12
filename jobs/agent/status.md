@@ -1,19 +1,18 @@
 # helios agent
 
-updated 2026-09-12 23:15:42 on worker01.cluster, job 3281385, cycle 312
+updated 2026-09-12 23:30:03 on worker01.cluster, job 3281385, cycle 319
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3288267 | 021_pk_maps_invivo | 1 RUNNING None |
-| 3289195 | 022_pk_maps_invivo | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 022_pk_maps_invivo | 1 RUNNING None |
+| 022_pk_maps_invivo | 1 COMPLETED 00:15:38 |
 | 013_dce_hdr_main | exit 0 |
 | 021_pk_maps_invivo | 1 RUNNING None |
 | 012_dce_hdr | exit 0 |

@@ -1,5 +1,6 @@
 queue 022_pk_maps_invivo
 jid 3289195
 submitted 2026-09-12 23:13:38
-state 1 RUNNING None
+state 1 COMPLETED 00:15:38
 log jobs/log/022_pk_maps_invivo_3289195.out
+ended 2026-09-12 23:30:03
