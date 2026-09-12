@@ -1,0 +1,6 @@
+probe 012_dce_hdr
+host worker01.cluster
+start 2026-09-12 23:01:22
+end 2026-09-12 23:01:22
+exit 0
+log jobs/log/probe_012_dce_hdr.out

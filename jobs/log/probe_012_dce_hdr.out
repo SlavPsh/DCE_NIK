@@ -1,0 +1,7 @@
+adFlipAngleDegree[0]     adFlipAngleDegree[0]	 = 	5.0
+alTR[0]                  alTR[0]	 = 	2060
+alTE[0]                  alTE[0]	 = 	710
+lTotalScanTimeSec        lTotalScanTimeSec">{ -1 }
+lRadialViews             lRadialViews">{ 64 }
+flNominalB0              flNominalB0">{ 2.8936200141906738 }
+tSequenceFileName        tSequenceFileName">{ "%AdjustSeq%/AdjCoilSensSeq" }
