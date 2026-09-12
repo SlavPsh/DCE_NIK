@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/__init__.py", line 216, in findall
+    return _compile(pattern, flags).findall(string)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/__init__.py", line 294, in _compile
+    p = _compiler.compile(pattern, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_compiler.py", line 745, in compile
+    p = _parser.parse(p, flags)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_parser.py", line 989, in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_parser.py", line 464, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_parser.py", line 872, in _parse
+    p = _parse_sub(source, state, sub_verbose, nested + 1)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_parser.py", line 464, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/re/_parser.py", line 572, in _parse
+    raise source.error("unterminated character set",
+re.error: unterminated character set at position 30
