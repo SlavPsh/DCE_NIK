@@ -1,16 +1,20 @@
 # helios agent
 
-updated 2026-09-12 20:51:03 on worker01.cluster, job 3281385, cycle 241
+updated 2026-09-12 20:55:10 on worker01.cluster, job 3281385, cycle 243
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3286691 | 018_pk_maps_phantom | 1 RUNNING Prolog |
+| 3286692 | 019_pk_maps_phantom | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 018_pk_maps_phantom | 1 RUNNING Prolog |
+| 019_pk_maps_phantom | 1 PENDING None |
 | 010_pk_lut | exit 137 |
 | 017_grasp_pro_k5_story | 1 COMPLETED 00:02:03 |
 | 009_pro_k5_diag | exit 137 |
@@ -29,5 +33,3 @@ updated 2026-09-12 20:51:03 on worker01.cluster, job 3281385, cycle 241
 | 006_gain_check | exit 0 |
 | 005_env_check | exit 0 |
 | 004_gif_grasp_pro_sl21 | exit 0 |
-| 005_pk_arms_k80 | 1 COMPLETED 00:16:21, 1 COMPLETED 00:16:22, 4 COMPLETED 00:16:23, 1 COMPLETED 00:16:24, 1 COMPLETED 00:16:25, 2 COMPLETED 00:16:28, 1 COMPLETED 00:16:29, 2 COMPLETED 00:16:30, 1 COMPLETED 00:16:32, 1 COMPLETED 00:16:33, 2 COMPLETED 00:16:35, 2 COMPLETED 00:16:36, 1 COMPLETED 00:16:37, 1 COMPLETED 00:16:39, 1 COMPLETED 00:16:40, 2 COMPLETED 00:16:42, 1 COMPLETED 00:16:43, 1 COMPLETED 00:17:52, 1 COMPLETED 00:17:58 |
-| 006_grasp_k80_refs_sl18_19 | 1 COMPLETED 00:07:58 |
