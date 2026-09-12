@@ -1,0 +1,146 @@
+== /net/beegfs/users/P101440/XCAT-ERIC/utilities/newContrastCalculation/XCAT_to_MR_DCE.m
+% 61 right ovary
+% 62 left ovary
+% 63 FAllopian tubes
+% 64 Parathyroid
+% 65 Thyroid
+% 66 Thymus
+% 67 salivary
+% 68 Pituitary
+% 69 Eye
+% 70 eye lens
+% 71 lesion
+% 72 Fat
+% 73 Pancreas tumor
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Tissue(1,:)=[1030;40;1471;47];
+Tissue(2,:)=[1030;40;1471;47];
+Tissue(3,:)=[1030;40;1471;47];
+Tissue(4,:)=[1030;40;1471;47];
+Tissue(5,:)=[1441;290;1932;275];
+Tissue(6,:)=[1441;290;1932;275];
+Tissue(7,:)=[1441;290;1932;275];
+Tissue(8,:)=[1441;290;1932;275];
+Tissue(9,:)=[1008;44;1412;50.00];
+Tissue(10,:)=[981.5;36;1232.9;37.20];
+Tissue(11,:)=[884;72;1084;69];
+Tissue(12,:)=[0;0;0;0];
+Tissue(13,:)=[576,46,812,42];
+Tissue(14,:)=[576;46;812;42];
+Tissue(15,:)=[0;0;0;0];
+Tissue(16,:)=[0;0;0;0];
+Tissue(17,:)=[576;46;812;42];
+Tissue(18,:)=[576;46;812;42];
+Tissue(19,:)=[1045.5;37.3;1201;44];
+Tissue(20,:)=[981.5;36;1232.9;37.20];
+% Tissue(21,:)=[981.5;36;1232.9;37.20];
+Tissue(21,:)=[0;0;0;0];
+Tissue(22,:)=[584;46;725;43];
+Tissue(23,:)=[828;71;1168;66];
+Tissue(24,:)=[1412;85;1545;81];
+Tissue(25,:)=[828;71;1168;66];
+Tissue(26,:)=[1412;85;1545;81];
+Tissue(27,:)=[576;46;812;42];
+Tissue(28,:)=[200;0.5;302;0.25];
+Tissue(29,:)=[200;0.5;302;0.25];
+Tissue(30,:)=[1057;79;1328;61];
+Tissue(31,:)=[200;0.5;302;0.25];
+Tissue(32,:)=[200;0.5;302;0.25];
+Tissue(33,:)=[200;0.5;302;0.25];
+Tissue(34,:)=[745;74;993;78];
+Tissue(35,:)=[549;49;586;49];
+Tissue(36,:)=[1585;254;1664;147];
+Tissue(37,:)=[1582;181;1584;66];
+Tissue(38,:)=[576;46;812;42];
+Tissue(39,:)=[1317;88;1597;74];
+Tissue(40,:)=[576;46;812;42];
+Tissue(41,:)=[576;46;812;42];
+Tissue(42,:)=[576;46;812;42];
+Tissue(43,:)=[576;46;812;42];
+Tissue(44,:)=[576;46;812;42];
+Tissue(45,:)=[1317;88;1597;74];
+Tissue(46,:)=[576;46;812;42];
+Tissue(47,:)=[576;46;812;42];
+Tissue(48,:)=[576;46;812;42];
+Tissue(49,:)=[576;46;812;42];
+Tissue(50,:)=[981.5;36;1232.9;37.20];
+Tissue(51,:)=[1024;30;1168;27];
+% Tissue(52,:)=[;;;];
+Tissue(53,:)=[1434.5;164;1498.3;164];
+Tissue(54,:)=[1434.5;164;1498.3;164];
+Tissue(55,:)=[5053;468;5053;468];
+% Tissue(56,:)=[;;;];
+Tissue(57,:)=[1045.5;37.3;1201;44];
+Tissue(58,:)=[0;0;0;0];
+Tissue(59,:)=[1309;117;1514;79];
+Tissue(60,:)=[1135;58;1616;83];
+Tissue(61,:)=[576;46;812;42];
+Tissue(62,:)=[576;46;812;42];
+Tissue(63,:)=[576;46;812;42];
+Tissue(64,:)=[1317;88;1597;74];
+Tissue(65,:)=[1317;88;1597;74];
+Tissue(66,:)=[1317;88;1597;74];
+Tissue(67,:)=[1317;88;1597;74];
+Tissue(68,:)=[1317;88;1597;74];
+Tissue(69,:)=[5053;468;5053;468];
+Tissue(70,:)=[1138;26;1138;26];
+% Tissue(71,:)=[;;;];
+Tissue(72,:)=[312.4;117.4;377;97.5];
+Tissue(73,:)=[0;0;1676;64]; % pancreatic tumor, only for 3T
+
+fatTissues = [34,35,72];    % spinal cord, bone marrow, fat
+
+
+MR=zeros(size(XCAT),'single');
+
+for iTissue=1:length(Tissue)
+== SIM /net/beegfs/users/P101440/XCAT-ERIC/results/simulation_results_20260816T210718.mat
+   #refs# 
+   #refs#/a (2,)
+   results 
+   results/images 
+   results/images/GroundTruth 
+   results/images/Recon 
+   results/kspace 
+   results/kspace/DCE (344, 8, 112, 220)
+   results/kspace/SP (1, 16)
+   results/kspace/coilMaps (8, 16, 220, 220)
+   results/kspace/meta 
+   results/kspace/spokeTimingDCE (344, 112)
+   results/kspace/trajDCE (344, 3, 112, 220)
+   results/labelGT (16, 152, 220)
+   results/pkLUT 
+   results/pkLUT/dt (73, 1)
+   results/pkLUT/ke (73, 1)
+   results/pkLUT/ve (73, 1)
+   results/pkLUT/vp (73, 1)
+   results/recon 
+   results/recon/DCE_R (16, 1)
+   results/recon/DCEframelength (1, 1)
+   results/recon/DCEframes (1, 1)
+   results/recon/SNR (1, 1)
+   results/recon/trajectory (14, 1)
+   results/sim 
+   results/sim/B0 (1, 1)
+   results/sim/TE (1, 1)
+   results/sim/TR (1, 1)
+   results/sim/alpha (1, 1)
+   results/sim/contrastSamplingTime (1, 1)
+   results/sim/injectionTime (1, 1)
+   results/sim/matrixAP (1, 1)
+   results/sim/matrixFH (1, 1)
+   results/sim/matrixRL (1, 1)
+   results/sim/relaxivity (1, 1)
+   results/sim/resAP (1, 1)
+   results/sim/resFH (1, 1)
+   results/sim/resRL (1, 1)
+   results/sim/respPeriod (3, 1)
+   results/sim/scanTime (1, 1)
+  attr MATLAB_class b'struct'
+  attr MATLAB_fields [array([b's', b'i', b'm'], dtype='|S1')
+ array([b'i', b'm', b'a', b'g', b'e', b's'], dtype='|S1')
+ array([b'r', b'e', b'c', b'o', b'n'], dtype='|S1')
+ array([b'k', b's', b'p', b'a', b'c', b'e'], dtype='|S1')
+ array([b'l', b'a', b'b', b'e', b'l', b'G', b'T'], dtype='|S1')
+ array([b'p', b'k', b'L', b'U', b'T'], dtype='|S1')]
