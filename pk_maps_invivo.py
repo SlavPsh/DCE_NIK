@@ -54,7 +54,7 @@ def main():
         aif = M.fit_aif(cp, tmf / 60.0, model="Cosine4"); fitc = M.Cosine4AIF(tmf / 60.0, aif["ab"], aif["ae"], aif["mb"], aif["me"], aif["t0"])
         print(f"slice {Z}: aif peak {cp.max():.2f} mM at {tmf[cp.argmax()]:.0f} s; cosine4 fit {dict((k, round(float(v), 3)) for k, v in aif.items())}, fit nrmse {np.linalg.norm(fitc - cp) / np.linalg.norm(cp):.3f}", flush=True)
         idx = np.flatnonzero(body.ravel()); maps = {}; rows = {}
-        late = mf[..., tmf > 150].mean(-1); base = mf[..., tmf < a.pre_s].mean(-1); enh = body & (late > 1.2 * base)      # display mask: enhancing in the reference, same for every method
+        late = mf[..., tmf > 150].mean(-1); base = mf[..., tmf < a.pre_s].mean(-1); enh = body & (late > 1.35 * base)      # display mask: enhancing in the reference, same for every method
         if a.figs_only:
             z2 = np.load(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.npz"); keys0 = sorted({k.rsplit("_", 1)[0] for k in z2.files if k != "body"}, key=lambda k: list(NAMES).index(k) if k in NAMES else 99)
             maps = {k: {nm: z2[f"{k}_{nm}"] for nm in ("ke", "dt", "ve", "vp", "ktrans")} for k in keys0}
