@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-13 14:55:46 on worker01.cluster, job 3291692, cycle 82
+updated 2026-09-13 19:24:02 on worker01.cluster, job 3291692, cycle 214
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3293823 | 029_pk_coef_fit | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 029_pk_coef_fit | 1 PENDING None |
 | 028_story_invivo_families | 1 COMPLETED 00:00:09 |
 | 026_pk_maps_invivo_figs | 1 COMPLETED 00:00:08 |
 | 027_pk_maps_invivo_figs | 1 COMPLETED 00:00:07 |
@@ -30,4 +32,3 @@ updated 2026-09-13 14:55:46 on worker01.cluster, job 3291692, cycle 82
 | 009_pro_k5_diag | exit 137 |
 | 016_grasp_pro_k5_story | 1 COMPLETED 00:02:50 |
 | 015_story_figs | 1 COMPLETED 00:00:43 |
-| 014_story_figs | 1 COMPLETED 00:00:46 |
