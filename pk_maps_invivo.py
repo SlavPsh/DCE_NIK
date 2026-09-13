@@ -41,7 +41,7 @@ def sources(Z):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--jobs", type=int, default=16); ap.add_argument("--hct", type=float, default=0.4); ap.add_argument("--r1", type=float, default=3.5)
-    ap.add_argument("--t10", default="cortex=1142,medulla=1545,blood=1650,other=1000"); ap.add_argument("--TR", type=float, default=None); ap.add_argument("--FA", type=float, default=None); ap.add_argument("--pre-s", type=float, default=45.0)
+    ap.add_argument("--t10", default="cortex=1142,medulla=1545,blood=1650,other=1000"); ap.add_argument("--TR", type=float, default=None); ap.add_argument("--FA", type=float, default=None); ap.add_argument("--pre-s", type=float, default=45.0); ap.add_argument("--figs-only", action="store_true", help="re-render the figures from the saved fits")
     a = ap.parse_args(); t0 = time.time(); T10 = {k: float(v) for k, v in (kv.split("=") for kv in a.t10.split(","))}
     TR, FA = header_params(); TR = a.TR or TR; FA = a.FA or FA; print(f"header: TR {TR} ms, flip {FA} deg; hct {a.hct}, r1 {a.r1}, T10 {T10}", flush=True)
     os.makedirs(f"{OUT}/pk_maps", exist_ok=True); md = ["# in vivo extended-kety maps at k80 (no truth; literature T10 per roi, model-free aorta aif, one aif for every method)", "",
@@ -82,6 +82,7 @@ def main():
                 if j == 0: ax[i, j].text(-0.06, 0.5, {"ktrans": "Ktrans (1/min)", "ve": "ve", "vp": "vp"}[nm], transform=ax[i, j].transAxes, rotation=90, va="center", fontsize=12)
         fig.suptitle(f"in vivo slice {Z}, k80 (1368 views) for every method: fitted extended-kety maps, no truth; literature T10, model-free aorta aif", fontsize=12)
         fig.tight_layout(); fig.savefig(f"{OUT}/figures/pk_maps_invivo_k80_sl{Z}.png", dpi=150, facecolor="white"); plt.close(fig); print(f"saved {OUT}/figures/pk_maps_invivo_k80_sl{Z}.png", flush=True)
-    open(f"{OUT}/pk_maps/pk_invivo_k80.md", "w").write("\n".join(md)); print("\n".join(md)); print(f"PK_INVIVO_DONE ({time.time() - t0:.0f} s)")
+    if not a.figs_only: open(f"{OUT}/pk_maps/pk_invivo_k80.md", "w").write("\n".join(md)); print("\n".join(md))
+    print(f"PK_INVIVO_DONE ({time.time() - t0:.0f} s)")
 
 if __name__ == "__main__": main()
