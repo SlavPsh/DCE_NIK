@@ -54,7 +54,11 @@ def main():
         aif = M.fit_aif(cp, tmf / 60.0, model="Cosine4"); fitc = M.Cosine4AIF(tmf / 60.0, aif["ab"], aif["ae"], aif["mb"], aif["me"], aif["t0"])
         print(f"slice {Z}: aif peak {cp.max():.2f} mM at {tmf[cp.argmax()]:.0f} s; cosine4 fit {dict((k, round(float(v), 3)) for k, v in aif.items())}, fit nrmse {np.linalg.norm(fitc - cp) / np.linalg.norm(cp):.3f}", flush=True)
         idx = np.flatnonzero(body.ravel()); maps = {}; rows = {}
-        for key, p in sources(Z).items():
+        late = mf[..., tmf > 150].mean(-1); base = mf[..., tmf < a.pre_s].mean(-1); enh = body & (late > 1.2 * base)      # display mask: enhancing in the reference, same for every method
+        if a.figs_only:
+            z2 = np.load(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.npz"); keys0 = sorted({k.rsplit("_", 1)[0] for k in z2.files if k != "body"}, key=lambda k: list(NAMES).index(k) if k in NAMES else 99)
+            maps = {k: {nm: z2[f"{k}_{nm}"] for nm in ("ke", "dt", "ve", "vp", "ktrans")} for k in keys0}
+        for key, p in ({} if a.figs_only else sources(Z)).items():
             v = np.abs(np.load(p)).astype(np.float32); t = ft(v.shape[-1]); S = v.reshape(-1, v.shape[-1])[idx]; pre = t < a.pre_s
             S0 = S[:, pre].mean(1, keepdims=True); Cc = np.nan_to_num(spgr_inverse(S, S0, t10map.ravel()[idx][:, None], TR, FA, a.r1))
             ts = time.time(); par = np.asarray(M.fit_tofts_model(Cc, t / 60.0, aif, jobs=a.jobs, model="Cosine4")); par = par if par.shape[0] == 4 else par.T     # (ke, dt, ve, vp)
@@ -64,15 +68,16 @@ def main():
             mp["ktrans"] = mp["ke"] * mp["ve"]; maps[key] = mp
             rows[key] = {r: {nm: [float(np.nanpercentile(mp[nm][rois[r]], q)) for q in (50, 25, 75)] for nm in ("ktrans", "ve", "vp", "ke")} for r in ("cortex", "medulla") if rois[r].sum() > 0}
             print(f"  {NAMES[key]:20s} {len(t):3d} fr, {idx.size} voxels, {time.time() - ts:.0f} s | cortex ktrans {rows[key]['cortex']['ktrans'][0]:.3f} ve {rows[key]['cortex']['ve'][0]:.3f} vp {rows[key]['cortex']['vp'][0]:.3f} | medulla ktrans {rows[key]['medulla']['ktrans'][0]:.3f} ve {rows[key]['medulla']['ve'][0]:.3f} vp {rows[key]['medulla']['vp'][0]:.3f}", flush=True)
-        np.savez(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.npz", body=body, **{f"{k}_{nm}": maps[k][nm] for k in maps for nm in maps[k]})
-        json.dump(dict(rows=rows, aif=aif, TR=TR, FA=FA, hct=a.hct, r1=a.r1, T10=T10), open(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.json", "w"), indent=1)
-        md += [f"## slice {Z}", "| method | cortex ktrans | cortex ve | cortex vp | medulla ktrans | medulla ve | medulla vp |", "|---|---|---|---|---|---|---|"]
-        for key in maps: md.append(f"| {NAMES[key]} | " + " | ".join(f"{rows[key][r][nm][0]:.3f} [{rows[key][r][nm][1]:.2f}, {rows[key][r][nm][2]:.2f}]" for r in ("cortex", "medulla") for nm in ("ktrans", "ve", "vp")) + " |")
-        md.append("")
+        if not a.figs_only:
+            np.savez(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.npz", body=body, **{f"{k}_{nm}": maps[k][nm] for k in maps for nm in maps[k]})
+            json.dump(dict(rows=rows, aif=aif, TR=TR, FA=FA, hct=a.hct, r1=a.r1, T10=T10), open(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.json", "w"), indent=1)
+            md += [f"## slice {Z}", "| method | cortex ktrans | cortex ve | cortex vp | medulla ktrans | medulla ve | medulla vp |", "|---|---|---|---|---|---|---|"]
+            for key in maps: md.append(f"| {NAMES[key]} | " + " | ".join(f"{rows[key][r][nm][0]:.3f} [{rows[key][r][nm][1]:.2f}, {rows[key][r][nm][2]:.2f}]" for r in ("cortex", "medulla") for nm in ("ktrans", "ve", "vp")) + " |")
+            md.append("")
         keys = list(maps); fig, ax = plt.subplots(3, len(keys), figsize=(2.9 * len(keys), 8.8), squeeze=False); anat = mf.mean(-1)
         for j, k in enumerate(keys):
-            for i, (nm, vmax) in enumerate((("ktrans", 1.0), ("ve", 1.0), ("vp", 0.3))):
-                im = np.where(body, maps[k][nm], np.nan); ax[i, j].imshow(anat, cmap="gray", vmin=0, vmax=np.percentile(anat[body], 99.5)); ax[i, j].imshow(np.ma.masked_invalid(im), cmap="inferno" if nm == "ktrans" else ("viridis" if nm == "vp" else "magma"), vmin=0, vmax=vmax, alpha=0.85); ax[i, j].axis("off")
+            for i, (nm, vmax) in enumerate((("ktrans", 0.5), ("ve", 0.8), ("vp", 0.15))):
+                im = np.where(enh, maps[k][nm], np.nan); ax[i, j].imshow(anat, cmap="gray", vmin=0, vmax=np.percentile(anat[body], 99.5)); ax[i, j].imshow(np.ma.masked_invalid(im), cmap="inferno" if nm == "ktrans" else ("viridis" if nm == "vp" else "magma"), vmin=0, vmax=vmax); ax[i, j].axis("off")
                 if i == 0: ax[i, j].set_title(NAMES[k], fontsize=11, fontweight="bold")
                 if j == 0: ax[i, j].text(-0.06, 0.5, {"ktrans": "Ktrans (1/min)", "ve": "ve", "vp": "vp"}[nm], transform=ax[i, j].transAxes, rotation=90, va="center", fontsize=12)
         fig.suptitle(f"in vivo slice {Z}, k80 (1368 views) for every method: fitted extended-kety maps, no truth; literature T10, model-free aorta aif", fontsize=12)
