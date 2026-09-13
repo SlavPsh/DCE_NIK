@@ -1,0 +1,83 @@
+coef maps (220, 220, 16), rank 16, |coef @ Phi| vs rec_best nrmse 1.34e-07 (path C render check); voxels 6138; TR 4.66 FA 18 r1 3.5
+coefficient-domain fit: 6138 voxels in 26 s
+# nik-tofts on the phantom: coefficient-domain fit vs image-domain fit vs truth (per-label medians over 6138 enhancing voxels; tag w768_ks2.5_s0_tofts16)
+
+coefficient-domain: residual phi^T S(t; ke, dt, ve, vp, S0) - a in the orthonormalized span, exact spgr with the label T10, sim aif, no frames rendered; image-domain: the DCE-NET fit of pk_maps_phantom.py on the rendered series
+
+## ktrans
+| label | truth | image-domain fit | coefficient-domain fit |
+|---|---|---|---|
+| 13 | 0.316 | 0.312 | 0.307 |
+| 22 | 0.296 | 0.283 | 0.285 |
+| 23 | 0.560 | 0.551 | 0.542 |
+| 24 | 0.630 | 0.524 | 0.519 |
+| 25 | 0.560 | 0.551 | 0.544 |
+| 26 | 0.630 | 0.559 | 0.557 |
+| 30 | 0.465 | 0.334 | 0.325 |
+| 36 | 0.000 | 0.230 | 0.206 |
+| 37 | 0.000 | 0.208 | 0.177 |
+| 40 | 0.160 | 0.154 | 0.154 |
+| 41 | 0.160 | 0.178 | 0.177 |
+| 42 | 0.160 | 0.169 | 0.169 |
+| 43 | 0.160 | 0.164 | 0.163 |
+
+## ve
+| label | truth | image-domain fit | coefficient-domain fit |
+|---|---|---|---|
+| 13 | 0.290 | 0.292 | 0.288 |
+| 22 | 0.210 | 0.198 | 0.203 |
+| 23 | 0.800 | 0.747 | 0.740 |
+| 24 | 0.900 | 0.734 | 0.731 |
+| 25 | 0.800 | 0.748 | 0.738 |
+| 26 | 0.900 | 0.781 | 0.778 |
+| 30 | 0.280 | 0.213 | 0.207 |
+| 36 | 0.000 | 0.139 | 0.135 |
+| 37 | 0.000 | 0.120 | 0.111 |
+| 40 | 0.190 | 0.183 | 0.184 |
+| 41 | 0.190 | 0.209 | 0.208 |
+| 42 | 0.190 | 0.204 | 0.203 |
+| 43 | 0.190 | 0.191 | 0.191 |
+
+## vp
+| label | truth | image-domain fit | coefficient-domain fit |
+|---|---|---|---|
+| 13 | 0.010 | 0.000 | 0.000 |
+| 22 | 0.040 | 0.034 | 0.035 |
+| 23 | 0.200 | 0.161 | 0.160 |
+| 24 | 0.100 | 0.098 | 0.098 |
+| 25 | 0.200 | 0.168 | 0.166 |
+| 26 | 0.100 | 0.099 | 0.100 |
+| 30 | 0.060 | 0.034 | 0.033 |
+| 36 | 0.600 | 0.151 | 0.154 |
+| 37 | 0.600 | 0.201 | 0.183 |
+| 40 | 0.010 | 0.010 | 0.010 |
+| 41 | 0.010 | 0.009 | 0.009 |
+| 42 | 0.010 | 0.008 | 0.008 |
+| 43 | 0.010 | 0.008 | 0.008 |
+
+## ke
+| label | truth | image-domain fit | coefficient-domain fit |
+|---|---|---|---|
+| 13 | 1.090 | 1.066 | 1.065 |
+| 22 | 1.410 | 1.415 | 1.405 |
+| 23 | 0.700 | 0.738 | 0.736 |
+| 24 | 0.700 | 0.718 | 0.717 |
+| 25 | 0.700 | 0.742 | 0.739 |
+| 26 | 0.700 | 0.722 | 0.720 |
+| 30 | 1.660 | 1.590 | 1.591 |
+| 36 | 0.000 | 1.602 | 1.486 |
+| 37 | 0.000 | 1.777 | 1.684 |
+| 40 | 0.840 | 0.842 | 0.841 |
+| 41 | 0.840 | 0.853 | 0.852 |
+| 42 | 0.840 | 0.830 | 0.829 |
+| 43 | 0.840 | 0.859 | 0.858 |
+
+## per-voxel median relative error vs truth (enhancing voxels)
+| param | image-domain | coefficient-domain |
+|---|---|---|
+| ktrans | 0.081 | 0.076 |
+| ve | 0.074 | 0.070 |
+| vp | 0.326 | 0.325 |
+saved /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/figures/pk_coef_fit_phantom.png (53 s)
+PK_COEF_DONE
+PKCOEF exit 0
