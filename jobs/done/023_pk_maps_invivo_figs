@@ -1,5 +1,6 @@
 queue 023_pk_maps_invivo_figs
 jid 3293789
 submitted 2026-09-13 10:20:49
-state 1 PENDING None
+state 1 COMPLETED 00:00:11
 log jobs/log/023_pk_maps_invivo_figs_3293789.out
+ended 2026-09-13 10:22:53

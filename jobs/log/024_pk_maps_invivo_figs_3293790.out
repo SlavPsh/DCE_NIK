@@ -1,0 +1,10 @@
+twix: 2 measurements, last at offset 39490048, sequence %SiemensSeq%\fl3d_vibe, TR matches ['4660', '4660'], flip matches ['18.0', '18.0']
+header: TR 4.66 ms, flip 18.0 deg; hct 0.4, r1 3.5, T10 {'cortex': 1142.0, 'medulla': 1545.0, 'blood': 1650.0, 'other': 1000.0}
+slice 21: aif peak 8.57 mM at 63 s; cosine4 fit {'ab': 3.746, 'ae': 1.438, 'mb': 19.44, 'me': 0.196, 't0': 0.899}, fit nrmse 0.101
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/pk_maps_invivo_k80_sl21.png
+slice 18: aif peak 9.72 mM at 63 s; cosine4 fit {'ab': 4.167, 'ae': 1.492, 'mb': 20.636, 'me': 0.199, 't0': 0.899}, fit nrmse 0.100
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/pk_maps_invivo_k80_sl18.png
+slice 19: aif peak 10.70 mM at 63 s; cosine4 fit {'ab': 4.722, 'ae': 1.37, 'mb': 20.796, 'me': 0.197, 't0': 0.905}, fit nrmse 0.100
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/pk_maps_invivo_k80_sl19.png
+PK_INVIVO_DONE (5 s)
+PK exit 0
