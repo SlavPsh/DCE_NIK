@@ -54,7 +54,7 @@ def main():
         aif = M.fit_aif(cp, tmf / 60.0, model="Cosine4"); fitc = M.Cosine4AIF(tmf / 60.0, aif["ab"], aif["ae"], aif["mb"], aif["me"], aif["t0"])
         print(f"slice {Z}: aif peak {cp.max():.2f} mM at {tmf[cp.argmax()]:.0f} s; cosine4 fit {dict((k, round(float(v), 3)) for k, v in aif.items())}, fit nrmse {np.linalg.norm(fitc - cp) / np.linalg.norm(cp):.3f}", flush=True)
         idx = np.flatnonzero(body.ravel()); maps = {}; rows = {}
-        late = mf[..., tmf > 150].mean(-1); base = mf[..., tmf < a.pre_s].mean(-1); enh = body & (late > 1.35 * base)      # display mask: enhancing in the reference, same for every method
+        late = mf[..., tmf > 150].mean(-1); base = mf[..., tmf < a.pre_s].mean(-1); enh = body & (late > 1.35 * base); enh60 = body & (late > 1.6 * base)      # display mask: enhancing in the reference, same for every method
         if a.figs_only:
             z2 = np.load(f"{OUT}/pk_maps/pk_invivo_k80_sl{Z}.npz"); keys0 = sorted({k.rsplit("_", 1)[0] for k in z2.files if k != "body"}, key=lambda k: list(NAMES).index(k) if k in NAMES else 99)
             maps = {k: {nm: z2[f"{k}_{nm}"] for nm in ("ke", "dt", "ve", "vp", "ktrans")} for k in keys0}
@@ -77,7 +77,7 @@ def main():
         keys = list(maps); fig, ax = plt.subplots(3, len(keys), figsize=(2.9 * len(keys), 8.8), squeeze=False); anat = mf.mean(-1)
         for j, k in enumerate(keys):
             for i, (nm, vmax) in enumerate((("ktrans", 0.5), ("ve", 0.8), ("vp", 0.15))):
-                im = np.where(enh, maps[k][nm], np.nan); ax[i, j].imshow(anat, cmap="gray", vmin=0, vmax=np.percentile(anat[body], 99.5)); ax[i, j].imshow(np.ma.masked_invalid(im), cmap="inferno" if nm == "ktrans" else ("viridis" if nm == "vp" else "magma"), vmin=0, vmax=vmax); ax[i, j].axis("off")
+                im = np.where(enh60 if nm == "ve" else enh, maps[k][nm], np.nan); ax[i, j].imshow(anat, cmap="gray", vmin=0, vmax=np.percentile(anat[body], 99.5)); ax[i, j].imshow(np.ma.masked_invalid(im), cmap="inferno" if nm == "ktrans" else ("viridis" if nm == "vp" else "magma"), vmin=0, vmax=vmax); ax[i, j].axis("off")
                 if i == 0: ax[i, j].set_title(NAMES[k], fontsize=11, fontweight="bold")
                 if j == 0: ax[i, j].text(-0.06, 0.5, {"ktrans": "Ktrans (1/min)", "ve": "ve", "vp": "vp"}[nm], transform=ax[i, j].transAxes, rotation=90, va="center", fontsize=12)
         fig.suptitle(f"in vivo slice {Z}, k80 (1368 views) for every method: fitted extended-kety maps, no truth; literature T10, model-free aorta aif", fontsize=12)
