@@ -94,8 +94,14 @@ def invivo(t_show, tofts_arm):
          ("GRASP-Pro", L(f"{GP}/cs_slice21_f80match.npy"), None), ("GRASP", L(f"{GV}/gv2_slice21_n12_k80.npy"), None)]
     M = [(nm, v, (t if t is not None else ft(v.shape[-1]))) for nm, v, t in M]
     mfc = {r: (lambda c: c - np.median(c[:8]))(np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])])) for r in ROIS}
+    note = f"same input for every method: k80 = 1368 of 1708 views (v%10<8); reference = model-free nufft (31-spoke window); one global scale vs the reference; image at t = {t_show:.0f} s"
     panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21.png", "in vivo slice 21: four NIK families, GRASP-Pro and GRASP on the same k80 input",
-          M, rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", f"same input for every method: k80 = 1368 of 1708 views (v%10<8); reference = model-free nufft (31-spoke window); one global scale vs the reference; image at t = {t_show:.0f} s")
+          M, rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
+    byname = {nm: (nm, v, t) for nm, v, t in M}
+    for fam in ("NIK-free", "NIK-sub16", "NIK-patlak", "NIK-" + tofts_arm):                       # one panel per family: reference | nik | grasp pro | grasp
+        if fam not in byname: continue
+        panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_{fam.split('-')[1]}.png", f"in vivo slice 21: {fam} vs GRASP-Pro and GRASP on the same k80 input",
+              [byname["model-free"], byname[fam], byname["GRASP-Pro"], byname["GRASP"]], rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--t-phantom", type=float, default=90.0); ap.add_argument("--t-invivo", type=float, default=90.0); ap.add_argument("--tofts", default="tofts"); ap.add_argument("--only", default="both")
