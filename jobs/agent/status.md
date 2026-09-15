@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-09-15 21:17:22 on worker01.cluster, job 3294737, cycle 299
+updated 2026-09-15 22:17:02 on worker01.cluster, job 3294737, cycle 328
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3297163 | 038_loss_weighting | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3297163 | 038_loss_weighting | 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 038_loss_weighting | 2 RUNNING None |
 | 032_amp_track_atomscale | 1 TIMEOUT 04:30:29 |
-| 038_loss_weighting | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 031_amp_track | 2 TIMEOUT 04:30:12, 1 TIMEOUT 04:30:28 |
 | 037_aorta_offset | 1 COMPLETED 00:00:52 |
 | 036_new_rois_rerun | 1 COMPLETED 00:00:40 |
