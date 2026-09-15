@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-15 13:52:53 on worker01.cluster, job 3294737, cycle 82
+updated 2026-09-15 14:07:21 on worker01.cluster, job 3294737, cycle 89
 
 ## active
 
@@ -8,11 +8,13 @@ updated 2026-09-15 13:52:53 on worker01.cluster, job 3294737, cycle 82
 |---|---|---|
 | 3296978 | 031_amp_track | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3296988 | 032_amp_track_atomscale | 1 PENDING QOSMaxGRESPerUser |
+| 3297088 | 035_roi_propose_v2 | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 035_roi_propose_v2 | 1 PENDING None |
 | 034_roi_propose | 1 COMPLETED 00:00:16 |
 | 032_amp_track_atomscale | 1 PENDING QOSMaxGRESPerUser |
 | 033_roi_check | 1 COMPLETED 00:00:20 |
@@ -32,4 +34,3 @@ updated 2026-09-15 13:52:53 on worker01.cluster, job 3294737, cycle 82
 | 011_dce_hdr | exit 1 |
 | 020_joblib_pk_maps | 1 COMPLETED 00:02:05 |
 | 018_pk_maps_phantom | 1 COMPLETED 00:00:04 |
-| 019_pk_maps_phantom | 1 COMPLETED 00:00:03 |
