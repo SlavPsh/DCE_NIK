@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-15 11:06:46 on worker01.cluster, job 3294737, cycle 1
+updated 2026-09-15 12:06:08 on worker01.cluster, job 3294737, cycle 30
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3296969 | 030_span_diag | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 030_span_diag | 1 PENDING Priority |
 | 029_pk_coef_fit | 1 COMPLETED 00:00:57 |
 | 028_story_invivo_families | 1 COMPLETED 00:00:09 |
 | 026_pk_maps_invivo_figs | 1 COMPLETED 00:00:08 |
@@ -30,4 +32,3 @@ updated 2026-09-15 11:06:46 on worker01.cluster, job 3294737, cycle 1
 | 017_grasp_pro_k5_story | 1 COMPLETED 00:02:03 |
 | 009_pro_k5_diag | exit 137 |
 | 016_grasp_pro_k5_story | 1 COMPLETED 00:02:50 |
-| 015_story_figs | 1 COMPLETED 00:00:43 |
