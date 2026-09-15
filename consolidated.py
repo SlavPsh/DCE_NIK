@@ -71,8 +71,16 @@ def slice_ctx(Z):
         if int(mask.sum()) == 0: continue
         rc = norm(tmf, np.array([im[mask].mean() for im in mf]))
         if np.isfinite(rc).all(): real[nm] = rc
+    rois = dict(cortex=cortex, medulla=medulla, aorta=ao, liver=liver); rois_old = dict(rois)
+    _pp = f"{D}/results/realdata_nik_vs_cs_figures/rois_proposed_sl{Z}.npz"                     # approved anatomical kidney rois (2026-09-15, roi_propose_invivo.py v2): both kidneys, cortex outer band / medulla interior
+    if os.path.exists(_pp) and not os.environ.get("ROIS_OLD"):
+        _z = np.load(_pp, allow_pickle=True); rois.update(cortex=_z["cortex"].astype(bool), medulla=_z["medulla"].astype(bool), kidney=_z["kidney"].astype(bool))
+        real = {}
+        for nm, mask in [("cortex", rois["cortex"]), ("medulla", rois["medulla"]), ("aorta", ao), ("liver", liver)]:
+            rc = norm(tmf, np.array([im[mask].mean() for im in mf]))
+            if int(mask.sum()) and np.isfinite(rc).all(): real[nm] = rc
     ctx = dict(ref_pre=ref_pre, ref_all=ref_all, t_pre=t_pre, BODY=BODY, AIR=AIR, NONENH=NONENH,
-               rois=dict(cortex=cortex, medulla=medulla, aorta=ao, liver=liver), real=real, tmf=tmf, fcm=fcm, cs100=cs100, cs_meth=cs_meth)
+               rois=rois, rois_old=rois_old, real=real, tmf=tmf, fcm=fcm, cs100=cs100, cs_meth=cs_meth)
     _slice_cache[Z] = ctx; return ctx
 
 def norm(t, c): b = c[t < 50].mean(); pk = c[(t > 20) & (t < 210)].max(); return (c - b) / (pk - b + 1e-9)

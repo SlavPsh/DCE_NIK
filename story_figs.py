@@ -37,6 +37,8 @@ def panel(fig_path, title, M, rois, body, t_show, tref, ref_curves, ylab, note, 
     vmax = float(np.percentile(M[0][1][:, :, int(np.argmin(np.abs(M[0][2] - t_show)))][body], 99.5))
     for j, (nm, v, t) in enumerate(M):
         ax = fig.add_subplot(gt[0, j]); i = int(np.argmin(np.abs(np.asarray(t) - t_show))); ax.imshow(v[:, :, i], cmap="gray", vmin=0, vmax=vmax); ax.axis("off")
+        for roi, col in (("aorta", "cyan"), ("cortex", "lime"), ("medulla", "orange")):                                        # roi contours on every image
+            if roi in rois and rois[roi].any(): ax.contour(rois[roi].astype(float), levels=[0.5], colors=[col], linewidths=0.6, alpha=0.8)
         ax.set_title(nm, fontsize=13, fontweight="bold", color=COL.get(nm, "k"))
         if metric_rows and nm in metric_rows:
             m = metric_rows[nm]; ax.text(0.5, -0.03, f"HaarPSI {m['haarpsi']:.3f}   SSIM {m['ssim']:.3f}\nPSNR {m['psnr']:.1f} dB", transform=ax.transAxes, ha="center", va="top", fontsize=10, linespacing=1.4)
