@@ -1,5 +1,6 @@
 queue 034_roi_propose
 jid 3297059
 submitted 2026-09-15 13:50:49
-state 1 PENDING None
+state 1 COMPLETED 00:00:16
 log jobs/log/034_roi_propose_3297059.out
+ended 2026-09-15 13:52:53
