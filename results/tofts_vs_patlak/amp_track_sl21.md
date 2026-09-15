@@ -1,9 +1,3 @@
-2026-09-15 21:17:13 host worker05.cluster job 3297277 stage track
-/var/spool/slurmd/job3297277/slurm_script: line 17: nvidia-smi: command not found
-base snapshots [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, 40000]
-wd0 snapshots [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, 40000]
-lr1e-4 snapshots [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, 40000]
-atomscale snapshots [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, 40000]
 # amplitude vs step, slice 21, k80, tofts8 (roi enhancement relative to the model-free reference; peak 20 to 210 s / washout mean t > 200 s)
 
 ## base (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/base_sl21)
@@ -101,7 +95,3 @@ atomscale snapshots [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 
 | 36000 | 0.90 / 0.99 | 0.87 / 1.02 | 0.96 / 1.03 | 0.76 / 0.95 | 7.458e-01 |
 | 38000 | 0.91 / 1.07 | 0.88 / 1.02 | 0.95 / 1.02 | 0.90 / 1.05 | 7.503e-01 |
 | 40000 | 0.92 / 1.00 | 0.87 / 1.01 | 0.95 / 1.01 | 0.86 / 1.02 | 7.548e-01 |
-
-AMP_TRACK_DONE
-[W915 21:18:35.583906904 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
-TRACK exit 0
