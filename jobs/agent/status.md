@@ -1,17 +1,21 @@
 # helios agent
 
-updated 2026-09-15 12:18:31 on worker01.cluster, job 3294737, cycle 36
+updated 2026-09-15 12:24:44 on worker01.cluster, job 3294737, cycle 39
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3296978 | 031_amp_track | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3296988 | 032_amp_track_atomscale | 1 PENDING Priority |
+| 3296989 | 033_roi_check | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 032_amp_track_atomscale | 1 PENDING Priority |
+| 033_roi_check | 1 PENDING Priority |
 | 031_amp_track | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 030_span_diag | 1 COMPLETED 00:00:34 |
 | 029_pk_coef_fit | 1 COMPLETED 00:00:57 |
@@ -30,5 +34,3 @@ updated 2026-09-15 12:18:31 on worker01.cluster, job 3294737, cycle 36
 | 018_pk_maps_phantom | 1 COMPLETED 00:00:04 |
 | 019_pk_maps_phantom | 1 COMPLETED 00:00:03 |
 | 010_pk_lut | exit 137 |
-| 017_grasp_pro_k5_story | 1 COMPLETED 00:02:03 |
-| 009_pro_k5_diag | exit 137 |
