@@ -1,5 +1,6 @@
 queue 031_amp_track
 jid 3296978
 submitted 2026-09-15 12:16:27
-state 1 RUNNING None
+state 2 TIMEOUT 04:30:12, 1 TIMEOUT 04:30:28
 log jobs/log/031_amp_track_3296978.out
+ended 2026-09-15 21:17:21

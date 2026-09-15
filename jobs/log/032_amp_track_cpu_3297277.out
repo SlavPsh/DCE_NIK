@@ -1,0 +1,2 @@
+2026-09-15 21:17:13 host worker05.cluster job 3297277 stage track
+/var/spool/slurmd/job3297277/slurm_script: line 17: nvidia-smi: command not found

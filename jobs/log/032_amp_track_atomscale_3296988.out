@@ -1,0 +1,69 @@
+2026-09-15 16:46:42 host gpu02.cluster job 3296988 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+Submitted batch job 3297277
+tracker chained afterany 3296988
+atoms rms 1.0000001192092896 shape (342, 8)
+variant atomscale -> results/tofts_vs_patlak/amp_track/atomscale_sl21 (basis results/tofts_vs_patlak/basis_sl21_r8_rms1.npz)
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 40000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run xh0dlvpg
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/atomscale_sl21/wandb_runs/wandb/run-20260915_164648-xh0dlvpg
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_atomscale_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/xh0dlvpg
+[wandb] gnik_atomscale_sl21_s21: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:351: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+    step   1000  train 1.052e+00  heldout 6.190e-01
+    step   2000  train 8.228e-01  heldout 5.753e-01
+    step   3000  train 7.171e-01  heldout 5.963e-01
+    step   4000  train 6.476e-01  heldout 6.244e-01
+    step   5000  train 6.045e-01  heldout 6.431e-01
+    step   6000  train 5.764e-01  heldout 6.526e-01
+    step   7000  train 5.555e-01  heldout 6.648e-01
+    step   8000  train 5.286e-01  heldout 6.714e-01
+    step   9000  train 5.029e-01  heldout 6.757e-01
+    step  10000  train 4.987e-01  heldout 6.789e-01
+    step  11000  train 4.962e-01  heldout 6.837e-01
+    step  12000  train 4.858e-01  heldout 6.822e-01
+    step  13000  train 4.795e-01  heldout 6.851e-01
+    step  14000  train 4.716e-01  heldout 6.859e-01
+    step  15000  train 4.515e-01  heldout 6.863e-01
+    step  16000  train 4.585e-01  heldout 6.880e-01
+    step  17000  train 4.480e-01  heldout 6.890e-01
+    step  18000  train 4.402e-01  heldout 6.909e-01
+    step  19000  train 4.385e-01  heldout 6.925e-01
+    step  20000  train 4.383e-01  heldout 6.932e-01
+    step  21000  train 4.216e-01  heldout 6.941e-01
+    step  22000  train 4.283e-01  heldout 6.952e-01
+    step  23000  train 4.187e-01  heldout 6.966e-01
+    step  24000  train 4.289e-01  heldout 6.933e-01
+    step  25000  train 4.135e-01  heldout 6.974e-01
+    step  26000  train 4.212e-01  heldout 6.950e-01
+    step  27000  train 4.144e-01  heldout 7.009e-01
+    step  28000  train 4.118e-01  heldout 6.988e-01
+    step  29000  train 4.131e-01  heldout 7.010e-01
+    step  30000  train 4.045e-01  heldout 7.028e-01
+    step  31000  train 4.030e-01  heldout 7.036e-01
+    step  32000  train 3.999e-01  heldout 7.015e-01
+    step  33000  train 4.002e-01  heldout 7.053e-01
+    step  34000  train 3.122e-01  heldout 7.342e-01
+    step  35000  train 3.145e-01  heldout 7.421e-01
+    step  36000  train 3.120e-01  heldout 7.458e-01
+    step  37000  train 3.063e-01  heldout 7.498e-01
+    step  38000  train 3.052e-01  heldout 7.503e-01
+    step  39000  train 3.015e-01  heldout 7.533e-01
+    step  40000  train 3.057e-01  heldout 7.548e-01
+    final weights kept (best heldout 5.753e-01 at step 2000)
+slurmstepd-gpu02: error: *** JOB 3296988 ON gpu02 CANCELLED AT 2026-09-15T21:17:10 DUE TO TIME LIMIT ***
