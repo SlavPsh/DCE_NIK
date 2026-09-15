@@ -1,5 +1,6 @@
 queue 030_span_diag
 jid 3296969
 submitted 2026-09-15 12:06:08
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:34
 log jobs/log/030_span_diag_3296969.out
+ended 2026-09-15 12:08:13
