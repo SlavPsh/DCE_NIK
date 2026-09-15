@@ -4,12 +4,12 @@ ratios are amplitude relative to the model-free curve: first-pass peak (20 to 21
 
 | curve | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | body voxel err (all / dynamic part) |
 |---|---|---|---|---|---|
-| projection rank 3 | 0.98 / 1.03 | 0.96 / 0.90 | 0.96 / 0.91 | 0.68 / 0.94 | 0.246 / 0.558 |
-| projection rank 5 | 0.99 / 1.03 | 0.99 / 1.00 | 1.02 / 1.00 | 0.79 / 1.00 | 0.231 / 0.524 |
-| projection rank 8 | 0.99 / 1.03 | 0.93 / 0.99 | 0.93 / 1.00 | 0.82 / 0.99 | 0.225 / 0.508 |
-| projection rank 12 | 1.01 / 1.00 | 0.95 / 1.00 | 0.94 / 1.00 | 0.82 / 1.00 | 0.221 / 0.498 |
-| NIK-tofts (trained) | 0.65 / 0.86 | 0.42 / 0.60 | 0.53 / 0.57 | 1.32 / 1.51 | |
-| NIK-tofts8 (trained) | 0.71 / 0.88 | 0.44 / 0.63 | 0.53 / 0.60 | 1.30 / 1.49 | |
-| NIK-patlak (trained) | 0.95 / 0.99 | 0.71 / 0.80 | 0.80 / 0.81 | 0.82 / 1.12 | |
+| projection rank 3 | 0.98 / 1.03 | 0.99 / 0.90 | 0.88 / 0.93 | 0.68 / 0.94 | 0.246 / 0.558 |
+| projection rank 5 | 0.99 / 1.03 | 1.02 / 1.01 | 0.94 / 1.00 | 0.79 / 1.00 | 0.231 / 0.524 |
+| projection rank 8 | 0.99 / 1.03 | 0.95 / 1.00 | 0.99 / 1.00 | 0.82 / 0.99 | 0.225 / 0.508 |
+| projection rank 12 | 1.01 / 1.00 | 0.96 / 1.01 | 0.99 / 1.00 | 0.82 / 1.00 | 0.221 / 0.498 |
+| NIK-tofts (trained) | 0.65 / 0.86 | 0.53 / 0.71 | 0.63 / 0.63 | 1.32 / 1.51 | |
+| NIK-tofts8 (trained) | 0.71 / 0.88 | 0.57 / 0.74 | 0.65 / 0.66 | 1.30 / 1.49 | |
+| NIK-patlak (trained) | 0.95 / 0.99 | 0.88 / 0.85 | 0.83 / 0.85 | 0.82 / 1.12 | |
 
 basis aif vs model-free aorta: time to peak 63.8 s vs 63.2 s; plateau / peak 0.23 vs 0.23
