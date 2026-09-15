@@ -1,5 +1,6 @@
 queue 033_roi_check
 jid 3296989
 submitted 2026-09-15 12:24:44
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:20
 log jobs/log/033_roi_check_3296989.out
+ended 2026-09-15 12:26:50
