@@ -6,6 +6,7 @@ import argparse, os, time, torch
 import xph_pipeline as P
 import nik_wandb as W
 from nik_focal_loss import composable_kspace_loss
+from kspace_normalization import compute_dcf_radial
 
 def main():
     ap = argparse.ArgumentParser()
@@ -18,19 +19,22 @@ def main():
     ap.add_argument("--basis-file", default=None, help="wire_ff_tofts: basis npz (default P.TOFTS_BASIS)")
     ap.add_argument("--val-every", type=int, default=2000, help="log VAL k-space NMSE (selection ruler) every N steps")
     ap.add_argument("--no-wandb", action="store_true", help="skip wandb (project dce_nik, offline fallback)")
+    ap.add_argument("--tag-suffix", default="", help="appended to the run tag (loss-weighting variants)")
+    ap.add_argument("--dcf-power", type=float, default=0.0, help="ramp dcf weight exponent in the k-space loss; 0 = unweighted (default)")
     a = ap.parse_args()
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X_, Yn, T_, C_, nz, dims = P.build_train(dev); C = dims[3]
     if a.model == "wire_ff_tofts": model = P.make_model_tofts(a.hidden_width, a.k_sigma, a.seed, C, dev, a.basis_file)
     else: model = P.make_model(a.hidden_width, a.k_sigma, a.seed, C, dev)
     model.train(); pc = P.param_counts(model)
-    tag = f"w{a.hidden_width}_ks{a.k_sigma:g}_s{a.seed}" + (f"_tofts{model.rank}" if a.model == "wire_ff_tofts" else "")
+    tag = f"w{a.hidden_width}_ks{a.k_sigma:g}_s{a.seed}" + (f"_tofts{model.rank}" if a.model == "wire_ff_tofts" else "") + a.tag_suffix
+    dcf_all = torch.as_tensor(compute_dcf_radial(X_, method="simple_ramp"), dtype=torch.float32, device=dev).view(-1)
     torch.cuda.reset_peak_memory_stats() if dev.type == "cuda" else None
     rundir = f"{P.OUT}/checkpoints/{tag}"; os.makedirs(rundir, exist_ok=True)
     print(f"{tag}: train {X_.shape[0]} samples | params {pc}", flush=True)
     opt = torch.optim.Adam(model.parameters(), lr=P.LR, weight_decay=P.WD); N = X_.shape[0]; t0 = time.time()
     sim = os.environ.get("XPH_SIM", "nomotion")
-    run = W.Run(f"xph_{sim}_{tag}", config=dict(vars(a), sim=sim, params=pc), group="xph_train", tags=[a.model],
+    run = W.Run(f"xph_{sim}_{tag}", config=dict(vars(a), sim=sim, params=pc, env=os.environ.get("XPH_ENV", P.FIX["env"])), group="xph_train", tags=[a.model],
                 local_json=f"{P.OUT}/wandb_runs/{tag}.json", enabled=not a.no_wandb)
     best_v, best_step = float("inf"), 0
     def save(step):
@@ -42,8 +46,8 @@ def main():
     save(0)
     for step in range(1, a.steps + 1):
         idx = torch.randint(0, N, (P.BATCH,), device=dev); opt.zero_grad(set_to_none=True)
-        loss = composable_kspace_loss(model(X_[idx], T_[idx], C_[idx]), Yn[idx], dcf=torch.ones(P.BATCH, device=dev),
-                                      use_dcf=False, dcf_power=0.0, use_focal=False, focal_warmup_progress=1.0)
+        loss = composable_kspace_loss(model(X_[idx], T_[idx], C_[idx]), Yn[idx], dcf=dcf_all[idx] if a.dcf_power > 0 else torch.ones(P.BATCH, device=dev),
+                                      use_dcf=a.dcf_power > 0, dcf_power=a.dcf_power, use_focal=False, focal_warmup_progress=1.0)
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step()
         if step % a.ckpt_every == 0: save(step)
         if step % a.val_every == 0:

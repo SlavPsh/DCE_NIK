@@ -1,6 +1,6 @@
 """NIK pipeline for the physical no-motion XCAT (shared by trainer + eval). F0 only. Mirrors the
 frozen Task-4C recipe; only hidden width, k_sigma (spatial bandwidth) and seed vary."""
-import warnings; warnings.filterwarnings("ignore")
+import os, warnings; warnings.filterwarnings("ignore")
 import sys, numpy as np, torch
 from types import SimpleNamespace
 sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK"); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
@@ -47,7 +47,7 @@ def _dataset(mask, dev):
     return X_, Y_, T_, C_, np.concatenate(rr), (F, nang, RO, C, Tt)
 
 def build_train(dev, env=None):
-    env = FIX["env"] if env is None else float(env)                     # envelope_exponent (D4 sweep); default 0.75
+    env = float(os.environ.get("XPH_ENV", FIX["env"])) if env is None else float(env)   # envelope_exponent (D4 sweep); default 0.75, XPH_ENV overrides train + eval consistently
     X_, Y_, T_, C_, _, dims = _dataset(masks()["train"], dev)
     dcf = compute_dcf_radial(X_, method="simple_ramp")
     nz = KSpaceNormalizer(); nz.fit(X_, Y_, dcf=dcf, envelope_exponent=env); Yn = nz.normalize(X_, Y_)
