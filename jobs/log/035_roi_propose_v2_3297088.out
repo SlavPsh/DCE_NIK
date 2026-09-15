@@ -1,0 +1,12 @@
+saved 21 {'px': {'kidney': 894, 'cortex': 473, 'medulla': 421, 'aorta': 29}, 'blobs': 2, 'old_px': {'cortex': 56, 'medulla': 56, 'aorta': 29}, 'ttp_s': {'aorta': 63.194850789935636, 'cortex': 70.87478057343476, 'medulla': 245.97717963721476, 'kidney': 70.87478057343476}, 'plateau_over_peak': {'aorta': 0.214878112077713, 'cortex': 0.6206737756729126, 'medulla': 0.8915443420410156, 'kidney': 0.8433998227119446}}
+saved 18 {'px': {'kidney': 1122, 'cortex': 643, 'medulla': 479, 'aorta': 45}, 'blobs': 2, 'old_px': {'cortex': 56, 'medulla': 57, 'aorta': 45}, 'ttp_s': {'aorta': 63.194850789935636, 'cortex': 70.87478057343476, 'medulla': 233.68929198361616, 'kidney': 70.87478057343476}, 'plateau_over_peak': {'aorta': 0.21670009195804596, 'cortex': 0.6640899181365967, 'medulla': 0.917400598526001, 'kidney': 0.8169346451759338}}
+saved 19 {'px': {'kidney': 930, 'cortex': 496, 'medulla': 434, 'aorta': 36}, 'blobs': 2, 'old_px': {'cortex': 66, 'medulla': 66, 'aorta': 36}, 'ttp_s': {'aorta': 63.194850789935636, 'cortex': 70.87478057343476, 'medulla': 259.80105324751315, 'kidney': 70.87478057343476}, 'plateau_over_peak': {'aorta': 0.21611161530017853, 'cortex': 0.6250578761100769, 'medulla': 0.919219970703125, 'kidney': 0.7711696624755859}}
+# proposed kidney rois (for approval; nothing uses them yet)
+
+| slice | kidney px | cortex px | medulla px | blobs | old cortex / medulla px | ttp cortex / medulla (s) | plateau/peak cortex / medulla |
+|---|---|---|---|---|---|---|---|
+| 21 | 894 | 473 | 421 | 2 | 56 / 56 | 71 / 246 | 0.62 / 0.89 |
+| 18 | 1122 | 643 | 479 | 2 | 56 / 57 | 71 / 234 | 0.66 / 0.92 |
+| 19 | 930 | 496 | 434 | 2 | 66 / 66 | 71 / 260 | 0.63 / 0.92 |
+ROI_PROPOSE_DONE
+ROIPROP exit 0
