@@ -343,6 +343,11 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
                     best_step = step
                 save_ckpt(step)                                        # survive wall-clock timeout
+                if args.snapshot_every and step % args.snapshot_every == 0:   # rendered magnitude per step, amplitude-vs-step diagnostics
+                    model.eval()
+                    with torch.no_grad():
+                        snap = recon_nik_cart(A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type, shared=sh, support_radius=args.support_radius, verbose=False), b1, bas)
+                    np.save(os.path.join(args.save_dir, f'snap_slice_{slc:02d}_step{step:06d}.npy'), np.abs(snap).astype(np.float16)); model.train()
                 run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
                              best_step=best_step, lr=opt.param_groups[0]['lr'], wall_s=time.time() - t_slice,
                              peak_gpu_mb=W.peak_gpu_mb()), step=step)
@@ -352,9 +357,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
                 print(f'    step {step:6d}  train {float(loss):.3e}', flush=True)
                 run.log(dict(loss=float(loss), wall_s=time.time() - t_slice, peak_gpu_mb=W.peak_gpu_mb()), step=step)
 
-    if best_state is not None:
+    if best_state is not None and not args.no_restore:
         model.load_state_dict({k: v.to(device) for k, v in best_state.items()})
         print(f'    restored best (heldout {best_heldout:.3e})', flush=True)
+    elif args.no_restore: print(f'    final weights kept (best heldout {best_heldout:.3e} at step {best_step})', flush=True)
     model.eval()
 
     cart = A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type,
@@ -443,6 +449,8 @@ def main():
     ap.add_argument('--grad-clip', type=float, default=1.0)
     ap.add_argument('--warmup-steps', type=int, default=2000)
     ap.add_argument('--eval-every', type=int, default=1000)
+    ap.add_argument('--snapshot-every', type=int, default=0, help='save |recon| (float16) every N steps at eval points; 0 = off')
+    ap.add_argument('--no-restore', action='store_true', help='keep the final weights instead of the best-heldout state')
     ap.add_argument('--console-every', type=int, default=1000)
     ap.add_argument('--scheduler-patience', type=int, default=30)
     ap.add_argument('--scheduler-min-lr', type=float, default=1e-7)
