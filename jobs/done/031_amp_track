@@ -1,5 +1,5 @@
 queue 031_amp_track
 jid 3296978
 submitted 2026-09-15 12:16:27
-state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
+state 1 RUNNING None
 log jobs/log/031_amp_track_3296978.out
