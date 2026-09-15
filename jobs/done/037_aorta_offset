@@ -1,5 +1,6 @@
 queue 037_aorta_offset
 jid 3297147
 submitted 2026-09-15 14:30:26
-state 1 PENDING None
+state 1 COMPLETED 00:00:52
 log jobs/log/037_aorta_offset_3297147.out
+ended 2026-09-15 14:32:31

@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-15 14:30:26 on worker01.cluster, job 3294737, cycle 100
+updated 2026-09-15 14:32:31 on worker01.cluster, job 3294737, cycle 101
 
 ## active
 
@@ -8,13 +8,12 @@ updated 2026-09-15 14:30:26 on worker01.cluster, job 3294737, cycle 100
 |---|---|---|
 | 3296978 | 031_amp_track | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3296988 | 032_amp_track_atomscale | 1 PENDING QOSMaxGRESPerUser |
-| 3297147 | 037_aorta_offset | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 037_aorta_offset | 1 PENDING None |
+| 037_aorta_offset | 1 COMPLETED 00:00:52 |
 | 036_new_rois_rerun | 1 COMPLETED 00:00:40 |
 | 035_roi_propose_v2 | 1 COMPLETED 00:00:13 |
 | 034_roi_propose | 1 COMPLETED 00:00:16 |
