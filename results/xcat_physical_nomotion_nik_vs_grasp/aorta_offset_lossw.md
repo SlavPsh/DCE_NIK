@@ -1,0 +1,15 @@
+# phantom aorta washout offset (method minus truth, late window 100 to 175 s, one global scale on the body)
+
+aorta roi 33 px, truth late aorta 0.283, truth late ring (2 to 6 px around) 0.069
+
+| method | aorta offset, erode 0 / 1 / 2 / 3 px | pre-contrast offset (erode 0) | ring offset late / pre | cortex / medulla late offset |
+|---|---|---|---|---|
+| NIK-free | +0.0187 (33) / +0.0198 (16) / +0.0202 (4) | +0.0007 | +0.0050 / -0.0003 | +0.0028 / +0.0057 (truth 0.390 / 0.403) |
+| NIK-tofts | +0.0248 (33) / +0.0257 (16) / +0.0251 (4) | +0.0122 | +0.0102 / +0.0109 | +0.0016 / +0.0011 (truth 0.390 / 0.403) |
+| NIK-sub16 | +0.0410 (33) / +0.0452 (16) / +0.0463 (4) | +0.0215 | -0.0030 / -0.0015 | +0.0102 / +0.0079 (truth 0.390 / 0.403) |
+| GRASP-Pro K5 | +0.0146 (33) / +0.0152 (16) / +0.0154 (4) | +0.0331 | +0.0025 / +0.0015 | -0.0108 / -0.0153 (truth 0.390 / 0.403) |
+| GRASP | -0.0099 (33) / -0.0030 (16) / +0.0029 (4) | +0.0230 | +0.0070 / +0.0058 | -0.0080 / -0.0020 (truth 0.390 / 0.403) |
+| NIK-tofts env0 | +0.1282 (33) / +0.1444 (16) / +0.1316 (4) | +0.0425 | +0.0173 / +0.0295 | +0.0098 / -0.0031 (truth 0.390 / 0.403) |
+| NIK-tofts dcf1 | +0.0179 (33) / +0.0199 (16) / +0.0208 (4) | -0.0163 | -0.0032 / -0.0108 | +0.0077 / +0.0078 (truth 0.390 / 0.403) |
+
+reading: offset falling with erosion and a ring offset of opposite sign = partial volume / blur; flat offset with the same sign in the ring = regional low-|k| error; nik-free vs nik-tofts equal = not the temporal model

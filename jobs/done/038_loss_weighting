@@ -1,5 +1,6 @@
 queue 038_loss_weighting
 jid 3297163
 submitted 2026-09-15 14:40:47
-state 1 RUNNING None
+state 1 COMPLETED 00:57:59, 1 COMPLETED 00:58:01, 1 COMPLETED 04:30:05, 1 COMPLETED 04:52:23
 log jobs/log/038_loss_weighting_3297163.out
+ended 2026-09-16 03:09:33

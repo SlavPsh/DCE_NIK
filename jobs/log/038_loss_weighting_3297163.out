@@ -1,0 +1,100 @@
+2026-09-15 22:15:13 host gpu03.cluster job 3297163 task 3 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 2g.24gb     Device  0: (UUID: MIG-f328f7be-cd56-503a-9bd5-4e010efe4fe5)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+variant dcf1 -> results/tofts_vs_patlak/amp_track/dcf1_sl21
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 1 env 0.75 | 40000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run ojk8xxa5
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/dcf1_sl21/wandb_runs/wandb/run-20260915_221525-ojk8xxa5
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_dcf1_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/ojk8xxa5
+[wandb] gnik_dcf1_sl21_s21: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:351: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+    step   1000  train 8.450e-01  heldout 6.747e-01
+    step   2000  train 6.416e-01  heldout 5.686e-01
+    step   3000  train 5.670e-01  heldout 5.625e-01
+    step   4000  train 5.066e-01  heldout 5.698e-01
+    step   5000  train 4.680e-01  heldout 5.782e-01
+    step   6000  train 4.447e-01  heldout 5.845e-01
+    step   7000  train 4.251e-01  heldout 5.884e-01
+    step   8000  train 4.071e-01  heldout 5.910e-01
+    step   9000  train 3.930e-01  heldout 5.936e-01
+    step  10000  train 3.825e-01  heldout 5.941e-01
+    step  11000  train 3.783e-01  heldout 5.956e-01
+    step  12000  train 3.661e-01  heldout 5.982e-01
+    step  13000  train 3.663e-01  heldout 6.001e-01
+    step  14000  train 3.622e-01  heldout 6.003e-01
+    step  15000  train 3.553e-01  heldout 6.008e-01
+    step  16000  train 3.546e-01  heldout 6.037e-01
+    step  17000  train 3.403e-01  heldout 6.039e-01
+    step  18000  train 3.422e-01  heldout 6.036e-01
+    step  19000  train 3.383e-01  heldout 6.043e-01
+    step  20000  train 3.427e-01  heldout 6.052e-01
+    step  21000  train 3.318e-01  heldout 6.074e-01
+    step  22000  train 3.304e-01  heldout 6.071e-01
+    step  23000  train 3.322e-01  heldout 6.082e-01
+    step  24000  train 3.291e-01  heldout 6.088e-01
+    step  25000  train 3.270e-01  heldout 6.084e-01
+    step  26000  train 3.300e-01  heldout 6.103e-01
+    step  27000  train 3.209e-01  heldout 6.098e-01
+    step  28000  train 3.155e-01  heldout 6.116e-01
+    step  29000  train 3.227e-01  heldout 6.106e-01
+    step  30000  train 3.183e-01  heldout 6.121e-01
+    step  31000  train 3.155e-01  heldout 6.118e-01
+    step  32000  train 3.144e-01  heldout 6.121e-01
+    step  33000  train 3.147e-01  heldout 6.122e-01
+    step  34000  train 3.129e-01  heldout 6.130e-01
+    step  35000  train 2.307e-01  heldout 6.248e-01
+    step  36000  train 2.301e-01  heldout 6.283e-01
+    step  37000  train 2.200e-01  heldout 6.299e-01
+    step  38000  train 2.240e-01  heldout 6.297e-01
+    step  39000  train 2.224e-01  heldout 6.306e-01
+    step  40000  train 2.189e-01  heldout 6.312e-01
+    final weights kept (best heldout 5.625e-01 at step 3000)
+    RESOURCES slice 21: peak_gpu_MB 12459 params 5531216 best_heldout 5.6246e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json
+wandb: uploading history steps 39-39, summary, console lines 45-45
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁▆██████████████████████████████████████
+wandb:      heldout_mse █▁▁▁▂▂▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅
+wandb:             loss █▆▅▄▄▄▃▃▃▃▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁
+wandb:               lr █████████████████████████████████▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁███████████████████████████████████████
+wandb:        val_knmse █▁▁▁▂▂▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅
+wandb:           wall_s ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▆▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.56246
+wandb:        best_step 3000
+wandb:      heldout_mse 0.63116
+wandb:             loss 0.21887
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12458.521
+wandb:        val_knmse 0.78818
+wandb:           wall_s 15780.16298
+wandb:     wall_total_s 16190.75772
+wandb: 
+wandb: 🚀 View run gnik_dcf1_sl21_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/ojk8xxa5
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/amp_track/dcf1_sl21/wandb_runs/wandb/run-20260915_221525-ojk8xxa5/logs
+slice 21  nik (192, 192, 342)  (16199s)  vs CS: corr 0.941  nrmse 0.248
+done 16200s -> results/tofts_vs_patlak/amp_track/dcf1_sl21
+[W916 02:45:18.366906290 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-16 02:45:18 TRAIN_DONE dcf1 exit 0
