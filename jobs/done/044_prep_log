@@ -1,0 +1,6 @@
+probe 044_prep_log
+host worker08.cluster
+start 2026-09-16 18:52:42
+end 2026-09-16 18:52:44
+exit 0
+log jobs/log/probe_044_prep_log.out

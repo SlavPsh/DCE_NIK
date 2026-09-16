@@ -1,0 +1,97 @@
+-rw-rw---- 1 P101440 P101440 26825749 Sep 16 18:21 /net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_3308108.out
+26825749 /net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_3308108.out
+2026-09-16 18:11:08 host worker08.cluster job 3308108 task  stage prep cpus 8
+7fe56b3 cs_nikmatch: SLICE env for f80match refs on other slices
+5b6dcc4 gv2_rerun: grasp v2 on DCE_Rerun full slab, multi lambda, dce prep input; MCNUFFT coils batched (n_trans), identical numbers
+prep env torch29
+-rw-r----- 1 P101440 P101440 5389161984 Aug 17 14:07 /net/beegfs/users/P101440/dce_data/orig/meas_MID3000007_FID100985_DCE_Rerun_1.dat
+loaded (384, 2169, 22, 36)  {"lPartitions": 32, "slice_res": 0.5, "slab_os": 0.185185185185, "images_per_slab": 54, "nz_recon": 64, "n_keep": 54, "center_par": 6}
+coil compression 36 -> 8, energy kept 81.19%
+kz: 22 acquired, DC 6 -> [26:48) of 64; 9 lines recoverable by symmetry, 1 not
+POCS partial-Fourier along kz (212s)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 6.786295898564276e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.800134653734858e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.1252003560002777e-06
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.133196729431802e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 6.732136057507887e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 6.502433507193928e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 5.851985065419285e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.1054584092562436e-06
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.880435871105874e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.020369364203361e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.149180305532354e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.999426543392474e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.1058265272367862e-06
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.17131592611986e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 9.631819466449087e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.405718290305231e-07
+== agent log
+[2026-09-16 18:44:19] skip large jobs/log/021_pk_maps_invivo_3288267.out (14574 kb)
+[2026-09-16 18:44:19] skip large jobs/log/043_gv2_rerun_3308108.out (26197 kb)
+[2026-09-16 18:46:24] skip large jobs/log/021_pk_maps_invivo_3288267.out (14574 kb)
+[2026-09-16 18:46:24] skip large jobs/log/043_gv2_rerun_3308108.out (26197 kb)
+[2026-09-16 18:48:29] skip large jobs/log/021_pk_maps_invivo_3288267.out (14574 kb)
+[2026-09-16 18:48:29] skip large jobs/log/043_gv2_rerun_3308108.out (26197 kb)
+[2026-09-16 18:50:34] skip large jobs/log/021_pk_maps_invivo_3288267.out (14574 kb)
+[2026-09-16 18:50:34] skip large jobs/log/043_gv2_rerun_3308108.out (26197 kb)
+== out
+geom.json
+lam0.02
+lam0.08
+lam0.25
+nufft
+prep
+1.5G	/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/prep
+47K	/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/nufft
+39K	/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.02
+2.4M	/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.08
+25K	/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.25
+{
+ "protocol": "DCE_Rerun_1",
+ "lPartitions": 32.0,
+ "lPartitions_hits": 2,
+ "lImagesPerSlab": 54.0,
+ "lImagesPerSlab_hits": 2,
+ "dSliceResolution": 0.5,
+ "dSliceResolution_hits": 2,
+ "dSliceOversamplingForDialog": 0.185185185185,
+ "dSliceOversamplingForDialog_hits": 2,
+ "lBaseResolution": 192.0,
+ "lBaseResolution_hits": 2,
+ "lRadialViews": 2169.0,
+ "lRadialViews_hits": 2,
+ "dReadoutFOV": 400.0,
+ "dReadoutFOV_hits": 2,
+ "dPhaseFOV": 400.0,
+ "dPhaseFOV_hits": 2,
+ "dThickness": 216.0,
+ "dThickness_hits": 2,
+ "alTR": 4820.0,
+ "alTR_hits": 2,
+ "adFlipAngleDegree": 20.0,
+ "adFlipAngleDegree_hits": 2,
+ "lTotalScanTimeSec": 376.0,
+ "lTotalScanTimeSec_hits": 2,
+ "dx_mm": 2.0833333333333335,
+ "dz_mm": 4.0
+}      1 3308511 gv2post PENDING 0:00
+      1 3308510_[24-53%12] gv2rr PENDING 0:00
+      1 3308510_23 gv2rr RUNNING 0:04
+      1 3308510_22 gv2rr RUNNING 3:23
+      1 3308510_21 gv2rr RUNNING 4:23
+      1 3308510_20 gv2rr RUNNING 4:23
