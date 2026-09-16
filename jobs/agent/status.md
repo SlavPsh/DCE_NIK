@@ -1,16 +1,19 @@
 # helios agent
 
-updated 2026-09-16 20:29:34 on worker08.cluster, job 3298317, cycle 291
+updated 2026-09-16 21:26:52 on worker08.cluster, job 3298317, cycle 319
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3310152 | 044_gv2_rerun_fix | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 044_gv2_rerun_fix | 1 PENDING None |
+| 046_hung_tasks | exit 0 |
 | 040_pk_arms_k80_rms1 | 1 COMPLETED 00:38:11, 1 COMPLETED 00:38:16, 4 COMPLETED 00:38:17, 1 COMPLETED 00:38:18, 2 COMPLETED 00:38:20, 1 COMPLETED 00:38:22, 1 COMPLETED 00:38:24, 1 COMPLETED 00:38:28, 2 COMPLETED 00:38:29, 2 COMPLETED 00:38:30, 1 COMPLETED 00:38:32, 1 COMPLETED 00:38:35, 1 COMPLETED 00:38:40, 1 COMPLETED 00:38:42, 2 COMPLETED 00:38:55, 1 COMPLETED 00:39:00, 1 COMPLETED 00:39:27, 1 COMPLETED 00:39:32, 2 COMPLETED 00:40:08 |
 | 045_throttle | exit 0 |
 | 044_prep_log | exit 0 |
@@ -29,5 +32,3 @@ updated 2026-09-16 20:29:34 on worker08.cluster, job 3298317, cycle 291
 | 033_roi_check | 1 COMPLETED 00:00:20 |
 | 030_span_diag | 1 COMPLETED 00:00:34 |
 | 029_pk_coef_fit | 1 COMPLETED 00:00:57 |
-| 028_story_invivo_families | 1 COMPLETED 00:00:09 |
-| 026_pk_maps_invivo_figs | 1 COMPLETED 00:00:08 |

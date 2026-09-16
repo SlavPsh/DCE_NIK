@@ -1,0 +1,6 @@
+probe 046_hung_tasks
+host worker08.cluster
+start 2026-09-16 21:26:51
+end 2026-09-16 21:26:51
+exit 0
+log jobs/log/probe_046_hung_tasks.out

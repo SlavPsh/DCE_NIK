@@ -1,0 +1,33 @@
+== squeue
+3308511 PENDING 0:00 (DependencyNeverSatisfied) 
+== sacct
+3308510_26       FAILED   00:00:01      1:0        worker06 
+3308510_33       FAILED   00:00:01      1:0        worker06 
+== stale logs (mmin +30)
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_26.out 18:54 that your input string or stream contains the expected JSON 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_21.out 18:52 00072   ite = 0, cost = 0.000071   ite = 1, cost = 0.000071 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_14.out 18:52 327s)   ite = 0, cost = 0.000628   ite = 1, cost = 0.000628 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_13.out 18:52 00308   ite = 3, cost = 0.000291   ite = 4, cost = 0.000240 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_12.out 18:52 00147   ite = 1, cost = 0.000138   ite = 2, cost = 0.000125 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_15.out 18:52 00334   ite = 4, cost = 0.000289   ite = 5, cost = 0.000274 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_20.out 18:52 00071   ite = 8, cost = 0.000071   ite = 0, cost = 0.000070 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_16.out 18:52 00134   ite = 1, cost = 0.000131   ite = 2, cost = 0.000128 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_18.out 18:52 00068   ite = 0, cost = 0.000068   ite = 1, cost = 0.000068 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_23.out 18:54 00086   ite = 6, cost = 0.000083   ite = 7, cost = 0.000080 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_22.out 18:52 00086   ite = 1, cost = 0.000084   ite = 2, cost = 0.000083 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_19.out 18:52 92, 192, 102) finite=True (392s)   ite = 0, cost = 0.000546 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_17.out 18:52 00320   ite = 2, cost = 0.000299   ite = 3, cost = 0.000269 
+/net/beegfs/users/P101440/DCE_NIK/jobs/log/043_gv2_rerun_recon_3308510_33.out 18:54 that your input string or stream contains the expected JSON 
+== cancel
+cancelled post 3308511
+== agent
+[2026-09-16 21:24:44] skip large jobs/log/021_pk_maps_invivo_3288267.out (14574 kb)
+[2026-09-16 21:24:44] skip large jobs/log/043_gv2_rerun_3308108.out (26197 kb)
+[2026-09-16 21:26:51] probe 046_hung_tasks
+3303772 PENDING 0:00 12:00:00
+3298317 RUNNING 10:51:34 1:08:26
+== outputs
+nufft: 52 slices
+lam0.02: 52 slices
+lam0.08: 52 slices
+lam0.25: 52 slices
