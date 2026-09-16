@@ -11,3 +11,35 @@ wrote fig1/fig2_gv2_lam0.08.png
 assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
 gv2_lam0.25: 54 slices, diverged [], window 6.625e-05
 wrote fig1/fig2_gv2_lam0.25.png
+# grasp v2 on DCE_Rerun (meas_MID3000007)
+
+binning 21 spokes/frame = 3.63 s, 102 frames, cut 15 spokes, 54 slices, ncc 8, POCS True
+kz: 22 acquired of 32 encoded, DC at 6, recon grid 64 (slice resolution 0.5), keep 54 (slab os 0.185)
+voxel 2.083 x 2.083 x 4.00 mm (header fov 400.0 mm, slab 216.0 mm)
+lambdas (fraction of max|E'y|): [0.02, 0.08, 0.25]; nufft = adjoint only
+
+| tag | diverged slices | 4d file |
+|---|---|---|
+| nufft | [] | /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/nufft/recon4d.nii.gz |
+| lam0.02 | [] | /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.02/recon4d.nii.gz |
+| lam0.08 | [] | /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.08/recon4d.nii.gz |
+| lam0.25 | [] | /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.25/recon4d.nii.gz |
+
+peak frame 26 (t = 99 s), late frame 81 (t = 299 s), cuts z=27 y=87 x=78
+figures: fig0_ortho_lambdas_{peak,late}.png, fig1_ortho_gv2_<tag>.png, fig2_timeseries_gv2_<tag>.png, fig4_enh_curves_lambdas.png
+POST_DONE
+total 5815
+drwxrwx--- 2 P101440 P101440      10 Sep 16 21:53 .
+drwxr-x--- 8 P101440 P101440       6 Sep 16 21:51 ..
+-rw-rw---- 1 P101440 P101440    1009 Sep 16 21:53 README.md
+-rw-rw---- 1 P101440 P101440 1120577 Sep 16 21:53 fig0_ortho_lambdas_late.png
+-rw-rw---- 1 P101440 P101440 1146700 Sep 16 21:53 fig0_ortho_lambdas_peak.png
+-rw-rw---- 1 P101440 P101440  386554 Sep 16 21:52 fig1_ortho_gv2_lam0.02.png
+-rw-rw---- 1 P101440 P101440  358454 Sep 16 21:52 fig1_ortho_gv2_lam0.08.png
+-rw-rw---- 1 P101440 P101440  333697 Sep 16 21:53 fig1_ortho_gv2_lam0.25.png
+-rw-rw---- 1 P101440 P101440  497540 Sep 16 21:51 fig1_ortho_gv2_nufft.png
+-rw-rw---- 1 P101440 P101440 1068229 Sep 16 21:52 fig2_timeseries_gv2_lam0.02.png
+-rw-rw---- 1 P101440 P101440  987073 Sep 16 21:52 fig2_timeseries_gv2_lam0.08.png
+-rw-rw---- 1 P101440 P101440  907401 Sep 16 21:53 fig2_timeseries_gv2_lam0.25.png
+-rw-rw---- 1 P101440 P101440 1408293 Sep 16 21:51 fig2_timeseries_gv2_nufft.png
+-rw-rw---- 1 P101440 P101440   77794 Sep 16 21:53 fig4_enh_curves_lambdas.png
