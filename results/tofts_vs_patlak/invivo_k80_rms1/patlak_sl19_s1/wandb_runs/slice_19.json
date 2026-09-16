@@ -1,0 +1,14 @@
+{
+ "name": "gnik_patlak_sl19_s1_s19",
+ "mode": "online",
+ "loss": 0.7396218776702881,
+ "heldout_mse": 0.41215530037879944,
+ "val_knmse": 0.5900569089200429,
+ "best_heldout_mse": 0.4111228585243225,
+ "best_step": 9000,
+ "lr": 1e-05,
+ "wall_s": 2303.8829267024994,
+ "peak_gpu_mb": 12458.3955078125,
+ "params": 5520966,
+ "wall_total_s": 2303.880651473999
+}
