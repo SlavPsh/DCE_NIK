@@ -1,5 +1,6 @@
 queue 041_beegfs_inventory
 jid 3307435
 submitted 2026-09-16 16:51:11
-state 1 PENDING None
+state 1 COMPLETED 00:00:03
 log jobs/log/041_beegfs_inventory_3307435.out
+ended 2026-09-16 16:53:18
