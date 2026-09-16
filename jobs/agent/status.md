@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-16 18:52:44 on worker08.cluster, job 3298317, cycle 244
+updated 2026-09-16 18:54:50 on worker08.cluster, job 3298317, cycle 245
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-09-16 18:52:44 on worker08.cluster, job 3298317, cycle 244
 
 | name | state |
 |---|---|
+| 045_throttle | exit 0 |
 | 044_prep_log | exit 0 |
 | 040_pk_arms_k80_rms1 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 043_gv2_rerun | 1 COMPLETED 00:10:18 |
@@ -31,4 +32,3 @@ updated 2026-09-16 18:52:44 on worker08.cluster, job 3298317, cycle 244
 | 029_pk_coef_fit | 1 COMPLETED 00:00:57 |
 | 028_story_invivo_families | 1 COMPLETED 00:00:09 |
 | 026_pk_maps_invivo_figs | 1 COMPLETED 00:00:08 |
-| 027_pk_maps_invivo_figs | 1 COMPLETED 00:00:07 |
