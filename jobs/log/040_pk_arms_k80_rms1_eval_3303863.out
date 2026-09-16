@@ -28,3 +28,311 @@ GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
   sl21 tofts s0: aorta_aff 0.0723 cortex_aff 0.0495 fwhm 16.9s | val 2.568e-01 test 2.639e-01
   sl21 tofts s1: aorta_aff 0.1115 cortex_aff 0.0504 fwhm 13.8s | val 2.542e-01 test 2.736e-01
   sl21 tofts s2: aorta_aff 0.0845 cortex_aff 0.0510 fwhm 13.8s | val 2.588e-01 test 2.706e-01
+  sl21 tofts8 s0: aorta_aff 0.0690 cortex_aff 0.0364 fwhm 16.9s | val 2.525e-01 test 2.575e-01
+  sl21 tofts8 s1: aorta_aff 0.0720 cortex_aff 0.0391 fwhm 15.4s | val 2.510e-01 test 2.571e-01
+  sl21 tofts8 s2: aorta_aff 0.0596 cortex_aff 0.0386 fwhm 18.4s | val 2.515e-01 test 2.584e-01
+# in vivo (meas_p3_dce, slices 18/19/21, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
+
+rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
+
+## slice 18
+| metric | Patlak mean±SD (n) | Tofts mean±SD (n) | tofts8 mean±SD (n) | Δ Tofts−Patlak | Δ tofts8−Patlak | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|---|---|---|---|
+| cortex_peak_ratio | 0.94 ± 0.017 (3) | 0.7586 ± 0.016 (3) | 0.8415 ± 0.0085 (3) | -0.1814 | -0.09855 | 0.7884 | 0.9924 |
+| cortex_washout_ratio | 0.8909 ± 0.01 (3) | 0.9507 ± 0.0045 (3) | 0.9837 ± 0.01 (3) | +0.05983 | +0.09278 | 1.046 | 1.012 |
+| medulla_peak_ratio | 0.8483 ± 0.011 (3) | 0.9189 ± 0.0026 (3) | 0.9263 ± 0.0055 (3) | +0.07059 | +0.07799 | 1.025 | 0.958 |
+| medulla_washout_ratio | 0.8943 ± 0.0051 (3) | 0.923 ± 0.0052 (3) | 0.9375 ± 0.0087 (3) | +0.0287 | +0.04316 | 1.046 | 0.933 |
+| aorta_peak_ratio | 0.9896 ± 0.015 (3) | 0.9953 ± 0.044 (3) | 0.9552 ± 0.021 (3) | +0.0057 | -0.03432 | 0.7434 | 0.6819 |
+| aorta_washout_ratio | 1.043 ± 0.034 (3) | 0.9179 ± 0.041 (3) | 1.03 ± 0.043 (3) | -0.1247 | -0.01243 | 1.008 | 0.8691 |
+| mf_aorta_affine | 0.03455 ± 0.00076 (3) | 0.06147 ± 0.0068 (3) | 0.05504 ± 0.0076 (3) | +0.02692 | +0.02048 | 0.09051 | 0.2972 |
+| mf_cortex_affine | 0.1482 ± 0.00039 (3) | 0.04957 ± 0.003 (3) | 0.0429 ± 0.00084 (3) | -0.09866 | -0.1053 | 0.04518 | 0.05357 |
+| mf_medulla_affine | 0.1224 ± 9.5e-05 (3) | 0.02961 ± 0.0018 (3) | 0.02383 ± 0.003 (3) | -0.09275 | -0.09852 | 0.0288 | 0.05778 |
+| mf_liver_affine | 0.02828 ± 0.0001 (3) | 0.0383 ± 0.0026 (3) | 0.02319 ± 0.00065 (3) | +0.01001 | -0.005097 | 0.02232 | 0.03045 |
+| mf_aorta_scale | 0.04646 ± 0.0029 (3) | 0.08231 ± 0.0059 (3) | 0.07351 ± 0.0056 (3) | +0.03586 | +0.02705 | 0.1248 | 0.3905 |
+| mf_cortex_scale | 0.2358 ± 0.00079 (3) | 0.07663 ± 0.0047 (3) | 0.06592 ± 0.0013 (3) | -0.1592 | -0.1699 | 0.07049 | 0.08244 |
+| mf_medulla_scale | 0.1881 ± 0.00051 (3) | 0.0469 ± 0.003 (3) | 0.03529 ± 0.0045 (3) | -0.1412 | -0.1528 | 0.04372 | 0.08555 |
+| aorta_peak_ratio_vs_mf | 0.9896 ± 0.015 (3) | 0.9953 ± 0.044 (3) | 0.9552 ± 0.021 (3) | +0.0057 | -0.03432 | 0.7434 | 0.6819 |
+| aorta_fwhm_s | 16.9 ± 0 (3) | 13.82 ± 0 (3) | 15.87 ± 0.72 (3) | -3.072 | -1.024 | 47.62 | 18.43 |
+| aorta_ttp_s | 63.19 ± 0 (3) | 63.19 ± 0 (3) | 63.19 ± 0 (3) | +0 | +0 | 63.19 | 69.34 |
+| aorta_neg_frac | 0 ± 0 (3) | 0 ± 0 (3) | 0 ± 0 (3) | +0 | +0 | 0 | 0 |
+| aorta_rise_mono | 1 ± 0 (3) | 1 ± 0 (3) | 1 ± 0 (3) | +0 | +0 | 1 | 0.8605 |
+| cortex_medulla_late_corr | 0.9888 ± 0.0023 (3) | 0.06512 ± 0.058 (3) | -0.1953 ± 0.15 (3) | -0.9237 | -1.184 | -0.01639 | 0.4411 |
+| train_kNMSE | 0.2656 ± 0.00098 (3) | 0.2227 ± 0.0012 (3) | 0.2536 ± 0.00096 (3) | -0.04294 | -0.01199 | nan | nan |
+| val_kNMSE | 0.2701 ± 0.0011 (3) | 0.3173 ± 0.0062 (3) | 0.2837 ± 0.0011 (3) | +0.04713 | +0.01359 | nan | nan |
+| test_kNMSE | 0.2746 ± 0.00086 (3) | 0.3322 ± 0.0067 (3) | 0.2881 ± 0.001 (3) | +0.0576 | +0.01351 | nan | nan |
+| wall_s | 2336 ± 43 (3) | 2318 ± 34 (3) | 2298 ± 7.9 (3) | -17.66 | -37.13 | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | +0.2246 | +0.1255 | nan | nan |
+| params | 5.521e+06 ± 0 (3) | 5.539e+06 ± 0 (3) | 5.531e+06 ± 0 (3) | +1.845e+04 | +1.025e+04 | nan | nan |
+
+model-free aorta FWHM (s): 15.359859566998232
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | Patlak | Tofts | tofts8 |
+|---|---|---|---|
+| 0.00-0.06 | 2.482e-01 | 2.700e-01 | 2.521e-01 |
+| 0.06-0.12 | 5.231e-01 | 9.244e-01 | 5.930e-01 |
+| 0.12-0.19 | 6.409e-01 | 1.283e+00 | 8.041e-01 |
+| 0.19-0.25 | 7.578e-01 | 1.538e+00 | 1.018e+00 |
+| 0.25-0.31 | 8.461e-01 | 1.701e+00 | 1.189e+00 |
+| 0.31-0.38 | 7.775e-01 | 1.431e+00 | 1.093e+00 |
+| 0.38-0.44 | 5.975e-01 | 1.048e+00 | 8.311e-01 |
+| 0.44-0.50 | 7.698e-01 | 1.225e+00 | 1.007e+00 |
+| 0.50-0.56 | 8.927e-01 | 1.183e+00 | 1.096e+00 |
+| 0.56-0.62 | 6.679e-01 | 9.857e-01 | 8.864e-01 |
+| 0.62-0.69 | 7.618e-01 | 1.095e+00 | 9.786e-01 |
+| 0.69-0.75 | 8.337e-01 | 1.179e+00 | 1.078e+00 |
+| 0.75-0.81 | 7.459e-01 | 1.046e+00 | 9.812e-01 |
+| 0.81-0.88 | 8.624e-01 | 1.251e+00 | 1.151e+00 |
+| 0.88-0.94 | 8.012e-01 | 1.194e+00 | 1.075e+00 |
+| 0.94-1.00 | 8.945e-01 | 1.327e+00 | 1.173e+00 |
+
+## slice 19
+| metric | Patlak mean±SD (n) | Tofts mean±SD (n) | tofts8 mean±SD (n) | Δ Tofts−Patlak | Δ tofts8−Patlak | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|---|---|---|---|
+| cortex_peak_ratio | 0.9378 ± 0.012 (3) | 0.8254 ± 0.0039 (3) | 0.8837 ± 0.0053 (3) | -0.1123 | -0.05407 | 0.7471 | 0.853 |
+| cortex_washout_ratio | 0.8754 ± 0.014 (3) | 0.9716 ± 0.018 (3) | 0.9755 ± 0.0075 (3) | +0.09621 | +0.1002 | 1.046 | 1.056 |
+| medulla_peak_ratio | 0.9103 ± 0.025 (3) | 0.9453 ± 0.02 (3) | 0.9492 ± 0.0089 (3) | +0.03503 | +0.03898 | 1.015 | 1.062 |
+| medulla_washout_ratio | 0.888 ± 0.0078 (3) | 0.9411 ± 0.015 (3) | 0.9393 ± 0.007 (3) | +0.05316 | +0.05131 | 1.038 | 0.9018 |
+| aorta_peak_ratio | 0.9908 ± 0.0042 (3) | 0.9756 ± 0.055 (3) | 0.9459 ± 0.037 (3) | -0.01522 | -0.04495 | 0.6472 | 0.3791 |
+| aorta_washout_ratio | 1.017 ± 0.021 (3) | 0.9795 ± 0.015 (3) | 1.019 ± 0.04 (3) | -0.03749 | +0.001872 | 1.003 | 1.042 |
+| mf_aorta_affine | 0.03406 ± 0.00054 (3) | 0.07027 ± 0.0055 (3) | 0.06262 ± 0.012 (3) | +0.0362 | +0.02856 | 0.1323 | 0.3489 |
+| mf_cortex_affine | 0.1491 ± 0.00025 (3) | 0.04104 ± 0.0018 (3) | 0.03569 ± 0.00088 (3) | -0.108 | -0.1134 | 0.0576 | 0.06224 |
+| mf_medulla_affine | 0.1265 ± 7.8e-05 (3) | 0.02099 ± 0.0015 (3) | 0.024 ± 0.0015 (3) | -0.1055 | -0.1025 | 0.0423 | 0.07265 |
+| mf_liver_affine | 0.02818 ± 0.00024 (3) | 0.02533 ± 0.00058 (3) | 0.02434 ± 0.001 (3) | -0.00285 | -0.003839 | 0.02405 | 0.03211 |
+| mf_aorta_scale | 0.04332 ± 0.0017 (3) | 0.08823 ± 0.0064 (3) | 0.08024 ± 0.016 (3) | +0.04492 | +0.03692 | 0.1761 | 0.4434 |
+| mf_cortex_scale | 0.2337 ± 0.00042 (3) | 0.06233 ± 0.0028 (3) | 0.05415 ± 0.0013 (3) | -0.1713 | -0.1795 | 0.08963 | 0.09467 |
+| mf_medulla_scale | 0.1908 ± 0.00058 (3) | 0.03059 ± 0.0022 (3) | 0.03531 ± 0.002 (3) | -0.1602 | -0.1555 | 0.0619 | 0.1055 |
+| aorta_peak_ratio_vs_mf | 0.9908 ± 0.0042 (3) | 0.9756 ± 0.055 (3) | 0.9459 ± 0.037 (3) | -0.01522 | -0.04495 | 0.6472 | 0.3791 |
+| aorta_fwhm_s | 16.9 ± 0 (3) | 14.85 ± 2.6 (3) | 16.38 ± 1.4 (3) | -2.048 | -0.512 | 92.16 | 56.83 |
+| aorta_ttp_s | 64.73 ± 0 (3) | 63.19 ± 0 (3) | 63.19 ± 0 (3) | -1.536 | -1.536 | 64.73 | 69.34 |
+| aorta_neg_frac | 0 ± 0 (3) | 0 ± 0 (3) | 0 ± 0 (3) | +0 | +0 | 0 | 0.004167 |
+| aorta_rise_mono | 1 ± 0 (3) | 1 ± 0 (3) | 1 ± 0 (3) | +0 | +0 | 1 | 0.8837 |
+| cortex_medulla_late_corr | 0.9895 ± 0.0014 (3) | 0.2925 ± 0.038 (3) | 0.06695 ± 0.14 (3) | -0.697 | -0.9226 | 0.05177 | 0.9518 |
+| train_kNMSE | 0.2657 ± 0.0001 (3) | 0.2381 ± 0.001 (3) | 0.2493 ± 0.00084 (3) | -0.02757 | -0.01641 | nan | nan |
+| val_kNMSE | 0.2714 ± 0.00047 (3) | 0.3028 ± 0.00077 (3) | 0.2927 ± 0.00065 (3) | +0.03144 | +0.02133 | nan | nan |
+| test_kNMSE | 0.2742 ± 0.00023 (3) | 0.3037 ± 0.00062 (3) | 0.2969 ± 0.00054 (3) | +0.02951 | +0.02271 | nan | nan |
+| wall_s | 2304 ± 0.18 (3) | 2297 ± 4.6 (3) | 2316 ± 32 (3) | -6.638 | +11.85 | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | +0.2246 | +0.1255 | nan | nan |
+| params | 5.521e+06 ± 0 (3) | 5.539e+06 ± 0 (3) | 5.531e+06 ± 0 (3) | +1.845e+04 | +1.025e+04 | nan | nan |
+
+model-free aorta FWHM (s): 15.359859566998232
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | Patlak | Tofts | tofts8 |
+|---|---|---|---|
+| 0.00-0.06 | 2.420e-01 | 2.555e-01 | 2.477e-01 |
+| 0.06-0.12 | 4.974e-01 | 5.928e-01 | 5.963e-01 |
+| 0.12-0.19 | 6.120e-01 | 8.151e-01 | 7.745e-01 |
+| 0.19-0.25 | 8.069e-01 | 1.156e+00 | 1.133e+00 |
+| 0.25-0.31 | 8.153e-01 | 1.249e+00 | 1.250e+00 |
+| 0.31-0.38 | 5.555e-01 | 8.033e-01 | 8.253e-01 |
+| 0.38-0.44 | 3.284e-01 | 4.954e-01 | 4.795e-01 |
+| 0.44-0.50 | 6.577e-01 | 8.631e-01 | 9.231e-01 |
+| 0.50-0.56 | 7.510e-01 | 9.085e-01 | 1.002e+00 |
+| 0.56-0.62 | 4.901e-01 | 6.491e-01 | 6.697e-01 |
+| 0.62-0.69 | 6.969e-01 | 8.615e-01 | 9.562e-01 |
+| 0.69-0.75 | 7.129e-01 | 9.193e-01 | 9.760e-01 |
+| 0.75-0.81 | 7.018e-01 | 8.646e-01 | 9.224e-01 |
+| 0.81-0.88 | 7.110e-01 | 8.753e-01 | 9.540e-01 |
+| 0.88-0.94 | 7.309e-01 | 8.968e-01 | 1.028e+00 |
+| 0.94-1.00 | 7.344e-01 | 9.397e-01 | 1.015e+00 |
+
+## slice 21
+| metric | Patlak mean±SD (n) | Tofts mean±SD (n) | tofts8 mean±SD (n) | Δ Tofts−Patlak | Δ tofts8−Patlak | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|---|---|---|---|
+| cortex_peak_ratio | 0.9309 ± 0.0051 (3) | 0.706 ± 0.015 (3) | 0.8081 ± 0.018 (3) | -0.2249 | -0.1228 | 0.7667 | 0.638 |
+| cortex_washout_ratio | 0.8587 ± 0.0025 (3) | 0.9537 ± 0.0097 (3) | 0.9729 ± 0.012 (3) | +0.09501 | +0.1142 | 1.048 | 0.9215 |
+| medulla_peak_ratio | 0.6876 ± 0.0031 (3) | 0.9098 ± 0.0058 (3) | 0.921 ± 0.0095 (3) | +0.2222 | +0.2334 | 1.008 | 0.9193 |
+| medulla_washout_ratio | 0.906 ± 0.0026 (3) | 0.967 ± 0.0091 (3) | 0.9892 ± 0.0084 (3) | +0.06108 | +0.08328 | 1.069 | 0.897 |
+| aorta_peak_ratio | 1.024 ± 0.023 (3) | 0.9352 ± 0.049 (3) | 0.9711 ± 0.048 (3) | -0.08865 | -0.05271 | 0.7097 | 0.2285 |
+| aorta_washout_ratio | 1.008 ± 0.069 (3) | 0.9274 ± 0.064 (3) | 1.116 ± 0.046 (3) | -0.08017 | +0.1088 | 0.9795 | 0.7434 |
+| mf_aorta_affine | 0.04474 ± 0.0025 (3) | 0.08941 ± 0.016 (3) | 0.06688 ± 0.0053 (3) | +0.04466 | +0.02214 | 0.1013 | 0.384 |
+| mf_cortex_affine | 0.1461 ± 3.2e-05 (3) | 0.05033 ± 0.00061 (3) | 0.038 ± 0.0012 (3) | -0.09576 | -0.1081 | 0.04423 | 0.1056 |
+| mf_medulla_affine | 0.1258 ± 0.0002 (3) | 0.03501 ± 0.0015 (3) | 0.02692 ± 0.00074 (3) | -0.09078 | -0.09887 | 0.02758 | 0.07839 |
+| mf_liver_affine | 0.02838 ± 2.6e-05 (3) | 0.03622 ± 0.0017 (3) | 0.02563 ± 0.0014 (3) | +0.00784 | -0.002747 | 0.02368 | 0.03818 |
+| mf_aorta_scale | 0.05862 ± 0.004 (3) | 0.1168 ± 0.021 (3) | 0.09334 ± 0.0048 (3) | +0.05818 | +0.03473 | 0.1419 | 0.5084 |
+| mf_cortex_scale | 0.2287 ± 5.8e-05 (3) | 0.07597 ± 0.00091 (3) | 0.05731 ± 0.0018 (3) | -0.1527 | -0.1714 | 0.06828 | 0.1632 |
+| mf_medulla_scale | 0.1941 ± 0.00093 (3) | 0.05273 ± 0.0018 (3) | 0.03969 ± 0.0012 (3) | -0.1414 | -0.1544 | 0.04174 | 0.1151 |
+| aorta_peak_ratio_vs_mf | 1.024 ± 0.023 (3) | 0.9352 ± 0.049 (3) | 0.9711 ± 0.048 (3) | -0.08865 | -0.05271 | 0.7097 | 0.2285 |
+| aorta_fwhm_s | 16.9 ± 0 (3) | 14.85 ± 1.4 (3) | 16.9 ± 1.3 (3) | -2.048 | -1.066e-14 | 52.22 | 98.3 |
+| aorta_ttp_s | 64.73 ± 0 (3) | 63.19 ± 0 (3) | 64.22 ± 0.72 (3) | -1.536 | -0.512 | 64.73 | 207.6 |
+| aorta_neg_frac | 0 ± 0 (3) | 0 ± 0 (3) | 0 ± 0 (3) | +0 | +0 | 0 | 0.02083 |
+| aorta_rise_mono | 1 ± 0 (3) | 0.8974 ± 0.042 (3) | 1 ± 0 (3) | -0.1026 | +0 | 1 | 0.6466 |
+| cortex_medulla_late_corr | 0.9781 ± 0.00027 (3) | 0.09283 ± 0.021 (3) | -0.1492 ± 0.048 (3) | -0.8853 | -1.127 | -0.1166 | 0.9698 |
+| train_kNMSE | 0.2358 ± 0.0005 (3) | 0.1755 ± 0.0023 (3) | 0.2279 ± 8.6e-05 (3) | -0.06029 | -0.00788 | nan | nan |
+| val_kNMSE | 0.2411 ± 0.00042 (3) | 0.2566 ± 0.0019 (3) | 0.2517 ± 0.00062 (3) | +0.01548 | +0.01054 | nan | nan |
+| test_kNMSE | 0.2444 ± 0.00029 (3) | 0.2694 ± 0.004 (3) | 0.2577 ± 0.00055 (3) | +0.02499 | +0.0133 | nan | nan |
+| wall_s | 2355 ± 33 (3) | 2303 ± 18 (3) | 2306 ± 14 (3) | -51.75 | -49.19 | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | 1.246e+04 ± 0 (3) | +0.2246 | +0.1255 | nan | nan |
+| params | 5.521e+06 ± 0 (3) | 5.539e+06 ± 0 (3) | 5.531e+06 ± 0 (3) | +1.845e+04 | +1.025e+04 | nan | nan |
+
+model-free aorta FWHM (s): 16.89584552369808
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | Patlak | Tofts | tofts8 |
+|---|---|---|---|
+| 0.00-0.06 | 2.268e-01 | 2.404e-01 | 2.316e-01 |
+| 0.06-0.12 | 4.318e-01 | 5.948e-01 | 5.201e-01 |
+| 0.12-0.19 | 4.941e-01 | 7.012e-01 | 6.583e-01 |
+| 0.19-0.25 | 6.398e-01 | 9.281e-01 | 8.988e-01 |
+| 0.25-0.31 | 7.616e-01 | 1.088e+00 | 1.134e+00 |
+| 0.31-0.38 | 8.142e-01 | 1.175e+00 | 1.211e+00 |
+| 0.38-0.44 | 8.530e-01 | 1.265e+00 | 1.203e+00 |
+| 0.44-0.50 | 1.006e+00 | 1.403e+00 | 1.366e+00 |
+| 0.50-0.56 | 1.121e+00 | 1.514e+00 | 1.459e+00 |
+| 0.56-0.62 | 1.154e+00 | 1.560e+00 | 1.494e+00 |
+| 0.62-0.69 | 1.256e+00 | 1.644e+00 | 1.542e+00 |
+| 0.69-0.75 | 1.326e+00 | 1.683e+00 | 1.593e+00 |
+| 0.75-0.81 | 1.328e+00 | 1.703e+00 | 1.615e+00 |
+| 0.81-0.88 | 1.399e+00 | 1.668e+00 | 1.589e+00 |
+| 0.88-0.94 | 1.449e+00 | 1.742e+00 | 1.607e+00 |
+| 0.94-1.00 | 1.469e+00 | 1.686e+00 | 1.596e+00 |
+
+INVIVO_EVAL_DONE
+[W916 20:36:21.223755279 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+EVAL_DONE exit 0
+metrics from /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_k80_rms1.json 33 rows
+slice 18: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2]), ('tofts8', [0, 1, 2])], refs ['grasp v2 k80 (1368 views, 142 fr, n12 lam0.25)', 'grasp pro f80match (1368 views, 122 fr, K5)']
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run zvpmh1mh
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203628-zvpmh1mh
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_k80_rms1_sl18_3303863
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/zvpmh1mh
+[wandb] figs_invivo_k80_rms1_sl18_3303863: mode online
+slice 18: 6 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/zvpmh1mh
+wandb: updating run metadata; uploading artifact run-zvpmh1mh-metrics_table
+wandb: uploading artifact run-zvpmh1mh-metrics_table
+wandb: uploading artifact run-zvpmh1mh-metrics_table; uploading media/images/roi_overlay_0_0debbb698d2bff396929.png; uploading media/images/annuli_0_45e97cf21444f43d1f56.png; uploading config.yaml; uploading media/images/curves_all_seeds_0_b4b6c414e9e4268161e7.png (+ 8 more)
+wandb: uploading artifact run-zvpmh1mh-metrics_table; uploading media/images/peak_diff_0_c4e71bc754ec450abc80.png; uploading media/images/panel_0_09795935574df83595eb.png
+wandb: uploading artifact run-zvpmh1mh-metrics_table
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 6
+wandb: wall_total_s 7.03101
+wandb: 
+wandb: 🚀 View run figs_invivo_k80_rms1_sl18_3303863 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/zvpmh1mh
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203628-zvpmh1mh/logs
+slice 19: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2]), ('tofts8', [0, 1, 2])], refs ['grasp v2 k80 (1368 views, 142 fr, n12 lam0.25)', 'grasp pro f80match (1368 views, 122 fr, K5)']
+wandb: setting up run cjq5uzcv
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203639-cjq5uzcv
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_k80_rms1_sl19_3303863
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/cjq5uzcv
+[wandb] figs_invivo_k80_rms1_sl19_3303863: mode online
+slice 19: 6 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/cjq5uzcv
+wandb: updating run metadata; uploading artifact run-cjq5uzcv-metrics_table
+wandb: uploading artifact run-cjq5uzcv-metrics_table
+wandb: uploading artifact run-cjq5uzcv-metrics_table; uploading media/images/panel_0_b5fa31cd3002b705b27f.png; uploading media/images/peak_diff_0_b7d614f0beb713d7551e.png; uploading output.log; uploading config.yaml (+ 8 more)
+wandb: uploading media/images/panel_0_b5fa31cd3002b705b27f.png; uploading media/images/peak_diff_0_b7d614f0beb713d7551e.png; uploading media/images/curves_all_seeds_0_86c1de233e950ca7a834.png; uploading media/images/annuli_0_1ddc5319ea8ca905058d.png
+wandb: uploading history steps 0-1, summary, console lines 1-1
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 6
+wandb: wall_total_s 7.38762
+wandb: 
+wandb: 🚀 View run figs_invivo_k80_rms1_sl19_3303863 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/cjq5uzcv
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203639-cjq5uzcv/logs
+slice 21: arms [('patlak', [0, 1, 2]), ('tofts', [0, 1, 2]), ('tofts8', [0, 1, 2])], refs ['grasp v2 k80 (1368 views, 142 fr, n12 lam0.25)', 'grasp pro f80match (1368 views, 122 fr, K5)']
+wandb: setting up run mjw0gfuo
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203651-mjw0gfuo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run figs_invivo_k80_rms1_sl21_3303863
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/mjw0gfuo
+[wandb] figs_invivo_k80_rms1_sl21_3303863: mode online
+slice 21: 6 figures -> https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/mjw0gfuo
+wandb: updating run metadata; uploading artifact run-mjw0gfuo-metrics_table
+wandb: uploading artifact run-mjw0gfuo-metrics_table
+wandb: uploading artifact run-mjw0gfuo-metrics_table; uploading wandb-metadata.json; uploading requirements.txt; uploading media/images/peak_diff_0_8053abc6c303d513ffde.png; uploading wandb-summary.json (+ 8 more)
+wandb: uploading media/images/peak_diff_0_8053abc6c303d513ffde.png; uploading media/images/panel_0_171436660e07d46aa086.png
+wandb: 
+wandb: Run summary:
+wandb:       n_figs 6
+wandb: wall_total_s 4.48611
+wandb: 
+wandb: 🚀 View run figs_invivo_k80_rms1_sl21_3303863 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/mjw0gfuo
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 7 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/tofts_vs_patlak/figures_wandb/wandb/run-20260916_203651-mjw0gfuo/logs
+FIGS_DONE
+[W916 20:36:59.567531636 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+FIGS exit 0
+# tofts basis span vs trained arms, in vivo slice 21, k80 (reference = model-free 31-spoke nufft, roi enhancement, baseline subtracted)
+
+ratios are amplitude relative to the model-free curve: first-pass peak (20 to 210 s) and washout mean (t > 200 s). projection = least squares of the model-free curve onto the first R atoms at the frame times (what a perfect fit inside the span could reach).
+
+| curve | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | body voxel err (all / dynamic part) |
+|---|---|---|---|---|---|
+| projection rank 3 | 0.99 / 1.02 | 1.00 / 0.90 | 0.73 / 0.93 | 0.68 / 0.94 | 0.264 / 0.604 |
+| projection rank 5 | 1.00 / 1.02 | 1.00 / 1.01 | 0.83 / 1.00 | 0.77 / 0.99 | 0.251 / 0.572 |
+| projection rank 8 | 1.00 / 1.02 | 0.96 / 1.00 | 0.93 / 1.00 | 0.81 / 0.99 | 0.244 / 0.554 |
+| projection rank 12 | 1.00 / 0.99 | 0.97 / 1.00 | 0.94 / 1.00 | 0.81 / 0.98 | 0.238 / 0.542 |
+| NIK-tofts (trained) | 0.88 / 0.94 | 0.72 / 0.97 | 0.92 / 0.97 | 1.55 / 1.10 | |
+| NIK-tofts8 (trained) | 0.90 / 1.05 | 0.84 / 1.00 | 0.93 / 1.00 | 0.99 / 1.10 | |
+| NIK-patlak (trained) | 1.00 / 0.91 | 0.94 / 0.87 | 0.69 / 0.91 | 0.68 / 0.94 | |
+
+basis aif vs model-free aorta: time to peak 63.8 s vs 63.2 s; plateau / peak 0.23 vs 0.23
+SPAN_DIAG_DONE
+[W916 20:37:04.414555802 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+# tofts basis span vs trained arms, in vivo slice 18, k80 (reference = model-free 31-spoke nufft, roi enhancement, baseline subtracted)
+
+ratios are amplitude relative to the model-free curve: first-pass peak (20 to 210 s) and washout mean (t > 200 s). projection = least squares of the model-free curve onto the first R atoms at the frame times (what a perfect fit inside the span could reach).
+
+| curve | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | body voxel err (all / dynamic part) |
+|---|---|---|---|---|---|
+| projection rank 3 | 0.98 / 1.03 | 0.99 / 0.90 | 0.88 / 0.93 | 0.68 / 0.94 | 0.246 / 0.558 |
+| projection rank 5 | 0.99 / 1.03 | 1.02 / 1.01 | 0.94 / 1.00 | 0.79 / 1.00 | 0.231 / 0.524 |
+| projection rank 8 | 0.99 / 1.03 | 0.95 / 1.00 | 0.99 / 1.00 | 0.82 / 0.99 | 0.225 / 0.508 |
+| projection rank 12 | 1.01 / 1.00 | 0.96 / 1.01 | 0.99 / 1.00 | 0.82 / 1.00 | 0.221 / 0.498 |
+| NIK-tofts (trained) | 1.05 / 0.91 | 0.75 / 0.94 | 0.91 / 0.91 | 1.56 / 1.11 | |
+| NIK-tofts8 (trained) | 0.95 / 1.06 | 0.84 / 0.97 | 0.92 / 0.92 | 0.93 / 1.18 | |
+| NIK-patlak (trained) | 0.97 / 1.00 | 0.97 / 0.89 | 0.87 / 0.89 | 0.73 / 1.01 | |
+
+basis aif vs model-free aorta: time to peak 63.8 s vs 63.2 s; plateau / peak 0.23 vs 0.23
+SPAN_DIAG_DONE
+[W916 20:37:08.008472248 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+# tofts basis span vs trained arms, in vivo slice 19, k80 (reference = model-free 31-spoke nufft, roi enhancement, baseline subtracted)
+
+ratios are amplitude relative to the model-free curve: first-pass peak (20 to 210 s) and washout mean (t > 200 s). projection = least squares of the model-free curve onto the first R atoms at the frame times (what a perfect fit inside the span could reach).
+
+| curve | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | body voxel err (all / dynamic part) |
+|---|---|---|---|---|---|
+| projection rank 3 | 0.99 / 1.02 | 1.02 / 0.90 | 0.93 / 0.92 | 0.67 / 0.94 | 0.255 / 0.577 |
+| projection rank 5 | 0.99 / 1.02 | 1.01 / 1.01 | 0.99 / 1.00 | 0.76 / 0.99 | 0.240 / 0.544 |
+| projection rank 8 | 0.99 / 1.02 | 0.97 / 1.00 | 0.99 / 0.99 | 0.79 / 0.98 | 0.234 / 0.528 |
+| projection rank 12 | 1.01 / 1.00 | 0.97 / 1.01 | 0.99 / 1.00 | 0.79 / 0.99 | 0.230 / 0.517 |
+| NIK-tofts (trained) | 1.07 / 0.96 | 0.83 / 0.95 | 0.93 / 0.93 | 0.95 / 1.11 | |
+| NIK-tofts8 (trained) | 1.01 / 0.97 | 0.89 / 0.97 | 0.97 / 0.94 | 0.94 / 1.12 | |
+| NIK-patlak (trained) | 1.00 / 1.00 | 0.95 / 0.86 | 0.93 / 0.88 | 0.73 / 1.03 | |
+
+basis aif vs model-free aorta: time to peak 63.8 s vs 63.2 s; plateau / peak 0.23 vs 0.23
+SPAN_DIAG_DONE
+[W916 20:37:13.618539671 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+SPAN exit 0
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_rms1.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_free_rms1.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_sub16_rms1.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_patlak_rms1.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_tofts_rms1.png
+STORY_DONE
+[W916 20:37:21.110246703 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+STORY tofts exit 0
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_rms1_t8.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_free_rms1_t8.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_sub16_rms1_t8.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_patlak_rms1_t8.png
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_tofts8_rms1_t8.png
+STORY_DONE
+[W916 20:37:28.107986903 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+STORY tofts8 exit 0
