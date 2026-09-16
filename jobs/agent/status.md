@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-09-16 18:33:51 on worker08.cluster, job 3298317, cycle 235
+updated 2026-09-16 18:35:58 on worker08.cluster, job 3298317, cycle 236
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3303860 | 040_pk_arms_k80_rms1 | 1 COMPLETING None, 1 PENDING QOSMaxGRESPerUser |
+| 3303860 | 040_pk_arms_k80_rms1 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 040_pk_arms_k80_rms1 | 1 COMPLETING None, 1 PENDING QOSMaxGRESPerUser |
+| 040_pk_arms_k80_rms1 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 043_gv2_rerun | 1 COMPLETED 00:10:18 |
 | 043_env_rerun | exit 0 |
 | 042_archive_verify | 1 COMPLETED 00:02:54 |
