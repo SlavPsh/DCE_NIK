@@ -1,0 +1,44 @@
+== mounts
+Filesystem           Size  Used Avail Use% Mounted on
+beegfs_nodev         1.6P  1.3P  305T  81% /net/beegfs
+store01.ib:/appdata   29T   18T   12T  61% /appdata
+store01.ib:/scratch   30T   17T   13T  57% /scratch
+/dev/md0p3           740G   15G  725G   2% /
+== candidates
+/appdata/users/P101440
+/net/beegfs
+/net/cifs
+/scratch
+== env
+SLURM_SUBMIT_DIR=/net/beegfs/users/P101440/DCE_NIK
+PWD=/net/beegfs/users/P101440/DCE_NIK
+MAMBA_ROOT_PREFIX=/net/beegfs/users/P101440/micromamba
+TMPDIR=/tmp/P101440.3298317
+MAMBA_EXE=/net/beegfs/users/P101440/micromamba/bin/micromamba
+SLURM_TMPDIR=/tmp/P101440.3298317
+PY=/appdata/users/P101440/micromamba/envs/torch29/bin/python
+NEWROOT=/net/beegfs/users/P101440
+PATH=/net/beegfs/users/P101440/micromamba/condabin:/appdata/users/P101440/npm-global/bin:/appdata/users/P101440/npm-global/bin:/appdata/users/P101440/npm-global/bin:/home/P101440/.local/bin:/home/P101440/bin:/trinity/shared/aumc/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+MODULEPATH=/etc/scl/modulefiles:/opt/ohpc/pub/modulefiles:/appdata/modules/modulefiles:/trinity/shared/modulefiles
+== quota
+
+Quota information for storage pool Default (ID: 1):
+
+      user/group     ||           size          ||    chunk files    
+     name     |  id  ||    used    |    hard    ||  used   |  hard   
+--------------|------||------------|------------||---------|---------
+       P101440|  8186||      0 Byte|   unlimited||        0|unlimited
+== slurm tmp
+JobContainerType        = (null)
+TmpFS                   = /tmp
+== motd
+bash_completion.sh
+colorgrep.csh
+colorgrep.sh
+colorls.csh
+colorls.sh
+colorsysstat.csh
+colorsysstat.sh
+colorxzgrep.csh
+colorxzgrep.sh
+colorzgrep.csh

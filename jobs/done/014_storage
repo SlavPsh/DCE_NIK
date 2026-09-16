@@ -1,0 +1,6 @@
+probe 014_storage
+host worker08.cluster
+start 2026-09-16 16:47:03
+end 2026-09-16 16:47:03
+exit 0
+log jobs/log/probe_014_storage.out
