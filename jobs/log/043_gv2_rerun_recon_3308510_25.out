@@ -56,3 +56,11 @@ SAVED slice 25 lam0.02 (192, 192, 102) finite=True (348s)
   ite = 7, cost = 0.000104
   ite = 8, cost = 0.000102
 SAVED slice 25 lam0.08 (192, 192, 102) finite=True (389s)
+  ite = 0, cost = 0.001423
+  ite = 1, cost = 0.001148
+  ite = 2, cost = 0.000992
+  ite = 3, cost = 0.000912
+  ite = 4, cost = 0.000776
+  ite = 5, cost = 0.000702
+  ite = 6, cost = 0.000663
+  ite = 7, cost = 0.000636
