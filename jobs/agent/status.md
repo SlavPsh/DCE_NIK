@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-16 10:35:20 on worker08.cluster, job 3298317, cycle 1
+updated 2026-09-16 11:26:22 on worker08.cluster, job 3298317, cycle 26
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3303860 | 040_pk_arms_k80_rms1 | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 040_pk_arms_k80_rms1 | 1 PENDING None |
 | 038_loss_weighting | 1 COMPLETED 00:57:59, 1 COMPLETED 00:58:01, 1 COMPLETED 04:30:05, 1 COMPLETED 04:52:23 |
 | 032_amp_track_atomscale | 1 TIMEOUT 04:30:29 |
 | 031_amp_track | 2 TIMEOUT 04:30:12, 1 TIMEOUT 04:30:28 |
@@ -30,4 +32,3 @@ updated 2026-09-16 10:35:20 on worker08.cluster, job 3298317, cycle 1
 | 021_pk_maps_invivo | 1 COMPLETED 01:57:46 |
 | 022_pk_maps_invivo | 1 COMPLETED 00:15:38 |
 | 013_dce_hdr_main | exit 0 |
-| 012_dce_hdr | exit 0 |
