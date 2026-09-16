@@ -1,0 +1,71 @@
+2026-09-16 14:00:45 host gpu02.cluster job 3304747 task 8 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+exists results/tofts_vs_patlak/basis_sl18_rms1.npz
+exists results/tofts_vs_patlak/basis_sl18_r8_rms1.npz
+slice 18 arm tofts8 seed 2 -> results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl18_s2
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run n2mkqn0j
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl18_s2/wandb_runs/wandb/run-20260916_140049-n2mkqn0j
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl18_s2_s18
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/n2mkqn0j
+[wandb] gnik_tofts8_sl18_s2_s18: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:351: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+    step   1000  train 1.083e+00  heldout 6.088e-01
+    step   2000  train 8.971e-01  heldout 5.531e-01
+    step   3000  train 7.978e-01  heldout 5.689e-01
+    step   4000  train 7.345e-01  heldout 5.992e-01
+    step   5000  train 6.700e-01  heldout 6.180e-01
+    step   6000  train 6.274e-01  heldout 6.295e-01
+    step   7000  train 6.000e-01  heldout 6.374e-01
+    step   8000  train 5.726e-01  heldout 6.378e-01
+    step   9000  train 5.541e-01  heldout 6.379e-01
+    step  10000  train 5.260e-01  heldout 6.378e-01
+    final weights kept (best heldout 5.531e-01 at step 2000)
+    RESOURCES slice 18: peak_gpu_MB 12459 params 5531216 best_heldout 5.5306e-01
+wandb: updating run metadata
+wandb: uploading history steps 9-9, summary, console lines 15-15
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁█████████
+wandb:      heldout_mse ▆▁▂▅▆▇████
+wandb:             loss █▆▄▄▃▂▂▂▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:        val_knmse ▆▁▂▅▆▇████
+wandb:           wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.55306
+wandb:        best_step 2000
+wandb:      heldout_mse 0.63783
+wandb:             loss 0.52602
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12458.521
+wandb:        val_knmse 0.82054
+wandb:           wall_s 1890.0767
+wandb:     wall_total_s 2309.3057
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl18_s2_s18 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/n2mkqn0j
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl18_s2/wandb_runs/wandb/run-20260916_140049-n2mkqn0j/logs
+slice 18  nik (192, 192, 342)  (2312s)  vs CS: corr 0.968  nrmse 0.190
+done 2312s -> results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl18_s2
+[W916 14:39:19.849340486 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-16 14:39:20 TRAIN_DONE tofts8 sl18 s2 exit 0

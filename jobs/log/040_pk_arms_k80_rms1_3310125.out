@@ -1,0 +1,75 @@
+2026-09-16 19:12:21 host gpu02.cluster job 3310125 task 25 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+exists results/tofts_vs_patlak/basis_sl21_rms1.npz
+exists results/tofts_vs_patlak/basis_sl21_r8_rms1.npz
+slice 21 arm tofts8 seed 1 -> results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl21_s1
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run azk3x8f0
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl21_s1/wandb_runs/wandb/run-20260916_191225-azk3x8f0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl21_s1_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/azk3x8f0
+[wandb] gnik_tofts8_sl21_s1_s21: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:351: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+    step   1000  train 9.872e-01  heldout 6.122e-01
+    step   2000  train 7.924e-01  heldout 5.842e-01
+    step   3000  train 6.976e-01  heldout 6.082e-01
+    step   4000  train 6.225e-01  heldout 6.275e-01
+    step   5000  train 6.069e-01  heldout 6.481e-01
+    step   6000  train 5.758e-01  heldout 6.619e-01
+    step   7000  train 5.384e-01  heldout 6.729e-01
+    step   8000  train 5.207e-01  heldout 6.833e-01
+    step   9000  train 5.076e-01  heldout 6.826e-01
+    step  10000  train 4.978e-01  heldout 6.877e-01
+    final weights kept (best heldout 5.842e-01 at step 2000)
+    RESOURCES slice 21: peak_gpu_MB 12459 params 5531216 best_heldout 5.8420e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading history steps 9-9, summary, console lines 15-15
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁█████████
+wandb:      heldout_mse ▃▁▃▄▅▆▇███
+wandb:             loss █▅▄▃▃▂▂▁▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:        val_knmse ▃▁▃▄▅▆▇███
+wandb:           wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.5842
+wandb:        best_step 2000
+wandb:      heldout_mse 0.68768
+wandb:             loss 0.49784
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12458.521
+wandb:        val_knmse 0.85877
+wandb:           wall_s 1876.04151
+wandb:     wall_total_s 2316.72722
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl21_s1_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/azk3x8f0
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl21_s1/wandb_runs/wandb/run-20260916_191225-azk3x8f0/logs
+slice 21  nik (192, 192, 342)  (2319s)  vs CS: corr 0.954  nrmse 0.220
+done 2320s -> results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl21_s1
+[W916 19:51:03.296885301 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-16 19:51:03 TRAIN_DONE tofts8 sl21 s1 exit 0

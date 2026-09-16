@@ -1,0 +1,14 @@
+{
+ "name": "gnik_tofts8_sl21_s2_s21",
+ "mode": "online",
+ "loss": 0.49979448318481445,
+ "heldout_mse": 0.6824533343315125,
+ "val_knmse": 0.8522415759052613,
+ "best_heldout_mse": 0.5848928689956665,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 2285.9118146896362,
+ "peak_gpu_mb": 12458.52099609375,
+ "params": 5531216,
+ "wall_total_s": 2285.909514427185
+}

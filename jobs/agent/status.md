@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-16 19:52:53 on worker08.cluster, job 3298317, cycle 273
+updated 2026-09-16 20:29:34 on worker08.cluster, job 3298317, cycle 291
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3303860 | 040_pk_arms_k80_rms1 | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 040_pk_arms_k80_rms1 | 1 RUNNING None |
+| 040_pk_arms_k80_rms1 | 1 COMPLETED 00:38:11, 1 COMPLETED 00:38:16, 4 COMPLETED 00:38:17, 1 COMPLETED 00:38:18, 2 COMPLETED 00:38:20, 1 COMPLETED 00:38:22, 1 COMPLETED 00:38:24, 1 COMPLETED 00:38:28, 2 COMPLETED 00:38:29, 2 COMPLETED 00:38:30, 1 COMPLETED 00:38:32, 1 COMPLETED 00:38:35, 1 COMPLETED 00:38:40, 1 COMPLETED 00:38:42, 2 COMPLETED 00:38:55, 1 COMPLETED 00:39:00, 1 COMPLETED 00:39:27, 1 COMPLETED 00:39:32, 2 COMPLETED 00:40:08 |
 | 045_throttle | exit 0 |
 | 044_prep_log | exit 0 |
 | 043_gv2_rerun | 1 COMPLETED 00:10:18 |
