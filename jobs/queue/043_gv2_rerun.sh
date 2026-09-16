@@ -14,7 +14,7 @@
 set -uo pipefail
 D=/net/beegfs/users/P101440/DCE_NIK; G=/net/beegfs/users/P101440/grasp_v2; P=/net/beegfs/users/P101440/grasp_pro_py
 export MAMBA_ROOT_PREFIX=/net/beegfs/users/P101440/micromamba PATH=/net/beegfs/users/P101440/micromamba/bin:$PATH
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8} PYTHONDONTWRITEBYTECODE=1
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8} PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=ignore
 export DAT=/net/beegfs/users/P101440/dce_data/orig/meas_MID3000007_FID100985_DCE_Rerun_1.dat
 export OUT=/net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun NLINE=21 LAMS=0.02,0.08,0.25 FIGDIR=$D/results/dce_rerun_gv2
 STAGE=${STAGE:-prep}
@@ -41,9 +41,10 @@ prep)
   echo "PREP_DONE $(date '+%F %T')"
   ;;
 recon)
-  cd $G; micromamba run -n torch29 python -u gv2_rerun.py recon --slice $SLURM_ARRAY_TASK_ID
+  # retry: many simultaneous `micromamba run` starts race on the shared cache (exit 1 after 1 s, 'expected JSON'); cached slices exit fast
+  cd $G; for a in 1 2 3; do micromamba run -n torch29 python -u gv2_rerun.py recon --slice $SLURM_ARRAY_TASK_ID && break; echo "attempt $a failed"; sleep $((30 * a)); done
   ;;
 post)
-  cd $G; micromamba run -n torch29 python -u gv2_rerun.py post && ls -la $FIGDIR
+  cd $G; for a in 1 2 3; do micromamba run -n torch29 python -u gv2_rerun.py post && break; echo "attempt $a failed"; sleep 30; done; ls -la $FIGDIR
   ;;
 esac
