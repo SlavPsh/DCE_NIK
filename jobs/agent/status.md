@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-09-15 22:51:51 on worker03.cluster, job 3296927, cycle 1
+updated 2026-09-16 02:47:02 on worker03.cluster, job 3296927, cycle 116
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3297163 | 038_loss_weighting | 2 RUNNING None |
+| 3297163 | 038_loss_weighting | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 038_loss_weighting | 2 RUNNING None |
+| 038_loss_weighting | 1 RUNNING None |
 | 032_amp_track_atomscale | 1 TIMEOUT 04:30:29 |
 | 031_amp_track | 2 TIMEOUT 04:30:12, 1 TIMEOUT 04:30:28 |
 | 037_aorta_offset | 1 COMPLETED 00:00:52 |
