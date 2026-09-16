@@ -89,7 +89,7 @@ def invivo(t_show, tofts_arm):
         return out
     def sc(v): return ls_scale(v, refwin(v.shape[-1]), body)
     L = lambda p: sc(np.abs(np.load(p)).astype(np.float32))
-    IV = f"{B}/results/tofts_vs_patlak/invivo_k80"
+    IV = f"{B}/results/tofts_vs_patlak/{os.environ.get('IV_DIR', 'invivo_k80')}"; TAGF = os.environ.get("STORY_TAG", "")   # IV_DIR / STORY_TAG: pk-arm run dir and output suffix
     M = [("model-free", mf, tmf),
          ("NIK-free", L(f"{B}/results_sl21_k80/nik_slice_21.npy"), None), ("NIK-sub16", L(f"{B}/results/realdata_nik_vs_cs_figures/outcoil_subspace_output_slice21.npy"), None),
          ("NIK-patlak", L(f"{IV}/patlak_sl21_s0/nik_slice_21_cplx.npy"), None), ("NIK-" + tofts_arm, L(f"{IV}/{tofts_arm}_sl21_s0/nik_slice_21_cplx.npy"), None),
@@ -97,12 +97,12 @@ def invivo(t_show, tofts_arm):
     M = [(nm, v, (t if t is not None else ft(v.shape[-1]))) for nm, v, t in M]
     mfc = {r: (lambda c: c - np.median(c[:8]))(np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])])) for r in ROIS}
     note = f"same input for every method: k80 = 1368 of 1708 views (v%10<8); reference = model-free nufft (31-spoke window); one global scale vs the reference; image at t = {t_show:.0f} s"
-    panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21.png", "in vivo slice 21: four NIK families, GRASP-Pro and GRASP on the same k80 input",
+    panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21{TAGF}.png", "in vivo slice 21: four NIK families, GRASP-Pro and GRASP on the same k80 input",
           M, rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
     byname = {nm: (nm, v, t) for nm, v, t in M}
     for fam in ("NIK-free", "NIK-sub16", "NIK-patlak", "NIK-" + tofts_arm):                       # one panel per family: reference | nik | grasp pro | grasp
         if fam not in byname: continue
-        panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_{fam.split('-')[1]}.png", f"in vivo slice 21: {fam} vs GRASP-Pro and GRASP on the same k80 input",
+        panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_{fam.split('-')[1]}{TAGF}.png", f"in vivo slice 21: {fam} vs GRASP-Pro and GRASP on the same k80 input",
               [byname["model-free"], byname[fam], byname["GRASP-Pro"], byname["GRASP"]], rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
 
 if __name__ == "__main__":

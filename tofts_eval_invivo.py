@@ -18,7 +18,8 @@ sh = A.load_shared(REFD)
 import argparse
 _ap = argparse.ArgumentParser(); _ap.add_argument("--slices", default="18,19,21"); _ap.add_argument("--arms", default="patlak,tofts")
 _ap.add_argument("--suffix", default=None, help="outputs invivo<suffix>.{json,md}; default '' for f25, '_k80' for k80")
-_ap.add_argument("--spokes", default="f25", choices=["f25", "k80"], help="k80 = the standard: keep v%10<8 (1368 views), val v%10==8, test v%10==9, runs in invivo_k80/, grasp k80 refs"); _a = _ap.parse_args()
+_ap.add_argument("--spokes", default="f25", choices=["f25", "k80"], help="k80 = the standard: keep v%10<8 (1368 views), val v%10==8, test v%10==9, runs in invivo_k80/, grasp k80 refs")
+_ap.add_argument("--iv-dir", default=None, help="run dir under results/tofts_vs_patlak (default invivo / invivo_k80)"); _ap.add_argument("--basis-suffix", default="", help="basis file suffix for the held-out eval, e.g. _rms1"); _a = _ap.parse_args()
 SLICES = [int(z) for z in _a.slices.split(",")]; ARMS = _a.arms.split(",")
 if _a.spokes == "k80":
     KEEP = np.load(f"{B}/spoke_masks/keep_f80match.npy"); VAL = np.load(f"{B}/spoke_masks/val_k80_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_k80_m9.npy"); IV = f"{RES}/invivo_k80"
@@ -28,8 +29,9 @@ else:
     REFS = (("GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", "{GV}/gv2_slice{Z}_f25.npy"), ("GRASP-Pro f25 (488 spokes, 122 fr, K5)", "{GP}/cs_slice{Z}_f25.npy"))
     SUF = _a.suffix or ""; SPK = "keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched"
 LABEL = {"patlak": "Patlak", "tofts": "Tofts"}
+if _a.iv_dir: IV = f"{RES}/{_a.iv_dir}"
 def basis_for(arm, Z):                                                          # tofts = rank rule basis, tofts<R> = forced rank R
-    return f"{RES}/basis_sl{Z}_r{arm[5:]}.npz" if arm.startswith("tofts") and arm != "tofts" else f"{RES}/basis_sl{Z}.npz"
+    return (f"{RES}/basis_sl{Z}_r{arm[5:]}" if arm.startswith("tofts") and arm != "tofts" else f"{RES}/basis_sl{Z}") + _a.basis_suffix + ".npz"
 
 def bs(c): return c - np.median(c[:8])
 def ft(nt): e = np.linspace(0, TA, nt+1); return 0.5*(e[:-1]+e[1:])
@@ -57,6 +59,7 @@ def curves(v, t, ctx):
         out[f"mf_{roi}_scale"] = float(np.linalg.norm(s*cb-mb)/np.linalg.norm(mb))
         Aa = np.stack([c, np.ones_like(c)], 1); ab = np.linalg.lstsq(Aa, m, rcond=None)[0]                  # affine (raw + affine), the corrected temporal ruler
         out[f"mf_{roi}_affine"] = float(np.linalg.norm(Aa @ ab - m)/np.linalg.norm(m - m.mean() + m.mean()))
+        pk = (tmf > 20) & (tmf < 210); out[f"{roi}_peak_ratio"] = float(cb[pk].max() / (mb[pk].max() + 1e-12)); out[f"{roi}_washout_ratio"] = float(cb[tmf > 200].mean() / (mb[tmf > 200].mean() + 1e-12))   # raw amplitude vs model-free after the ONE global scale
         if roi == "aorta":
             out["aorta_peak_ratio_vs_mf"] = float(cb.max()/mb.max()); out.update(fwhm(tmf, c)); mfw = fwhm(tmf, m); out["mf_aorta_fwhm_s"] = mfw["aorta_fwhm_s"]
     # cortex vs medulla separation preserved? (late-phase correlation, physiology says distinct)
@@ -116,7 +119,7 @@ for Z in SLICES:
         if not os.path.exists(p): continue
         v = np.abs(np.load(p)).astype(np.float32); r = dict(slice=Z, arm=lab, seed=-1, status="complete", frames=int(v.shape[-1])); r.update(curves(v, ft(v.shape[-1]), ctx)); rows.append(r)
 json.dump(rows, open(f"{RES}/invivo{SUF}.json", "w"), indent=1)
-keys = ["mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "mf_aorta_scale", "mf_cortex_scale", "mf_medulla_scale", "aorta_peak_ratio_vs_mf",
+keys = ["cortex_peak_ratio", "cortex_washout_ratio", "medulla_peak_ratio", "medulla_washout_ratio", "aorta_peak_ratio", "aorta_washout_ratio", "mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "mf_aorta_scale", "mf_cortex_scale", "mf_medulla_scale", "aorta_peak_ratio_vs_mf",
         "aorta_fwhm_s", "aorta_ttp_s", "aorta_neg_frac", "aorta_rise_mono", "cortex_medulla_late_corr", "train_kNMSE", "val_kNMSE", "test_kNMSE", "wall_s", "peak_gpu_mb", "params"]
 lines = [f"# in vivo (meas_p3_dce, slices {'/'.join(map(str, SLICES))}, {SPK})", "",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]

@@ -44,7 +44,7 @@ def main():
             o[:, :, g] = mf[:, :, m].mean(2)
         return o
     for arm in a.arms.split(","):
-        p = f"{B}/results/tofts_vs_patlak/invivo_k80/{arm}_sl{Z}_s0/nik_slice_{Z}_cplx.npy"
+        p = f"{B}/results/tofts_vs_patlak/{os.environ.get('IV_DIR', 'invivo_k80')}/{arm}_sl{Z}_s0/nik_slice_{Z}_cplx.npy"
         if not os.path.exists(p): print("missing", p); continue
         v = np.abs(np.load(p)).astype(np.float32); t = ft(v.shape[-1]); v = ls_scale(v, refwin(v.shape[-1]), body); c = roi_curve(v, t); row = {}
         for r in names:
@@ -61,7 +61,7 @@ def main():
     for Rk, row in out["ranks"].items(): L.append(f"| projection rank {Rk} | " + " | ".join(f"{row[r]['peak_ratio']:.2f} / {row[r]['washout_ratio']:.2f}" for r in names) + f" | {row['err_all']:.3f} / {row['err_dynamic']:.3f} |")
     for arm, row in out["arms"].items(): L.append(f"| NIK-{arm} (trained) | " + " | ".join(f"{row[r]['peak_ratio']:.2f} / {row[r]['washout_ratio']:.2f}" for r in names) + " | |")
     ai = out["aif"]; L += ["", f"basis aif vs model-free aorta: time to peak {ai['ttp_basis_s']:.1f} s vs {ai['ttp_mf_s']:.1f} s; plateau / peak {ai['plateau_over_peak_basis']:.2f} vs {ai['plateau_over_peak_mf']:.2f}"]
-    R = f"{B}/results/tofts_vs_patlak"; open(f"{R}/span_diag_sl{Z}.md", "w").write("\n".join(L)); json.dump(out, open(f"{R}/span_diag_sl{Z}.json", "w"), indent=1); print("\n".join(L))
+    R = f"{B}/results/tofts_vs_patlak"; SD = os.environ.get("STORY_TAG", ""); open(f"{R}/span_diag_sl{Z}{SD}.md", "w").write("\n".join(L)); json.dump(out, open(f"{R}/span_diag_sl{Z}{SD}.json", "w"), indent=1); print("\n".join(L))
     fig, ax = plt.subplots(1, len(names), figsize=(5.2 * len(names), 4.2))
     for j, r in enumerate(names):
         for k, (nm, (t, c)) in enumerate(curves[r].items()):
@@ -69,6 +69,6 @@ def main():
         ax[j].set_title(r); ax[j].set_xlabel("t [s]"); ax[j].axhline(0, color="0.7", lw=0.6)
         if j == 0: ax[j].set_ylabel("enhancement"); ax[j].legend(fontsize=7)
     fig.suptitle(f"slice {Z}, k80: model-free curves projected onto the tofts atoms (dashed) vs the trained arms (solid)", fontsize=11); fig.tight_layout()
-    os.makedirs(f"{R}/figures", exist_ok=True); fig.savefig(f"{R}/figures/span_diag_sl{Z}.png", dpi=140, facecolor="white"); print("SPAN_DIAG_DONE")
+    os.makedirs(f"{R}/figures", exist_ok=True); fig.savefig(f"{R}/figures/span_diag_sl{Z}{SD}.png", dpi=140, facecolor="white"); print("SPAN_DIAG_DONE")
 
 if __name__ == "__main__": main()
