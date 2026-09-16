@@ -1,1 +1,13 @@
 2026-09-16 21:51:08 host worker02.cluster job 3310154 task  stage post cpus 4
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_nufft: 54 slices, diverged [], window 4.246e-05
+wrote fig1/fig2_gv2_nufft.png
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_lam0.02: 54 slices, diverged [], window 7.585e-05
+wrote fig1/fig2_gv2_lam0.02.png
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_lam0.08: 54 slices, diverged [], window 7.257e-05
+wrote fig1/fig2_gv2_lam0.08.png
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_lam0.25: 54 slices, diverged [], window 6.625e-05
+wrote fig1/fig2_gv2_lam0.25.png
