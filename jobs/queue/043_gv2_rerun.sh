@@ -33,11 +33,11 @@ prep)
   cd $G; micromamba run -n torch29 python -u gv2_rerun.py geom || exit 1
   NZ=$(micromamba run -n torch29 python -c "import numpy as np; print(int(np.load('$OUT/prep/shared.npz')['nzz']))")
   echo "slices $NZ"; du -sh $OUT/prep
-  A=$(sbatch --parsable --dependency=afterok:$SLURM_JOB_ID --export=ALL,STAGE=recon --array=0-$((NZ-1))%12 -J gv2rr -p defq -c 8 --mem 16G -t 4:00:00 \
+  A=$(sbatch --parsable --dependency=afterok:$SLURM_JOB_ID --export=ALL,STAGE=recon --array=0-$((NZ-1))%24 -J gv2rr -p defq -c 8 --mem 16G -t 4:00:00 \
       --output=$D/jobs/log/043_gv2_rerun_recon_%A_%a.out --error=$D/jobs/log/043_gv2_rerun_recon_%A_%a.out $D/jobs/queue/043_gv2_rerun.sh) || exit 1
   B=$(sbatch --parsable --dependency=afterok:$A --export=ALL,STAGE=post -J gv2post -p defq -c 4 --mem 32G -t 2:00:00 \
       --output=$D/jobs/log/043_gv2_rerun_post_%j.out --error=$D/jobs/log/043_gv2_rerun_post_%j.out $D/jobs/queue/043_gv2_rerun.sh) || exit 1
-  echo "chained recon array $A (0-$((NZ-1)), 12 concurrent) -> post $B"
+  echo "chained recon array $A (0-$((NZ-1)), 24 concurrent) -> post $B"
   echo "PREP_DONE $(date '+%F %T')"
   ;;
 recon)
