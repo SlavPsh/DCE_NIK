@@ -1,0 +1,43 @@
+== envs
+  Name  Active  Path                                          
+────────────────────────────────────────────────────────────────
+                /appdata/users/P101440/micromamba/envs/torch29
+  base  *       /net/beegfs/users/P101440/micromamba          
+torch29: twixtools ok numpy 2.4.6
+anon: critical libmamba The given prefix does not exist: "/net/beegfs/users/P101440/micromamba/envs/anon"
+torch29 finufft/nibabel: 2.5.0 5.4.2
+== defq
+HOSTNAMES CPUS MEMORY GRES STATE
+worker01 256 773519 (null) mix
+worker02 256 773519 (null) mix
+worker03 256 773519 (null) mix
+worker04 256 773519 (null) mix
+worker05 256 773519 (null) mix
+worker06 256 773519 (null) mix
+worker07 256 773519 (null) mix
+worker08 256 773519 (null) mix
+worker09 256 773519 (null) mix
+   AllocNodes=ALL Default=YES QoS=normal
+   DefaultTime=NONE DisableRootJobs=NO ExclusiveUser=NO GraceTime=0 Hidden=NO
+   MaxNodes=UNLIMITED MaxTime=7-00:00:00 MinNodes=0 LLN=NO MaxCPUsPerNode=UNLIMITED MaxCPUsPerSocket=UNLIMITED
+   JobDefaults=(null)
+   DefMemPerNode=UNLIMITED MaxMemPerNode=UNLIMITED
+== qos
+Name|MaxTRESPU|MaxJobsPU|MaxSubmitPU|GrpTRES
+normal|cpu=512|||
+high||||
+low|cpu=1000|||
+intern_test||||
+dragen||||
+== data
+total 5527236
+drwxr-x--- 2 P101440 P101440          4 Aug 17 14:06 .
+drwxr-x--- 7 P101440 P101440         24 Jun 16 16:39 ..
+-rw-r----- 1 P101440 P101440 5389161984 Aug 17 14:07 meas_MID3000007_FID100985_DCE_Rerun_1.dat
+-rw-r----- 1 P101440 P101440  773295616 Jul 16 15:19 meas_p1_VFA_18_1.dat
+-r-------- 1 P101440 P101440 4292514304 Jun  3 17:41 meas_p3_dce.dat
+-rw-r----- 1 P101440 P101440  773295616 Jun  3 17:40 meas_p3_vfa.dat
+rec_final
+401M	/net/beegfs/users/P101440/tmp/dce_rerun
+== quota
+beegfs_nodev    1.6P  1.3P  303T  82% /net/beegfs

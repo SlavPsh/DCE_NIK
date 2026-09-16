@@ -1,0 +1,6 @@
+probe 043_env_rerun
+host worker08.cluster
+start 2026-09-16 18:11:05
+end 2026-09-16 18:11:07
+exit 0
+log jobs/log/probe_043_env_rerun.out
