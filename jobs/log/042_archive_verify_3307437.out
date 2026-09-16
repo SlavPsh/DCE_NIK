@@ -1,0 +1,11 @@
+done /net/beegfs/users/P101440/02_DCE_NIK.tar: 9116 files, 8833 same, 283 differ, 0 missing
+done /net/beegfs/users/P101440/03_dce_data.tar: 66 files, 66 same, 0 differ, 0 missing
+done /net/beegfs/users/P101440/04_XCAT-ERIC.tar: 361 files, 360 same, 0 differ, 1 missing
+done /net/beegfs/users/P101440/01_essentials.tgz: 1399 files, 1240 same, 159 differ, 0 missing
+done /net/beegfs/users/P101440/05_tmp.tar: 6 files, 6 same, 0 differ, 0 missing
+done /net/beegfs/users/P101440/claude_port.tgz: 97 files, 0 same, 0 differ, 97 missing
+done /net/beegfs/users/P101440/delta_20260908/delta_20260908.tgz: 864 files, 577 same, 287 differ, 0 missing
+done /net/beegfs/users/P101440/delta_20260908/delta_heavy_20260908.tgz: 446 files, 445 same, 1 differ, 0 missing
+done /net/beegfs/users/P101440/delta_20260908/claude_port_20260908.tgz: 110 files, 0 same, 0 differ, 110 missing
+done /net/beegfs/users/P101440/grasp_v2.zip: 227 files, 184 same, 0 differ, 43 missing
+VERIFY_DONE
