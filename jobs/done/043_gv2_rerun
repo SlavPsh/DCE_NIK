@@ -1,5 +1,6 @@
 queue 043_gv2_rerun
 jid 3308108
 submitted 2026-09-16 18:11:07
-state 1 RUNNING None
+state 1 COMPLETED 00:10:18
 log jobs/log/043_gv2_rerun_3308108.out
+ended 2026-09-16 18:23:25
