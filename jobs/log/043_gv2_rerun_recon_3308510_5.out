@@ -31,3 +31,11 @@ slice 05: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 0.0001088 (2s)
   ite = 7, cost = 0.000030
   ite = 8, cost = 0.000030
 SAVED slice 05 lam0.02 (192, 192, 102) finite=True (359s)
+  ite = 0, cost = 0.000386
+  ite = 1, cost = 0.000382
+  ite = 2, cost = 0.000362
+  ite = 3, cost = 0.000337
+  ite = 4, cost = 0.000258
+  ite = 5, cost = 0.000196
+  ite = 6, cost = 0.000175
+  ite = 7, cost = 0.000160
