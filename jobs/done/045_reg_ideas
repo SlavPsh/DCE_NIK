@@ -1,5 +1,5 @@
 queue 045_reg_ideas
 jid 3318607
 submitted 2026-09-17 11:18:46
-state 1 PENDING QOSMaxGRESPerUser
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/045_reg_ideas_3318607.out

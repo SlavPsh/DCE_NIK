@@ -1,0 +1,72 @@
+2026-09-17 12:30:59 host worker01.cluster job 3317397 task 0 stage track
+/var/spool/slurmd/job3317397/slurm_script: line 18: nvidia-smi: command not found
+rms1_wd3e-3 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+rms1_wd1e-2 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+# amplitude vs step, slice 21, k80, tofts8 (roi enhancement relative to the model-free reference; peak 20 to 210 s / washout mean t > 200 s)
+
+## rms1_wd3e-3 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/rms1_wd3e-3_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+| 1000 | 0.82 / 0.57 | 0.70 / 0.89 | 0.87 / 0.92 | 1.23 / 1.18 | 6.190e-01 |
+| 2000 | 1.00 / 0.92 | 0.78 / 0.92 | 0.89 / 0.95 | 1.08 / 1.31 | 5.753e-01 |
+| 3000 | 1.03 / 1.25 | 0.81 / 0.96 | 0.89 / 0.97 | 1.01 / 1.21 | 5.963e-01 |
+| 4000 | 0.91 / 0.95 | 0.83 / 0.96 | 0.89 / 0.95 | 0.92 / 1.06 | 6.244e-01 |
+| 5000 | 0.94 / 1.03 | 0.83 / 0.97 | 0.90 / 0.97 | 0.87 / 1.03 | 6.431e-01 |
+| 6000 | 0.90 / 0.96 | 0.85 / 0.97 | 0.91 / 0.98 | 0.90 / 1.10 | 6.526e-01 |
+| 7000 | 0.89 / 0.95 | 0.81 / 0.96 | 0.92 / 0.98 | 1.03 / 1.14 | 6.648e-01 |
+| 8000 | 0.91 / 0.93 | 0.85 / 0.99 | 0.94 / 1.00 | 1.08 / 1.25 | 6.714e-01 |
+| 9000 | 0.98 / 1.06 | 0.84 / 0.98 | 0.91 / 0.98 | 0.93 / 1.07 | 6.757e-01 |
+| 10000 | 0.90 / 1.05 | 0.84 / 1.00 | 0.93 / 1.00 | 0.99 / 1.10 | 6.789e-01 |
+| 11000 | 0.94 / 0.94 | 0.80 / 0.97 | 0.91 / 0.97 | 0.95 / 1.10 | 6.837e-01 |
+| 12000 | 0.91 / 1.08 | 0.81 / 0.97 | 0.91 / 0.98 | 0.99 / 1.16 | 6.822e-01 |
+
+## rms1_wd1e-2 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/rms1_wd1e-2_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+| 1000 | 0.99 / 0.84 | 0.70 / 0.95 | 0.94 / 0.99 | 1.00 / 1.18 | 5.987e-01 |
+| 2000 | 1.02 / 1.15 | 0.78 / 0.96 | 0.94 / 1.01 | 1.02 / 1.27 | 5.528e-01 |
+| 3000 | 1.03 / 1.04 | 0.79 / 0.97 | 0.92 / 0.98 | 0.93 / 1.13 | 5.540e-01 |
+| 4000 | 1.01 / 1.05 | 0.85 / 0.98 | 0.93 / 0.99 | 0.97 / 1.11 | 5.686e-01 |
+| 5000 | 1.02 / 1.15 | 0.86 / 0.98 | 0.92 / 0.99 | 0.90 / 1.03 | 5.897e-01 |
+| 6000 | 0.95 / 1.06 | 0.88 / 0.99 | 0.93 / 0.99 | 0.91 / 1.08 | 6.004e-01 |
+| 7000 | 0.94 / 1.06 | 0.85 / 0.98 | 0.94 / 1.01 | 0.92 / 1.05 | 6.121e-01 |
+| 8000 | 0.97 / 0.93 | 0.88 / 1.00 | 0.94 / 1.01 | 1.00 / 1.16 | 6.218e-01 |
+| 9000 | 0.99 / 1.00 | 0.85 / 1.00 | 0.92 / 0.98 | 0.91 / 1.06 | 6.291e-01 |
+| 10000 | 0.99 / 0.94 | 0.85 / 1.01 | 0.93 / 1.00 | 0.88 / 1.05 | 6.363e-01 |
+| 11000 | 0.97 / 0.94 | 0.85 / 0.98 | 0.93 / 0.99 | 0.95 / 1.04 | 6.436e-01 |
+| 12000 | 0.98 / 1.01 | 0.85 / 0.98 | 0.92 / 0.99 | 0.90 / 1.08 | 6.489e-01 |
+
+AMP_TRACK_DONE
+[W917 12:31:09.380049785 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+AMP exit 0
+model-free {'haarpsi_90': 0.71, 'ssim_90': 0.831, 'psnr_90': np.float64(27.844), 'airE_90': 0.415, 'haarpsi_300': 0.702, 'ssim_300': 0.819, 'psnr_300': np.float64(28.522), 'airE_300': 0.413, 'static_noise': 0.021, 'cortex_peak': 0.977, 'cortex_washout': 0.977, 'cortex_nrmse': 0.023, 'medulla_peak': 0.977, 'medulla_washout': 0.977, 'medulla_nrmse': 0.023}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(125.651), 'airE_90': 0.157, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(125.938), 'airE_300': 0.135, 'static_noise': 0.02, 'cortex_peak': 0.837, 'cortex_washout': 1.024, 'cortex_nrmse': 0.084, 'medulla_peak': 0.943, 'medulla_washout': 0.95, 'medulla_nrmse': 0.101}
+NIK-free {'haarpsi_90': 0.799, 'ssim_90': 0.9, 'psnr_90': np.float64(30.663), 'airE_90': 0.162, 'haarpsi_300': 0.839, 'ssim_300': 0.908, 'psnr_300': np.float64(33.398), 'airE_300': 0.168, 'static_noise': 0.005, 'cortex_peak': 0.727, 'cortex_washout': 0.88, 'cortex_nrmse': 0.149, 'medulla_peak': 0.912, 'medulla_washout': 0.947, 'medulla_nrmse': 0.079}
+NIK-sub16 {'haarpsi_90': 0.777, 'ssim_90': 0.894, 'psnr_90': np.float64(30.737), 'airE_90': 0.169, 'haarpsi_300': 0.831, 'ssim_300': 0.916, 'psnr_300': np.float64(32.722), 'airE_300': 0.172, 'static_noise': 0.018, 'cortex_peak': 0.756, 'cortex_washout': 0.92, 'cortex_nrmse': 0.125, 'medulla_peak': 0.987, 'medulla_washout': 0.941, 'medulla_nrmse': 0.099}
+NIK-tofts8 old (3k, restore) {'haarpsi_90': 0.743, 'ssim_90': 0.903, 'psnr_90': np.float64(29.164), 'airE_90': 0.129, 'haarpsi_300': 0.806, 'ssim_300': 0.937, 'psnr_300': np.float64(31.711), 'airE_300': 0.13, 'static_noise': 0.002, 'cortex_peak': 0.539, 'cortex_washout': 0.728, 'cortex_nrmse': 0.302, 'medulla_peak': 0.674, 'medulla_washout': 0.752, 'medulla_nrmse': 0.26}
+NIK-tofts8 new (10k, rms1) {'haarpsi_90': 0.716, 'ssim_90': 0.851, 'psnr_90': np.float64(28.676), 'airE_90': 0.18, 'haarpsi_300': 0.815, 'ssim_300': 0.936, 'psnr_300': np.float64(32.405), 'airE_300': 0.152, 'static_noise': 0.004, 'cortex_peak': 0.839, 'cortex_washout': 0.996, 'cortex_nrmse': 0.057, 'medulla_peak': 0.932, 'medulla_washout': 0.998, 'medulla_nrmse': 0.042}
+NIK-tofts new (10k, rms1) {'haarpsi_90': 0.654, 'ssim_90': 0.793, 'psnr_90': np.float64(27.661), 'airE_90': 0.248, 'haarpsi_300': 0.817, 'ssim_300': 0.931, 'psnr_300': np.float64(32.611), 'airE_300': 0.168, 'static_noise': 0.015, 'cortex_peak': 0.715, 'cortex_washout': 0.971, 'cortex_nrmse': 0.092, 'medulla_peak': 0.919, 'medulla_washout': 0.974, 'medulla_nrmse': 0.052}
+NIK-patlak new (10k) {'haarpsi_90': 0.778, 'ssim_90': 0.92, 'psnr_90': np.float64(30.636), 'airE_90': 0.145, 'haarpsi_300': 0.798, 'ssim_300': 0.931, 'psnr_300': np.float64(31.702), 'airE_300': 0.141, 'static_noise': 0.001, 'cortex_peak': 0.94, 'cortex_washout': 0.873, 'cortex_nrmse': 0.284, 'medulla_peak': 0.692, 'medulla_washout': 0.911, 'medulla_nrmse': 0.234}
+GRASP-Pro {'haarpsi_90': 0.671, 'ssim_90': 0.888, 'psnr_90': np.float64(27.263), 'airE_90': 0.155, 'haarpsi_300': 0.921, 'ssim_300': 0.976, 'psnr_300': np.float64(36.138), 'airE_300': 0.158, 'static_noise': 0.045, 'cortex_peak': 0.646, 'cortex_washout': 0.925, 'cortex_nrmse': 0.216, 'medulla_peak': 0.925, 'medulla_washout': 0.891, 'medulla_nrmse': 0.132}
+GRASP {'haarpsi_90': 0.74, 'ssim_90': 0.885, 'psnr_90': np.float64(28.516), 'airE_90': 0.134, 'haarpsi_300': 0.785, 'ssim_300': 0.903, 'psnr_300': np.float64(30.467), 'airE_300': 0.133, 'static_noise': 0.001, 'cortex_peak': 0.767, 'cortex_washout': 1.047, 'cortex_nrmse': 0.075, 'medulla_peak': 1.005, 'medulla_washout': 1.064, 'medulla_nrmse': 0.079}
+rms1_wd3e-3 steps [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+rms1_wd1e-2 steps [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+# image quality vs curve fidelity, slice 21, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)
+
+| recon | haarpsi_90 | ssim_90 | psnr_90 | airE_90 | haarpsi_300 | airE_300 | static_noise | cortex_peak | cortex_washout | cortex_nrmse | medulla_nrmse |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| model-free | 0.710 | 0.831 | 27.844 | 0.415 | 0.702 | 0.413 | 0.021 | 0.977 | 0.977 | 0.023 | 0.023 |
+| cs100 (GRASP-Pro all spokes) | 1.000 | 1.000 | 125.651 | 0.157 | 1.000 | 0.135 | 0.020 | 0.837 | 1.024 | 0.084 | 0.101 |
+| NIK-free | 0.799 | 0.900 | 30.663 | 0.162 | 0.839 | 0.168 | 0.005 | 0.727 | 0.880 | 0.149 | 0.079 |
+| NIK-sub16 | 0.777 | 0.894 | 30.737 | 0.169 | 0.831 | 0.172 | 0.018 | 0.756 | 0.920 | 0.125 | 0.099 |
+| NIK-tofts8 old (3k, restore) | 0.743 | 0.903 | 29.164 | 0.129 | 0.806 | 0.130 | 0.002 | 0.539 | 0.728 | 0.302 | 0.260 |
+| NIK-tofts8 new (10k, rms1) | 0.716 | 0.851 | 28.676 | 0.180 | 0.815 | 0.152 | 0.004 | 0.839 | 0.996 | 0.057 | 0.042 |
+| NIK-tofts new (10k, rms1) | 0.654 | 0.793 | 27.661 | 0.248 | 0.817 | 0.168 | 0.015 | 0.715 | 0.971 | 0.092 | 0.052 |
+| NIK-patlak new (10k) | 0.778 | 0.920 | 30.636 | 0.145 | 0.798 | 0.141 | 0.001 | 0.940 | 0.873 | 0.284 | 0.234 |
+| GRASP-Pro | 0.671 | 0.888 | 27.263 | 0.155 | 0.921 | 0.158 | 0.045 | 0.646 | 0.925 | 0.216 | 0.132 |
+| GRASP | 0.740 | 0.885 | 28.516 | 0.134 | 0.785 | 0.133 | 0.001 | 0.767 | 1.047 | 0.075 | 0.079 |
+
+## rms1_wd3e-3, per training step
+IQ_TRACK_DONE
+[W917 12:31:19.718558044 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+IQ exit 0
