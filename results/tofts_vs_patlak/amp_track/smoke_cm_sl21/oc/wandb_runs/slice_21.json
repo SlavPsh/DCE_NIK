@@ -1,0 +1,15 @@
+{
+ "name": "gnik_oc_s21",
+ "mode": "disabled",
+ "loss": 20.00845718383789,
+ "heldout_mse": 9.678990364074707,
+ "val_knmse": 12.087035971669623,
+ "best_heldout_mse": Infinity,
+ "coef_tv": 0.0,
+ "best_step": 0,
+ "lr": 1e-05,
+ "wall_s": 823.9922878742218,
+ "peak_gpu_mb": 4796.18017578125,
+ "params": 5641856,
+ "wall_total_s": 823.9874079227448
+}
