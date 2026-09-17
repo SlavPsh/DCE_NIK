@@ -1,0 +1,8 @@
+2026-09-17 15:14:20 host worker06.cluster job 3319011 task  stage post cpus 4
+gv2_nufft: 54 slices, diverged [], window 4.246e-05
+wrote fig1/fig2_gv2_nufft.png
+gv2_lam0.02: 54 slices, diverged [], window 7.585e-05
+wrote fig1/fig2_gv2_lam0.02.png
+gv2_lam0.08: 54 slices, diverged [], window 7.257e-05
+wrote fig1/fig2_gv2_lam0.08.png
+gv2_lam0.25: 54 slices, diverged [], window 6.625e-05
