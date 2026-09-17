@@ -1,4 +1,4 @@
-2026-09-17 14:23:33 host worker03.cluster job 3319001 task 18 stage recon cpus 8
+2026-09-17 14:25:41 host worker06.cluster job 3319030 task 18 stage recon cpus 8
 slice 18: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 6.843e-05 (2s)
   ite = 0, cost = 0.000126
   ite = 1, cost = 0.000106
@@ -9,11 +9,3 @@ slice 18: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 6.843e-05 (2s)
   ite = 6, cost = 0.000079
   ite = 7, cost = 0.000077
   ite = 8, cost = 0.000075
-  ite = 0, cost = 0.000074
-  ite = 1, cost = 0.000074
-  ite = 2, cost = 0.000072
-  ite = 3, cost = 0.000072
-  ite = 4, cost = 0.000071
-  ite = 5, cost = 0.000070
-  ite = 6, cost = 0.000069
-  ite = 7, cost = 0.000069

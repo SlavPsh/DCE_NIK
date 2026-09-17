@@ -1,0 +1,4 @@
+2026-09-17 14:25:37 host worker06.cluster job 3319009
+d8cb27b gv2_rerun: GLAMS global lambdas (fraction of X0REF, same for every slice), tag glam<frac>
+chained recon array 3319010 -> post 3319011
+GLAM_DONE

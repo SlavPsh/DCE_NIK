@@ -1,4 +1,4 @@
-2026-09-17 14:23:33 host worker03.cluster job 3318986 task 3 stage recon cpus 8
+2026-09-17 14:25:40 host worker04.cluster job 3319015 task 3 stage recon cpus 8
 error    libmamba Could not set lock (Resource temporarily unavailable)
 warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
     Waiting for other mamba process to finish
@@ -6,10 +6,3 @@ slice 03: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 7.772e-05 (2s)
   ite = 0, cost = 0.000073
   ite = 1, cost = 0.000065
   ite = 2, cost = 0.000050
-  ite = 3, cost = 0.000043
-  ite = 4, cost = 0.000038
-  ite = 5, cost = 0.000035
-  ite = 6, cost = 0.000033
-  ite = 7, cost = 0.000031
-  ite = 8, cost = 0.000029
-  ite = 0, cost = 0.000028
