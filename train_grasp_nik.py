@@ -295,11 +295,15 @@ def train_one_slice(out_dir, slc, sh, args, device):
         nxc = int(args.coef_tv_grid or sh['nx']); _cg = torch.from_numpy(A.cartesian_grid(nxc)).to(device)
         _cmask = (torch.sqrt((_cg ** 2).sum(1)) <= 1.0).float().view(nxc, nxc, 1)
         print(f'    [coef-tv] grid {nxc} every {args.coef_tv_every} weight {args.coef_tv_weight:g} delta {args.coef_tv_delta:g}', flush=True)
+        from torch.utils.checkpoint import checkpoint as _ckpt
+        _CH = int(args.coef_tv_chunk)
+        def _coil_kspace(cc, c):                                                                                                 # raw coefficient k-space of one chunk, one coil [n,R,2]
+            cd = torch.full((cc.shape[0],), c, dtype=torch.long, device=device); Amp = model.amplitudes(cc, cd)
+            return torch.stack([normalizer.denormalize(cc, Amp[:, r, :]) for r in range(int(model.rank))], 1)
         def coef_tv_backward(scale):
             tot = 0.0; Rk = int(model.rank)
             for c in range(ncc):
-                cd = torch.full((nxc * nxc,), c, dtype=torch.long, device=device); Amp = model.amplitudes(_cg, cd)                 # [P,R,2]
-                pr = torch.stack([normalizer.denormalize(_cg, Amp[:, r, :]) for r in range(Rk)], 1)                              # [P,R,2] raw k-space
+                pr = torch.cat([_ckpt(_coil_kspace, _cg[i:i + _CH], c, use_reentrant=False) for i in range(0, _cg.shape[0], _CH)], 0)   # activations recomputed in backward: peak memory = one chunk
                 K = torch.complex(pr[..., 0], pr[..., 1]).view(nxc, nxc, Rk) * _cmask
                 im = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(K, dim=(0, 1)), dim=(0, 1)), dim=(0, 1))          # [nx,nx,R] coil image per atom
                 rms = torch.sqrt((im.abs() ** 2).mean(dim=(0, 1))).detach() + 1e-12
@@ -479,6 +483,7 @@ def main():
     ap.add_argument('--coef-tv-every', type=int, default=8, help='evaluate the coefficient-map tv every N steps (weight scaled by N)')
     ap.add_argument('--coef-tv-grid', type=int, default=0, help='cartesian grid for the tv render; 0 = the data nx (full resolution, no fov wrap)')
     ap.add_argument('--coef-tv-delta', type=float, default=0.1, help='huber knee as a fraction of the map rms')
+    ap.add_argument('--coef-tv-chunk', type=int, default=16384, help='grid points per checkpointed chunk in the tv render (memory)')
     ap.add_argument('--snapshot-every', type=int, default=0, help='save |recon| (float16) every N steps at eval points; 0 = off')
     ap.add_argument('--no-restore', action='store_true', help='keep the final weights instead of the best-heldout state')
     ap.add_argument('--console-every', type=int, default=1000)
