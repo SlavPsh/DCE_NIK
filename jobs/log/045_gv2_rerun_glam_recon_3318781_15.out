@@ -1,1 +1,2 @@
 2026-09-17 13:27:42 host worker05.cluster job 3318798 task 15 stage recon cpus 8
+slice 15: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 0.0001075 (155s)
