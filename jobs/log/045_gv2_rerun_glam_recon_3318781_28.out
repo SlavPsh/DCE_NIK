@@ -1,2 +1,11 @@
 2026-09-17 13:35:44 host worker09.cluster job 3318819 task 28 stage recon cpus 8
 slice 28: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 9.356e-05 (2s)
+  ite = 0, cost = 0.001428
+  ite = 1, cost = 0.001397
+  ite = 2, cost = 0.001165
+  ite = 3, cost = 0.001100
+  ite = 4, cost = 0.000892
+  ite = 5, cost = 0.000824
+  ite = 6, cost = 0.000813
+  ite = 7, cost = 0.000784
+  ite = 8, cost = 0.000754

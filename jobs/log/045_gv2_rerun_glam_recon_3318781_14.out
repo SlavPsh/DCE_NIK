@@ -29,3 +29,6 @@ slice 14: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 8.362e-05 (2s)
   ite = 5, cost = 0.000164
   ite = 6, cost = 0.000161
   ite = 7, cost = 0.000157
+  ite = 8, cost = 0.000150
+SAVED slice 14 glam0.25 lam=1.89e-05 (192, 192, 102) finite=True (509s)
+SLICE_DONE 14 510s
