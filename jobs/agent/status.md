@@ -1,22 +1,21 @@
 # helios agent
 
-updated 2026-09-17 17:02:01 on worker06.cluster, job 3310792, cycle 205
+updated 2026-09-17 17:12:14 on worker06.cluster, job 3310792, cycle 210
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3319920 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
-| 3319921 | 052_coilmode_smoke | 1 RUNNING None |
 | 3319931 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
-| 052_coilmode_smoke | 1 RUNNING None |
 | 016_b1factor_log | exit 0 |
 | 015_senseB_logs | exit 0 |
 | 049_state_047 | exit 0 |

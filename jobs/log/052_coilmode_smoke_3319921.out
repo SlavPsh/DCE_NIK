@@ -1,0 +1,31 @@
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 8 steps, batch 8192, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:375: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last,
+    step      8  train 2.001e+01  heldout 9.679e+00
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 21: peak_gpu_MB 4796 params 5641856 best_heldout inf
+slice 21  nik (192, 192, 342)  (826s)  vs CS: corr 0.136  nrmse 0.894
+done 826s -> results/tofts_vs_patlak/amp_track/smoke_cm_sl21/oc
+SMOKE oc exit 0
+device=cuda
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 8 steps, batch 8192, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+    warmstarted Phi from PCA basis (rank 16, 100 frames, fit MSE 7.089e-03)
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:375: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last,
+    step      8  train 1.946e+00  heldout 9.307e-01
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 21: peak_gpu_MB 4806 params 5558016 best_heldout inf
+slice 21  nik (192, 192, 342)  (833s)  vs CS: corr 0.157  nrmse 0.893
+done 833s -> results/tofts_vs_patlak/amp_track/smoke_cm_sl21/sub16
+SMOKE sub16 exit 0
+ckpt coil_mode output a_head torch.Size([128, 1024])
