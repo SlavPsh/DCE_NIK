@@ -20,7 +20,7 @@ def main():
         tr = traj[:, idx]; w = np.maximum(np.abs(tr), 1 / nx / 4)
         x = (SIGN * 2 * np.pi * tr.real).ravel().astype(np.float64); y = (SIGN * 2 * np.pi * tr.imag).ravel().astype(np.float64)
         acc = sum(finufft.nufft2d1(x, y, (kdata[:, idx, c] * w).astype(np.complex128).ravel(), (nx, nx), isign=1, eps=1e-4) * np.conj(b1[:, :, c]) for c in range(ncc))
-        s = (nx - bas) // 2; return np.abs(acc / den)[s:s + bas, s:s + bas]
+        s = (nx - bas) // 2; return np.abs(acc / den)[s:s + bas, s:s + bas] / len(idx)                                   # per-spoke normalization so windows of different width are on one scale
     out = {}; ref31 = None
     for W in [int(w) for w in a.windows.split(",")]:
         step = max(W // 4, 2); wins = [order[i:i + W] for i in range(0, len(order) - W + 1, step)]; t = np.array([vt[idx].mean() * TA for idx in wins])
