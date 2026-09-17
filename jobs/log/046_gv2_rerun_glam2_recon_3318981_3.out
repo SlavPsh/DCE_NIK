@@ -13,3 +13,5 @@ slice 03: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 7.772e-05 (2s)
   ite = 7, cost = 0.000031
   ite = 8, cost = 0.000029
   ite = 0, cost = 0.000028
+  ite = 1, cost = 0.000028
+slurmstepd-worker03: error: *** JOB 3318986 ON worker03 CANCELLED AT 2026-09-17T14:29:47 ***

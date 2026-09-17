@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-17 14:27:41 on worker06.cluster, job 3310792, cycle 130
+updated 2026-09-17 14:29:52 on worker06.cluster, job 3310792, cycle 131
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-09-17 14:27:41 on worker06.cluster, job 3310792, cycle 130
 
 | name | state |
 |---|---|
+| 048_cancel_046_chain | exit 0 |
 | 047_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
 | 046_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
 | 047_cancel_046 | exit 0 |
@@ -31,4 +32,3 @@ updated 2026-09-17 14:27:41 on worker06.cluster, job 3310792, cycle 130
 | 044_prep_log | exit 0 |
 | 043_gv2_rerun | 1 COMPLETED 00:10:18 |
 | 043_env_rerun | exit 0 |
-| 042_archive_verify | 1 COMPLETED 00:02:54 |

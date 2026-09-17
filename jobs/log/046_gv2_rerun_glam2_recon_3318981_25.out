@@ -1,0 +1,4 @@
+2026-09-17 14:29:28 host worker09.cluster job 3319041 task 25 stage recon cpus 8
+slice 25: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 0.0001064 (2s)
+  ite = 0, cost = 0.000120
+slurmstepd-worker09: error: *** JOB 3319041 ON worker09 CANCELLED AT 2026-09-17T14:29:47 ***

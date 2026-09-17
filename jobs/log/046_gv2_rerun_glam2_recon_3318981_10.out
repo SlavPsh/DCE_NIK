@@ -21,3 +21,14 @@ slice 10: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 9.324e-05 (2s)
   ite = 6, cost = 0.000054
   ite = 7, cost = 0.000053
   ite = 8, cost = 0.000052
+  ite = 0, cost = 0.000051
+  ite = 1, cost = 0.000051
+  ite = 2, cost = 0.000050
+  ite = 3, cost = 0.000049
+  ite = 4, cost = 0.000049
+  ite = 5, cost = 0.000049
+  ite = 6, cost = 0.000049
+  ite = 7, cost = 0.000048
+  ite = 8, cost = 0.000048
+SAVED slice 10 glam0.02 lam=1.52e-06 (192, 192, 102) finite=True (346s)
+SLICE_DONE 10 347s
