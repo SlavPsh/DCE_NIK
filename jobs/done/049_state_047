@@ -1,0 +1,6 @@
+probe 049_state_047
+host worker06.cluster
+start 2026-09-17 14:50:33
+end 2026-09-17 14:50:33
+exit 0
+log jobs/log/probe_049_state_047.out
