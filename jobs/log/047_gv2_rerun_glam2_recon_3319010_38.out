@@ -1,0 +1,2 @@
+2026-09-17 14:41:58 host worker02.cluster job 3319069 task 38 stage recon cpus 8
+slice 38: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 6.55e-05 (2s)
