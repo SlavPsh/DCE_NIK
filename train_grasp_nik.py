@@ -290,7 +290,14 @@ def train_one_slice(out_dir, slc, sh, args, device):
     # spatial prior on the coefficient maps (fixed-basis models): per-coil coefficient images = ifft2 of the R cartesian coefficient k-spaces
     # (model.amplitudes on the full nx grid, denormalized, masked to the sampled disk), huber tv per map normalized by the map rms (scale-free),
     # backward per coil so the graph never holds all coils. the grasp-pro move (tv on subspace coefficients), no image rendering per frame.
-    ctv_on = args.coef_tv_weight > 0 and hasattr(model, 'amplitudes')
+    # k-space support prior (same render): the coefficient images must vanish outside the body; penalty = energy outside / energy inside per map.
+    # streaks extend outside the body, so this targets them directly; the mask orientation is checked once against the model's own energy.
+    ctv_on = (args.coef_tv_weight > 0 or args.support_weight > 0) and hasattr(model, 'amplitudes')
+    _smask = [None]
+    if args.support_weight > 0:
+        _m0 = torch.from_numpy(np.load(args.support_mask).astype(bool)).to(device)
+        assert _m0.shape[0] == int(args.coef_tv_grid or sh['nx']), (_m0.shape, sh['nx'])
+        _mcands = {'id': _m0, 'rot180': torch.flip(_m0, (0, 1)), 'fliplr': torch.flip(_m0, (1,)), 'flipud': torch.flip(_m0, (0,))}
     if ctv_on:
         nxc = int(args.coef_tv_grid or sh['nx']); _cg = torch.from_numpy(A.cartesian_grid(nxc)).to(device)
         _cmask = (torch.sqrt((_cg ** 2).sum(1)) <= 1.0).float().view(nxc, nxc, 1)
@@ -300,18 +307,43 @@ def train_one_slice(out_dir, slc, sh, args, device):
         def _coil_kspace(cc, c):                                                                                                 # raw coefficient k-space of one chunk, one coil [n,R,2]
             cd = torch.full((cc.shape[0],), c, dtype=torch.long, device=device); Amp = model.amplitudes(cc, cd)
             return torch.stack([normalizer.denormalize(cc, Amp[:, r, :]) for r in range(int(model.rank))], 1)
-        def coef_tv_backward(scale):
-            tot = 0.0; Rk = int(model.rank)
+        def coef_tv_backward(scale_tv, scale_sup=0.0):
+            tot = 0.0; tot_s = 0.0; Rk = int(model.rank)
             for c in range(ncc):
                 pr = torch.cat([_ckpt(_coil_kspace, _cg[i:i + _CH], c, use_reentrant=False) for i in range(0, _cg.shape[0], _CH)], 0)   # activations recomputed in backward: peak memory = one chunk
                 K = torch.complex(pr[..., 0], pr[..., 1]).view(nxc, nxc, Rk) * _cmask
                 im = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(K, dim=(0, 1)), dim=(0, 1)), dim=(0, 1))          # [nx,nx,R] coil image per atom
-                rms = torch.sqrt((im.abs() ** 2).mean(dim=(0, 1))).detach() + 1e-12
-                dx = (im[1:, :] - im[:-1, :]).abs(); dy = (im[:, 1:] - im[:, :-1]).abs(); d = args.coef_tv_delta * rms
-                hub = lambda a: torch.where(a <= d, 0.5 * a ** 2 / d, a - 0.5 * d)
-                pen = ((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms).sum() / (ncc * Rk)
-                (scale * pen).backward(); tot += float(pen)
-            return tot
+                E = im.abs() ** 2; pen = torch.zeros((), device=device); pen_s = torch.zeros((), device=device)
+                if scale_tv > 0:
+                    rms = torch.sqrt(E.mean(dim=(0, 1))).detach() + 1e-12
+                    dx = (im[1:, :] - im[:-1, :]).abs(); dy = (im[:, 1:] - im[:, :-1]).abs(); d = args.coef_tv_delta * rms
+                    hub = lambda a: torch.where(a <= d, 0.5 * a ** 2 / d, a - 0.5 * d)
+                    pen = ((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms).sum() / (ncc * Rk)
+                if scale_sup > 0:
+                    if _smask[0] is None:                                                                                        # one-time orientation check on the model's own energy (first coil, all atoms)
+                        Ed = E.detach().sum(-1); fr = {k: float(Ed[m].sum() / Ed.sum()) for k, m in _mcands.items()}; best = max(fr, key=fr.get)
+                        _smask[0] = _mcands[best]; print(f'    [support] mask orientation {best} (inside-energy fractions {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
+                    m = _smask[0]
+                    pen_s = (E[~m].mean(0) / (E[m].mean(0) + 1e-12)).sum() / (ncc * Rk)                                          # outside / inside energy per map
+                (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+            return tot, tot_s
+    # PISCO-style self-supervised k-space consistency: random acquired centres with a (2s+1)^2-1 cartesian stencil at 1/fov spacing, all coils,
+    # own spoke time; one shift-invariant kernel solved from the batch (ridge), residual of the relation penalized. calibration-free, no render.
+    pisco_on = args.pisco_weight > 0
+    if pisco_on:
+        _dk = 2.0 / int(sh['nx']); _sp = int(args.pisco_stencil)
+        _offs = torch.tensor([(i * _dk, j * _dk) for i in range(-_sp, _sp + 1) for j in range(-_sp, _sp + 1) if (i, j) != (0, 0)], dtype=torch.float32, device=device)
+        print(f'    [pisco] stencil {_offs.shape[0]} neighbours at dk {_dk:.4f}, batch {args.pisco_batch}, every {args.pisco_every}, weight {args.pisco_weight:g}, ridge {args.pisco_ridge:g}', flush=True)
+        def pisco_term():
+            B = int(args.pisco_batch); idx = torch.randint(0, N_train, (B,), device=device); xc = xtr[idx]; tc = ttr[idx]; S = _offs.shape[0]
+            pts = torch.cat([xc, (xc[:, None, :] + _offs[None]).reshape(-1, 2)], 0); tt = torch.cat([tc, tc.repeat_interleave(S)], 0)
+            V = []
+            for c in range(ncc):
+                cd = torch.full((pts.shape[0],), c, dtype=torch.long, device=device); pr = normalizer.denormalize(pts, model(pts, tt, cd)); V.append(torch.complex(pr[:, 0], pr[:, 1]))
+            V = torch.stack(V, 1); T = V[:B]; Nb = V[B:].view(B, S * ncc)                                                          # targets [B,C], neighbours [B,S*C], raw k-space
+            G = Nb.conj().T @ Nb; lam = float(args.pisco_ridge) * torch.real(torch.trace(G)) / G.shape[0]
+            Wk = torch.linalg.solve(G + lam * torch.eye(G.shape[0], device=device, dtype=G.dtype), Nb.conj().T @ T)
+            r = T - Nb @ Wk; return (r.abs() ** 2).sum() / ((T.abs() ** 2).sum() + 1e-12)
 
     best_heldout, best_state, best_step = float('inf'), None, 0
     ckpt_path = os.path.join(args.save_dir, f'ckpt_slice_{slc:02d}.pt')
@@ -329,7 +361,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                         sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state, best_step=best_step), tmp)
         os.replace(tmp, ckpt_path)
 
-    model.train(); ctv_last = 0.0
+    model.train(); ctv_last = 0.0; sup_last = 0.0; pisco_last = 0.0
     for step in range(start_step, args.steps + 1):
         idx = torch.randint(0, N_train, (args.batch_size,), device=device)
         opt.zero_grad(set_to_none=True)
@@ -347,8 +379,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
                 delta=args.ktv21_delta, device=device.type)
         if spirit_on:                                            # A0 k-space coil-consistency prior
             loss = loss + args.spirit_weight * spirit_term()
+        if pisco_on and step % args.pisco_every == 0:
+            pv = pisco_term(); loss = loss + args.pisco_weight * args.pisco_every * pv; pisco_last = float(pv)
         loss.backward()
-        if ctv_on and step % args.coef_tv_every == 0: ctv_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
+        if ctv_on and step % args.coef_tv_every == 0: ctv_last, sup_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every, args.support_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         opt.step()
         if cosine: sched.step()
@@ -376,7 +410,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     with torch.no_grad():
                         snap = recon_nik_cart(A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type, shared=sh, support_radius=args.support_radius, verbose=False), b1, bas)
                     np.save(os.path.join(args.save_dir, f'snap_slice_{slc:02d}_step{step:06d}.npy'), np.abs(snap).astype(np.float16)); model.train()
-                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last,
+                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last, support=sup_last, pisco=pisco_last,
                              best_step=best_step, lr=opt.param_groups[0]['lr'], wall_s=time.time() - t_slice,
                              peak_gpu_mb=W.peak_gpu_mb()), step=step)
                 if step % args.console_every == 0 or step == args.steps:
@@ -484,6 +518,11 @@ def main():
     ap.add_argument('--coef-tv-grid', type=int, default=0, help='cartesian grid for the tv render; 0 = the data nx (full resolution, no fov wrap)')
     ap.add_argument('--coef-tv-delta', type=float, default=0.1, help='huber knee as a fraction of the map rms')
     ap.add_argument('--coef-tv-chunk', type=int, default=16384, help='grid points per checkpointed chunk in the tv render (memory)')
+    ap.add_argument('--support-weight', type=float, default=0.0, help='k-space support prior on the coefficient images (energy outside / inside the body); shares the tv render cadence --coef-tv-every; 0 = off')
+    ap.add_argument('--support-mask', default=None, help='bool npy [nx,nx] body support (support_mask.py)')
+    ap.add_argument('--pisco-weight', type=float, default=0.0, help='PISCO-style self-supervised k-space consistency; 0 = off')
+    ap.add_argument('--pisco-every', type=int, default=8); ap.add_argument('--pisco-batch', type=int, default=1024)
+    ap.add_argument('--pisco-stencil', type=int, default=1, help='half-width of the cartesian neighbour stencil (1 = 8 neighbours)'); ap.add_argument('--pisco-ridge', type=float, default=1e-3)
     ap.add_argument('--snapshot-every', type=int, default=0, help='save |recon| (float16) every N steps at eval points; 0 = off')
     ap.add_argument('--no-restore', action='store_true', help='keep the final weights instead of the best-heldout state')
     ap.add_argument('--console-every', type=int, default=1000)
