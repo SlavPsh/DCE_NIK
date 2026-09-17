@@ -1,0 +1,88 @@
+2026-09-17 14:38:22 host worker05.cluster job 3318679 task 0 stage track
+/var/spool/slurmd/job3318679/slurm_script: line 21: nvidia-smi: command not found
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+wrote /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl21_avg3: seeds [0, 1, 2], mean relative seed deviation 0.052
+AVG exit 0
+cos snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+cos_wd1e-2 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+ctv0.03 snapshots []
+ctv0.3 snapshots []
+# amplitude vs step, slice 21, k80, tofts8 (roi enhancement relative to the model-free reference; peak 20 to 210 s / washout mean t > 200 s)
+
+## cos (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/cos_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+| 1000 | 1.04 / 1.06 | 0.81 / 0.91 | 0.92 / 0.96 | 1.28 / 1.29 | 6.234e-01 |
+| 2000 | 1.04 / 1.05 | 0.76 / 0.92 | 0.89 / 0.94 | 0.98 / 1.18 | 5.767e-01 |
+| 3000 | 1.02 / 1.27 | 0.82 / 0.96 | 0.90 / 0.97 | 0.95 / 1.13 | 6.017e-01 |
+| 4000 | 0.85 / 0.94 | 0.83 / 0.97 | 0.90 / 0.98 | 0.92 / 1.08 | 6.379e-01 |
+| 5000 | 0.86 / 1.09 | 0.84 / 0.99 | 0.93 / 0.99 | 0.92 / 1.11 | 6.709e-01 |
+| 6000 | 0.91 / 0.89 | 0.87 / 1.00 | 0.94 / 1.00 | 0.90 / 1.07 | 6.982e-01 |
+| 7000 | 0.93 / 0.98 | 0.87 / 1.00 | 0.94 / 1.01 | 0.85 / 0.99 | 7.258e-01 |
+| 8000 | 0.90 / 0.98 | 0.91 / 1.02 | 0.96 / 1.02 | 0.87 / 0.99 | 7.502e-01 |
+| 9000 | 0.92 / 1.03 | 0.89 / 1.03 | 0.96 / 1.03 | 0.81 / 0.96 | 7.679e-01 |
+| 10000 | 0.95 / 1.08 | 0.90 / 1.03 | 0.96 / 1.03 | 0.87 / 1.01 | 7.819e-01 |
+| 11000 | 0.95 / 1.07 | 0.90 / 1.03 | 0.96 / 1.03 | 0.80 / 0.94 | 7.890e-01 |
+| 12000 | 0.94 / 1.07 | 0.91 / 1.03 | 0.97 / 1.03 | 0.82 / 0.97 | 7.915e-01 |
+
+## cos_wd1e-2 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/cos_wd1e-2_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+| 1000 | 0.71 / 0.90 | 0.69 / 0.92 | 0.96 / 0.98 | 1.09 / 1.22 | 5.999e-01 |
+| 2000 | 1.10 / 1.03 | 0.78 / 0.94 | 0.91 / 0.98 | 0.82 / 0.97 | 5.547e-01 |
+| 3000 | 1.02 / 1.06 | 0.83 / 0.98 | 0.91 / 0.98 | 1.06 / 1.23 | 5.533e-01 |
+| 4000 | 1.00 / 1.11 | 0.87 / 0.97 | 0.92 / 0.98 | 0.87 / 1.02 | 5.698e-01 |
+| 5000 | 1.00 / 1.19 | 0.88 / 1.00 | 0.94 / 1.01 | 0.92 / 1.08 | 5.967e-01 |
+| 6000 | 1.04 / 1.00 | 0.90 / 1.01 | 0.95 / 1.01 | 0.80 / 0.94 | 6.140e-01 |
+| 7000 | 1.03 / 1.04 | 0.89 / 1.01 | 0.95 / 1.02 | 0.76 / 0.88 | 6.327e-01 |
+| 8000 | 0.96 / 0.99 | 0.93 / 1.02 | 0.96 / 1.02 | 0.91 / 1.05 | 6.474e-01 |
+| 9000 | 1.00 / 1.09 | 0.92 / 1.02 | 0.95 / 1.02 | 0.78 / 0.92 | 6.597e-01 |
+| 10000 | 1.00 / 1.06 | 0.93 / 1.03 | 0.97 / 1.03 | 0.82 / 0.98 | 6.684e-01 |
+| 11000 | 1.01 / 1.06 | 0.93 / 1.03 | 0.96 / 1.03 | 0.80 / 0.96 | 6.737e-01 |
+| 12000 | 1.02 / 1.06 | 0.93 / 1.03 | 0.97 / 1.03 | 0.81 / 0.98 | 6.752e-01 |
+
+## ctv0.03 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/ctv0.03_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+
+## ctv0.3 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/ctv0.3_sl21)
+| step | aorta peak / washout | cortex peak / washout | medulla peak / washout | liver peak / washout | heldout mse |
+|---|---|---|---|---|---|
+
+AMP_TRACK_DONE
+[W917 14:38:33.735190737 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+AMP exit 0
+model-free {'haarpsi_90': 0.71, 'ssim_90': 0.831, 'psnr_90': np.float64(27.844), 'airE_90': 0.415, 'haarpsi_300': 0.702, 'ssim_300': 0.819, 'psnr_300': np.float64(28.522), 'airE_300': 0.413, 'flatnoise_90': 0.253, 'highpass_90': 1.018, 'edge_90': 0.205, 'flatnoise_300': 0.256, 'highpass_300': 1.007, 'edge_300': 0.191, 'static_noise': 0.021, 'cortex_peak': 0.977, 'cortex_washout': 0.977, 'cortex_nrmse': 0.023, 'medulla_peak': 0.977, 'medulla_washout': 0.977, 'medulla_nrmse': 0.023}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(125.651), 'airE_90': 0.157, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(125.938), 'airE_300': 0.135, 'flatnoise_90': 0.254, 'highpass_90': 1.0, 'edge_90': 0.205, 'flatnoise_300': 0.259, 'highpass_300': 1.0, 'edge_300': 0.192, 'static_noise': 0.02, 'cortex_peak': 0.837, 'cortex_washout': 1.024, 'cortex_nrmse': 0.084, 'medulla_peak': 0.943, 'medulla_washout': 0.95, 'medulla_nrmse': 0.101}
+NIK-free {'haarpsi_90': 0.799, 'ssim_90': 0.9, 'psnr_90': np.float64(30.663), 'airE_90': 0.162, 'haarpsi_300': 0.839, 'ssim_300': 0.908, 'psnr_300': np.float64(33.398), 'airE_300': 0.168, 'flatnoise_90': 0.235, 'highpass_90': 0.972, 'edge_90': 0.197, 'flatnoise_300': 0.251, 'highpass_300': 0.996, 'edge_300': 0.192, 'static_noise': 0.005, 'cortex_peak': 0.727, 'cortex_washout': 0.88, 'cortex_nrmse': 0.149, 'medulla_peak': 0.912, 'medulla_washout': 0.947, 'medulla_nrmse': 0.079}
+NIK-sub16 {'haarpsi_90': 0.777, 'ssim_90': 0.894, 'psnr_90': np.float64(30.737), 'airE_90': 0.169, 'haarpsi_300': 0.831, 'ssim_300': 0.916, 'psnr_300': np.float64(32.722), 'airE_300': 0.172, 'flatnoise_90': 0.243, 'highpass_90': 0.951, 'edge_90': 0.194, 'flatnoise_300': 0.257, 'highpass_300': 1.037, 'edge_300': 0.193, 'static_noise': 0.018, 'cortex_peak': 0.756, 'cortex_washout': 0.92, 'cortex_nrmse': 0.125, 'medulla_peak': 0.987, 'medulla_washout': 0.941, 'medulla_nrmse': 0.099}
+NIK-tofts8 old (3k, restore) {'haarpsi_90': 0.743, 'ssim_90': 0.903, 'psnr_90': np.float64(29.164), 'airE_90': 0.129, 'haarpsi_300': 0.806, 'ssim_300': 0.937, 'psnr_300': np.float64(31.711), 'airE_300': 0.13, 'flatnoise_90': 0.241, 'highpass_90': 0.898, 'edge_90': 0.191, 'flatnoise_300': 0.251, 'highpass_300': 0.98, 'edge_300': 0.193, 'static_noise': 0.002, 'cortex_peak': 0.539, 'cortex_washout': 0.728, 'cortex_nrmse': 0.302, 'medulla_peak': 0.674, 'medulla_washout': 0.752, 'medulla_nrmse': 0.26}
+NIK-tofts8 new (10k, rms1) {'haarpsi_90': 0.716, 'ssim_90': 0.851, 'psnr_90': np.float64(28.676), 'airE_90': 0.18, 'haarpsi_300': 0.815, 'ssim_300': 0.936, 'psnr_300': np.float64(32.405), 'airE_300': 0.152, 'flatnoise_90': 0.232, 'highpass_90': 0.932, 'edge_90': 0.195, 'flatnoise_300': 0.254, 'highpass_300': 0.99, 'edge_300': 0.193, 'static_noise': 0.004, 'cortex_peak': 0.839, 'cortex_washout': 0.996, 'cortex_nrmse': 0.057, 'medulla_peak': 0.932, 'medulla_washout': 0.998, 'medulla_nrmse': 0.042}
+NIK-tofts new (10k, rms1) {'haarpsi_90': 0.654, 'ssim_90': 0.793, 'psnr_90': np.float64(27.661), 'airE_90': 0.248, 'haarpsi_300': 0.817, 'ssim_300': 0.931, 'psnr_300': np.float64(32.611), 'airE_300': 0.168, 'flatnoise_90': 0.267, 'highpass_90': 0.904, 'edge_90': 0.19, 'flatnoise_300': 0.242, 'highpass_300': 0.971, 'edge_300': 0.192, 'static_noise': 0.015, 'cortex_peak': 0.715, 'cortex_washout': 0.971, 'cortex_nrmse': 0.092, 'medulla_peak': 0.919, 'medulla_washout': 0.974, 'medulla_nrmse': 0.052}
+NIK-patlak new (10k) {'haarpsi_90': 0.778, 'ssim_90': 0.92, 'psnr_90': np.float64(30.636), 'airE_90': 0.145, 'haarpsi_300': 0.798, 'ssim_300': 0.931, 'psnr_300': np.float64(31.702), 'airE_300': 0.141, 'flatnoise_90': 0.239, 'highpass_90': 0.927, 'edge_90': 0.194, 'flatnoise_300': 0.241, 'highpass_300': 0.987, 'edge_300': 0.194, 'static_noise': 0.001, 'cortex_peak': 0.94, 'cortex_washout': 0.873, 'cortex_nrmse': 0.284, 'medulla_peak': 0.692, 'medulla_washout': 0.911, 'medulla_nrmse': 0.234}
+GRASP-Pro {'haarpsi_90': 0.671, 'ssim_90': 0.888, 'psnr_90': np.float64(27.263), 'airE_90': 0.155, 'haarpsi_300': 0.921, 'ssim_300': 0.976, 'psnr_300': np.float64(36.138), 'airE_300': 0.158, 'flatnoise_90': 0.258, 'highpass_90': 0.897, 'edge_90': 0.187, 'flatnoise_300': 0.259, 'highpass_300': 1.016, 'edge_300': 0.193, 'static_noise': 0.045, 'cortex_peak': 0.646, 'cortex_washout': 0.925, 'cortex_nrmse': 0.216, 'medulla_peak': 0.925, 'medulla_washout': 0.891, 'medulla_nrmse': 0.132}
+GRASP {'haarpsi_90': 0.74, 'ssim_90': 0.885, 'psnr_90': np.float64(28.516), 'airE_90': 0.134, 'haarpsi_300': 0.785, 'ssim_300': 0.903, 'psnr_300': np.float64(30.467), 'airE_300': 0.133, 'flatnoise_90': 0.232, 'highpass_90': 0.808, 'edge_90': 0.183, 'flatnoise_300': 0.244, 'highpass_300': 0.798, 'edge_300': 0.173, 'static_noise': 0.001, 'cortex_peak': 0.767, 'cortex_washout': 1.047, 'cortex_nrmse': 0.075, 'medulla_peak': 1.005, 'medulla_washout': 1.064, 'medulla_nrmse': 0.079}
+NIK-tofts8 new avg3 {'haarpsi_90': 0.748, 'ssim_90': 0.878, 'psnr_90': np.float64(29.122), 'airE_90': 0.184, 'haarpsi_300': 0.841, 'ssim_300': 0.951, 'psnr_300': np.float64(33.05), 'airE_300': 0.153, 'flatnoise_90': 0.237, 'highpass_90': 0.928, 'edge_90': 0.195, 'flatnoise_300': 0.251, 'highpass_300': 0.987, 'edge_300': 0.192, 'static_noise': 0.004, 'cortex_peak': 0.814, 'cortex_washout': 0.981, 'cortex_nrmse': 0.065, 'medulla_peak': 0.923, 'medulla_washout': 0.988, 'medulla_nrmse': 0.039}
+cos steps [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+cos_wd1e-2 steps [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+# image quality vs curve fidelity, slice 21, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)
+
+| recon | haarpsi_90 | ssim_90 | airE_90 | flatnoise_90 | highpass_90 | edge_90 | haarpsi_300 | airE_300 | flatnoise_300 | highpass_300 | edge_300 | cortex_peak | cortex_washout | cortex_nrmse | medulla_nrmse |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| model-free | 0.710 | 0.831 | 0.415 | 0.253 | 1.018 | 0.205 | 0.702 | 0.413 | 0.256 | 1.007 | 0.191 | 0.977 | 0.977 | 0.023 | 0.023 |
+| cs100 (GRASP-Pro all spokes) | 1.000 | 1.000 | 0.157 | 0.254 | 1.000 | 0.205 | 1.000 | 0.135 | 0.259 | 1.000 | 0.192 | 0.837 | 1.024 | 0.084 | 0.101 |
+| NIK-free | 0.799 | 0.900 | 0.162 | 0.235 | 0.972 | 0.197 | 0.839 | 0.168 | 0.251 | 0.996 | 0.192 | 0.727 | 0.880 | 0.149 | 0.079 |
+| NIK-sub16 | 0.777 | 0.894 | 0.169 | 0.243 | 0.951 | 0.194 | 0.831 | 0.172 | 0.257 | 1.037 | 0.193 | 0.756 | 0.920 | 0.125 | 0.099 |
+| NIK-tofts8 old (3k, restore) | 0.743 | 0.903 | 0.129 | 0.241 | 0.898 | 0.191 | 0.806 | 0.130 | 0.251 | 0.980 | 0.193 | 0.539 | 0.728 | 0.302 | 0.260 |
+| NIK-tofts8 new (10k, rms1) | 0.716 | 0.851 | 0.180 | 0.232 | 0.932 | 0.195 | 0.815 | 0.152 | 0.254 | 0.990 | 0.193 | 0.839 | 0.996 | 0.057 | 0.042 |
+| NIK-tofts new (10k, rms1) | 0.654 | 0.793 | 0.248 | 0.267 | 0.904 | 0.190 | 0.817 | 0.168 | 0.242 | 0.971 | 0.192 | 0.715 | 0.971 | 0.092 | 0.052 |
+| NIK-patlak new (10k) | 0.778 | 0.920 | 0.145 | 0.239 | 0.927 | 0.194 | 0.798 | 0.141 | 0.241 | 0.987 | 0.194 | 0.940 | 0.873 | 0.284 | 0.234 |
+| GRASP-Pro | 0.671 | 0.888 | 0.155 | 0.258 | 0.897 | 0.187 | 0.921 | 0.158 | 0.259 | 1.016 | 0.193 | 0.646 | 0.925 | 0.216 | 0.132 |
+| GRASP | 0.740 | 0.885 | 0.134 | 0.232 | 0.808 | 0.183 | 0.785 | 0.133 | 0.244 | 0.798 | 0.173 | 0.767 | 1.047 | 0.075 | 0.079 |
+| NIK-tofts8 new avg3 | 0.748 | 0.878 | 0.184 | 0.237 | 0.928 | 0.195 | 0.841 | 0.153 | 0.251 | 0.987 | 0.192 | 0.814 | 0.981 | 0.065 | 0.039 |
+
+IQ_TRACK_DONE
+[W917 14:38:43.008653754 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+IQ exit 0

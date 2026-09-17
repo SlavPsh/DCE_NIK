@@ -1,0 +1,54 @@
+2026-09-17 14:38:08 host gpu03.cluster job 3318607 task 3 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+  MIG 2g.24gb     Device  0: (UUID: MIG-7fdc2adf-8d97-57e9-a2a9-0e63797cb117)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+variant ctv0.3 -> results/tofts_vs_patlak/amp_track/ctv0.3_sl21
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 12000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run u1xg31ss
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/ctv0.3_sl21/wandb_runs/wandb/run-20260917_143812-u1xg31ss
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_ctv0.3_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/u1xg31ss
+[wandb] gnik_ctv0.3_sl21_s21: mode online
+    [coef-tv] grid 384 every 16 weight 0.3 delta 0.1
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 552, in <module>
+    main()
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 530, in main
+    img = train_one_slice(args.out_dir, slc, sh, args, device)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 347, in train_one_slice
+    if ctv_on and step % args.coef_tv_every == 0: ctv_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 301, in coef_tv_backward
+    cd = torch.full((nxc * nxc,), c, dtype=torch.long, device=device); Amp = model.amplitudes(_cg, cd)                 # [P,R,2]
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/nik_model.py", line 1274, in amplitudes
+    h = h + blk(h) if self.residual else blk(h)
+            ^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/nik_model.py", line 95, in forward
+    imag = gauss * torch.sin(self.w0 * h)
+           ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 288.00 MiB. GPU 0 has a total capacity of 21.62 GiB of which 49.06 MiB is free. Including non-PyTorch memory, this process has 21.54 GiB memory in use. Of the allocated memory 21.22 GiB is allocated by PyTorch, and 15.80 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mgnik_ctv0.3_sl21_s21[0m at: [34mhttps://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/u1xg31ss[0m
+[W917 14:38:20.426862421 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-17 14:38:20 TRAIN_DONE ctv0.3 exit 1

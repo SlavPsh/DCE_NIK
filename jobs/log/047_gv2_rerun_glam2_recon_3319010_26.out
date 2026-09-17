@@ -3,3 +3,13 @@ error    libmamba Could not set lock (Resource temporarily unavailable)
 warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
     Waiting for other mamba process to finish
 slice 26: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 9.853e-05 (2s)
+  ite = 0, cost = 0.000115
+  ite = 1, cost = 0.000104
+  ite = 2, cost = 0.000100
+  ite = 3, cost = 0.000091
+  ite = 4, cost = 0.000089
+  ite = 5, cost = 0.000086
+  ite = 6, cost = 0.000084
+  ite = 7, cost = 0.000082
+  ite = 8, cost = 0.000080
+  ite = 0, cost = 0.000077
