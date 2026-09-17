@@ -1,2 +1,5 @@
 2026-09-17 13:27:42 host worker05.cluster job 3318805 task 22 stage recon cpus 8
 slice 22: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 8.628e-05 (160s)
+  ite = 0, cost = 0.001456
+  ite = 1, cost = 0.001432
+  ite = 2, cost = 0.001248
