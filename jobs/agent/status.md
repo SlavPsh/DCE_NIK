@@ -1,17 +1,21 @@
 # helios agent
 
-updated 2026-09-17 10:25:39 on worker06.cluster, job 3310792, cycle 12
+updated 2026-09-17 11:18:46 on worker06.cluster, job 3310792, cycle 38
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3317395 | 044_iq_tradeoff | 2 RUNNING None |
+| 3318607 | 045_reg_ideas | 1 PENDING None |
+| 3318608 | 046_ctv_smoke | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 045_reg_ideas | 1 PENDING None |
+| 046_ctv_smoke | 1 PENDING Priority |
 | 044_iq_tradeoff | 2 RUNNING None |
 | 043_iq_track | 1 COMPLETED 00:00:16 |
 | 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |
@@ -30,5 +34,3 @@ updated 2026-09-17 10:25:39 on worker06.cluster, job 3310792, cycle 12
 | 037_aorta_offset | 1 COMPLETED 00:00:52 |
 | 036_new_rois_rerun | 1 COMPLETED 00:00:40 |
 | 035_roi_propose_v2 | 1 COMPLETED 00:00:13 |
-| 034_roi_propose | 1 COMPLETED 00:00:16 |
-| 033_roi_check | 1 COMPLETED 00:00:20 |
