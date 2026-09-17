@@ -1,0 +1,15 @@
+{
+ "name": "gnik_sub16_sl19_s1_s19",
+ "mode": "online",
+ "loss": 0.07406332343816757,
+ "heldout_mse": 0.1039554700255394,
+ "val_knmse": 0.148826530320548,
+ "best_heldout_mse": 0.1039554700255394,
+ "coef_tv": 0.0,
+ "best_step": 10000,
+ "lr": 1e-05,
+ "wall_s": 2305.7183582782745,
+ "peak_gpu_mb": 12458.8173828125,
+ "params": 5558016,
+ "wall_total_s": 2305.7161014080048
+}
