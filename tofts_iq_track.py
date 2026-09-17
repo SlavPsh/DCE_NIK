@@ -54,12 +54,12 @@ def main():
             if not os.path.exists(v): print("missing", v); continue
             v = np.abs(np.load(v)).astype(np.float32)
         t = t if t is not None else ft(v.shape[-1]); r = iq(v, t, nm); rows["final"].append(r); ims[nm] = (frame(ls_scale(v, RW.get(v.shape[-1], refwin(v.shape[-1])), body), t, 90.0), frame(ls_scale(v, RW.get(v.shape[-1], refwin(v.shape[-1])), body), t, 300.0)); print(nm, {k: round(x, 3) for k, x in r.items() if k != "label"}, flush=True)
-    for var in ("base", "wd0", "atomscale", "env0", "dcf1", "lr1e-4"):
+    for var in os.environ.get("IQ_VARIANTS", "base,wd0,atomscale,env0,dcf1,lr1e-4").split(","):                 # IQ_VARIANTS: amp_track dirs to score per step; IQ_TAG: output suffix
         d = f"{B}/results/tofts_vs_patlak/amp_track/{var}_sl{Z}"; rows["steps"][var] = {}
         for p in sorted(glob.glob(f"{d}/snap_slice_{Z:02d}_step*.npy")):
             step = int(re.search(r"step(\d+)", p).group(1)); v = np.load(p).astype(np.float32); rows["steps"][var][step] = iq(v, ft(v.shape[-1]), f"{var} {step}")
         if rows["steps"][var]: print(var, "steps", sorted(rows["steps"][var]), flush=True)
-    R = f"{B}/results/tofts_vs_patlak"; json.dump(rows, open(f"{R}/iq_track_sl{Z}.json", "w"), indent=1)
+    R = f"{B}/results/tofts_vs_patlak"; TG = os.environ.get("IQ_TAG", ""); json.dump(rows, open(f"{R}/iq_track_sl{Z}{TG}.json", "w"), indent=1)
     K = ["haarpsi_90", "ssim_90", "psnr_90", "airE_90", "haarpsi_300", "airE_300", "static_noise", "cortex_peak", "cortex_washout", "cortex_nrmse", "medulla_nrmse"]
     L = [f"# image quality vs curve fidelity, slice {Z}, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)", "",
          "| recon | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
@@ -68,7 +68,7 @@ def main():
         if not st: continue
         L += ["", f"## {var}, per training step", "| step | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
         for s in sorted(st): L.append(f"| {s} | " + " | ".join(f"{st[s][k]:.3f}" for k in K) + " |")
-    open(f"{R}/iq_track_sl{Z}.md", "w").write("\n".join(L)); print("\n".join(L[:16]))
+    open(f"{R}/iq_track_sl{Z}{TG}.md", "w").write("\n".join(L)); print("\n".join(L[:16]))
     fig, ax = plt.subplots(1, 4, figsize=(20, 4.4))
     for var, st in rows["steps"].items():
         if not st: continue
@@ -79,7 +79,7 @@ def main():
         ax[3].scatter(r["cortex_nrmse"], r["haarpsi_90"], marker="*", s=120, edgecolor="k", label=r["label"], zorder=5)
     for k, ttl in ((0, "HaarPSI at 90 s vs cs100"), (1, "air energy at 90 s (streaks + noise)"), (2, "temporal noise in the static roi")): ax[k].set_title(ttl, fontsize=10); ax[k].set_xlabel("step"); ax[k].legend(fontsize=7)
     ax[3].set_xlabel("cortex curve NRMSE vs model-free (lower = better dynamics)"); ax[3].set_ylabel("HaarPSI at 90 s (higher = sharper)"); ax[3].set_title("trade-off: snapshots coloured by step, stars = final recons", fontsize=10); ax[3].legend(fontsize=6, loc="lower left")
-    fig.suptitle(f"slice {Z}: image quality vs curve fidelity along training and across methods", fontsize=11); fig.tight_layout(); fig.savefig(f"{R}/figures/iq_track_sl{Z}.png", dpi=130, facecolor="white")
+    fig.suptitle(f"slice {Z}: image quality vs curve fidelity along training and across methods", fontsize=11); fig.tight_layout(); fig.savefig(f"{R}/figures/iq_track_sl{Z}{TG}.png", dpi=130, facecolor="white")
     names = [n for n in ("cs100 (GRASP-Pro all spokes)", "GRASP", "GRASP-Pro", "NIK-tofts8 old (3k, restore)", "NIK-tofts8 new (10k, rms1)", "NIK-free", "NIK-sub16") if n in ims]
     c = np.argwhere(rois["cortex"]).mean(0).astype(int); h = 46
     fig, ax = plt.subplots(2, len(names), figsize=(3.1 * len(names), 6.4))
@@ -88,6 +88,6 @@ def main():
             im = ims[n][i]; sl = (slice(max(c[0] - h, 0), c[0] + h), slice(max(c[1] - 2 * h, 0), c[1] + 2 * h)); ax[i, j].imshow(im[sl], cmap="gray", vmin=0, vmax=np.percentile(im[body], 99.5)); ax[i, j].axis("off")
             if i == 0: ax[i, j].set_title(n, fontsize=8)
     ax[0, 0].set_ylabel("t = 90 s"); ax[1, 0].set_ylabel("t = 300 s"); fig.suptitle(f"slice {Z}: kidney zoom at 90 s (top) and 300 s (bottom), one global scale, same k80 input", fontsize=10); fig.tight_layout()
-    fig.savefig(f"{R}/figures/iq_zoom_sl{Z}.png", dpi=140, facecolor="white"); print("IQ_TRACK_DONE")
+    fig.savefig(f"{R}/figures/iq_zoom_sl{Z}{TG}.png", dpi=140, facecolor="white"); print("IQ_TRACK_DONE")
 
 if __name__ == "__main__": main()
