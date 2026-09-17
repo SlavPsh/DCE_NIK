@@ -1,19 +1,21 @@
 # helios agent
 
-updated 2026-09-17 14:23:31 on worker06.cluster, job 3310792, cycle 128
+updated 2026-09-17 14:25:37 on worker06.cluster, job 3310792, cycle 129
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3318607 | 045_reg_ideas | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
-| 3318980 | 046_gv2_rerun_glam2 | 1 PENDING Priority |
+| 3319009 | 047_gv2_rerun_glam2 | 1 RUNNING Prolog |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 046_gv2_rerun_glam2 | 1 PENDING Priority |
+| 046_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
+| 047_gv2_rerun_glam2 | 1 RUNNING Prolog |
+| 047_cancel_046 | exit 0 |
 | 045_gv2_rerun_glam | 1 COMPLETED 00:00:01 |
 | 050_residual_fig | 1 COMPLETED 00:00:05 |
 | 049_iq_noise_metrics | 1 COMPLETED 00:00:12 |
@@ -31,5 +33,3 @@ updated 2026-09-17 14:23:31 on worker06.cluster, job 3310792, cycle 128
 | 043_gv2_rerun | 1 COMPLETED 00:10:18 |
 | 043_env_rerun | exit 0 |
 | 042_archive_verify | 1 COMPLETED 00:02:54 |
-| 041_beegfs_inventory | 1 COMPLETED 00:00:03 |
-| 014_storage | exit 0 |

@@ -1,0 +1,6 @@
+probe 047_cancel_046
+host worker06.cluster
+start 2026-09-17 14:25:36
+end 2026-09-17 14:25:36
+exit 0
+log jobs/log/probe_047_cancel_046.out
