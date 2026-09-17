@@ -1,0 +1,56 @@
+slice 21: body 19831 px of 192x192, support 19831 px of 384x384 (13.4%)
+slice 18: body 19246 px of 192x192, support 19246 px of 384x384 (13.1%)
+slice 19: body 20082 px of 192x192, support 20082 px of 384x384 (13.6%)
+MASK exit 0
+31 {'aorta': 0.001915, 'cortex': 0.000972, 'medulla': 0.000722}
+21 {'aorta': 0.001365, 'cortex': 0.000666, 'medulla': 0.000493}
+15 {'aorta': 0.001003, 'cortex': 0.000492, 'medulla': 0.000363}
+11 {'aorta': 0.00075, 'cortex': 0.00037, 'medulla': 0.000266}
+7 {'aorta': 0.000496, 'cortex': 0.000247, 'medulla': 0.000192}
+# model-free reference: first-pass peak vs sliding-window width, slice 21 (nufft, ramp dcf, sense combine, approved rois; enhancement = baseline-subtracted roi mean)
+
+| window (spokes) | window (s) | frames | aorta peak (ratio to 31) / ttp s / late noise | cortex peak (ratio to 31) / ttp s / late noise | medulla peak (ratio to 31) / ttp s / late noise |
+|---|---|---|---|---|---|
+| 31 | 6.8 | 240 | 0.00191 (1.00) / 63 / 0.015 | 0.00097 (1.00) / 71 / 0.014 | 0.00072 (1.00) / 203 / 0.020 |
+| 21 | 4.6 | 338 | 0.00137 (0.71) / 63 / 0.017 | 0.00067 (0.68) / 72 / 0.019 | 0.00049 (0.68) / 202 / 0.028 |
+| 15 | 3.3 | 566 | 0.00100 (0.52) / 63 / 0.026 | 0.00049 (0.51) / 72 / 0.017 | 0.00036 (0.50) / 207 / 0.024 |
+| 11 | 2.4 | 850 | 0.00075 (0.39) / 63 / 0.024 | 0.00037 (0.38) / 72 / 0.025 | 0.00027 (0.37) / 200 / 0.033 |
+| 7 | 1.5 | 852 | 0.00050 (0.26) / 64 / 0.044 | 0.00025 (0.25) / 72 / 0.048 | 0.00019 (0.27) / 200 / 0.061 |
+
+reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the peak by that factor (temporal smoothing of the window); the late noise column shows what the narrower window costs
+MF_PEAK_DONE
+31 {'aorta': 0.002131, 'cortex': 0.00086, 'medulla': 0.000716}
+21 {'aorta': 0.001476, 'cortex': 0.000591, 'medulla': 0.000497}
+15 {'aorta': 0.001093, 'cortex': 0.000452, 'medulla': 0.00036}
+11 {'aorta': 0.000826, 'cortex': 0.000343, 'medulla': 0.000272}
+7 {'aorta': 0.000536, 'cortex': 0.000229, 'medulla': 0.000188}
+# model-free reference: first-pass peak vs sliding-window width, slice 18 (nufft, ramp dcf, sense combine, approved rois; enhancement = baseline-subtracted roi mean)
+
+| window (spokes) | window (s) | frames | aorta peak (ratio to 31) / ttp s / late noise | cortex peak (ratio to 31) / ttp s / late noise | medulla peak (ratio to 31) / ttp s / late noise |
+|---|---|---|---|---|---|
+| 31 | 6.8 | 240 | 0.00213 (1.00) / 63 / 0.010 | 0.00086 (1.00) / 71 / 0.018 | 0.00072 (1.00) / 200 / 0.022 |
+| 21 | 4.6 | 338 | 0.00148 (0.69) / 63 / 0.012 | 0.00059 (0.69) / 72 / 0.022 | 0.00050 (0.69) / 202 / 0.032 |
+| 15 | 3.3 | 566 | 0.00109 (0.51) / 63 / 0.019 | 0.00045 (0.53) / 73 / 0.021 | 0.00036 (0.50) / 184 / 0.021 |
+| 11 | 2.4 | 850 | 0.00083 (0.39) / 63 / 0.025 | 0.00034 (0.40) / 72 / 0.030 | 0.00027 (0.38) / 197 / 0.031 |
+| 7 | 1.5 | 852 | 0.00054 (0.25) / 63 / 0.030 | 0.00023 (0.27) / 72 / 0.052 | 0.00019 (0.26) / 197 / 0.053 |
+
+reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the peak by that factor (temporal smoothing of the window); the late noise column shows what the narrower window costs
+MF_PEAK_DONE
+31 {'aorta': 0.002141, 'cortex': 0.000996, 'medulla': 0.000759}
+21 {'aorta': 0.001502, 'cortex': 0.00068, 'medulla': 0.000526}
+15 {'aorta': 0.001102, 'cortex': 0.000499, 'medulla': 0.000378}
+11 {'aorta': 0.000829, 'cortex': 0.000386, 'medulla': 0.000286}
+7 {'aorta': 0.000534, 'cortex': 0.000261, 'medulla': 0.000194}
+# model-free reference: first-pass peak vs sliding-window width, slice 19 (nufft, ramp dcf, sense combine, approved rois; enhancement = baseline-subtracted roi mean)
+
+| window (spokes) | window (s) | frames | aorta peak (ratio to 31) / ttp s / late noise | cortex peak (ratio to 31) / ttp s / late noise | medulla peak (ratio to 31) / ttp s / late noise |
+|---|---|---|---|---|---|
+| 31 | 6.8 | 240 | 0.00214 (1.00) / 63 / 0.009 | 0.00100 (1.00) / 71 / 0.016 | 0.00076 (1.00) / 200 / 0.019 |
+| 21 | 4.6 | 338 | 0.00150 (0.70) / 63 / 0.011 | 0.00068 (0.68) / 69 / 0.021 | 0.00053 (0.69) / 199 / 0.031 |
+| 15 | 3.3 | 566 | 0.00110 (0.51) / 63 / 0.016 | 0.00050 (0.50) / 68 / 0.019 | 0.00038 (0.50) / 198 / 0.017 |
+| 11 | 2.4 | 850 | 0.00083 (0.39) / 63 / 0.023 | 0.00039 (0.39) / 72 / 0.024 | 0.00029 (0.38) / 68 / 0.026 |
+| 7 | 1.5 | 852 | 0.00053 (0.25) / 63 / 0.033 | 0.00026 (0.26) / 68 / 0.044 | 0.00019 (0.25) / 191 / 0.052 |
+
+reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the peak by that factor (temporal smoothing of the window); the late noise column shows what the narrower window costs
+MF_PEAK_DONE
+PEAK exit 0

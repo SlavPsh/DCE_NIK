@@ -1,5 +1,6 @@
 queue 054_mf_peak_support_mask
 jid 3320103
 submitted 2026-09-17 20:52:19
-state 1 RUNNING None
+state 1 COMPLETED 00:09:25
 log jobs/log/054_mf_peak_support_mask_3320103.out
+ended 2026-09-17 21:02:37
