@@ -1,5 +1,5 @@
 queue 046_ctv_smoke
 jid 3318608
 submitted 2026-09-17 11:18:46
-state 1 PENDING Priority
+state 1 RUNNING None
 log jobs/log/046_ctv_smoke_3318608.out
