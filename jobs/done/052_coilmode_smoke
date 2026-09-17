@@ -1,5 +1,5 @@
 queue 052_coilmode_smoke
 jid 3319921
 submitted 2026-09-17 16:43:31
-state 1 PENDING Priority
+state 1 RUNNING None
 log jobs/log/052_coilmode_smoke_3319921.out
