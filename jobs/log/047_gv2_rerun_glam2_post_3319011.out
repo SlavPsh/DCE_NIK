@@ -6,3 +6,11 @@ wrote fig1/fig2_gv2_lam0.02.png
 gv2_lam0.08: 54 slices, diverged [], window 7.257e-05
 wrote fig1/fig2_gv2_lam0.08.png
 gv2_lam0.25: 54 slices, diverged [], window 6.625e-05
+wrote fig1/fig2_gv2_lam0.25.png
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_glam0.02: 54 slices, diverged [], window 7.575e-05
+wrote fig1/fig2_gv2_glam0.02.png
+assembled (192, 192, 54, 102) -> recon4d.nii.gz (2.0833333333333335x2.0833333333333335x4.0 mm, TR 3.63 s)
+gv2_glam0.08: 54 slices, diverged [], window 7.330e-05
+wrote fig1/fig2_gv2_glam0.08.png
+gv2_glam0.25: 54 slices, diverged [], window 6.562e-05
