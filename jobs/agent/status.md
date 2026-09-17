@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-17 18:41:56 on worker06.cluster, job 3310792, cycle 254
+updated 2026-09-17 20:52:19 on worker06.cluster, job 3310792, cycle 318
 
 ## active
 
@@ -8,11 +8,15 @@ updated 2026-09-17 18:41:56 on worker06.cluster, job 3310792, cycle 254
 |---|---|---|
 | 3319920 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3319931 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
+| 3320103 | 054_mf_peak_support_mask | 1 PENDING Priority |
+| 3320104 | 055_kspace_priors | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 054_mf_peak_support_mask | 1 PENDING Priority |
+| 055_kspace_priors | 1 PENDING None |
 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
@@ -31,5 +35,3 @@ updated 2026-09-17 18:41:56 on worker06.cluster, job 3310792, cycle 254
 | 047_best_images | 1 COMPLETED 00:00:19 |
 | 044_iq_tradeoff | 1 COMPLETED 02:07:19, 1 COMPLETED 02:07:22 |
 | 046_ctv_smoke | 1 TIMEOUT 00:40:23 |
-| 043_iq_track | 1 COMPLETED 00:00:16 |
-| 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |
