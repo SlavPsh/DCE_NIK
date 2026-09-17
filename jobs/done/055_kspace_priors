@@ -1,5 +1,5 @@
 queue 055_kspace_priors
 jid 3320104
 submitted 2026-09-17 20:52:19
-state 1 PENDING None
+state 1 PENDING QOSMaxGRESPerUser
 log jobs/log/055_kspace_priors_3320104.out
