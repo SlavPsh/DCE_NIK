@@ -1,0 +1,68 @@
+-rw-r----- 1 P101440 P101440 131 Sep  7 20:02 axchk_3103448.log
+-rw-r----- 1 P101440 P101440 499 Sep  7 20:02 axchk_3103450.log
+-rw-r----- 1 P101440 P101440 273 Sep  7 20:03 axchk_3103451.log
+-rw-r----- 1 P101440 P101440 677 Sep  7 20:01 sbk_3103444.log
+-rw-r----- 1 P101440 P101440 960 Sep  7 20:01 sbk_3103447.log
+===== sbk_3103444.log
+coil kernel energy vs half-width r (taps = (2r+1)^2), 8 coils
+  r   taps  energy %   cost vs 1 eval
+  0      1     0.09%               1x
+  1      9     0.38%               9x
+  2     25     0.75%              25x
+  3     49     1.18%              49x
+  4     81     1.65%              81x
+  6    169     2.67%             169x
+  8    289     3.62%             289x
+ 12    625     5.59%             625x
+ 16   1089     7.58%            1089x
+ 24   2401    11.70%            2401x
+ 32   4225    15.98%            4225x
+
+for reference, an exact convolution would need the full 384x384 = 147456 taps.
+SENSE-B is affordable only if a few % radius already captures ~all the energy.
+===== sbk_3103447.log
+coil kernel energy vs half-width r (taps = (2r+1)^2), 8 coils
+  r   taps  energy %   cost vs 1 eval
+  0      1     0.09%               1x
+  1      9     0.38%               9x
+  2     25     0.75%              25x
+  3     49     1.18%              49x
+  4     81     1.65%              81x
+  6    169     2.67%             169x
+  8    289     3.62%             289x
+ 12    625     5.59%             625x
+ 16   1089     7.58%            1089x
+ 24   2401    11.70%            2401x
+ 32   4225    15.98%            4225x
+
+for reference, an exact convolution would need the full 384x384 = 147456 taps.
+SENSE-B is affordable only if a few % radius already captures ~all the energy.
+
+smoothed b1 (body-masked, gaussian-extrapolated outside):
+  sigma  4: r1:  0.6% r2:  1.6% r4:  4.0% r8:  8.2%   in-body change 6.4%
+  sigma  8: r1:  0.6% r2:  1.5% r4:  3.5% r8:  6.8%   in-body change 13.4%
+  sigma 16: r1:  0.6% r2:  1.3% r4:  2.5% r8:  4.8%   in-body change 30.4%
+===== axchk_3103448.log
+/scratch/rnga/vvpshenov/micromamba/envs/torch29/bin/python: can't open file '/tmp/axcheck.py': [Errno 2] No such file or directory
+===== axchk_3103450.log
+def fft2c_mri(x):
+    # X = fftshift(ifft(fftshift(x,1),[],1),1)*sqrt(n1); then dim2
+    _need_even(x.shape[0], "fft2c_mri"); _need_even(x.shape[1], "fft2c_mri")
+    X = np.fft.fftshift(np.fft.ifft(np.fft.fftshift(x, axes=0), axis=0), axes=0) * np.sqrt(x.shape[0])
+    X = np.fft.fftshift(np.fft.ifft
+b1 (384, 384, 8) -> K (384, 384, 8); peak (np.int64(192), np.int64(192)) centre (192, 192); r2 57.79% r8 72.33%
+CONTROL smooth gaussian: peak (np.int64(192), np.int64(192)); r2 99.98% (expect ~100)
+===== axchk_3103451.log
+  r   taps  energy %
+  0      1    38.99%
+  1      9    50.82%
+  2     25    57.79%
+  3     49    62.97%
+  4     81    66.23%
+  6    169    69.78%
+  8    289    72.33%
+ 12    625    75.90%
+ 16   1089    78.50%
+ 24   2401    83.02%
+ 32   4225    87.07%
+ 48   9409    92.36%

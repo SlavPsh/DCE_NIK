@@ -1,0 +1,6 @@
+probe 015_senseB_logs
+host worker06.cluster
+start 2026-09-17 15:40:04
+end 2026-09-17 15:40:04
+exit 0
+log jobs/log/probe_015_senseB_logs.out
