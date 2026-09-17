@@ -1,5 +1,5 @@
 queue 053_ctv_rerun
 jid 3319931
 submitted 2026-09-17 16:59:57
-state 1 PENDING None
+state 1 PENDING QOSMaxGRESPerUser
 log jobs/log/053_ctv_rerun_3319931.out
