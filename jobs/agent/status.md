@@ -1,21 +1,19 @@
 # helios agent
 
-updated 2026-09-17 13:27:36 on worker06.cluster, job 3310792, cycle 101
+updated 2026-09-17 13:29:40 on worker06.cluster, job 3310792, cycle 102
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3318607 | 045_reg_ideas | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
-| 3318779 | 045_gv2_rerun_glam | 1 PENDING Priority |
-| 3318780 | 050_residual_fig | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 045_gv2_rerun_glam | 1 PENDING Priority |
-| 050_residual_fig | 1 PENDING Priority |
+| 045_gv2_rerun_glam | 1 COMPLETED 00:00:01 |
+| 050_residual_fig | 1 COMPLETED 00:00:05 |
 | 049_iq_noise_metrics | 1 COMPLETED 00:00:12 |
 | 048_best_images_v2 | 1 COMPLETED 00:00:08 |
 | 047_best_images | 1 COMPLETED 00:00:19 |

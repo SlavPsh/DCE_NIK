@@ -1,0 +1,11 @@
+2026-09-17 13:27:41 host worker02.cluster job 3318790 task 7 stage recon cpus 8
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+slice 07: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 0.0001147 (2s)
+  ite = 0, cost = 0.000774
+  ite = 1, cost = 0.000593
+  ite = 2, cost = 0.000497
+  ite = 3, cost = 0.000461
+  ite = 4, cost = 0.000398
+  ite = 5, cost = 0.000363
