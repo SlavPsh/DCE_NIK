@@ -8,8 +8,8 @@ ratios are amplitude relative to the model-free curve: first-pass peak (20 to 21
 | projection rank 5 | 0.99 / 1.03 | 1.02 / 1.01 | 0.94 / 1.00 | 0.79 / 1.00 | 0.231 / 0.524 |
 | projection rank 8 | 0.99 / 1.03 | 0.95 / 1.00 | 0.99 / 1.00 | 0.82 / 0.99 | 0.225 / 0.508 |
 | projection rank 12 | 1.01 / 1.00 | 0.96 / 1.01 | 0.99 / 1.00 | 0.82 / 1.00 | 0.221 / 0.498 |
-| NIK-tofts (trained) | 1.05 / 0.91 | 0.75 / 0.94 | 0.91 / 0.91 | 1.56 / 1.11 | |
 | NIK-tofts8 (trained) | 0.95 / 1.06 | 0.84 / 0.97 | 0.92 / 0.92 | 0.93 / 1.18 | |
 | NIK-patlak (trained) | 0.97 / 1.00 | 0.97 / 0.89 | 0.87 / 0.89 | 0.73 / 1.01 | |
+| NIK-sub16 (trained) | 0.55 / 0.95 | 0.78 / 0.92 | 0.91 / 0.84 | 1.44 / 1.06 | |
 
 basis aif vs model-free aorta: time to peak 63.8 s vs 63.2 s; plateau / peak 0.23 vs 0.23

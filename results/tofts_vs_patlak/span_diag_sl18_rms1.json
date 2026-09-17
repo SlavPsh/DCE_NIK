@@ -99,24 +99,6 @@
   }
  },
  "arms": {
-  "tofts": {
-   "aorta": {
-    "peak_ratio": 1.0506473133679428,
-    "washout_ratio": 0.9080223355810702
-   },
-   "cortex": {
-    "peak_ratio": 0.7490185005293828,
-    "washout_ratio": 0.9432854585074993
-   },
-   "medulla": {
-    "peak_ratio": 0.9085787497304401,
-    "washout_ratio": 0.9104766817035472
-   },
-   "liver": {
-    "peak_ratio": 1.5623403097036181,
-    "washout_ratio": 1.1074133405782975
-   }
-  },
   "tofts8": {
    "aorta": {
     "peak_ratio": 0.950489229337373,
@@ -151,6 +133,24 @@
    "liver": {
     "peak_ratio": 0.7300113432342704,
     "washout_ratio": 1.0093984620746705
+   }
+  },
+  "sub16": {
+   "aorta": {
+    "peak_ratio": 0.5541277177856735,
+    "washout_ratio": 0.9454614194821761
+   },
+   "cortex": {
+    "peak_ratio": 0.7828719276417274,
+    "washout_ratio": 0.9189278923426498
+   },
+   "medulla": {
+    "peak_ratio": 0.9146761907293562,
+    "washout_ratio": 0.839375634434537
+   },
+   "liver": {
+    "peak_ratio": 1.4372890780187044,
+    "washout_ratio": 1.0619231164480234
    }
   }
  },
