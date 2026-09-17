@@ -23,3 +23,10 @@ slice 13: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 7.955e-05 (2s)
   ite = 8, cost = 0.000273
   ite = 0, cost = 0.000209
   ite = 1, cost = 0.000194
+  ite = 2, cost = 0.000175
+  ite = 3, cost = 0.000168
+  ite = 4, cost = 0.000164
+  ite = 5, cost = 0.000157
+  ite = 6, cost = 0.000153
+  ite = 7, cost = 0.000150
+  ite = 8, cost = 0.000143
