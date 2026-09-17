@@ -1,5 +1,6 @@
 queue 043_iq_track
 jid 3317355
 submitted 2026-09-17 10:13:16
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:16
 log jobs/log/043_iq_track_3317355.out
+ended 2026-09-17 10:15:20
