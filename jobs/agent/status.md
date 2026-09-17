@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-17 21:02:37 on worker06.cluster, job 3310792, cycle 323
+updated 2026-09-17 21:04:41 on worker06.cluster, job 3310792, cycle 324
 
 ## active
 
@@ -9,14 +9,13 @@ updated 2026-09-17 21:02:37 on worker06.cluster, job 3310792, cycle 323
 | 3319920 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3319931 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
 | 3320104 | 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser |
-| 3320107 | 056_kprior_smoke | 1 RUNNING Prolog |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 056_kprior_smoke | 1 COMPLETED 00:00:06 |
 | 054_mf_peak_support_mask | 1 COMPLETED 00:09:25 |
-| 056_kprior_smoke | 1 RUNNING Prolog |
 | 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser |
 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
