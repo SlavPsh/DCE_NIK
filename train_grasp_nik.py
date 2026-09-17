@@ -130,14 +130,14 @@ def build_model(args, ncc):
             coil_embed_dim=args.coil_embed_dim, hidden=args.hidden, depth=args.depth, w0=args.w0,
             s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma, t_freq=args.t_freq,
             t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True,
-            phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0)
+            phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0, coil_mode=getattr(args, 'coil_mode', 'input'))
     if args.model == 'wire_ff_tofts':
         bz = np.load(args.tofts_basis, allow_pickle=True)      # built offline by nik_tofts_basis.py (fixed, no learned rate)
         return WIRE_FF_TOFTS_KXY_COIL_T_REIM(
             n_coils=ncc, atom_tgrid=bz['tgrid_model'], atoms=bz['atoms'], R_patlak=bz['R_patlak'],
             coil_embed_dim=args.coil_embed_dim, hidden=args.hidden, depth=args.depth, w0=args.w0,
             s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma, t_freq=args.t_freq,
-            t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True)
+            t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True, coil_mode=getattr(args, 'coil_mode', 'input'))
     if args.model == 'wire_ff_res_radial':
         return WIRE_FF_RES_RADIAL_KXY_COIL_T_REIM(
             n_coils=ncc, coil_embed_dim=args.coil_embed_dim, hidden=args.hidden, depth=args.depth,
@@ -149,7 +149,7 @@ def build_model(args, ncc):
             depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma,
             t_freq=args.t_freq, t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True,
             phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0,
-            ortho=args.phi_ortho)
+            ortho=args.phi_ortho, coil_mode=getattr(args, 'coil_mode', 'input'))
     cls = WIRE_FF_RES_KXY_COIL_T_REIM if args.model == 'wire_ff_res' else WIRE_FF_KXY_COIL_T_REIM
     return cls(n_coils=ncc, coil_embed_dim=args.coil_embed_dim, hidden=args.hidden,
                depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma,
@@ -396,7 +396,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     model=args.model, rank=args.rank, hidden=args.hidden, depth=args.depth,
                     w0=args.w0, s0=args.s0, coil_embed_dim=args.coil_embed_dim,
                     k_freq=args.k_freq, k_sigma=args.k_sigma, t_freq=args.t_freq,
-                    t_sigma=args.t_sigma, ff_seed=args.ff_seed, ncc=ncc, slice=slc),
+                    t_sigma=args.t_sigma, ff_seed=args.ff_seed, ncc=ncc, slice=slc, coil_mode=getattr(args, 'coil_mode', 'input')),
                os.path.join(args.save_dir, f'model_slice_{slc:02d}.pt'))
     np.save(os.path.join(args.save_dir, f'nik_slice_{slc:02d}_cplx.npy'), img_cplx)
     if device.type == 'cuda':
@@ -446,6 +446,7 @@ def main():
                     help='(wire_ff_res_radial) |k|-dependent FF warp strength; 0 = no warp')
     # factorized low-rank model (--model wire_ff_subspace). rank = temporal-DoF knob (sweep > 5).
     ap.add_argument('--rank', type=int, default=12, help='subspace rank R (temporal DoF)')
+    ap.add_argument('--coil-mode', default='input', choices=['input', 'output'], help='subspace / patlak / tofts: coil embedding at the input (default) or one output head per coil (shared backbone)')
     ap.add_argument('--phi-ortho', action='store_true', help='hard QR orthonormalize Phi (fix the gauge)')
     ap.add_argument('--phi-hidden', type=int, default=64, help='temporal-basis net width')
     ap.add_argument('--phi-depth', type=int, default=3, help='temporal-basis net depth')

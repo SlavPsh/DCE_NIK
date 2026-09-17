@@ -75,9 +75,10 @@ def heldout(run, Z, arm="tofts"):
     kept = torch.as_tensor(KEEP, device=dev, dtype=sid.dtype); tr = torch.where(torch.isin(sid, kept))[0]
     dcf = compute_dcf_radial(x, method="simple_ramp"); nz = KSpaceNormalizer(); nz.fit(x[tr], y_raw[tr], dcf=dcf[tr], envelope_exponent=0.75); y = nz.normalize(x, y_raw)
     args = SimpleNamespace(**{k: ck[k] for k in ("model", "rank", "hidden", "depth", "w0", "s0", "coil_embed_dim", "k_freq", "k_sigma", "t_freq", "t_sigma", "ff_seed")},
-                           patlak_free=0, aif_file=f"{B}/aif_slice{Z}.npz", tofts_basis=basis_for(arm, Z), phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0)
+                           patlak_free=0, aif_file=f"{B}/aif_slice{Z}.npz", tofts_basis=basis_for(arm, Z), phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0,
+                           coil_mode=ck.get("coil_mode", "input"))
     m = build_model(args, int(ck["ncc"])).to(dev); m.load_state_dict(ck["state_dict"]); m.eval()
-    out = dict(rank=int(m.rank), params=int(sum(p.numel() for p in m.parameters())))
+    out = dict(rank=int(m.rank), params=int(sum(p.numel() for p in m.parameters())), coil_mode=ck.get("coil_mode", "input"))
     for nm, spk in (("val", VAL), ("test", TEST), ("train", KEEP)):
         idx = torch.where(torch.isin(sid, torch.as_tensor(spk, device=dev, dtype=sid.dtype)))[0]; num = np.zeros(16); den = np.zeros(16)
         for i in range(0, idx.numel(), 40000):

@@ -1240,25 +1240,27 @@ class WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(nn.Module):
     def __init__(self, n_coils, coil_embed_dim=8, rank=12, hidden=512, depth=12,
                  w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5,
                  ff_seed=0, residual=True, phi_hidden=64, phi_depth=3, phi_w0=30.0,
-                 ortho=False, ortho_grid=342):
+                 ortho=False, ortho_grid=342, coil_mode='input'):
         super().__init__()
         self.rank = int(rank)
         self.residual = bool(residual)
+        self.coil_mode = str(coil_mode); self.n_coils = int(n_coils)   # input: coil embedding at the input; output: one shared backbone, one head per coil
         # ortho: hard QR orthonormalization of Phi over a fixed t-grid, gauge fixed, zero
         # expressiveness cost (any invertible transform absorbed into A). t in [-1,1].
         self.ortho = bool(ortho)
         self.register_buffer('t_grid', torch.linspace(-1.0, 1.0, int(ortho_grid)))
         self.last_gram_cond = 0.0                                # logged for stability
-        self.coil_embed = nn.Embedding(int(n_coils), int(coil_embed_dim))
-        nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
+        if self.coil_mode == 'input':
+            self.coil_embed = nn.Embedding(int(n_coils), int(coil_embed_dim))
+            nn.init.uniform_(self.coil_embed.weight, -1.0, 1.0)
         self.ff_k = FourierFeatures(2, n_freq=int(k_freq), sigma=k_sigma, seed=ff_seed)
         self.ff_t = FourierFeatures(1, n_freq=int(t_freq), sigma=t_sigma, seed=ff_seed)
-        # spatial amplitude net (WIRE Gabor backbone -> 2R)
-        a_in = 2 * int(k_freq) + int(coil_embed_dim)
+        # spatial amplitude net (WIRE Gabor backbone -> 2R, or 2R per coil in output mode)
+        a_in = 2 * int(k_freq) + (int(coil_embed_dim) if self.coil_mode == 'input' else 0)
         self.a_first = GaborLayer(a_in, hidden, w0=w0, s0=s0, is_first=True)   # -> 2*hidden
         self.a_blocks = nn.ModuleList([GaborLayer(2 * hidden, hidden, w0=w0, s0=s0)
                                        for _ in range(max(0, depth - 2))])
-        self.a_head = nn.Linear(2 * hidden, 2 * self.rank)
+        self.a_head = nn.Linear(2 * hidden, 2 * self.rank * (1 if self.coil_mode == 'input' else self.n_coils))
         # temporal basis net (small SIREN on FF(t) -> 2R)
         t_in = 2 * int(t_freq)
         phi_layers = [SineLayer(t_in, phi_hidden, w0=phi_w0, is_first=True)]
@@ -1268,6 +1270,12 @@ class WIRE_FF_SUBSPACE_KXY_COIL_T_REIM(nn.Module):
         self.phi_head = nn.Linear(phi_hidden, 2 * self.rank)
 
     def amplitudes(self, kcoords, coil_idx):
+        if self.coil_mode == 'output':                          # shared backbone, coil picked at the output head
+            h = self.a_first(self.ff_k(kcoords))
+            for blk in self.a_blocks:
+                h = h + blk(h) if self.residual else blk(h)
+            a = self.a_head(h).view(-1, self.n_coils, self.rank, 2)
+            return a[torch.arange(a.shape[0], device=a.device), coil_idx.long()]   # [N,R,2] complex
         ec = self.coil_embed(coil_idx.long())
         h = self.a_first(torch.cat([self.ff_k(kcoords), ec], dim=-1))
         for blk in self.a_blocks:
@@ -1429,11 +1437,11 @@ class WIRE_FF_PATLAK_KXY_COIL_T_REIM(WIRE_FF_SUBSPACE_KXY_COIL_T_REIM):
     def __init__(self, n_coils, aif_tgrid, aif_vals, iaif_vals, n_free=0,
                  coil_embed_dim=8, hidden=512, depth=12, w0=62.0, s0=15.0,
                  k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, residual=True,
-                 phi_hidden=64, phi_depth=3, phi_w0=30.0):
+                 phi_hidden=64, phi_depth=3, phi_w0=30.0, coil_mode='input'):
         super().__init__(n_coils, coil_embed_dim=coil_embed_dim, rank=3 + int(n_free),
                          hidden=hidden, depth=depth, w0=w0, s0=s0, k_freq=k_freq, k_sigma=k_sigma,
                          t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual,
-                         phi_hidden=phi_hidden, phi_depth=phi_depth, phi_w0=phi_w0)
+                         phi_hidden=phi_hidden, phi_depth=phi_depth, phi_w0=phi_w0, coil_mode=coil_mode)
         self.n_fixed = 3; self.n_free = int(n_free)
         self.register_buffer('aif_tgrid', torch.as_tensor(aif_tgrid, dtype=torch.float32))
         self.register_buffer('aif_vals', torch.as_tensor(aif_vals, dtype=torch.float32))
@@ -1471,11 +1479,11 @@ class WIRE_FF_TOFTS_KXY_COIL_T_REIM(WIRE_FF_SUBSPACE_KXY_COIL_T_REIM):
     embedding, the loss and the k-space training loop are untouched. no learned temporal net.
     off-grid t: linear interp of the stored atoms (same rule as the Patlak class)."""
     def __init__(self, n_coils, atom_tgrid, atoms, R_patlak=None, coil_embed_dim=8, hidden=512, depth=12,
-                 w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, residual=True):
+                 w0=62.0, s0=15.0, k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, residual=True, coil_mode='input'):
         atoms = torch.as_tensor(np.asarray(atoms), dtype=torch.float32)
         super().__init__(n_coils, coil_embed_dim=coil_embed_dim, rank=int(atoms.shape[1]),
                          hidden=hidden, depth=depth, w0=w0, s0=s0, k_freq=k_freq, k_sigma=k_sigma,
-                         t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual)
+                         t_freq=t_freq, t_sigma=t_sigma, ff_seed=ff_seed, residual=residual, coil_mode=coil_mode)
         self.n_fixed = int(atoms.shape[1]); self.n_free = 0
         self.phi_body = None; self.phi_head = None                     # no temporal net at all
         self.register_buffer('atom_tgrid', torch.as_tensor(np.asarray(atom_tgrid), dtype=torch.float32))
