@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-17 11:20:50 on worker06.cluster, job 3310792, cycle 39
+updated 2026-09-17 11:59:36 on worker06.cluster, job 3310792, cycle 58
 
 ## active
 
@@ -8,14 +8,13 @@ updated 2026-09-17 11:20:50 on worker06.cluster, job 3310792, cycle 39
 |---|---|---|
 | 3317395 | 044_iq_tradeoff | 2 RUNNING None |
 | 3318607 | 045_reg_ideas | 1 PENDING QOSMaxGRESPerUser |
-| 3318608 | 046_ctv_smoke | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 046_ctv_smoke | 1 TIMEOUT 00:40:23 |
 | 045_reg_ideas | 1 PENDING QOSMaxGRESPerUser |
-| 046_ctv_smoke | 1 RUNNING None |
 | 044_iq_tradeoff | 2 RUNNING None |
 | 043_iq_track | 1 COMPLETED 00:00:16 |
 | 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |

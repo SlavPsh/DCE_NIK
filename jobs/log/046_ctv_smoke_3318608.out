@@ -1,0 +1,11 @@
+device=cpu
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 8 steps, batch 4096, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+    [coef-tv] grid 384 every 4 weight 0.03 delta 0.1
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:309: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale * pen).backward(); tot += float(pen)
+    step      8  train 1.705e+01  heldout 8.913e+00
+    final weights kept (best heldout inf at step 0)
+slurmstepd-worker07: error: *** JOB 3318608 ON worker07 CANCELLED AT 2026-09-17T11:59:09 DUE TO TIME LIMIT ***
