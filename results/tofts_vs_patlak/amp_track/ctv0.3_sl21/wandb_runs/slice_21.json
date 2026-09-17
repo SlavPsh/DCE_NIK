@@ -1,0 +1,17 @@
+{
+ "name": "gnik_ctv0.3_sl21_s21",
+ "mode": "online",
+ "loss": 0.5019741654396057,
+ "heldout_mse": 0.6196116805076599,
+ "val_knmse": 0.7737654847307736,
+ "best_heldout_mse": 0.5410930514335632,
+ "coef_tv": 0.672643706202507,
+ "support": 0.0,
+ "pisco": 0.0,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 9942.14163517952,
+ "peak_gpu_mb": 12461.20849609375,
+ "params": 5531216,
+ "wall_total_s": 9942.139343738556
+}
