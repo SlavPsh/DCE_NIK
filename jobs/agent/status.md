@@ -1,16 +1,20 @@
 # helios agent
 
-updated 2026-09-17 15:42:12 on worker06.cluster, job 3310792, cycle 166
+updated 2026-09-17 16:43:31 on worker06.cluster, job 3310792, cycle 196
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3319920 | 051_sub16_input_tofts8_output | 1 PENDING None |
+| 3319921 | 052_coilmode_smoke | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 051_sub16_input_tofts8_output | 1 PENDING None |
+| 052_coilmode_smoke | 1 PENDING Priority |
 | 016_b1factor_log | exit 0 |
 | 015_senseB_logs | exit 0 |
 | 049_state_047 | exit 0 |
@@ -29,5 +33,3 @@ updated 2026-09-17 15:42:12 on worker06.cluster, job 3310792, cycle 166
 | 043_iq_track | 1 COMPLETED 00:00:16 |
 | 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |
 | 046_hung_tasks | exit 0 |
-| 040_pk_arms_k80_rms1 | 1 COMPLETED 00:38:11, 1 COMPLETED 00:38:16, 4 COMPLETED 00:38:17, 1 COMPLETED 00:38:18, 2 COMPLETED 00:38:20, 1 COMPLETED 00:38:22, 1 COMPLETED 00:38:24, 1 COMPLETED 00:38:28, 2 COMPLETED 00:38:29, 2 COMPLETED 00:38:30, 1 COMPLETED 00:38:32, 1 COMPLETED 00:38:35, 1 COMPLETED 00:38:40, 1 COMPLETED 00:38:42, 2 COMPLETED 00:38:55, 1 COMPLETED 00:39:00, 1 COMPLETED 00:39:27, 1 COMPLETED 00:39:32, 2 COMPLETED 00:40:08 |
-| 045_throttle | exit 0 |
