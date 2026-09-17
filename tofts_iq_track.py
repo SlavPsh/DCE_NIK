@@ -6,7 +6,7 @@ reference, model-free the dynamics reference.
 out: results/tofts_vs_patlak/iq_track_sl<Z>.{md,json}, figures/iq_track_sl<Z>.png (metrics vs step, trade-off scatter), figures/iq_zoom_sl<Z>.png
 usage: python tofts_iq_track.py --slice 21"""
 import warnings; warnings.filterwarnings("ignore")
-import os, re, sys, json, glob, argparse, numpy as np
+import os, re, sys, json, glob, argparse, numpy as np, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; sys.path.insert(0, B)
 import consolidated as C
@@ -37,6 +37,12 @@ def main():
         v = ls_scale(v, RW[nt], body); out = dict(label=label)
         for ts in (90.0, 300.0):
             p = frame(v, t, ts); r = frame(cs, tcs, ts); s = C.score(p, r, body); out.update({f"haarpsi_{int(ts)}": s["haarpsi"], f"ssim_{int(ts)}": s["ssim"], f"psnr_{int(ts)}": s["psnr"], f"airE_{int(ts)}": C.bgE(p, r, body, air)})
+        flat = ndi.binary_erosion(static, iterations=3) if static.sum() > 200 else static; kb = ndi.binary_dilation(rois["kidney"], iterations=2) & ~ndi.binary_erosion(rois["kidney"], iterations=2) if "kidney" in rois else None
+        for ts in (90.0, 300.0):
+            p = frame(v, t, ts); r = frame(cs, tcs, ts); r = r * (np.sum(p[body] * r[body]) / (np.sum(r[body] ** 2) + 1e-12))
+            out[f"flatnoise_{int(ts)}"] = float(p[flat].std() / (p[flat].mean() + 1e-12))                                                   # spatial noise in flat tissue
+            hp_p = p - ndi.gaussian_filter(p, 3.0); hp_r = r - ndi.gaussian_filter(r, 3.0); out[f"highpass_{int(ts)}"] = float(np.sqrt((hp_p[body] ** 2).mean()) / (np.sqrt((hp_r[body] ** 2).mean()) + 1e-12))   # fine-scale energy vs reference
+            if kb is not None: gy, gx = np.gradient(p); out[f"edge_{int(ts)}"] = float(np.sqrt(gy ** 2 + gx ** 2)[kb].mean() / (p[rois["cortex"]].mean() + 1e-12))   # kidney edge sharpness
         cst = np.array([v[..., i][static].mean() for i in range(nt)]); hp = cst - np.convolve(cst, np.ones(9) / 9, mode="same"); out["static_noise"] = float(np.std(hp[5:-5]) / (np.abs(cst).mean() + 1e-12))
         for r in ("cortex", "medulla"):
             c = np.array([v[..., i][rois[r]].mean() for i in range(nt)]); pk, wo = amp(c, t); out[f"{r}_peak"] = pk / (ref_amp[r][0] + 1e-12); out[f"{r}_washout"] = wo / (ref_amp[r][1] + 1e-12)
@@ -61,7 +67,7 @@ def main():
             step = int(re.search(r"step(\d+)", p).group(1)); v = np.load(p).astype(np.float32); rows["steps"][var][step] = iq(v, ft(v.shape[-1]), f"{var} {step}")
         if rows["steps"][var]: print(var, "steps", sorted(rows["steps"][var]), flush=True)
     R = f"{B}/results/tofts_vs_patlak"; TG = os.environ.get("IQ_TAG", ""); json.dump(rows, open(f"{R}/iq_track_sl{Z}{TG}.json", "w"), indent=1)
-    K = ["haarpsi_90", "ssim_90", "psnr_90", "airE_90", "haarpsi_300", "airE_300", "static_noise", "cortex_peak", "cortex_washout", "cortex_nrmse", "medulla_nrmse"]
+    K = ["haarpsi_90", "ssim_90", "airE_90", "flatnoise_90", "highpass_90", "edge_90", "haarpsi_300", "airE_300", "flatnoise_300", "highpass_300", "edge_300", "cortex_peak", "cortex_washout", "cortex_nrmse", "medulla_nrmse"]
     L = [f"# image quality vs curve fidelity, slice {Z}, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)", "",
          "| recon | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
     for r in rows["final"]: L.append(f"| {r['label']} | " + " | ".join(f"{r[k]:.3f}" for k in K) + " |")
