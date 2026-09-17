@@ -284,8 +284,30 @@ def train_one_slice(out_dir, slc, sh, args, device):
             x = torch.stack(outs, 0).permute(0, 3, 1, 2)                          # [C,2,P,P]
             return _spirit_pen(x, Gr, Gi)
     opt = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    sched = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        opt, mode='min', factor=0.5, patience=args.scheduler_patience, min_lr=args.scheduler_min_lr)
+    cosine = args.lr_schedule == 'cosine'                                # cosine: lr -> min_lr at args.steps, stepped every iteration; endpoint independent of the stop
+    sched = (torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.steps, eta_min=args.scheduler_min_lr) if cosine else
+             torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode='min', factor=0.5, patience=args.scheduler_patience, min_lr=args.scheduler_min_lr))
+    # spatial prior on the coefficient maps (fixed-basis models): per-coil coefficient images = ifft2 of the R cartesian coefficient k-spaces
+    # (model.amplitudes on the full nx grid, denormalized, masked to the sampled disk), huber tv per map normalized by the map rms (scale-free),
+    # backward per coil so the graph never holds all coils. the grasp-pro move (tv on subspace coefficients), no image rendering per frame.
+    ctv_on = args.coef_tv_weight > 0 and hasattr(model, 'amplitudes')
+    if ctv_on:
+        nxc = int(args.coef_tv_grid or sh['nx']); _cg = torch.from_numpy(A.cartesian_grid(nxc)).to(device)
+        _cmask = (torch.sqrt((_cg ** 2).sum(1)) <= 1.0).float().view(nxc, nxc, 1)
+        print(f'    [coef-tv] grid {nxc} every {args.coef_tv_every} weight {args.coef_tv_weight:g} delta {args.coef_tv_delta:g}', flush=True)
+        def coef_tv_backward(scale):
+            tot = 0.0; Rk = int(model.rank)
+            for c in range(ncc):
+                cd = torch.full((nxc * nxc,), c, dtype=torch.long, device=device); Amp = model.amplitudes(_cg, cd)                 # [P,R,2]
+                pr = torch.stack([normalizer.denormalize(_cg, Amp[:, r, :]) for r in range(Rk)], 1)                              # [P,R,2] raw k-space
+                K = torch.complex(pr[..., 0], pr[..., 1]).view(nxc, nxc, Rk) * _cmask
+                im = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(K, dim=(0, 1)), dim=(0, 1)), dim=(0, 1))          # [nx,nx,R] coil image per atom
+                rms = torch.sqrt((im.abs() ** 2).mean(dim=(0, 1))).detach() + 1e-12
+                dx = (im[1:, :] - im[:-1, :]).abs(); dy = (im[:, 1:] - im[:, :-1]).abs(); d = args.coef_tv_delta * rms
+                hub = lambda a: torch.where(a <= d, 0.5 * a ** 2 / d, a - 0.5 * d)
+                pen = ((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms).sum() / (ncc * Rk)
+                (scale * pen).backward(); tot += float(pen)
+            return tot
 
     best_heldout, best_state, best_step = float('inf'), None, 0
     ckpt_path = os.path.join(args.save_dir, f'ckpt_slice_{slc:02d}.pt')
@@ -303,7 +325,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                         sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state, best_step=best_step), tmp)
         os.replace(tmp, ckpt_path)
 
-    model.train()
+    model.train(); ctv_last = 0.0
     for step in range(start_step, args.steps + 1):
         idx = torch.randint(0, N_train, (args.batch_size,), device=device)
         opt.zero_grad(set_to_none=True)
@@ -322,8 +344,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
         if spirit_on:                                            # A0 k-space coil-consistency prior
             loss = loss + args.spirit_weight * spirit_term()
         loss.backward()
+        if ctv_on and step % args.coef_tv_every == 0: ctv_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         opt.step()
+        if cosine: sched.step()
         if args.phi_ortho and (step <= 20 or (step <= 300 and step % 20 == 0)   # QR stability, ALL 40k
                                or step % 1000 == 0 or step == args.steps):
             print(f'    [ortho] step {step:6d}  loss {float(loss):.3e}  gradnorm {float(gnorm):.2e}  '
@@ -337,7 +361,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                                     for i in range(0, xhe.shape[0], 262144)], 0)
                     hl = float(F.mse_loss(hp, yhe).item())
                 model.train()
-                sched.step(hl)
+                if not cosine: sched.step(hl)
                 if step >= args.warmup_steps and hl < best_heldout:
                     best_heldout = hl
                     best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -348,7 +372,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     with torch.no_grad():
                         snap = recon_nik_cart(A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type, shared=sh, support_radius=args.support_radius, verbose=False), b1, bas)
                     np.save(os.path.join(args.save_dir, f'snap_slice_{slc:02d}_step{step:06d}.npy'), np.abs(snap).astype(np.float16)); model.train()
-                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout,
+                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last,
                              best_step=best_step, lr=opt.param_groups[0]['lr'], wall_s=time.time() - t_slice,
                              peak_gpu_mb=W.peak_gpu_mb()), step=step)
                 if step % args.console_every == 0 or step == args.steps:
@@ -449,6 +473,11 @@ def main():
     ap.add_argument('--grad-clip', type=float, default=1.0)
     ap.add_argument('--warmup-steps', type=int, default=2000)
     ap.add_argument('--eval-every', type=int, default=1000)
+    ap.add_argument('--lr-schedule', default='plateau', choices=['plateau', 'cosine'], help='plateau = ReduceLROnPlateau on the held-out mse (default); cosine = decay to --scheduler-min-lr at --steps')
+    ap.add_argument('--coef-tv-weight', type=float, default=0.0, help='huber tv on the per-coil coefficient maps (fixed-basis models); 0 = off')
+    ap.add_argument('--coef-tv-every', type=int, default=8, help='evaluate the coefficient-map tv every N steps (weight scaled by N)')
+    ap.add_argument('--coef-tv-grid', type=int, default=0, help='cartesian grid for the tv render; 0 = the data nx (full resolution, no fov wrap)')
+    ap.add_argument('--coef-tv-delta', type=float, default=0.1, help='huber knee as a fraction of the map rms')
     ap.add_argument('--snapshot-every', type=int, default=0, help='save |recon| (float16) every N steps at eval points; 0 = off')
     ap.add_argument('--no-restore', action='store_true', help='keep the final weights instead of the best-heldout state')
     ap.add_argument('--console-every', type=int, default=1000)
