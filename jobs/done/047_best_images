@@ -1,5 +1,6 @@
 queue 047_best_images
 jid 3318724
 submitted 2026-09-17 13:02:52
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:19
 log jobs/log/047_best_images_3318724.out
+ended 2026-09-17 13:04:57
