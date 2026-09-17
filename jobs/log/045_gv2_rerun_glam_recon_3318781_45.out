@@ -5,3 +5,11 @@ warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
 slice 45: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 5.701e-05 (2s)
   ite = 0, cost = 0.000829
   ite = 1, cost = 0.000737
+  ite = 2, cost = 0.000654
+  ite = 3, cost = 0.000618
+  ite = 4, cost = 0.000455
+  ite = 5, cost = 0.000397
+  ite = 6, cost = 0.000353
+  ite = 7, cost = 0.000317
+  ite = 8, cost = 0.000299
+  ite = 0, cost = 0.000254
