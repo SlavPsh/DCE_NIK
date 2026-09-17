@@ -1,25 +1,25 @@
 # helios agent
 
-updated 2026-09-17 21:47:30 on worker09.cluster, job 3317310, cycle 1
+updated 2026-09-17 22:01:46 on worker09.cluster, job 3317310, cycle 8
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3319920 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
-| 3319931 | 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
-| 3320104 | 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser |
+| 3319920 | 051_sub16_input_tofts8_output | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 3319931 | 053_ctv_rerun | 1 PENDING MaxGRESPerAccount |
+| 3320104 | 055_kspace_priors | 1 PENDING MaxGRESPerAccount |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 051_sub16_input_tofts8_output | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 053_ctv_rerun | 1 PENDING MaxGRESPerAccount |
+| 055_kspace_priors | 1 PENDING MaxGRESPerAccount |
 | 056_kprior_smoke | 1 COMPLETED 00:00:06 |
 | 054_mf_peak_support_mask | 1 COMPLETED 00:09:25 |
-| 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser |
-| 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
-| 053_ctv_rerun | 1 PENDING QOSMaxGRESPerUser |
 | 016_b1factor_log | exit 0 |
 | 015_senseB_logs | exit 0 |
 | 049_state_047 | exit 0 |
