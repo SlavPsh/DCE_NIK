@@ -1,0 +1,53 @@
+8:#SBATCH -o /net/beegfs/users/P101440/DCE_NIK/b1factor_%j.log
+===== b1factor_3103138.log
+model wire_ff_res loaded
+normalizer fit on 4202496 train samples
+per-coil cartesian k-space (384, 384, 342, 8)
+
+factorization residual (per-coil k-space vs its factorized projection): 8.12 dB
+data NMSE at measured spokes:  as-is 1.0000   factorization-forced 1.0000   degradation -0.0%
+
+READ: small degradation -> factorization is nearly free, SENSE-forward B has headroom.
+      large degradation -> the network is using non-factorization to fit data.
+CHECK_DONE
+===== b1factor_3103138.log
+model wire_ff_res loaded
+normalizer fit on 4202496 train samples
+per-coil cartesian k-space (384, 384, 342, 8)
+
+factorization residual (per-coil k-space vs its factorized projection): 8.12 dB
+data NMSE at measured spokes:  as-is 1.0000   factorization-forced 1.0000   degradation -0.0%
+
+READ: small degradation -> factorization is nearly free, SENSE-forward B has headroom.
+      large degradation -> the network is using non-factorization to fit data.
+CHECK_DONE
+===== b1factor_3103135.log
+model wire_ff_res loaded
+normalizer fit on 4202496 train samples
+per-coil cartesian k-space (384, 384, 342, 8)
+
+factorization residual (per-coil k-space vs its factorized projection): 8.12 dB
+Traceback (most recent call last):
+  File "/scratch/rnga/vvpshenov/DCE_NIK/check_b1_factor.py", line 65, in <module>
+    p0 = gather(cart); p1 = gather(cart_p); meas = Yc[:M]
+         ^^^^^^^^^^^^
+  File "/scratch/rnga/vvpshenov/DCE_NIK/check_b1_factor.py", line 64, in gather
+    return np.stack([c3[ix.ravel()[:M] % nx, iy.ravel()[:M] % nx, np.clip(fi.ravel()[:M], 0, nt-1), :]], 0)[0]
+                     ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: shape mismatch: indexing arrays could not be broadcast together with shapes (656640,) (656640,) (1710,) 
+===== b1factor_3103135.log
+model wire_ff_res loaded
+normalizer fit on 4202496 train samples
+per-coil cartesian k-space (384, 384, 342, 8)
+
+factorization residual (per-coil k-space vs its factorized projection): 8.12 dB
+Traceback (most recent call last):
+  File "/scratch/rnga/vvpshenov/DCE_NIK/check_b1_factor.py", line 65, in <module>
+    p0 = gather(cart); p1 = gather(cart_p); meas = Yc[:M]
+         ^^^^^^^^^^^^
+  File "/scratch/rnga/vvpshenov/DCE_NIK/check_b1_factor.py", line 64, in gather
+    return np.stack([c3[ix.ravel()[:M] % nx, iy.ravel()[:M] % nx, np.clip(fi.ravel()[:M], 0, nt-1), :]], 0)[0]
+                     ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: shape mismatch: indexing arrays could not be broadcast together with shapes (656640,) (656640,) (1710,) 
+b1factor_3103135.log
+b1factor_3103138.log
