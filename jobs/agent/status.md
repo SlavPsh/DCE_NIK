@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-17 16:45:38 on worker06.cluster, job 3310792, cycle 197
+updated 2026-09-17 16:59:57 on worker06.cluster, job 3310792, cycle 204
 
 ## active
 
@@ -8,11 +8,13 @@ updated 2026-09-17 16:45:38 on worker06.cluster, job 3310792, cycle 197
 |---|---|---|
 | 3319920 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3319921 | 052_coilmode_smoke | 1 RUNNING None |
+| 3319931 | 053_ctv_rerun | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 053_ctv_rerun | 1 PENDING None |
 | 051_sub16_input_tofts8_output | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 052_coilmode_smoke | 1 RUNNING None |
 | 016_b1factor_log | exit 0 |
@@ -32,4 +34,3 @@ updated 2026-09-17 16:45:38 on worker06.cluster, job 3310792, cycle 197
 | 046_ctv_smoke | 1 TIMEOUT 00:40:23 |
 | 043_iq_track | 1 COMPLETED 00:00:16 |
 | 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |
-| 046_hung_tasks | exit 0 |
