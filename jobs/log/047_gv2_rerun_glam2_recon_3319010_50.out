@@ -43,3 +43,10 @@ SAVED slice 50 glam0.02 lam=1.52e-06 (192, 192, 102) finite=True (362s)
   ite = 3, cost = 0.000045
   ite = 4, cost = 0.000042
   ite = 5, cost = 0.000039
+  ite = 6, cost = 0.000037
+  ite = 7, cost = 0.000034
+  ite = 8, cost = 0.000033
+  ite = 0, cost = 0.000032
+  ite = 1, cost = 0.000031
+  ite = 2, cost = 0.000028
+  ite = 3, cost = 0.000028
