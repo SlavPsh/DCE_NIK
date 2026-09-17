@@ -16,3 +16,12 @@ slice 29: 102 frames x 21 spokes, ncc 8, grid (384, 384), max|x0| 7.76e-05 (2s)
   ite = 4, cost = 0.000062
   ite = 5, cost = 0.000060
   ite = 6, cost = 0.000059
+  ite = 7, cost = 0.000059
+  ite = 8, cost = 0.000058
+  ite = 0, cost = 0.000057
+  ite = 1, cost = 0.000057
+  ite = 2, cost = 0.000057
+  ite = 3, cost = 0.000056
+  ite = 4, cost = 0.000056
+  ite = 5, cost = 0.000055
+  ite = 6, cost = 0.000055
