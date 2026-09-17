@@ -1,12 +1,12 @@
 # helios agent
 
-updated 2026-09-17 22:01:46 on worker09.cluster, job 3317310, cycle 8
+updated 2026-09-17 22:05:52 on worker09.cluster, job 3317310, cycle 10
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3319920 | 051_sub16_input_tofts8_output | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 3319920 | 051_sub16_input_tofts8_output | 2 RUNNING None |
 | 3319931 | 053_ctv_rerun | 1 PENDING MaxGRESPerAccount |
 | 3320104 | 055_kspace_priors | 1 PENDING MaxGRESPerAccount |
 
@@ -14,7 +14,7 @@ updated 2026-09-17 22:01:46 on worker09.cluster, job 3317310, cycle 8
 
 | name | state |
 |---|---|
-| 051_sub16_input_tofts8_output | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 051_sub16_input_tofts8_output | 2 RUNNING None |
 | 053_ctv_rerun | 1 PENDING MaxGRESPerAccount |
 | 055_kspace_priors | 1 PENDING MaxGRESPerAccount |
 | 056_kprior_smoke | 1 COMPLETED 00:00:06 |

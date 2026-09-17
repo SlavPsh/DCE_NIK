@@ -1,5 +1,5 @@
 queue 051_sub16_input_tofts8_output
 jid 3319920
 submitted 2026-09-17 16:43:31
-state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
+state 2 RUNNING None
 log jobs/log/051_sub16_input_tofts8_output_3319920.out
