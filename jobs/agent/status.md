@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-17 10:15:20 on worker06.cluster, job 3310792, cycle 7
+updated 2026-09-17 10:23:35 on worker06.cluster, job 3310792, cycle 11
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3317395 | 044_iq_tradeoff | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 044_iq_tradeoff | 1 PENDING None |
 | 043_iq_track | 1 COMPLETED 00:00:16 |
 | 044_gv2_rerun_fix | 1 COMPLETED 00:00:01 |
 | 046_hung_tasks | exit 0 |
@@ -30,4 +32,3 @@ updated 2026-09-17 10:15:20 on worker06.cluster, job 3310792, cycle 7
 | 035_roi_propose_v2 | 1 COMPLETED 00:00:13 |
 | 034_roi_propose | 1 COMPLETED 00:00:16 |
 | 033_roi_check | 1 COMPLETED 00:00:20 |
-| 030_span_diag | 1 COMPLETED 00:00:34 |
