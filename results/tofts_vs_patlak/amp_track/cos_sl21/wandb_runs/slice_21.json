@@ -1,0 +1,15 @@
+{
+ "name": "gnik_cos_sl21_s21",
+ "mode": "online",
+ "loss": 0.3796277642250061,
+ "heldout_mse": 0.791510820388794,
+ "val_knmse": 0.9884315820289254,
+ "best_heldout_mse": 0.576732337474823,
+ "coef_tv": 0.0,
+ "best_step": 2000,
+ "lr": 1e-07,
+ "wall_s": 7616.250931501389,
+ "peak_gpu_mb": 12458.52099609375,
+ "params": 5531216,
+ "wall_total_s": 7616.248628854752
+}

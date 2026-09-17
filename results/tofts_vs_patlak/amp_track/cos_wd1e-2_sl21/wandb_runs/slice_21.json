@@ -1,0 +1,15 @@
+{
+ "name": "gnik_cos_wd1e-2_sl21_s21",
+ "mode": "online",
+ "loss": 0.4748423397541046,
+ "heldout_mse": 0.6751715540885925,
+ "val_knmse": 0.843148154337176,
+ "best_heldout_mse": 0.5532874464988708,
+ "coef_tv": 0.0,
+ "best_step": 3000,
+ "lr": 1e-07,
+ "wall_s": 7614.931786298752,
+ "peak_gpu_mb": 12458.52099609375,
+ "params": 5531216,
+ "wall_total_s": 7614.929477453232
+}
