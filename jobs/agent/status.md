@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-09-18 02:12:13 on worker09.cluster, job 3317310, cycle 131
+updated 2026-09-18 02:14:19 on worker09.cluster, job 3317310, cycle 132
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3320104 | 055_kspace_priors | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 3320104 | 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 055_kspace_priors | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 053_ctv_rerun | 1 COMPLETED 02:45:49, 1 COMPLETED 03:21:10 |
-| 055_kspace_priors | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 051_sub16_input_tofts8_output | 1 COMPLETED 00:38:24, 1 COMPLETED 00:38:26, 2 COMPLETED 00:38:31, 1 COMPLETED 00:38:34, 1 COMPLETED 00:38:35, 1 COMPLETED 00:38:36, 1 COMPLETED 00:38:38, 1 COMPLETED 00:38:55, 1 COMPLETED 00:38:56, 1 COMPLETED 00:38:57, 1 COMPLETED 00:39:19, 1 COMPLETED 00:42:10, 1 COMPLETED 00:42:35, 1 COMPLETED 00:45:02, 1 COMPLETED 00:45:15, 1 COMPLETED 00:45:29, 1 COMPLETED 00:45:32 |
 | 056_kprior_smoke | 1 COMPLETED 00:00:06 |
 | 054_mf_peak_support_mask | 1 COMPLETED 00:09:25 |
