@@ -1,5 +1,6 @@
 queue 062_claim_fig2
 jid 3326579
 submitted 2026-09-18 12:23:21
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:06
 log jobs/log/062_claim_fig2_3326579.out
+ended 2026-09-18 12:25:25
