@@ -1,0 +1,17 @@
+{
+ "name": "gnik_pisco1_sl21_s21",
+ "mode": "online",
+ "loss": 0.5085824131965637,
+ "heldout_mse": 0.6776289939880371,
+ "val_knmse": 0.8462169831452976,
+ "best_heldout_mse": 0.575316846370697,
+ "coef_tv": 0.0,
+ "support": 0.0,
+ "pisco": 0.002516356762498617,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 7841.325743436813,
+ "peak_gpu_mb": 12927.27392578125,
+ "params": 5531216,
+ "wall_total_s": 7841.323445796967
+}
