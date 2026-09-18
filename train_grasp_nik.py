@@ -321,9 +321,9 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     hub = lambda a: torch.where(a <= d, 0.5 * a ** 2 / d, a - 0.5 * d)
                     pen = ((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms).sum() / (ncc * Rk)
                 if scale_sup > 0:
-                    if _smask[0] is None:                                                                                        # one-time orientation check on the model's own energy (first coil, all atoms)
-                        Ed = E.detach().sum(-1); fr = {k: float(Ed[m].sum() / Ed.sum()) for k, m in _mcands.items()}; best = max(fr, key=fr.get)
-                        _smask[0] = _mcands[best]; print(f'    [support] mask orientation {best} (inside-energy fractions {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
+                    if _smask[0] is None:                                                                                        # orientation fixed by --support-orient (rot180 verified by support_diag.py on trained models: inside fraction 0.91 vs 0.79 for id); the energy check is informational only
+                        Ed = E.detach().sum(-1); fr = {k: float(Ed[m].sum() / Ed.sum()) for k, m in _mcands.items()}
+                        _smask[0] = _mcands[args.support_orient]; print(f'    [support] mask orientation {args.support_orient} (inside-energy fractions now, untrained model: {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
                     m = _smask[0]; air = _crop & ~m
                     pen_s = (E[air].sum(0) / (E[m].sum(0) + 1e-12)).sum() / (ncc * Rk)                                            # air-ring energy / body energy per map (sums, inside the crop)
                 (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
@@ -531,6 +531,7 @@ def main():
     ap.add_argument('--coef-tv-chunk', type=int, default=16384, help='grid points per checkpointed chunk in the tv render (memory)')
     ap.add_argument('--support-weight', type=float, default=0.0, help='k-space support prior on the coefficient images (energy outside / inside the body); shares the tv render cadence --coef-tv-every; 0 = off')
     ap.add_argument('--support-mask', default=None, help='bool npy [nx,nx] body support (support_mask.py)')
+    ap.add_argument('--support-orient', default='rot180', choices=['id', 'rot180', 'fliplr', 'flipud'], help='mask orientation in the prior render frame (rot180 verified for the in vivo data by support_diag.py)')
     ap.add_argument('--pisco-weight', type=float, default=0.0, help='PISCO-style self-supervised k-space consistency; 0 = off')
     ap.add_argument('--pisco-every', type=int, default=8); ap.add_argument('--pisco-batch', type=int, default=1024)
     ap.add_argument('--pisco-stencil', type=int, default=1, help='half-width of the cartesian neighbour stencil (1 = 8 neighbours)'); ap.add_argument('--pisco-ridge', type=float, default=1e-3)

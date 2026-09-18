@@ -154,3 +154,19 @@ TEST-spoke k-space NMSE per |k| annulus:
 | 0.81-0.88 | 1.412e+00 |
 | 0.88-0.94 | 1.417e+00 |
 | 0.94-1.00 | 1.439e+00 |
+
+## reference peak correction
+
+the 31-spoke model-free reference (6.8 s window) clips the first-pass peak; factor = peak at an 11-spoke window / peak at 31 spokes (`mf_peak_check.py`, per-spoke normalized, approved rois). corrected ratio = ratio vs the 31-spoke reference / factor. state this with every peak comparison.
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 18 | cortex | 1.12 | 0.78 (raw 0.87) | 0.70 (raw 0.79) | 0.88 (raw 0.99) |
+| 18 | medulla | 1.07 | 0.87 (raw 0.93) | 0.96 (raw 1.02) | 0.90 (raw 0.96) |
+| 18 | aorta | 1.09 | 0.94 (raw 1.03) | 0.68 (raw 0.74) | 0.62 (raw 0.68) |
+| 19 | cortex | 1.09 | 0.82 (raw 0.90) | 0.68 (raw 0.75) | 0.78 (raw 0.85) |
+| 19 | medulla | 1.06 | 0.88 (raw 0.94) | 0.96 (raw 1.02) | 1.00 (raw 1.06) |
+| 19 | aorta | 1.09 | 0.93 (raw 1.01) | 0.59 (raw 0.65) | 0.35 (raw 0.38) |
+| 21 | cortex | 1.07 | 0.78 (raw 0.84) | 0.72 (raw 0.77) | 0.60 (raw 0.64) |
+| 21 | medulla | 1.04 | 0.87 (raw 0.90) | 0.97 (raw 1.01) | 0.89 (raw 0.92) |
+| 21 | aorta | 1.10 | 0.94 (raw 1.04) | 0.64 (raw 0.71) | 0.21 (raw 0.23) |
