@@ -1,16 +1,25 @@
 # aorta median intensity curves, DCE_Rerun grasp v2
 
-roi: 147 px, z 18-33, centre (y=146, x=3), from **nufft** by time to peak in the 35 to 160 s window, largest blob per slice, 1 px erosion; identical roi applied to every tag
-selected component: 16 slices, median cross-section 12 px (50 mm2), centroid wander 1.5 px, median ttp 41 s
+roi: tracked lumen disc r=4 px (17 mm across), 490 px over z 1-10 (10 slices), centre (y=69, x=109), centroid wander 3.5 px, median ttp 48 s
+found on **nufft** (method-neutral) by a vessel-disc matched filter (r=5 px, fill >= 0.7) over voxels above 0.45 of the 99.9th percentile peak with ttp <= 70 s and more than 15 px inside the body, tracked in z, then the earliest median ttp of 2 tube candidates; identical roi for every tag
+a fixed lumen disc is used rather than a brightness-thresholded mask, which would bias the median toward the brightest voxels and inflate the peak
 
 | tag | baseline [1e-5] | peak [1e-5] | rel. peak | ttp [s] | plateau/peak |
 |---|---|---|---|---|---|
-| nufft | 0.71 | 2.12 | +198% | 37 | 0.09 |
-| lam0.02 | 0.90 | 3.35 | +273% | 37 | 0.08 |
-| lam0.08 | 0.81 | 2.71 | +236% | 37 | 0.12 |
-| lam0.25 | 0.72 | 1.49 | +107% | 37 | 0.26 |
-| glam0.02 | 0.89 | 3.31 | +272% | 37 | 0.09 |
-| glam0.08 | 0.80 | 2.77 | +246% | 37 | 0.12 |
-| glam0.25 | 0.75 | 1.60 | +112% | 37 | 0.27 |
+| nufft | 1.17 | 7.14 | +513% | 48 | 0.22 |
+| lam0.02 | 2.43 | 14.08 | +480% | 44 | 0.21 |
+| lam0.08 | 2.46 | 12.96 | +427% | 44 | 0.22 |
+| lam0.25 | 2.29 | 10.59 | +363% | 48 | 0.25 |
+| glam0.02 | 2.45 | 14.16 | +479% | 44 | 0.21 |
+| glam0.08 | 2.47 | 13.49 | +446% | 44 | 0.21 |
+| glam0.25 | 2.19 | 10.71 | +390% | 44 | 0.24 |
 
-files: aorta_roi_check.png (roi on anatomy, three views + peak/ttp maps), aorta_curves.png, aorta_curves.csv, aorta_roi.npz
+tube candidates (the selected one is the earliest):
+
+| centre (y, x) | slices | z range | disc fill | wander px | median ttp s | median peak |
+|---|---|---|---|---|---|---|
+| (68, 113) **selected** | 10 | 1-10 | 1.00 | 3.5 | 48.0 | 6.408e-05 |
+| (111, 95) | 13 | 14-26 | 0.88 | 1.6 | 58.9 | 4.021e-05 |
+
+files: aorta_roi_check.png (roi on anatomy, axial + both through-plane cuts + coverage and timing maps + centre track), aorta_curves.png, aorta_curves.csv, aorta_roi.npz
+override with AORTA_YX="y,x" and ZRANGE="z0,z1" if the overlay shows the disc off the vessel

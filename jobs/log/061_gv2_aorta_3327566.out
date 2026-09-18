@@ -1,0 +1,46 @@
+2026-09-18 22:16:10 host worker02.cluster job 3327566
+e438904 gv2_aorta: vessel-disc matched filter + z stability, tracked lumen disc roi
+reference nufft (192, 192, 54, 102), 102 frames, 3.63 s
+candidates 7553 voxels (peak > 0.45 x 7.302e-05, ttp <= 70 s, > 15 px inside body); best in-plane disc coverage 10 slices
+  cand (y= 68, x=113): 10 slices z  1-10, fill 1.00, wander  3.5 px, median ttp  48.0 s, median peak 6.408e-05 (+509%)
+  cand (y=111, x= 95): 13 slices z 14-26, fill 0.88, wander  1.6 px, median ttp  58.9 s, median peak 4.021e-05 (+807%)
+selected (y=68, x=113): earliest median ttp 48.0 s of 2 tube candidates
+roi 490 px, z 1-10, tracked disc r=4 px, centre (y=69, x=109), median ttp 48 s
+  nufft      base 1.166e-05 peak 7.145e-05 (+513%) ttp 48 s plateau/peak 0.22
+  lam0.02    base 2.429e-05 peak 1.408e-04 (+480%) ttp 44 s plateau/peak 0.21
+  lam0.08    base 2.458e-05 peak 1.296e-04 (+427%) ttp 44 s plateau/peak 0.22
+  lam0.25    base 2.287e-05 peak 1.059e-04 (+363%) ttp 48 s plateau/peak 0.25
+  glam0.02   base 2.446e-05 peak 1.416e-04 (+479%) ttp 44 s plateau/peak 0.21
+  glam0.08   base 2.472e-05 peak 1.349e-04 (+446%) ttp 44 s plateau/peak 0.21
+  glam0.25   base 2.187e-05 peak 1.071e-04 (+390%) ttp 44 s plateau/peak 0.24
+# aorta median intensity curves, DCE_Rerun grasp v2
+
+roi: tracked lumen disc r=4 px (17 mm across), 490 px over z 1-10 (10 slices), centre (y=69, x=109), centroid wander 3.5 px, median ttp 48 s
+found on **nufft** (method-neutral) by a vessel-disc matched filter (r=5 px, fill >= 0.7) over voxels above 0.45 of the 99.9th percentile peak with ttp <= 70 s and more than 15 px inside the body, tracked in z, then the earliest median ttp of 2 tube candidates; identical roi for every tag
+a fixed lumen disc is used rather than a brightness-thresholded mask, which would bias the median toward the brightest voxels and inflate the peak
+
+| tag | baseline [1e-5] | peak [1e-5] | rel. peak | ttp [s] | plateau/peak |
+|---|---|---|---|---|---|
+| nufft | 1.17 | 7.14 | +513% | 48 | 0.22 |
+| lam0.02 | 2.43 | 14.08 | +480% | 44 | 0.21 |
+| lam0.08 | 2.46 | 12.96 | +427% | 44 | 0.22 |
+| lam0.25 | 2.29 | 10.59 | +363% | 48 | 0.25 |
+| glam0.02 | 2.45 | 14.16 | +479% | 44 | 0.21 |
+| glam0.08 | 2.47 | 13.49 | +446% | 44 | 0.21 |
+| glam0.25 | 2.19 | 10.71 | +390% | 44 | 0.24 |
+
+tube candidates (the selected one is the earliest):
+
+| centre (y, x) | slices | z range | disc fill | wander px | median ttp s | median peak |
+|---|---|---|---|---|---|---|
+| (68, 113) **selected** | 10 | 1-10 | 1.00 | 3.5 | 48.0 | 6.408e-05 |
+| (111, 95) | 13 | 14-26 | 0.88 | 1.6 | 58.9 | 4.021e-05 |
+
+files: aorta_roi_check.png (roi on anatomy, axial + both through-plane cuts + coverage and timing maps + centre track), aorta_curves.png, aorta_curves.csv, aorta_roi.npz
+override with AORTA_YX="y,x" and ZRANGE="z0,z1" if the overlay shows the disc off the vessel
+AORTA_DONE
+-rw-rw---- 1 P101440 P101440    1632 Sep 18 22:16 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta.md
+-rw-rw---- 1 P101440 P101440   20461 Sep 18 22:16 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_curves.csv
+-rw-rw---- 1 P101440 P101440  218910 Sep 18 22:16 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_curves.png
+-rw-rw---- 1 P101440 P101440 1993934 Sep 18 22:16 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_roi.npz
+-rw-rw---- 1 P101440 P101440  449122 Sep 18 22:16 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_roi_check.png
