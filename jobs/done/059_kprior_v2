@@ -1,5 +1,5 @@
 queue 059_kprior_v2
 jid 3326528
 submitted 2026-09-18 11:52:36
-state 1 PENDING None
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/059_kprior_v2_3326528.out
