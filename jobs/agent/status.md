@@ -1,17 +1,19 @@
 # helios agent
 
-updated 2026-09-18 12:17:12 on worker03.cluster, job 3320124, cycle 82
+updated 2026-09-18 12:23:21 on worker03.cluster, job 3320124, cycle 85
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3326528 | 059_kprior_v2 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3326579 | 062_claim_fig2 | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 062_claim_fig2 | 1 PENDING Priority |
 | 061_claim_fig2 | 1 COMPLETED 00:00:04 |
 | 060_claim_figs | 1 COMPLETED 00:00:10 |
 | 059_kprior_v2 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
@@ -31,4 +33,3 @@ updated 2026-09-18 12:17:12 on worker03.cluster, job 3320124, cycle 82
 | 047_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
 | 046_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
 | 047_cancel_046 | exit 0 |
-| 045_gv2_rerun_glam | 1 COMPLETED 00:00:01 |
