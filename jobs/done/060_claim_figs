@@ -1,5 +1,6 @@
 queue 060_claim_figs
 jid 3326563
 submitted 2026-09-18 12:06:54
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:10
 log jobs/log/060_claim_figs_3326563.out
+ended 2026-09-18 12:08:58

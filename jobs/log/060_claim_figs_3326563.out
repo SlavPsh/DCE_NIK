@@ -1,0 +1,11 @@
+saved /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/figures/claims_regularization_sl21.png
+FIG1 exit 0
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/compare_runs_fig.py", line 51, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/compare_runs_fig.py", line 29, in main
+    parts = spec.split(":"); nm, p = parts[0], parts[1]; key = parts[2] if len(parts) > 2 else None
+                                               ~~~~~^^^
+IndexError: list index out of range
+FIG2 exit 1
