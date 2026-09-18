@@ -1,5 +1,6 @@
 queue 060_gv2_aorta
 jid 3327323
 submitted 2026-09-18 22:05:26
-state 1 PENDING None
+state 1 COMPLETED 00:00:38
 log jobs/log/060_gv2_aorta_3327323.out
+ended 2026-09-18 22:07:30

@@ -1,0 +1,71 @@
+2026-09-18 22:05:29 host worker03.cluster job 3327323
+37c602d gv2_aorta: aorta roi by time-to-peak + median intensity curves per tag
+reference nufft (192, 192, 54, 102), 102 frames, 3.63 s
+strong 102081 voxels, ttp cut 69.8 s -> 34133 early, 910 components
+  comp  31:   142 px, z 13-23 (11 sl), area med 13 max 26, wander   3.2, ttp   69.8 s, peak 2.151e-05, centre (y=39, x=68)
+  comp  38:   327 px, z 11-20 (10 sl), area med 26 max 90, wander   3.9, ttp   69.8 s, peak 2.064e-05, centre (y=39, x=173)
+  comp  41:   136 px, z 9-25 (17 sl), area med 5 max 25, wander   6.6, ttp   58.9 s, peak 2.164e-05, centre (y=40, x=52)
+  comp  76:    32 px, z 18-25 (8 sl), area med 4 max 8, wander   2.1, ttp   48.0 s, peak 2.087e-05, centre (y=40, x=83)
+  comp  79:   260 px, z 11-25 (15 sl), area med 11 max 50, wander   4.7, ttp   66.1 s, peak 2.193e-05, centre (y=42, x=121)
+  comp  92:    76 px, z 23-37 (15 sl), area med 5 max 11, wander   3.6, ttp   69.8 s, peak 2.307e-05, centre (y=42, x=63)
+  comp 104:   100 px, z 30-40 (11 sl), area med 4 max 38, wander   5.8, ttp   51.6 s, peak 2.043e-05, centre (y=46, x=124)
+  comp 118:    18 px, z 26-31 (6 sl), area med 4 max 5, wander   1.1, ttp   48.0 s, peak 2.049e-05, centre (y=41, x=78)
+  comp 128:    53 px, z 2-10 (9 sl), area med 6 max 12, wander   2.5, ttp   48.0 s, peak 2.280e-05, centre (y=43, x=119)
+  comp 182:   151 px, z 37-49 (13 sl), area med 10 max 24, wander   4.1, ttp   44.4 s, peak 2.341e-05, centre (y=49, x=44)
+  comp 234:    57 px, z 29-35 (7 sl), area med 9 max 13, wander   1.7, ttp   48.0 s, peak 2.143e-05, centre (y=46, x=136)
+  comp 236:    87 px, z 12-25 (14 sl), area med 3 max 17, wander   1.6, ttp   55.3 s, peak 1.965e-05, centre (y=47, x=137)
+  comp 314:    32 px, z 16-23 (8 sl), area med 4 max 10, wander   1.4, ttp   62.5 s, peak 1.996e-05, centre (y=51, x=150)
+  comp 325:    35 px, z 13-18 (6 sl), area med 5 max 15, wander   1.7, ttp   66.1 s, peak 2.429e-05, centre (y=53, x=114)
+  comp 330:    17 px, z 3-9 (7 sl), area med 2 max 6, wander   0.7, ttp   44.4 s, peak 2.270e-05, centre (y=51, x=152)
+  comp 337:    29 px, z 16-23 (8 sl), area med 4 max 5, wander   2.6, ttp   62.5 s, peak 2.376e-05, centre (y=52, x=75)
+  comp 355:   118 px, z 0-16 (17 sl), area med 6 max 22, wander   3.5, ttp   62.5 s, peak 2.432e-05, centre (y=56, x=78)
+  comp 365:    20 px, z 42-47 (6 sl), area med 3 max 5, wander   0.5, ttp   44.4 s, peak 2.089e-05, centre (y=53, x=156)
+  comp 377:    71 px, z 3-9 (7 sl), area med 10 max 18, wander   3.5, ttp   51.6 s, peak 1.971e-05, centre (y=56, x=147)
+  comp 404:    56 px, z 34-42 (9 sl), area med 3 max 15, wander   1.5, ttp   44.4 s, peak 2.238e-05, centre (y=59, x=32)
+  comp 405:    45 px, z 18-24 (7 sl), area med 4 max 14, wander   1.5, ttp   58.9 s, peak 2.143e-05, centre (y=58, x=35)
+  comp 423: 20076 px, z 0-28 (29 sl), area med 484 max 1937, wander  10.2, ttp   51.6 s, peak 3.359e-05, centre (y=77, x=114)
+  comp 474:    54 px, z 26-32 (7 sl), area med 7 max 17, wander   2.0, ttp   66.1 s, peak 2.076e-05, centre (y=65, x=116)
+  comp 558:    42 px, z 29-34 (6 sl), area med 8 max 11, wander   1.4, ttp   69.8 s, peak 2.002e-05, centre (y=70, x=108)
+  comp 614:    18 px, z 27-36 (10 sl), area med 2 max 3, wander   0.7, ttp   44.4 s, peak 2.185e-05, centre (y=76, x=22)
+  comp 655:   431 px, z 22-32 (11 sl), area med 25 max 97, wander   6.7, ttp   66.1 s, peak 1.960e-05, centre (y=89, x=101)
+  comp 667:   306 px, z 23-33 (11 sl), area med 36 max 51, wander   2.0, ttp   66.1 s, peak 1.892e-05, centre (y=88, x=76)
+  comp 718:    12 px, z 31-36 (6 sl), area med 2 max 4, wander   0.8, ttp   69.8 s, peak 2.061e-05, centre (y=92, x=111)
+  comp 738:  1008 px, z 4-28 (25 sl), area med 41 max 77, wander   4.1, ttp   58.9 s, peak 3.255e-05, centre (y=115, x=97)
+  comp 757:   121 px, z 15-24 (10 sl), area med 12 max 20, wander   6.2, ttp   66.1 s, peak 2.111e-05, centre (y=112, x=132)
+  comp 788:  3449 px, z 16-40 (25 sl), area med 128 max 233, wander   6.5, ttp   69.8 s, peak 2.593e-05, centre (y=124, x=132)
+  comp 800:  1840 px, z 23-43 (21 sl), area med 86 max 168, wander   2.7, ttp   66.1 s, peak 2.394e-05, centre (y=126, x=54)
+  comp 820:  1810 px, z 8-19 (12 sl), area med 162 max 293, wander   8.5, ttp   66.1 s, peak 1.988e-05, centre (y=135, x=142)
+  comp 823:    30 px, z 8-15 (8 sl), area med 4 max 8, wander   0.8, ttp   66.1 s, peak 2.101e-05, centre (y=124, x=127)
+  comp 832:    59 px, z 7-14 (8 sl), area med 7 max 14, wander   2.0, ttp   66.1 s, peak 1.907e-05, centre (y=132, x=123)
+  comp 839:    15 px, z 16-21 (6 sl), area med 3 max 3, wander   0.6, ttp   66.1 s, peak 2.136e-05, centre (y=136, x=158)
+  comp 841:   221 px, z 18-33 (16 sl), area med 12 max 38, wander   1.5, ttp   40.7 s, peak 2.529e-05, centre (y=146, x=2)
+selected comp 841 (earliest ttp of 14 tube-like candidates)
+  nufft      base 7.104e-06 peak 2.117e-05 (+198%) ttp 37 s plateau/peak 0.09
+  lam0.02    base 8.969e-06 peak 3.347e-05 (+273%) ttp 37 s plateau/peak 0.08
+  lam0.08    base 8.054e-06 peak 2.708e-05 (+236%) ttp 37 s plateau/peak 0.12
+  lam0.25    base 7.204e-06 peak 1.493e-05 (+107%) ttp 37 s plateau/peak 0.26
+  glam0.02   base 8.874e-06 peak 3.305e-05 (+272%) ttp 37 s plateau/peak 0.09
+  glam0.08   base 8.003e-06 peak 2.766e-05 (+246%) ttp 37 s plateau/peak 0.12
+  glam0.25   base 7.530e-06 peak 1.600e-05 (+112%) ttp 37 s plateau/peak 0.27
+# aorta median intensity curves, DCE_Rerun grasp v2
+
+roi: 147 px, z 18-33, centre (y=146, x=3), from **nufft** by time to peak in the 35 to 160 s window, largest blob per slice, 1 px erosion; identical roi applied to every tag
+selected component: 16 slices, median cross-section 12 px (50 mm2), centroid wander 1.5 px, median ttp 41 s
+
+| tag | baseline [1e-5] | peak [1e-5] | rel. peak | ttp [s] | plateau/peak |
+|---|---|---|---|---|---|
+| nufft | 0.71 | 2.12 | +198% | 37 | 0.09 |
+| lam0.02 | 0.90 | 3.35 | +273% | 37 | 0.08 |
+| lam0.08 | 0.81 | 2.71 | +236% | 37 | 0.12 |
+| lam0.25 | 0.72 | 1.49 | +107% | 37 | 0.26 |
+| glam0.02 | 0.89 | 3.31 | +272% | 37 | 0.09 |
+| glam0.08 | 0.80 | 2.77 | +246% | 37 | 0.12 |
+| glam0.25 | 0.75 | 1.60 | +112% | 37 | 0.27 |
+
+files: aorta_roi_check.png (roi on anatomy, three views + peak/ttp maps), aorta_curves.png, aorta_curves.csv, aorta_roi.npz
+AORTA_DONE
+-rw-rw---- 1 P101440 P101440     887 Sep 18 22:06 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta.md
+-rw-rw---- 1 P101440 P101440   20461 Sep 18 22:06 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_curves.csv
+-rw-rw---- 1 P101440 P101440  289137 Sep 18 22:06 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_curves.png
+-rw-rw---- 1 P101440 P101440 1992194 Sep 18 22:05 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_roi.npz
+-rw-rw---- 1 P101440 P101440  732371 Sep 18 22:05 /net/beegfs/users/P101440/DCE_NIK/results/dce_rerun_gv2/aorta_roi_check.png
