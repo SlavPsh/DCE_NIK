@@ -1,0 +1,4 @@
+base: prior-render inside fraction {'id': 0.7907598854631982, 'rot180': 0.9115965250313245, 'fliplr': 0.8581932155148619, 'flipud': 0.8746493927073082, 'T': 0.7692848585311508} | penalty (out/in mean) {'id': 0.000664633170050991, 'rot180': 0.00028011408115954505, 'fliplr': 0.00044981694845365125, 'flipud': 0.0003974837482482633, 'T': 0.0007331685992685358} | energy in the 192 crop 0.949, of which outside body 0.250 | production render airE(90 s) 0.182
+sup3: prior-render inside fraction {'id': 0.790047497707608, 'rot180': 0.9108943423418637, 'fliplr': 0.8566303942948094, 'flipud': 0.8734995358366069, 'T': 0.7660722786440589} | penalty (out/in mean) {'id': 0.0006612944354620901, 'rot180': 0.0002799732468224166, 'fliplr': 0.0004509673965564976, 'flipud': 0.0003977698790312943, 'T': 0.0007371682433173897} | energy in the 192 crop 0.949, of which outside body 0.250 | production render airE(90 s) 0.184
+SUPPORT_DIAG_DONE
+DIAG exit 0
