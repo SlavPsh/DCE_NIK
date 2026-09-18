@@ -1,0 +1,60 @@
+2026-09-18 04:26:28 host gpu02.cluster job 3325958 task 2 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+variant pisco0.1 -> results/tofts_vs_patlak/amp_track/pisco0.1_sl21
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 12000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 6m3erxwf
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/pisco0.1_sl21/wandb_runs/wandb/run-20260918_042634-6m3erxwf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_pisco0.1_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/6m3erxwf
+[wandb] gnik_pisco0.1_sl21_s21: mode online
+    [pisco] stencil 8 neighbours at dk 0.0052, batch 1024, every 8, weight 0.1, ridge 0.001
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 597, in <module>
+    main()
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 575, in main
+    img = train_one_slice(args.out_dir, slc, sh, args, device)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 383, in train_one_slice
+    pv = pisco_term(); loss = loss + args.pisco_weight * args.pisco_every * pv; pisco_last = float(pv)
+         ^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py", line 342, in pisco_term
+    cd = torch.full((pts.shape[0],), c, dtype=torch.long, device=device); pr = normalizer.denormalize(pts, model(pts, tt, cd)); V.append(torch.complex(pr[:, 0], pr[:, 1]))
+                                                                                                           ^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/nik_model.py", line 1305, in forward
+    A = self.amplitudes(kcoords, coil_idx)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/nik_model.py", line 1282, in amplitudes
+    h = h + blk(h) if self.residual else blk(h)
+            ^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/nik_model.py", line 95, in forward
+    imag = gauss * torch.sin(self.w0 * h)
+                             ~~~~~~~~^~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 18.00 MiB. GPU 0 has a total capacity of 21.62 GiB of which 5.06 MiB is free. Process 1363158 has 1.23 GiB memory in use. Process 2658469 has 6.61 GiB memory in use. Including non-PyTorch memory, this process has 21.58 GiB memory in use. Of the allocated memory 21.15 GiB is allocated by PyTorch, and 134.90 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mgnik_pisco0.1_sl21_s21[0m at: [34mhttps://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/6m3erxwf[0m
+[W918 04:26:40.053170141 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-18 04:26:40 TRAIN_DONE pisco0.1 exit 1
