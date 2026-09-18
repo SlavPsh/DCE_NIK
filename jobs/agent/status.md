@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-18 22:07:30 on worker05.cluster, job 3326244, cycle 26
+updated 2026-09-18 22:15:41 on worker05.cluster, job 3326244, cycle 30
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3327566 | 061_gv2_aorta | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 061_gv2_aorta | 1 PENDING None |
 | 060_gv2_aorta | 1 COMPLETED 00:00:38 |
 | 059_kprior_v2 | 1 COMPLETED 02:11:24, 1 COMPLETED 02:11:34, 1 COMPLETED 02:38:10, 1 COMPLETED 02:38:23 |
 | 062_claim_fig2 | 1 COMPLETED 00:00:06 |
@@ -30,4 +32,3 @@ updated 2026-09-18 22:07:30 on worker05.cluster, job 3326244, cycle 26
 | 045_reg_ideas | 1 COMPLETED 00:00:12, 1 COMPLETED 00:00:13, 1 COMPLETED 02:07:00, 1 COMPLETED 02:07:02 |
 | 048_cancel_046_chain | exit 0 |
 | 047_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
-| 046_gv2_rerun_glam2 | 1 COMPLETED 00:00:01 |
