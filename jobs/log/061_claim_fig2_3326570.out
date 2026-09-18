@@ -1,0 +1,4 @@
+usage: compare_runs_fig.py [-h] [--slice SLICE] --items ITEMS --out OUT
+                           [--t T] [--title TITLE]
+compare_runs_fig.py: error: unrecognized arguments: run -n torch29 python -u compare_runs_fig.py
+FIG2 exit 2
