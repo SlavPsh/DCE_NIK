@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-18 11:15:49 on worker03.cluster, job 3320124, cycle 52
+updated 2026-09-18 11:19:55 on worker03.cluster, job 3320124, cycle 54
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3326210 | 057_pisco_rerun | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 057_pisco_rerun | 1 RUNNING None |
+| 057_pisco_rerun | 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06 |
 | 058_support_diag | 1 COMPLETED 00:27:44 |
 | 055_kspace_priors | 1 COMPLETED 00:00:11, 1 COMPLETED 00:00:12, 1 COMPLETED 02:38:52, 1 COMPLETED 02:49:31 |
 | 053_ctv_rerun | 1 COMPLETED 02:45:49, 1 COMPLETED 03:21:10 |

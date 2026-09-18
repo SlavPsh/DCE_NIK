@@ -1,0 +1,79 @@
+2026-09-18 09:03:11 host gpu02.cluster job 3326212 task 0 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+  MIG 2g.24gb     Device  0: (UUID: MIG-5fbcb857-7ec1-52fa-967f-a37150159422)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+Submitted batch job 3326213
+tracker chained afterany 3326210
+variant pisco0.1 -> results/tofts_vs_patlak/amp_track/pisco0.1_sl21
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 12000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run lx1dyc67
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/pisco0.1_sl21/wandb_runs/wandb/run-20260918_090315-lx1dyc67
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_pisco0.1_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/lx1dyc67
+[wandb] gnik_pisco0.1_sl21_s21: mode online
+    [pisco] stencil 8 neighbours at dk 0.0052, batch 512, every 8, weight 0.1, ridge 0.001
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:385: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  pv = pisco_term(); loss = loss + args.pisco_weight * args.pisco_every * pv; pisco_last = float(pv)
+    step   1000  train 1.037e+00  heldout 6.177e-01
+    step   2000  train 8.145e-01  heldout 5.764e-01
+    step   3000  train 7.182e-01  heldout 5.989e-01
+    step   4000  train 6.461e-01  heldout 6.226e-01
+    step   5000  train 6.098e-01  heldout 6.404e-01
+    step   6000  train 5.761e-01  heldout 6.534e-01
+    step   7000  train 5.523e-01  heldout 6.636e-01
+    step   8000  train 5.279e-01  heldout 6.698e-01
+    step   9000  train 5.145e-01  heldout 6.749e-01
+    step  10000  train 4.981e-01  heldout 6.765e-01
+    step  11000  train 4.921e-01  heldout 6.774e-01
+    step  12000  train 4.835e-01  heldout 6.832e-01
+    final weights kept (best heldout 5.764e-01 at step 2000)
+    RESOURCES slice 21: peak_gpu_MB 12927 params 5531216 best_heldout 5.7638e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading history steps 11-11, summary, console lines 18-18
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁███████████
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse ▄▁▂▄▅▆▇▇▇███
+wandb:             loss █▅▄▃▃▂▂▂▁▁▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁███████████
+wandb:            pisco ▁▁▂▄▆▄▅▃▄▅█▇
+wandb:          support ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:        val_knmse ▄▁▂▄▅▆▇▇▇███
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.57638
+wandb:        best_step 2000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.68325
+wandb:             loss 0.48351
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12927.27393
+wandb:            pisco 0.00256
+wandb:          support 0
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_pisco0.1_sl21_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/lx1dyc67
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/amp_track/pisco0.1_sl21/wandb_runs/wandb/run-20260918_090315-lx1dyc67/logs
+slice 21  nik (192, 192, 342)  (8162s)  vs CS: corr 0.954  nrmse 0.220
+done 8162s -> results/tofts_vs_patlak/amp_track/pisco0.1_sl21
+[W918 11:19:15.748234944 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-18 11:19:16 TRAIN_DONE pisco0.1 exit 0

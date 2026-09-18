@@ -1,5 +1,6 @@
 queue 057_pisco_rerun
 jid 3326210
 submitted 2026-09-18 09:03:10
-state 1 RUNNING None
+state 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06
 log jobs/log/057_pisco_rerun_3326210.out
+ended 2026-09-18 11:19:55

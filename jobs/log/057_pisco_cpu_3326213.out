@@ -1,3 +1,9 @@
+2026-09-18 11:19:30 host worker09.cluster job 3326213 task 0 stage track
+/var/spool/slurmd/job3326213/slurm_script: line 17: nvidia-smi: command not found
+sup0.3 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+sup3 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+pisco0.1 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
+pisco1 snapshots [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000]
 # amplitude vs step, slice 21, k80, tofts8 (roi enhancement relative to the model-free reference; peak 20 to 210 s / washout mean t > 200 s)
 
 ## sup0.3 (/net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/amp_track/sup0.3_sl21)
@@ -63,3 +69,11 @@
 | 10000 | 0.87 / 0.88 | 0.81 / 0.96 | 0.90 / 0.97 | 0.94 / 1.15 | 6.733e-01 |
 | 11000 | 1.01 / 1.04 | 0.81 / 0.97 | 0.92 / 0.98 | 0.84 / 1.03 | 6.765e-01 |
 | 12000 | 0.90 / 1.05 | 0.79 / 0.98 | 0.93 / 1.00 | 0.88 / 1.11 | 6.776e-01 |
+
+AMP_TRACK_DONE
+[W918 11:19:49.338400399 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+AMP exit 0
+model-free {'haarpsi_90': 0.71, 'ssim_90': 0.831, 'psnr_90': np.float64(27.844), 'airE_90': 0.415, 'haarpsi_300': 0.702, 'ssim_300': 0.819, 'psnr_300': np.float64(28.522), 'airE_300': 0.413, 'flatnoise_90': 0.253, 'highpass_90': 1.018, 'edge_90': 0.205, 'flatnoise_300': 0.256, 'highpass_300': 1.007, 'edge_300': 0.191, 'static_noise': 0.021, 'cortex_peak': 0.977, 'cortex_washout': 0.977, 'cortex_nrmse': 0.023, 'medulla_peak': 0.977, 'medulla_washout': 0.977, 'medulla_nrmse': 0.023}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(125.651), 'airE_90': 0.157, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(125.938), 'airE_300': 0.135, 'flatnoise_90': 0.254, 'highpass_90': 1.0, 'edge_90': 0.205, 'flatnoise_300': 0.259, 'highpass_300': 1.0, 'edge_300': 0.192, 'static_noise': 0.02, 'cortex_peak': 0.837, 'cortex_washout': 1.024, 'cortex_nrmse': 0.084, 'medulla_peak': 0.943, 'medulla_washout': 0.95, 'medulla_nrmse': 0.101}
+NIK-free {'haarpsi_90': 0.799, 'ssim_90': 0.9, 'psnr_90': np.float64(30.663), 'airE_90': 0.162, 'haarpsi_300': 0.839, 'ssim_300': 0.908, 'psnr_300': np.float64(33.398), 'airE_300': 0.168, 'flatnoise_90': 0.235, 'highpass_90': 0.972, 'edge_90': 0.197, 'flatnoise_300': 0.251, 'highpass_300': 0.996, 'edge_300': 0.192, 'static_noise': 0.005, 'cortex_peak': 0.727, 'cortex_washout': 0.88, 'cortex_nrmse': 0.149, 'medulla_peak': 0.912, 'medulla_washout': 0.947, 'medulla_nrmse': 0.079}
+NIK-sub16 {'haarpsi_90': 0.777, 'ssim_90': 0.894, 'psnr_90': np.float64(30.737), 'airE_90': 0.169, 'haarpsi_300': 0.831, 'ssim_300': 0.916, 'psnr_300': np.float64(32.722), 'airE_300': 0.172, 'flatnoise_90': 0.243, 'highpass_90': 0.951, 'edge_90': 0.194, 'flatnoise_300': 0.257, 'highpass_300': 1.037, 'edge_300': 0.193, 'static_noise': 0.018, 'cortex_peak': 0.756, 'cortex_washout': 0.92, 'cortex_nrmse': 0.125, 'medulla_peak': 0.987, 'medulla_washout': 0.941, 'medulla_nrmse': 0.099}
