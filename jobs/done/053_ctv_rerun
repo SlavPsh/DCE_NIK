@@ -1,5 +1,6 @@
 queue 053_ctv_rerun
 jid 3319931
 submitted 2026-09-17 16:59:57
-state 1 RUNNING None
+state 1 COMPLETED 02:45:49, 1 COMPLETED 03:21:10
 log jobs/log/053_ctv_rerun_3319931.out
+ended 2026-09-18 02:12:13
