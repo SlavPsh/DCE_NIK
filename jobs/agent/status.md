@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-18 11:19:55 on worker03.cluster, job 3320124, cycle 54
+updated 2026-09-18 11:52:36 on worker03.cluster, job 3320124, cycle 70
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3326528 | 059_kprior_v2 | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 059_kprior_v2 | 1 PENDING None |
 | 057_pisco_rerun | 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06 |
 | 058_support_diag | 1 COMPLETED 00:27:44 |
 | 055_kspace_priors | 1 COMPLETED 00:00:11, 1 COMPLETED 00:00:12, 1 COMPLETED 02:38:52, 1 COMPLETED 02:49:31 |
@@ -30,4 +32,3 @@ updated 2026-09-18 11:19:55 on worker03.cluster, job 3320124, cycle 54
 | 045_gv2_rerun_glam | 1 COMPLETED 00:00:01 |
 | 050_residual_fig | 1 COMPLETED 00:00:05 |
 | 049_iq_noise_metrics | 1 COMPLETED 00:00:12 |
-| 048_best_images_v2 | 1 COMPLETED 00:00:08 |
