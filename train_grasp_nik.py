@@ -338,8 +338,10 @@ def train_one_slice(out_dir, slc, sh, args, device):
             B = int(args.pisco_batch); idx = torch.randint(0, N_train, (B,), device=device); xc = xtr[idx]; tc = ttr[idx]; S = _offs.shape[0]
             pts = torch.cat([xc, (xc[:, None, :] + _offs[None]).reshape(-1, 2)], 0); tt = torch.cat([tc, tc.repeat_interleave(S)], 0)
             V = []
-            for c in range(ncc):
-                cd = torch.full((pts.shape[0],), c, dtype=torch.long, device=device); pr = normalizer.denormalize(pts, model(pts, tt, cd)); V.append(torch.complex(pr[:, 0], pr[:, 1]))
+            from torch.utils.checkpoint import checkpoint as _ck2
+            def _coil_vals(pp, tq, c):
+                cd = torch.full((pp.shape[0],), c, dtype=torch.long, device=device); pr = normalizer.denormalize(pp, model(pp, tq, cd)); return torch.complex(pr[:, 0], pr[:, 1])
+            for c in range(ncc): V.append(_ck2(_coil_vals, pts, tt, c, use_reentrant=False))                                   # activations recomputed in backward: memory = one coil
             V = torch.stack(V, 1); T = V[:B]; Nb = V[B:].view(B, S * ncc)                                                          # targets [B,C], neighbours [B,S*C], raw k-space
             G = Nb.conj().T @ Nb; lam = float(args.pisco_ridge) * torch.real(torch.trace(G)) / G.shape[0]
             Wk = torch.linalg.solve(G + lam * torch.eye(G.shape[0], device=device, dtype=G.dtype), Nb.conj().T @ T)
