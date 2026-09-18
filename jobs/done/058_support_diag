@@ -1,5 +1,5 @@
 queue 058_support_diag
 jid 3326211
 submitted 2026-09-18 09:03:10
-state 1 PENDING Priority
+state 1 RUNNING None
 log jobs/log/058_support_diag_3326211.out
