@@ -1,0 +1,77 @@
+2026-09-18 11:52:37 host gpu03.cluster job 3326530 task 1 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+  MIG 2g.24gb     Device  0: (UUID: MIG-bbe93c91-7dfa-5181-9573-fffd3e3ea5ce)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+variant supv2_10 -> results/tofts_vs_patlak/amp_track/supv2_10_sl21
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 12000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 94jss2sd
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/amp_track/supv2_10_sl21/wandb_runs/wandb/run-20260918_115241-94jss2sd
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_supv2_10_sl21_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/94jss2sd
+[wandb] gnik_supv2_10_sl21_s21: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+    [support] mask orientation rot180 (inside-energy fractions {'id': 0.793, 'rot180': 0.795, 'fliplr': 0.791, 'flipud': 0.793})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:329: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 1.118e+00  heldout 6.466e-01
+    step   2000  train 8.650e-01  heldout 5.687e-01
+    step   3000  train 7.465e-01  heldout 5.769e-01
+    step   4000  train 6.759e-01  heldout 5.989e-01
+    step   5000  train 6.301e-01  heldout 6.237e-01
+    step   6000  train 5.946e-01  heldout 6.365e-01
+    step   7000  train 5.666e-01  heldout 6.543e-01
+    step   8000  train 5.394e-01  heldout 6.469e-01
+    step   9000  train 5.183e-01  heldout 6.555e-01
+    step  10000  train 5.120e-01  heldout 6.661e-01
+    step  11000  train 5.016e-01  heldout 6.702e-01
+    step  12000  train 4.942e-01  heldout 6.620e-01
+    final weights kept (best heldout 5.687e-01 at step 2000)
+    RESOURCES slice 21: peak_gpu_MB 12462 params 5531216 best_heldout 5.6870e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁███████████
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse ▆▁▂▃▅▆▇▆▇██▇
+wandb:             loss █▅▄▃▃▂▂▂▁▁▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁███████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:          support ▁▁▃▅▇▇▇█████
+wandb:        val_knmse ▆▁▂▃▅▆▇▆▇██▇
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.5687
+wandb:        best_step 2000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.66195
+wandb:             loss 0.49421
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12461.91162
+wandb:            pisco 0
+wandb:          support 0.04036
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_supv2_10_sl21_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/94jss2sd
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/amp_track/supv2_10_sl21/wandb_runs/wandb/run-20260918_115241-94jss2sd/logs
+slice 21  nik (192, 192, 342)  (9487s)  vs CS: corr 0.955  nrmse 0.217
+done 9487s -> results/tofts_vs_patlak/amp_track/supv2_10_sl21
+[W918 14:30:47.503081756 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-18 14:30:47 TRAIN_DONE supv2_10 exit 0

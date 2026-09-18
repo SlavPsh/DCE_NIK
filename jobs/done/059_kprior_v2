@@ -1,5 +1,6 @@
 queue 059_kprior_v2
 jid 3326528
 submitted 2026-09-18 11:52:36
-state 2 RUNNING None
+state 1 COMPLETED 02:11:24, 1 COMPLETED 02:11:34, 1 COMPLETED 02:38:10, 1 COMPLETED 02:38:23
 log jobs/log/059_kprior_v2_3326528.out
+ended 2026-09-18 16:43:50

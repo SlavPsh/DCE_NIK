@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-18 14:31:37 on worker03.cluster, job 3320124, cycle 148
+updated 2026-09-18 16:43:50 on worker03.cluster, job 3320124, cycle 211
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3326528 | 059_kprior_v2 | 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 059_kprior_v2 | 2 RUNNING None |
+| 059_kprior_v2 | 1 COMPLETED 02:11:24, 1 COMPLETED 02:11:34, 1 COMPLETED 02:38:10, 1 COMPLETED 02:38:23 |
 | 062_claim_fig2 | 1 COMPLETED 00:00:06 |
 | 061_claim_fig2 | 1 COMPLETED 00:00:04 |
 | 060_claim_figs | 1 COMPLETED 00:00:10 |
