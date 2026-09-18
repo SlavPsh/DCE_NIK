@@ -298,6 +298,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
         _m0 = torch.from_numpy(np.load(args.support_mask).astype(bool)).to(device)
         assert _m0.shape[0] == int(args.coef_tv_grid or sh['nx']), (_m0.shape, sh['nx'])
         _mcands = {'id': _m0, 'rot180': torch.flip(_m0, (0, 1)), 'fliplr': torch.flip(_m0, (1,)), 'flipud': torch.flip(_m0, (0,))}
+        _nxs, _bas = int(_m0.shape[0]), int(sh['bas']); _s0 = (_nxs - _bas) // 2; _crop = torch.zeros_like(_m0); _crop[_s0:_s0 + _bas, _s0:_s0 + _bas] = True   # the reconstruction crop: streaks live here, not in the oversampling margin
     if ctv_on:
         nxc = int(args.coef_tv_grid or sh['nx']); _cg = torch.from_numpy(A.cartesian_grid(nxc)).to(device)
         _cmask = (torch.sqrt((_cg ** 2).sum(1)) <= 1.0).float().view(nxc, nxc, 1)
@@ -323,8 +324,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     if _smask[0] is None:                                                                                        # one-time orientation check on the model's own energy (first coil, all atoms)
                         Ed = E.detach().sum(-1); fr = {k: float(Ed[m].sum() / Ed.sum()) for k, m in _mcands.items()}; best = max(fr, key=fr.get)
                         _smask[0] = _mcands[best]; print(f'    [support] mask orientation {best} (inside-energy fractions {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
-                    m = _smask[0]
-                    pen_s = (E[~m].mean(0) / (E[m].mean(0) + 1e-12)).sum() / (ncc * Rk)                                          # outside / inside energy per map
+                    m = _smask[0]; air = _crop & ~m
+                    pen_s = (E[air].sum(0) / (E[m].sum(0) + 1e-12)).sum() / (ncc * Rk)                                            # air-ring energy / body energy per map (sums, inside the crop)
                 (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
             return tot, tot_s
     # PISCO-style self-supervised k-space consistency: random acquired centres with a (2s+1)^2-1 cartesian stencil at 1/fov spacing, all coils,
@@ -342,7 +343,15 @@ def train_one_slice(out_dir, slc, sh, args, device):
             def _coil_vals(pp, tq, c):
                 cd = torch.full((pp.shape[0],), c, dtype=torch.long, device=device); pr = normalizer.denormalize(pp, model(pp, tq, cd)); return torch.complex(pr[:, 0], pr[:, 1])
             for c in range(ncc): V.append(_ck2(_coil_vals, pts, tt, c, use_reentrant=False))                                   # activations recomputed in backward: memory = one coil
-            V = torch.stack(V, 1); T = V[:B]; Nb = V[B:].view(B, S * ncc)                                                          # targets [B,C], neighbours [B,S*C], raw k-space
+            V = torch.stack(V, 1); T = V[:B]; Nb3 = V[B:].view(B, S, ncc)                                                         # targets [B,C], neighbours [B,S,C], raw k-space
+            if args.pisco_cross_only:                                                                                              # coil c predicted from the OTHER coils only: the relation then encodes coil diversity, which aliasing violates
+                num = torch.zeros((), device=device); den = (T.abs() ** 2).sum() + 1e-12
+                for c in range(ncc):
+                    Nb = Nb3[:, :, [k for k in range(ncc) if k != c]].reshape(B, -1); Tc = T[:, c:c + 1]
+                    G = Nb.conj().T @ Nb; lam = float(args.pisco_ridge) * torch.real(torch.trace(G)) / G.shape[0]
+                    Wk = torch.linalg.solve(G + lam * torch.eye(G.shape[0], device=device, dtype=G.dtype), Nb.conj().T @ Tc); num = num + ((Tc - Nb @ Wk).abs() ** 2).sum()
+                return num / den
+            Nb = Nb3.reshape(B, S * ncc)
             G = Nb.conj().T @ Nb; lam = float(args.pisco_ridge) * torch.real(torch.trace(G)) / G.shape[0]
             Wk = torch.linalg.solve(G + lam * torch.eye(G.shape[0], device=device, dtype=G.dtype), Nb.conj().T @ T)
             r = T - Nb @ Wk; return (r.abs() ** 2).sum() / ((T.abs() ** 2).sum() + 1e-12)
@@ -525,6 +534,7 @@ def main():
     ap.add_argument('--pisco-weight', type=float, default=0.0, help='PISCO-style self-supervised k-space consistency; 0 = off')
     ap.add_argument('--pisco-every', type=int, default=8); ap.add_argument('--pisco-batch', type=int, default=1024)
     ap.add_argument('--pisco-stencil', type=int, default=1, help='half-width of the cartesian neighbour stencil (1 = 8 neighbours)'); ap.add_argument('--pisco-ridge', type=float, default=1e-3)
+    ap.add_argument('--pisco-cross-only', type=int, default=1, help='1 = predict each coil from the other coils only (default); 0 = all coils incl. own (inert: a smooth k-space satisfies it trivially)')
     ap.add_argument('--snapshot-every', type=int, default=0, help='save |recon| (float16) every N steps at eval points; 0 = off')
     ap.add_argument('--no-restore', action='store_true', help='keep the final weights instead of the best-heldout state')
     ap.add_argument('--console-every', type=int, default=1000)
