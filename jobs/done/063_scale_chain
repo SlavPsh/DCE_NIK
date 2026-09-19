@@ -1,0 +1,6 @@
+probe 063_scale_chain
+host worker03.cluster
+start 2026-09-19 09:17:51
+end 2026-09-19 09:17:53
+exit 1
+log jobs/log/probe_063_scale_chain.out

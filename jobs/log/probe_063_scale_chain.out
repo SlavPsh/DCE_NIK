@@ -1,0 +1,20 @@
+prep kdata_radial (384, 2154, 8)  b1 (384, 384, 8)  nx 384 grid 384
+  |k| at readout centre (dc, mean over spokes/coils) 1.0715e-04
+  |k| mean over everything                            6.4393e-06
+  |k| max                                             6.2004e-04
+  ramp dcf w: min 1.3021e-03 mean 2.5000e-01 max 4.9870e-01; mean sqrt(w) 0.4714
+  after data x sqrt(w):      mean |y| 1.0478e-06
+Traceback (most recent call last):
+  File "<stdin>", line 19, in <module>
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/finufft/_interfaces.py", line 920, in nufft2d1
+    return invoke_guru(2,1,x,y,None,c,None,None,None,out,isign,eps,n_modes,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/finufft/_interfaces.py", line 659, in invoke_guru
+    out = plan.execute(c,f)
+          ^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/finufft/_interfaces.py", line 267, in execute
+    _data = _ensure_array_type(data, "data", self._dtype)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/finufft/_interfaces.py", line 415, in _ensure_array_type
+    raise TypeError(f"Argument `{name}` does not have the correct dtype: {x.dtype} was given, but {dtype} was expected.")
+TypeError: Argument `data` does not have the correct dtype: complex128 was given, but complex64 was expected.
