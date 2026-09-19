@@ -1,0 +1,12 @@
+prep kdata_radial (384, 2154, 8)  b1 (384, 384, 8)  nx 384 grid 384
+  |k| at readout centre (dc, mean over spokes/coils) 1.0715e-04
+  |k| mean over everything                            6.4393e-06
+  |k| max                                             6.2004e-04
+  ramp dcf w: min 1.3021e-03 mean 2.5000e-01 max 4.9870e-01; mean sqrt(w) 0.4714
+  after data x sqrt(w):      mean |y| 1.0478e-06
+  type-1 sum over 8064 points:  max |coil img| 2.3772e-04
+  / sqrt(Nx*Ny) = /384:         max 6.1905e-07
+  x usf = Nx*pi/2/nspokes = x28.7: max 1.7781e-05
+  coil combine / den (den 0.828..1.106): max |image| 1.6172e-05
+  -> one frame, one slice, max 1.6172e-05   (aorta baseline in the recon ~9e-6)
+NOTE z-ifft in prep divided by lPartitions/slice_res = 64 (numpy ifft 1/n), applied before all of this
