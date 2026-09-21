@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-21 07:56:21 on worker03.cluster, job 3346058, cycle 1
+updated 2026-09-21 13:44:18 on worker03.cluster, job 3346058, cycle 172
 
 ## active
 
@@ -11,6 +11,7 @@ updated 2026-09-21 07:56:21 on worker03.cluster, job 3346058, cycle 1
 
 | name | state |
 |---|---|
+| 065_nifti_inventory | exit 0 |
 | 064_scale_chain | exit 0 |
 | 063_scale_chain | exit 1 |
 | 062_gv2_aorta | 1 COMPLETED 00:00:30 |
@@ -30,4 +31,3 @@ updated 2026-09-21 07:56:21 on worker03.cluster, job 3346058, cycle 1
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
 | 016_b1factor_log | exit 0 |
 | 015_senseB_logs | exit 0 |
-| 049_state_047 | exit 0 |

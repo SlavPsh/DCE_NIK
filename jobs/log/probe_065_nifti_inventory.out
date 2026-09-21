@@ -1,0 +1,24 @@
+-rw-rw---- 1 P101440 P101440 737873288 Sep 17 15:16 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/glam0.02/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 739927218 Sep 17 15:16 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/glam0.08/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 740335244 Sep 17 14:15 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/glam0.25/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 737720644 Sep 16 21:52 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.02/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 739891388 Sep 16 21:52 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.08/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 740132238 Sep 16 21:53 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/lam0.25/recon4d.nii.gz
+-rw-rw---- 1 P101440 P101440 731308613 Sep 16 21:51 /net/beegfs/users/P101440/dce_data/orig/gv2_DCE_Rerun/nufft/recon4d.nii.gz
+== 3d summaries and per-slice files
+glam0.02                     nii 1  slice_npy 54  total 1.5G
+glam0.08                     nii 1  slice_npy 54  total 1.5G
+glam0.25                     nii 1  slice_npy 54  total 1.5G
+lam0.02                      nii 1  slice_npy 54  total 1.5G
+lam0.08                      nii 1  slice_npy 54  total 1.5G
+lam0.25                      nii 1  slice_npy 54  total 1.5G
+nufft                        nii 1  slice_npy 54  total 698M
+prep                         nii 0  slice_npy 0  total 3.2G
+== headers
+glam0.02   (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  738 MB
+glam0.08   (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  740 MB
+glam0.25   (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  740 MB
+lam0.02    (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  738 MB
+lam0.08    (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  740 MB
+lam0.25    (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  740 MB
+nufft      (192, 192, 54, 102) voxel 2.083x2.083x4.00 mm  TR 3.63 s  731 MB
