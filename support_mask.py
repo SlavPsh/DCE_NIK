@@ -8,4 +8,5 @@ ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19");
 sh = np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref/shared.npz"); nx = int(sh["nx"]); bas = int(sh["bas"]); s = (nx - bas) // 2
 for Z in [int(z) for z in a.slices.split(",")]:
     body = ndi.binary_dilation(C.slice_ctx(Z)["BODY"], iterations=a.dilate); full = np.zeros((nx, nx), bool); full[s:s + bas, s:s + bas] = body
-    np.save(f"{D}/spoke_masks/support_sl{Z}.npy", full); print(f"slice {Z}: body {int(body.sum())} px of {bas}x{bas}, support {int(full.sum())} px of {nx}x{nx} ({100 * full.mean():.1f}%)")
+    out = f"{D}/spoke_masks/support_sl{Z}" + ("" if a.dilate == 4 else f"_d{a.dilate}") + ".npy"                      # d4 = the 2026-09-18 test masks; production uses d6 (about 12 mm at 2 mm pixels, above the anterior-wall breathing excursion)
+    np.save(out, full); print(f"slice {Z}: body {int(body.sum())} px of {bas}x{bas}, support {int(full.sum())} px of {nx}x{nx} ({100 * full.mean():.1f}%) -> {out}")

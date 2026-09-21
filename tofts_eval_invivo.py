@@ -31,7 +31,8 @@ else:
 LABEL = {"patlak": "Patlak", "tofts": "Tofts"}
 if _a.iv_dir: IV = f"{RES}/{_a.iv_dir}"
 def basis_for(arm, Z):                                                          # tofts = rank rule basis, tofts<R> = forced rank R
-    return (f"{RES}/basis_sl{Z}_r{arm[5:]}" if arm.startswith("tofts") and arm != "tofts" else f"{RES}/basis_sl{Z}") + _a.basis_suffix + ".npz"
+    m = re.match(r"tofts(\d+)", arm)                                                # tofts8, tofts8oc -> rank 8; tofts / others -> rank-rule basis
+    return (f"{RES}/basis_sl{Z}_r{m.group(1)}" if m else f"{RES}/basis_sl{Z}") + _a.basis_suffix + ".npz"
 
 def bs(c): return c - np.median(c[:8])
 def ft(nt): e = np.linspace(0, TA, nt+1); return 0.5*(e[:-1]+e[1:])
