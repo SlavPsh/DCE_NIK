@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-21 13:44:18 on worker03.cluster, job 3346058, cycle 172
+updated 2026-09-21 15:20:01 on worker03.cluster, job 3346058, cycle 219
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3347079 | 063_production | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 063_production | 1 PENDING None |
 | 065_nifti_inventory | exit 0 |
 | 064_scale_chain | exit 0 |
 | 063_scale_chain | exit 1 |
@@ -30,4 +32,3 @@ updated 2026-09-21 13:44:18 on worker03.cluster, job 3346058, cycle 172
 | 054_mf_peak_support_mask | 1 COMPLETED 00:09:25 |
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
 | 016_b1factor_log | exit 0 |
-| 015_senseB_logs | exit 0 |
