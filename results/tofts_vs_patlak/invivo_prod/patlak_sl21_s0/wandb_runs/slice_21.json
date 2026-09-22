@@ -1,0 +1,17 @@
+{
+ "name": "gnik_patlak_sl21_s0_s21",
+ "mode": "online",
+ "loss": 0.7074971199035645,
+ "heldout_mse": 0.520003616809845,
+ "val_knmse": 0.6493758321227305,
+ "best_heldout_mse": 0.4974496364593506,
+ "coef_tv": 0.0,
+ "support": 0.05175622319802642,
+ "pisco": 0.0,
+ "best_step": 3000,
+ "lr": 1e-05,
+ "wall_s": 3795.977329492569,
+ "peak_gpu_mb": 12461.7861328125,
+ "params": 5520966,
+ "wall_total_s": 3795.975011587143
+}
