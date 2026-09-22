@@ -17,3 +17,22 @@ GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
   sl18 free s0: aorta_aff 0.1206 cortex_aff 0.0473 fwhm 21.5s | val nan test nan
   sl18 free s1: MISSING
   sl18 free s2: MISSING
+  sl19 tofts8 s0: aorta_aff 0.0423 cortex_aff 0.0335 fwhm 16.9s | val 2.744e-01 test 2.768e-01
+  sl19 tofts8 s1: aorta_aff 0.0527 cortex_aff 0.0378 fwhm 15.4s | val 2.770e-01 test 2.806e-01
+  sl19 tofts8 s2: aorta_aff 0.0593 cortex_aff 0.0365 fwhm 15.4s | val 2.738e-01 test 2.779e-01
+  sl19 patlak s0: aorta_aff 0.0351 cortex_aff 0.1521 fwhm 16.9s | val 2.703e-01 test 2.721e-01
+  sl19 patlak s1: MISSING
+  sl19 patlak s2: MISSING
+  sl19 sub16 s0: aorta_aff 0.2717 cortex_aff 0.0577 fwhm 41.5s | val 4.703e-02 test 4.827e-02
+  sl19 sub16 s1: MISSING
+  sl19 sub16 s2: MISSING
+   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
+  sl19 free s0: aorta_aff 0.0954 cortex_aff 0.0434 fwhm 18.4s | val nan test nan
+  sl19 free s1: MISSING
+  sl19 free s2: MISSING
+  sl21 tofts8 s0: aorta_aff 0.0453 cortex_aff 0.0357 fwhm 15.4s | val 2.455e-01 test 2.500e-01
+  sl21 tofts8 s1: aorta_aff 0.0596 cortex_aff 0.0375 fwhm 16.9s | val 2.458e-01 test 2.514e-01
+  sl21 tofts8 s2: aorta_aff 0.0481 cortex_aff 0.0370 fwhm 15.4s | val 2.449e-01 test 2.518e-01
+  sl21 patlak s0: aorta_aff 0.0422 cortex_aff 0.1496 fwhm 16.9s | val 2.410e-01 test 2.435e-01
+  sl21 patlak s1: MISSING
+  sl21 patlak s2: MISSING
