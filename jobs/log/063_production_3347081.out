@@ -1,0 +1,85 @@
+2026-09-21 15:20:02 host gpu02.cluster job 3347081 task 1 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+  MIG 2g.24gb     Device  0: (UUID: MIG-2038141f-8495-5c55-b48a-e2d7d63f2df1)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+slice 18: body 20557 px of 192x192, support 20557 px of 384x384 (13.9%) -> /net/beegfs/users/P101440/DCE_NIK/spoke_masks/support_sl18_d6.npy
+[W921 15:20:07.670423865 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+slice 19: body 21327 px of 192x192, support 21327 px of 384x384 (14.5%) -> /net/beegfs/users/P101440/DCE_NIK/spoke_masks/support_sl19_d6.npy
+[W921 15:20:11.015183650 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+slice 21: body 20954 px of 192x192, support 20954 px of 384x384 (14.2%) -> /net/beegfs/users/P101440/DCE_NIK/spoke_masks/support_sl21_d6.npy
+[W921 15:20:16.220153171 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+task 1: tofts8 slice 18 seed 1 -> results/tofts_vs_patlak/invivo_prod/tofts8_sl18_s1
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run e827koop
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo_prod/tofts8_sl18_s1/wandb_runs/wandb/run-20260921_152019-e827koop
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl18_s1_s18
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/e827koop
+[wandb] gnik_tofts8_sl18_s1_s18: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.813, 'rot180': 0.816, 'fliplr': 0.817, 'flipud': 0.813})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:329: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 1.223e+00  heldout 6.314e-01
+    step   2000  train 1.107e+00  heldout 5.678e-01
+    step   3000  train 1.040e+00  heldout 5.607e-01
+    step   4000  train 9.901e-01  heldout 5.604e-01
+    step   5000  train 9.863e-01  heldout 5.610e-01
+    step   6000  train 9.430e-01  heldout 5.556e-01
+    step   7000  train 8.284e-01  heldout 5.333e-01
+    step   8000  train 7.657e-01  heldout 5.383e-01
+    step   9000  train 7.415e-01  heldout 5.569e-01
+    step  10000  train 7.037e-01  heldout 5.738e-01
+    final weights kept (best heldout 5.333e-01 at step 7000)
+    RESOURCES slice 18: peak_gpu_MB 12462 params 5531216 best_heldout 5.3330e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading history steps 9-9, summary, console lines 17-17
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  █▇▆▆▆▁▁▁▁
+wandb:        best_step ▁▃▄▅▅▇████
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse █▃▃▃▃▃▁▁▃▄
+wandb:             loss █▆▆▅▅▄▃▂▂▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁
+wandb:          support ▄▁▁▂▃▅▄▆▇█
+wandb:        val_knmse █▃▃▃▃▃▁▁▃▄
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.5333
+wandb:        best_step 7000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.57376
+wandb:             loss 0.70375
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12461.91162
+wandb:            pisco 0
+wandb:          support 0.02069
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl18_s1_s18 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/e827koop
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/invivo_prod/tofts8_sl18_s1/wandb_runs/wandb/run-20260921_152019-e827koop/logs
+slice 18  nik (192, 192, 342)  (3847s)  vs CS: corr 0.969  nrmse 0.188
+done 3848s -> results/tofts_vs_patlak/invivo_prod/tofts8_sl18_s1
+[W921 16:24:25.995320209 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-09-21 16:24:26 TRAIN_DONE tofts8 sl18 s1 exit 0
