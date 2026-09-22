@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-22 09:27:25 on worker03.cluster, job 3347335, cycle 61
+updated 2026-09-22 18:56:20 on worker03.cluster, job 3347335, cycle 340
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3354967 | 064_gradient_check | 1 RUNNING Prolog |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 064_gradient_check | 1 RUNNING Prolog |
 | 063_production | 2 COMPLETED 00:38:15, 1 COMPLETED 00:38:16, 1 COMPLETED 00:38:17, 1 COMPLETED 00:38:18, 1 COMPLETED 00:38:21, 1 COMPLETED 00:38:22, 1 COMPLETED 00:38:24, 3 COMPLETED 00:38:25, 1 COMPLETED 00:38:32, 1 COMPLETED 00:38:40, 1 COMPLETED 00:38:43, 1 COMPLETED 00:38:53, 2 COMPLETED 01:03:22, 1 COMPLETED 01:03:30, 1 COMPLETED 01:03:42, 1 COMPLETED 01:03:47, 2 COMPLETED 01:03:50, 1 COMPLETED 01:03:54, 1 COMPLETED 01:03:57, 1 COMPLETED 01:04:07, 1 COMPLETED 01:04:24, 1 COMPLETED 01:04:26, 1 COMPLETED 01:04:34, 1 COMPLETED 01:04:42, 1 COMPLETED 01:04:49, 1 COMPLETED 01:04:57, 1 COMPLETED 01:05:02, 1 COMPLETED 01:05:10, 1 COMPLETED 01:05:14, 1 COMPLETED 01:05:23, 1 COMPLETED 01:05:31, 1 COMPLETED 01:05:44, 1 COMPLETED 01:05:46, 1 COMPLETED 01:05:50 |
 | 065_nifti_inventory | exit 0 |
 | 064_scale_chain | exit 0 |
@@ -30,4 +32,3 @@ updated 2026-09-22 09:27:25 on worker03.cluster, job 3347335, cycle 61
 | 056_kprior_smoke | 1 COMPLETED 00:00:06 |
 | 054_mf_peak_support_mask | 1 COMPLETED 00:09:25 |
 | 052_coilmode_smoke | 1 COMPLETED 00:27:46 |
-| 016_b1factor_log | exit 0 |
