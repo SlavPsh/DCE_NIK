@@ -1,5 +1,5 @@
 queue 063_production
 jid 3347079
 submitted 2026-09-21 15:20:01
-state 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/063_production_3347079.out
