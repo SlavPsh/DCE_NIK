@@ -1,48 +1,3 @@
-2026-09-22 09:25:54 host gpu03.cluster job 3347082 task 0 stage eval
-GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
-  MIG 1g.12gb     Device  0: (UUID: MIG-e23bb79c-2a45-5a6e-91ca-fb5b8182ea07)
-GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
-GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
-GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
-  sl18 tofts8 s0: aorta_aff 0.0472 cortex_aff 0.0389 fwhm 15.4s | val 2.759e-01 test 2.807e-01
-  sl18 tofts8 s1: aorta_aff 0.0541 cortex_aff 0.0395 fwhm 15.4s | val 2.755e-01 test 2.815e-01
-  sl18 tofts8 s2: aorta_aff 0.0540 cortex_aff 0.0384 fwhm 15.4s | val 2.741e-01 test 2.803e-01
-  sl18 patlak s0: aorta_aff 0.0335 cortex_aff 0.1501 fwhm 16.9s | val 2.703e-01 test 2.737e-01
-  sl18 patlak s1: MISSING
-  sl18 patlak s2: MISSING
-  sl18 sub16 s0: aorta_aff 0.2657 cortex_aff 0.0658 fwhm 36.9s | val 5.667e-02 test 5.823e-02
-  sl18 sub16 s1: MISSING
-  sl18 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl18 free s0: aorta_aff 0.1206 cortex_aff 0.0473 fwhm 21.5s | val nan test nan
-  sl18 free s1: MISSING
-  sl18 free s2: MISSING
-  sl19 tofts8 s0: aorta_aff 0.0423 cortex_aff 0.0335 fwhm 16.9s | val 2.744e-01 test 2.768e-01
-  sl19 tofts8 s1: aorta_aff 0.0527 cortex_aff 0.0378 fwhm 15.4s | val 2.770e-01 test 2.806e-01
-  sl19 tofts8 s2: aorta_aff 0.0593 cortex_aff 0.0365 fwhm 15.4s | val 2.738e-01 test 2.779e-01
-  sl19 patlak s0: aorta_aff 0.0351 cortex_aff 0.1521 fwhm 16.9s | val 2.703e-01 test 2.721e-01
-  sl19 patlak s1: MISSING
-  sl19 patlak s2: MISSING
-  sl19 sub16 s0: aorta_aff 0.2717 cortex_aff 0.0577 fwhm 41.5s | val 4.703e-02 test 4.827e-02
-  sl19 sub16 s1: MISSING
-  sl19 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl19 free s0: aorta_aff 0.0954 cortex_aff 0.0434 fwhm 18.4s | val nan test nan
-  sl19 free s1: MISSING
-  sl19 free s2: MISSING
-  sl21 tofts8 s0: aorta_aff 0.0453 cortex_aff 0.0357 fwhm 15.4s | val 2.455e-01 test 2.500e-01
-  sl21 tofts8 s1: aorta_aff 0.0596 cortex_aff 0.0375 fwhm 16.9s | val 2.458e-01 test 2.514e-01
-  sl21 tofts8 s2: aorta_aff 0.0481 cortex_aff 0.0370 fwhm 15.4s | val 2.449e-01 test 2.518e-01
-  sl21 patlak s0: aorta_aff 0.0422 cortex_aff 0.1496 fwhm 16.9s | val 2.410e-01 test 2.435e-01
-  sl21 patlak s1: MISSING
-  sl21 patlak s2: MISSING
-  sl21 sub16 s0: aorta_aff 0.2470 cortex_aff 0.0971 fwhm 43.0s | val 5.348e-02 test 5.373e-02
-  sl21 sub16 s1: MISSING
-  sl21 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl21 free s0: aorta_aff 0.1151 cortex_aff 0.0506 fwhm 21.5s | val nan test nan
-  sl21 free s1: MISSING
-  sl21 free s2: MISSING
 # in vivo (meas_p3_dce, slices 18/19/21, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
 
 rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
@@ -139,14 +94,3 @@ model-free aorta FWHM (s): 15.359859566998232
 | params | 5.531e+06 ± 0 (3) | 5.521e+06 ± 0 (1) | 5.558e+06 ± 0 (1) | nan ± nan (0) | -1.025e+04 | +2.68e+04 | +nan | nan | nan |
 
 model-free aorta FWHM (s): 16.89584552369808
-
-INVIVO_EVAL_DONE
-[W922 09:29:38.563703697 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
-EVAL prod exit 0
-  sl18 tofts8 s0: aorta_aff 0.0459 cortex_aff 0.0387 fwhm 15.4s | val 2.744e-01 test 2.781e-01
-  sl18 tofts8 s1: aorta_aff 0.0389 cortex_aff 0.0399 fwhm 15.4s | val 2.723e-01 test 2.765e-01
-  sl18 tofts8 s2: aorta_aff 0.0477 cortex_aff 0.0382 fwhm 15.4s | val 2.737e-01 test 2.781e-01
-  sl19 tofts8 s0: aorta_aff 0.0395 cortex_aff 0.0348 fwhm 15.4s | val 2.726e-01 test 2.775e-01
-  sl19 tofts8 s1: aorta_aff 0.0411 cortex_aff 0.0372 fwhm 15.4s | val 2.725e-01 test 2.780e-01
-  sl19 tofts8 s2: aorta_aff 0.0470 cortex_aff 0.0391 fwhm 15.4s | val 2.739e-01 test 2.777e-01
-  sl21 tofts8 s0: aorta_aff 0.0464 cortex_aff 0.0362 fwhm 16.9s | val 2.489e-01 test 2.505e-01
