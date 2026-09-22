@@ -1,0 +1,31 @@
+tofts8 in-coil complex: none | kinks: none | worst rel err: 3.243569804941277e-05
+tofts8 out-coil complex: none | kinks: none | worst rel err: 4.13185070930239e-05
+sub16 complex: none | kinks: none | worst rel err: 5.0379942286931276e-05
+free complex: none | kinks: none | worst rel err: 5.844312312221183e-05
+# gradient check on trained in vivo models (slice 21, one fixed batch of 4096 kept samples, float64)
+
+| model | complex tensors with grad in the data-loss graph | autograd ops with kinks (abs / sign / sqrt) | parameter | autograd | finite difference | rel. error |
+|---|---|---|---|---|---|---|
+| tofts8 in-coil | none | none | coil_embed.weight | +2.173726e-02 | +2.173727e-02 | 9.1e-08 |
+|  |  |  | a_first.linear.weight | +3.516927e-01 | +3.516913e-01 | 2.1e-06 |
+|  |  |  | a_blocks.5.linear.weight | -2.480432e-01 | -2.480271e-01 | 3.2e-05 |
+|  |  |  | a_head.weight | -1.515284e-01 | -1.515284e-01 | 1.8e-12 |
+|  |  |  | a_head.bias | +4.069722e-02 | +4.069722e-02 | 2.2e-12 |
+| tofts8 out-coil | none | none | a_first.linear.weight | -2.518086e-01 | -2.518073e-01 | 2.5e-06 |
+|  |  |  | a_blocks.5.linear.weight | +1.835066e-01 | +1.834914e-01 | 4.1e-05 |
+|  |  |  | a_head.weight | +8.396543e-02 | +8.396543e-02 | 2.1e-12 |
+|  |  |  | a_head.bias | +1.342643e-02 | +1.342643e-02 | 1.7e-12 |
+| sub16 | none | none | coil_embed.weight | -1.062947e-02 | -1.062947e-02 | 2.0e-08 |
+|  |  |  | a_first.linear.weight | +4.550997e-01 | +4.550960e-01 | 4.1e-06 |
+|  |  |  | a_blocks.5.linear.weight | +2.033845e-01 | +2.033640e-01 | 5.0e-05 |
+|  |  |  | a_head.weight | +5.879880e-02 | +5.879880e-02 | 1.4e-12 |
+|  |  |  | a_head.bias | +2.060987e-02 | +2.060987e-02 | 6.1e-12 |
+|  |  |  | phi_body.0.linear.weight | -1.041669e-01 | -1.041667e-01 | 1.1e-06 |
+| free | none | none | coil_embed.weight | -1.076350e-02 | -1.076350e-02 | 2.0e-07 |
+|  |  |  | first.linear.weight | -3.002579e-01 | -3.002552e-01 | 4.3e-06 |
+|  |  |  | blocks.5.linear.weight | -1.512826e-01 | -1.512650e-01 | 5.8e-05 |
+|  |  |  | head.weight | -1.333846e-01 | -1.333846e-01 | 5.9e-13 |
+
+reading: 'none' complex tensors = the data-loss graph is entirely real; rel. error at 1e-6 or below = autograd equals the finite-difference derivative of the real loss to float64 precision at every sampled parameter
+GRADCHECK_DONE
+GRADCHK exit 0
