@@ -1,0 +1,17 @@
+{
+ "name": "gnik_free_sl19_s0_s19",
+ "mode": "online",
+ "loss": 0.1517513394355774,
+ "heldout_mse": 0.1791413426399231,
+ "val_knmse": 0.2564654313574285,
+ "best_heldout_mse": 0.17861852049827576,
+ "coef_tv": 0.0,
+ "support": 0.0,
+ "pisco": 0.0,
+ "best_step": 9000,
+ "lr": 1e-05,
+ "wall_s": 2317.7587535381317,
+ "peak_gpu_mb": 12474.7177734375,
+ "params": 5549634,
+ "wall_total_s": 2317.756444454193
+}
