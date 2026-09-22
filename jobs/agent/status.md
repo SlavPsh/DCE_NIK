@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-09-21 22:50:19 on worker03.cluster, job 3346526, cycle 94
+updated 2026-09-22 02:20:18 on worker03.cluster, job 3346526, cycle 197
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3347079 | 063_production | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3347079 | 063_production | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 063_production | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 063_production | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 | 065_nifti_inventory | exit 0 |
 | 064_scale_chain | exit 0 |
 | 063_scale_chain | exit 1 |
