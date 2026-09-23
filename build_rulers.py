@@ -3,8 +3,10 @@ B: all-spoke static temporal-mean), same construction as nufft_reference.py (sli
 out: results_nufft_slice{Z}/{nufft_all,nufft_pre,pre_view_idx}.npy + meta.json"""
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, finufft, os, json
-REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; D = "/net/beegfs/users/P101440/DCE_NIK"
-SLICES = [18, 19, 20, 21]
+import sys; D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REF = dsp.REF
+SLICES = [int(z) for z in sys.argv[1].split(",")] if len(sys.argv) > 1 else [18, 19, 20, 21]
 sh = np.load(f"{REF}/shared.npz")
 traj = np.asarray(sh["traj_norm"]).astype(np.complex64); vt = np.asarray(sh["view_time"]).ravel().astype(np.float64)
 TA = float(sh["TA"]); nx = int(sh["nx"]); bas = int(sh["bas"])
@@ -14,7 +16,7 @@ def crop(img, n=bas): s = (img.shape[0] - n) // 2; return img[s:s + n, s:s + n]
 
 for SL in SLICES:
     sl = np.load(f"{REF}/slice_{SL:02d}.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64)
-    b1 = np.asarray(sl["b1"]).astype(np.complex64); ncc = kdata.shape[2]; OUT = f"{D}/results_nufft_slice{SL}"; os.makedirs(OUT, exist_ok=True)
+    b1 = np.asarray(sl["b1"]).astype(np.complex64); ncc = kdata.shape[2]; OUT = dsp.NUF(SL); os.makedirs(OUT, exist_ok=True)
     def nufft_recon(view_idx, sign=-1.0, eps=1e-6):
         tr = traj[:, view_idx]; w = ramp_dcf(tr)
         x = (sign * 2 * np.pi * np.real(tr)).astype(np.float64).ravel(); y = (sign * 2 * np.pi * np.imag(tr)).astype(np.float64).ravel()

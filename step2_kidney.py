@@ -11,8 +11,9 @@ sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
 
 Z = int(sys.argv[1]) if len(sys.argv) > 1 else 19
-D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
-TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REF = dsp.REF; TA = dsp.TA
 
 sh = np.load(f"{REF}/shared.npz")
 traj = np.asarray(sh["traj_norm"]).astype(np.complex64)
@@ -31,7 +32,7 @@ nav = np.abs(kdata[c0 - 2:c0 + 3, :nt * nline, :]).reshape(5, nline, nt, ncc, or
 dseq = nav.transpose(0, 2, 1).reshape(5 * ncc, nt, order="F")       # (5ncc, nt)
 w, PC = np.linalg.eigh(np.cov(dseq, rowvar=False))
 Phi5_342 = np.real(PC[:, np.argsort(-w)][:, :5]).astype(np.float64) # (nt,5) real navigator basis
-meta = json.load(open(f"{D}/results_nufft/meta.json")); SIGN = meta["sign"]; order = np.argsort(vt)
+meta = json.load(open(f"{dsp.NUF(Z)}/meta.json")); SIGN = meta["sign"]; order = np.argsort(vt)
 def win_img(idx):
     tr = traj[:, idx]; w = np.maximum(np.abs(tr), 1 / nx / 4)
     x = (SIGN * 2 * np.pi * tr.real).ravel().astype(np.float64); y = (SIGN * 2 * np.pi * tr.imag).ravel().astype(np.float64)
@@ -81,6 +82,6 @@ ax[2].axhline(tau / s[0], color="0.5", ls="-", lw=1, label="GD noise floor")
 ax[2].axvline(5, color="r", ls="--", lw=1, label="K=5 (CS)"); ax[2].axvline(r_sig, color="g", ls=":", lw=1.5, label=f"signal rank={r_sig}")
 ax[2].set_xlim(0, min(60, len(s))); ax[2].set_xlabel("component"); ax[2].set_ylabel("norm. singular value"); ax[2].grid(alpha=.3); ax[2].legend(); ax[2].set_title("dynamics singular spectrum")
 fig.suptitle(f"STEP 2 substrate: slice {Z} effective rank & K=5 residual (model-free)", fontweight="bold")
-fig.tight_layout(); p = fpath(f"step2_slice{Z}.png"); fig.savefig(p, dpi=135)
-np.savez(f"{D}/step2_slice{Z}.npz", rmap=rmap, body=body, mf=mf.astype(np.float32), tmf=tmf, Phi5=P, sv=s)
+fig.tight_layout(); p = fpath(f"step2{dsp.SFX}_slice{Z}.png"); fig.savefig(p, dpi=135)
+np.savez(dsp.STEP2(Z), rmap=rmap, body=body, mf=mf.astype(np.float32), tmf=tmf, Phi5=P, sv=s)
 print(f"wrote {p.split('/')[-1]} + step2_slice{Z}.npz")

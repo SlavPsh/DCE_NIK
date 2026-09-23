@@ -11,11 +11,13 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
 from masked_metrics import haarpsi_masked, ssim_masked
-D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
+D = "/net/beegfs/users/P101440/DCE_NIK"
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REF = dsp.REF
 # reference-method plumbing. defaults = grasp-pro (unchanged). CSD/CSPRE swap in grasp v2.
 # NOTE: ROI anatomy stays on grasp-pro cs_img on purpose, so both notebooks score the SAME rois.
 # only the reference-METHOD image (ctx["cs_meth"]) follows CSPRE.
-CSD = os.environ.get("CSD", "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs")
+CSD = os.environ.get("CSD", dsp.GP)
 CSPRE = os.environ.get("CSPRE", "cs")
 BATCH = f"{D}/results_batch"; TA = 375.0
 dev = "cuda" if torch.cuda.is_available() else "cpu"
@@ -39,7 +41,7 @@ CFG += [(21, "R8", f"{BATCH}/nik_r8_sl21/nik_slice_21_cplx.npy", "sub", 8),
 _slice_cache = {}
 def slice_ctx(Z):
     if Z in _slice_cache: return _slice_cache[Z]
-    NUF = f"{D}/results_nufft_slice{Z}"
+    NUF = dsp.NUF(Z)
     ref_pre = np.load(f"{NUF}/nufft_pre.npy").astype(np.float32); ref_all = np.load(f"{NUF}/nufft_all.npy").astype(np.float32)
     meta = json.load(open(f"{NUF}/meta.json")); t_pre = meta["t_pre_s"]
     def clean_body(ref):
@@ -64,7 +66,7 @@ def slice_ctx(Z):
     liver = ndi.binary_erosion(BODY, iterations=8) & (cv < np.quantile(cv[BODY], 0.3)) & (~kid)  # static interior
     ll, lk = ndi.label(liver); liver = (ll == (1 + np.argmax(ndi.sum(np.ones_like(ll), ll, range(1, lk + 1))))) if lk else liver
     # streak-free real ROI curves from model-free
-    md = np.load(f"{D}/step2_slice{Z}.npz"); mf = md["mf"]; tmf = md["tmf"]
+    md = np.load(dsp.STEP2(Z)); mf = md["mf"]; tmf = md["tmf"]
     def norm(t, c): b = c[t < 50].mean(); pk = c[(t > 20) & (t < 210)].max(); return (c - b) / (pk - b + 1e-9)
     real = {}
     for nm, mask in [("cortex", cortex), ("medulla", medulla), ("aorta", ao), ("liver", liver)]:
@@ -72,7 +74,7 @@ def slice_ctx(Z):
         rc = norm(tmf, np.array([im[mask].mean() for im in mf]))
         if np.isfinite(rc).all(): real[nm] = rc
     rois = dict(cortex=cortex, medulla=medulla, aorta=ao, liver=liver); rois_old = dict(rois)
-    _pp = f"{D}/results/realdata_nik_vs_cs_figures/rois_proposed_sl{Z}.npz"                     # approved anatomical kidney rois (2026-09-15, roi_propose_invivo.py v2): both kidneys, cortex outer band / medulla interior
+    _pp = dsp.ROIS(Z)                     # approved anatomical kidney rois (2026-09-15, roi_propose_invivo.py v2): both kidneys, cortex outer band / medulla interior
     if os.path.exists(_pp) and not os.environ.get("ROIS_OLD"):
         _z = np.load(_pp, allow_pickle=True); rois.update(cortex=_z["cortex"].astype(bool), medulla=_z["medulla"].astype(bool), kidney=_z["kidney"].astype(bool))
         real = {}

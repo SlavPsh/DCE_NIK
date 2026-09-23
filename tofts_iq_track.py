@@ -8,7 +8,9 @@ usage: python tofts_iq_track.py --slice 21"""
 import warnings; warnings.filterwarnings("ignore")
 import os, re, sys, json, glob, argparse, numpy as np, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"; sys.path.insert(0, B)
+B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+GV = dsp.GV; GP = dsp.GP
 import consolidated as C
 from story_figs import ls_scale
 TA = 375.0
@@ -16,7 +18,7 @@ TA = 375.0
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); a = ap.parse_args(); Z = a.slice
     ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; air = ctx["AIR"]; cs = ctx["cs100"]; tcs = np.linspace(0, TA, cs.shape[-1])
-    z = np.load(f"{B}/step2_slice{Z}.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
+    z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
     def ft(nt): e = np.linspace(0, TA, nt + 1); return 0.5 * (e[:-1] + e[1:])
     def refwin(nt):
         e = np.linspace(0, TA, nt + 1); o = np.zeros(mf.shape[:2] + (nt,), np.float32)

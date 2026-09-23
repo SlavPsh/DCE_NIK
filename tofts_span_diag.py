@@ -8,14 +8,15 @@ import warnings; warnings.filterwarnings("ignore")
 import os, sys, json, argparse, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 import consolidated as C
 from story_figs import ls_scale
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--arms", default="tofts,tofts8,patlak"); a = ap.parse_args(); Z = a.slice
-    ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(f"{B}/step2_slice{Z}.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); TA = 375.0
+    ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); TA = 375.0
     names = [r for r in ("aorta", "cortex", "medulla", "liver") if r in rois]
-    bz = np.load(f"{B}/results/tofts_vs_patlak/basis_sl{Z}.npz", allow_pickle=True); atoms, tg = np.asarray(bz["atoms"], float), np.asarray(bz["tgrid_s"], float)
+    bz = np.load(dsp.BASIS(Z, 8) if dsp.DS != "p3" else f"{B}/results/tofts_vs_patlak/basis_sl{Z}.npz", allow_pickle=True); atoms, tg = np.asarray(bz["atoms"], float), np.asarray(bz["tgrid_s"], float)
     Phi = np.stack([np.interp(tmf, tg, atoms[:, k]) for k in range(atoms.shape[1])], 1)                       # [F,R] atoms at the model-free frame times
     pre = tmf < 40; fp = (tmf > 40) & (tmf < 110); wo = tmf > 200
     def roi_curve(v, t): return {r: np.array([v[..., i][rois[r]].mean() for i in range(v.shape[-1])]) for r in names}
@@ -51,7 +52,7 @@ def main():
             ar = amp(c[r], t); row[r] = dict(peak_ratio=ar["peak"] / (ref[r]["peak"] + 1e-9), washout_ratio=ar["washout"] / (ref[r]["washout"] + 1e-9)); curves[r][f"NIK-{arm}"] = (t, enh(c[r], t))
         out["arms"][arm] = row
     # basis aif vs the model-free aorta curve: timing and plateau
-    az = np.load(f"{B}/aif_slice{Z}.npz", allow_pickle=True); af, tC = np.asarray(az["aif_frame"], float), np.asarray(az["tC"], float); ao = enh(mfc["aorta"], tmf)
+    az = np.load(dsp.AIF(Z), allow_pickle=True); af, tC = np.asarray(az["aif_frame"], float), np.asarray(az["tC"], float); ao = enh(mfc["aorta"], tmf)
     afe = af - np.median(af[tC < 40]); out["aif"] = dict(ttp_basis_s=float(tC[np.argmax(afe)]), ttp_mf_s=float(tmf[np.argmax(ao)]), plateau_over_peak_basis=float(afe[tC > 200].mean() / afe.max()), plateau_over_peak_mf=float(ao[tmf > 200].mean() / ao.max()))
     curves["aorta"]["basis aif (scaled)"] = (tC, afe / afe.max() * ao.max())
     # report

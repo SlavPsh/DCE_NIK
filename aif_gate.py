@@ -7,10 +7,12 @@ from scipy.signal import savgol_filter, find_peaks
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 import sys; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 from figpath import fig as fpath
-REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; D = "/net/beegfs/users/P101440/DCE_NIK"; TA = 375.0
+D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REF = dsp.REF; TA = dsp.TA
 Z = int(sys.argv[1]) if len(sys.argv) > 1 else 21
 
-d = np.load(f"{D}/step2_slice{Z}.npz"); mf = d["mf"]; tmf = d["tmf"]
+d = np.load(dsp.STEP2(Z)); mf = d["mf"]; tmf = d["tmf"]
 cs = np.abs(np.load(f"{REF}/slice_{Z:02d}.npz")["cs_img"]).astype(np.float32); tC = np.linspace(0, TA, cs.shape[-1])
 base = cs[..., tC < 50].mean(-1); enh = cs - base[..., None]; m = cs.mean(-1); body = m > np.quantile(m, 0.5)
 late = enh[..., (tC > 130) & (tC < 200)].mean(-1); kid = body & (late > np.quantile(late[body], 0.985)); kid = ndi.binary_opening(kid, iterations=1)
@@ -65,5 +67,5 @@ p = fpath("aif_gate_slice21.png"); fig.savefig(p, dpi=135); print("wrote", p.spl
 
 # save AIF on the CS frame grid (interp) for the Patlak basis, only meaningful if PASS
 aif_frame = np.interp(tC, tmf, sm); aif_frame = np.maximum(aif_frame, 0)
-np.savez(f"{D}/aif_slice{Z}.npz", aif_tmf=aif, tmf=tmf, aif_frame=aif_frame, tC=tC, ao=ao,
+np.savez(dsp.AIF(Z), aif_tmf=aif, tmf=tmf, aif_frame=aif_frame, tC=tC, ao=ao,
          verdict=verdict, ttp=ttp, checks=json.dumps(checks))

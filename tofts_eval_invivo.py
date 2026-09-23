@@ -10,8 +10,9 @@ import consolidated as C, nik_adapter as A
 from kspace_normalization import compute_dcf_radial, KSpaceNormalizer
 from train_grasp_nik import build_model
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"; REFD = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"
-GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
+B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"; REFD = None
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REFD = dsp.REF; GV = dsp.GV; GP = dsp.GP
 TA = 375.0; NTV = 1710; ROIS = ("aorta", "cortex", "medulla", "liver"); EDGES = np.linspace(0, 1, 17)
 KEEP = np.load(f"{B}/spoke_masks/keep_f25.npy"); VAL = np.load(f"{B}/spoke_masks/val_f25c_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_f25c_m9.npy")
 sh = A.load_shared(REFD)
@@ -32,7 +33,7 @@ LABEL = {"patlak": "Patlak", "tofts": "Tofts"}
 if _a.iv_dir: IV = f"{RES}/{_a.iv_dir}"
 def basis_for(arm, Z):                                                          # tofts = rank rule basis, tofts<R> = forced rank R
     m = re.match(r"tofts(\d+)", arm)                                                # tofts8, tofts8oc -> rank 8; tofts / others -> rank-rule basis
-    return (f"{RES}/basis_sl{Z}_r{m.group(1)}" if m else f"{RES}/basis_sl{Z}") + _a.basis_suffix + ".npz"
+    return (f"{RES}/basis{dsp.SFX}_sl{Z}_r{m.group(1)}" if m else f"{RES}/basis{dsp.SFX}_sl{Z}") + _a.basis_suffix + ".npz"
 
 def bs(c): return c - np.median(c[:8])
 def ft(nt): e = np.linspace(0, TA, nt+1); return 0.5*(e[:-1]+e[1:])
@@ -76,7 +77,7 @@ def heldout(run, Z, arm="tofts"):
     kept = torch.as_tensor(KEEP, device=dev, dtype=sid.dtype); tr = torch.where(torch.isin(sid, kept))[0]
     dcf = compute_dcf_radial(x, method="simple_ramp"); nz = KSpaceNormalizer(); nz.fit(x[tr], y_raw[tr], dcf=dcf[tr], envelope_exponent=0.75); y = nz.normalize(x, y_raw)
     args = SimpleNamespace(**{k: ck[k] for k in ("model", "rank", "hidden", "depth", "w0", "s0", "coil_embed_dim", "k_freq", "k_sigma", "t_freq", "t_sigma", "ff_seed")},
-                           patlak_free=0, aif_file=f"{B}/aif_slice{Z}.npz", tofts_basis=basis_for(arm, Z), phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0,
+                           patlak_free=0, aif_file=dsp.AIF(Z), tofts_basis=basis_for(arm, Z), phi_hidden=64, phi_depth=3, phi_w0=30.0, phi_ortho=False, n_pk=-1, radial_alpha=1.0,
                            coil_mode=ck.get("coil_mode", "input"))
     m = build_model(args, int(ck["ncc"])).to(dev); m.load_state_dict(ck["state_dict"]); m.eval()
     out = dict(rank=int(m.rank), params=int(sum(p.numel() for p in m.parameters())), coil_mode=ck.get("coil_mode", "input"))
@@ -104,7 +105,7 @@ def resources(Z, arm, s):
 
 rows = []
 for Z in SLICES:
-    ctx = C.slice_ctx(Z); md = np.load(f"{B}/step2_slice{Z}.npz"); ctx["mf"] = md["mf"]; ctx["tmf"] = md["tmf"]   # model-free frames-first [240,192,192]
+    ctx = C.slice_ctx(Z); md = np.load(dsp.STEP2(Z)); ctx["mf"] = md["mf"]; ctx["tmf"] = md["tmf"]   # model-free frames-first [240,192,192]
     for arm in ARMS:
         for s in (0, 1, 2):
             run = f"{IV}/{arm}_sl{Z}_s{s}"; f = f"{run}/nik_slice_{Z:02d}_cplx.npy"

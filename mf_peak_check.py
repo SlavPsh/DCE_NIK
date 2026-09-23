@@ -5,7 +5,9 @@ below 1 against it is not necessarily an under-read. out: results/tofts_vs_patla
 usage: python mf_peak_check.py --slice 21 --windows 31,21,15,11,7"""
 import warnings; warnings.filterwarnings("ignore")
 import sys, json, argparse, numpy as np, finufft
-D = "/net/beegfs/users/P101440/DCE_NIK"; REF = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; sys.path.insert(0, D); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
+D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+REF = dsp.REF; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import consolidated as C
 TA = 375.0
 
@@ -14,7 +16,7 @@ def main():
     sh = np.load(f"{REF}/shared.npz"); traj = np.asarray(sh["traj_norm"]).astype(np.complex64); vt = np.asarray(sh["view_time"]).ravel().astype(np.float64)
     nx = int(sh["nx"]); bas = int(sh["bas"]); sl = np.load(f"{REF}/slice_{Z:02d}.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64)
     b1 = np.asarray(sl["b1"]).astype(np.complex64); ncc = kdata.shape[2]; den = np.sum(np.abs(b1) ** 2, 2) + 1e-12
-    SIGN = json.load(open(f"{D}/results_nufft/meta.json"))["sign"]; order = np.argsort(vt)
+    SIGN = json.load(open(f"{dsp.NUF(Z)}/meta.json"))["sign"]; order = np.argsort(vt)
     ctx = C.slice_ctx(Z); rois = ctx["rois"]; names = [r for r in ("aorta", "cortex", "medulla") if r in rois]
     def win_img(idx):
         tr = traj[:, idx]; w = np.maximum(np.abs(tr), 1 / nx / 4)
@@ -40,6 +42,6 @@ def main():
     for W in sorted(out, reverse=True):
         o = out[W]; L.append(f"| {W} | {o['window_s']:.1f} | {o['frames']} | " + " | ".join(f"{o[r]['peak']:.5f} ({o[r]['peak'] / (r31[r]['peak'] + 1e-12):.2f}) / {o[r]['ttp']:.0f} / {o[r]['noise'] / (o[r]['peak'] + 1e-12):.3f}" for r in names) + " |")
     L += ["", "reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the peak by that factor (temporal smoothing of the window); the late noise column shows what the narrower window costs"]
-    open(f"{D}/results/tofts_vs_patlak/mf_peak_check_sl{Z}.md", "w").write("\n".join(L)); json.dump(out, open(f"{D}/results/tofts_vs_patlak/mf_peak_check_sl{Z}.json", "w"), indent=1); print("\n".join(L)); print("MF_PEAK_DONE")
+    open(f"{D}/results/tofts_vs_patlak/mf_peak_check{dsp.SFX}_sl{Z}.md", "w").write("\n".join(L)); json.dump(out, open(f"{D}/results/tofts_vs_patlak/mf_peak_check{dsp.SFX}_sl{Z}.json", "w"), indent=1); print("\n".join(L)); print("MF_PEAK_DONE")
 
 if __name__ == "__main__": main()

@@ -3,10 +3,11 @@
 usage: python support_mask.py --slices 21,18,19 --dilate 4  -> spoke_masks/support_sl<Z>.npy (bool [nx,nx])"""
 import sys, argparse, numpy as np, scipy.ndimage as ndi
 D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 import consolidated as C
 ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--dilate", type=int, default=4); a = ap.parse_args()
-sh = np.load("/net/beegfs/users/P101440/grasp_pro_py/results_ref/shared.npz"); nx = int(sh["nx"]); bas = int(sh["bas"]); s = (nx - bas) // 2
+sh = np.load(f"{dsp.REF}/shared.npz"); nx = int(sh["nx"]); bas = int(sh["bas"]); s = (nx - bas) // 2
 for Z in [int(z) for z in a.slices.split(",")]:
     body = ndi.binary_dilation(C.slice_ctx(Z)["BODY"], iterations=a.dilate); full = np.zeros((nx, nx), bool); full[s:s + bas, s:s + bas] = body
-    out = f"{D}/spoke_masks/support_sl{Z}" + ("" if a.dilate == 4 else f"_d{a.dilate}") + ".npy"                      # d4 = the 2026-09-18 test masks; production uses d6 (about 12 mm at 2 mm pixels, above the anterior-wall breathing excursion)
+    out = dsp.SUPPORT(Z, a.dilate)                      # d4 = the 2026-09-18 test masks; production uses d6 (about 12 mm at 2 mm pixels, above the anterior-wall breathing excursion)
     np.save(out, full); print(f"slice {Z}: body {int(body.sum())} px of {bas}x{bas}, support {int(full.sum())} px of {nx}x{nx} ({100 * full.mean():.1f}%) -> {out}")

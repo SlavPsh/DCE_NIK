@@ -9,7 +9,9 @@ import os, sys, argparse, numpy as np, torch
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 sys.path.insert(0, "/net/beegfs/users/P101440/DCE_NIK")
 from masked_metrics import haarpsi_masked, ssim_masked
-B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; GP = "/net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs"
+B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+GV = dsp.GV; GP = dsp.GP
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 COL = {"NIK-free": "#00838f", "NIK-sub16": "#1e8449", "NIK-sub16 (output-coil, other trainer)": "#1e8449", "NIK-patlak": "#0369a1", "NIK-tofts": "#c0392b", "NIK-tofts8": "#7b1fa2", "NIK-tofts8 (output-coil)": "#d81b60", "GRASP-Pro": "#8e44ad", "GRASP": "#e67e22"}
 ROIS = ("aorta", "cortex", "medulla")
@@ -78,7 +80,7 @@ def phantom(t_show, pro="k12", tag=""):
 
 def invivo(t_show, tofts_arm):
     import consolidated as C
-    ctx = C.slice_ctx(21); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(f"{B}/step2_slice21.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"]).astype(np.float64); TA = 375.0
+    ZS = int(os.environ.get("STORY_SLICE", "21")); ctx = C.slice_ctx(ZS); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(ZS)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"]).astype(np.float64); TA = 375.0
     def ft(nt): e = np.linspace(0, TA, nt + 1); return 0.5 * (e[:-1] + e[1:])
     def refwin(nt):
         e = np.linspace(0, TA, nt + 1); out = np.zeros((mf.shape[0], mf.shape[1], nt), np.float32)
@@ -91,25 +93,25 @@ def invivo(t_show, tofts_arm):
     L = lambda p: sc(np.abs(np.load(p)).astype(np.float32))
     IV = f"{B}/results/tofts_vs_patlak/{os.environ.get('IV_DIR', 'invivo_k80')}"; TAGF = os.environ.get("STORY_TAG", "")   # IV_DIR / STORY_TAG: pk-arm run dir and output suffix
     M = [("model-free", mf, tmf),
-         ("NIK-free", L(os.environ.get("FREE_PATH", f"{B}/results_sl21_k80/nik_slice_21.npy")), None),                          # FREE_PATH: nik-free recon from the standard protocol (invivo_prod)
-         (("NIK-sub16", L(f"{IV}/sub16_sl21_s0/nik_slice_21_cplx.npy"), None) if os.path.exists(f"{IV}/sub16_sl21_s0/nik_slice_21_cplx.npy") else       # input-coil sub16 from the same trainer / protocol as the pk arms
-          ("NIK-sub16 (output-coil, other trainer)", L(f"{B}/results/realdata_nik_vs_cs_figures/outcoil_subspace_output_slice21.npy"), None)),   # flagged: outcoil_real.py, different protocol
-         ("NIK-patlak", L(f"{IV}/patlak_sl21_s0/nik_slice_21_cplx.npy"), None), ("NIK-" + tofts_arm, L(f"{IV}/{tofts_arm}_sl21_s0/nik_slice_21_cplx.npy"), None),
+         ("NIK-free", L(os.environ.get("FREE_PATH", f"{B}/results_sl{ZS}_k80/nik_slice_{ZS}.npy")), None),                          # FREE_PATH: nik-free recon from the standard protocol (invivo_prod)
+         (("NIK-sub16", L(f"{IV}/sub16_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy"), None) if os.path.exists(f"{IV}/sub16_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy") else       # input-coil sub16 from the same trainer / protocol as the pk arms
+          ("NIK-sub16 (output-coil, other trainer)", L(f"{B}/results/realdata_nik_vs_cs_figures/outcoil_subspace_output_slice{ZS}.npy"), None)),   # flagged: outcoil_real.py, different protocol
+         ("NIK-patlak", L(f"{IV}/patlak_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy"), None), ("NIK-" + tofts_arm, L(f"{IV}/{tofts_arm}_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy"), None),
          ("GRASP-Pro", L(f"{GP}/cs_slice21_f80match.npy"), None), ("GRASP", L(f"{GV}/gv2_slice21_n12_k80.npy"), None)]
     OC = os.environ.get("OC_DIR")                                                                                       # OC_DIR: output-coil tofts8 run dir, added as its own column
-    if OC and os.path.exists(f"{B}/results/tofts_vs_patlak/{OC}/tofts8_sl21_s0/nik_slice_21_cplx.npy"):
-        M.insert(-2, ("NIK-tofts8 (output-coil)", L(f"{B}/results/tofts_vs_patlak/{OC}/tofts8_sl21_s0/nik_slice_21_cplx.npy"), None))
+    if OC and os.path.exists(f"{B}/results/tofts_vs_patlak/{OC}/tofts8_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy"):
+        M.insert(-2, ("NIK-tofts8 (output-coil)", L(f"{B}/results/tofts_vs_patlak/{OC}/tofts8_sl{ZS}_s0/nik_slice_{ZS}_cplx.npy"), None))
     M = [(nm, v, (t if t is not None else ft(v.shape[-1]))) for nm, v, t in M]
     mfc = {r: (lambda c: c - np.median(c[:8]))(np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])])) for r in ROIS}
     cm = "all NIK arms: input-coil embedding, train_grasp_nik.py, same protocol" if any(nm == "NIK-sub16" for nm, _, _ in M) else "NIK-sub16 is an OUTPUT-coil model from outcoil_real.py (other trainer, other protocol); the other NIK arms are input-coil"
     cm = os.environ.get("STORY_NOTE", cm)                                                                                    # STORY_NOTE: protocol statement for the panel (coil mode, prior, wd)
     note = f"same input for every method: k80 = 1368 of 1708 views (v%10<8); reference = model-free nufft (31-spoke window); one global scale vs the reference; image at t = {t_show:.0f} s; {cm}"
-    panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21{TAGF}.png", "in vivo slice 21: four NIK families, GRASP-Pro and GRASP on the same k80 input",
+    panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl{ZS}{TAGF}.png", "in vivo slice {ZS}: four NIK families, GRASP-Pro and GRASP on the same k80 input",
           M, rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
     byname = {nm: (nm, v, t) for nm, v, t in M}
     for fam in ("NIK-free", "NIK-sub16", "NIK-patlak", "NIK-" + tofts_arm):                       # one panel per family: reference | nik | grasp pro | grasp
         if fam not in byname: continue
-        panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl21_{fam.split('-')[1]}{TAGF}.png", f"in vivo slice 21: {fam} vs GRASP-Pro and GRASP on the same k80 input",
+        panel(f"{B}/results/realdata_nik_vs_cs_figures/figures/story_invivo_k80_sl{ZS}_{fam.split('-')[1]}{TAGF}.png", f"in vivo slice {ZS}: {fam} vs GRASP-Pro and GRASP on the same k80 input",
               [byname["model-free"], byname[fam], byname["GRASP-Pro"], byname["GRASP"]], rois, body, t_show, tmf, mfc, "enhancement (baseline subtracted)", note)
 
 if __name__ == "__main__":

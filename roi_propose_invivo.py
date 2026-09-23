@@ -7,7 +7,9 @@ usage: python roi_propose_invivo.py --slices 21,18,19 [--thr 0.35 --erode 1]"""
 import warnings; warnings.filterwarnings("ignore")
 import os, sys, argparse, json, numpy as np, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-B = "/net/beegfs/users/P101440/DCE_NIK"; GV = "/net/beegfs/users/P101440/grasp_v2/results_grasp_v2"; sys.path.insert(0, B)
+B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
+GV = dsp.GV
 import consolidated as C
 OUTD = f"{B}/results/realdata_nik_vs_cs_figures"
 
@@ -30,7 +32,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--thr", type=float, default=0.35); ap.add_argument("--erode", type=int, default=1); ap.add_argument("--smooth", type=float, default=1.0); ap.add_argument("--min-medulla-px", type=int, default=15); a = ap.parse_args(); TA = 375.0
     rep = {}
     for Z in [int(s) for s in a.slices.split(",")]:
-        ctx = C.slice_ctx(Z); body = ctx["BODY"]; old = ctx["rois"]; z = np.load(f"{B}/step2_slice{Z}.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
+        ctx = C.slice_ctx(Z); body = ctx["BODY"]; old = ctx["rois"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
         rois, aux = build(mf, tmf, body, a.thr, a.erode, a.smooth, a.min_medulla_px); rois["aorta"] = old["aorta"]
         gv = f"{GV}/gv2_slice{Z}_n12_k80.npy"; g = np.abs(np.load(gv)).astype(np.float32) if os.path.exists(gv) else None
         frame = lambda v, t, ts, w=8: v[..., (t > ts - w) & (t < ts + w)].mean(2)
@@ -38,7 +40,7 @@ def main():
         curves = {r: c - np.median(c[tmf < 40]) for r, c in curves.items()}
         rep[Z] = dict(px={r: int(rois[r].sum()) for r in rois}, blobs=aux["n_blobs"], old_px={r: int(old[r].sum()) for r in old if r in ("cortex", "medulla", "aorta")},
                       ttp_s={r: float(tmf[np.argmax(curves[r])]) for r in curves}, plateau_over_peak={r: float(curves[r][tmf > 250].mean() / (curves[r].max() + 1e-9)) for r in curves})
-        np.savez(f"{OUTD}/rois_proposed_sl{Z}.npz", **{r: rois[r] for r in rois}, thr=a.thr, erode=a.erode, smooth=a.smooth, min_medulla_px=a.min_medulla_px, source="model-free 31-spoke nufft, late enhancement 130-200 s")
+        np.savez(dsp.ROIS(Z), **{r: rois[r] for r in rois}, thr=a.thr, erode=a.erode, smooth=a.smooth, min_medulla_px=a.min_medulla_px, source="model-free 31-spoke nufft, late enhancement 130-200 s")
         fig, ax = plt.subplots(1, 5, figsize=(21, 4.6)); vm = np.percentile(mf[..., 0][body], 99.5)
         panels = [("late enhancement 130-200 s (model-free), kidney = 2 largest blobs", aux["late"], None), ("model-free at 90 s: cortex (green) / medulla (orange)", frame(mf, tmf, 90), None),
                   ("model-free at 300 s", frame(mf, tmf, 300), None), ("GRASP k80 at 90 s" if g is not None else "", frame(g, (np.arange(g.shape[-1]) + 0.5) * TA / g.shape[-1], 90) if g is not None else np.zeros_like(body, float), None)]
@@ -53,10 +55,10 @@ def main():
         for r, c in (("aorta", "cyan"), ("cortex", "lime"), ("medulla", "orange"), ("kidney", "yellow")): ax[4].plot(tmf, curves[r] / (curves["aorta"].max() + 1e-9), color=c, lw=1.4, label=f"{r} ({int(rois[r].sum())} px)")
         ax[4].set_title("model-free mean curves, proposed rois (norm to aorta peak)", fontsize=9); ax[4].set_xlabel("t [s]"); ax[4].legend(fontsize=7); ax[4].axhline(0, color="0.7", lw=0.6)
         fig.suptitle(f"slice {Z}: proposed kidney rois (thr {a.thr} of the 99.5th percentile late enhancement, erode {a.erode} px, ratio smoothed {a.smooth} px, medulla islands < {a.min_medulla_px} px dropped) vs the old crescent rois", fontsize=11); fig.tight_layout()
-        fig.savefig(f"{OUTD}/figures/roi_proposed_sl{Z}.png", dpi=130, facecolor="white"); plt.close(fig); print("saved", Z, rep[Z], flush=True)
-    json.dump(rep, open(f"{OUTD}/rois_proposed.json", "w"), indent=1)
+        fig.savefig(f"{OUTD}/figures/roi_proposed{dsp.SFX}_sl{Z}.png", dpi=130, facecolor="white"); plt.close(fig); print("saved", Z, rep[Z], flush=True)
+    json.dump(rep, open(f"{OUTD}/rois_proposed{dsp.SFX}.json", "w"), indent=1)
     L = ["# proposed kidney rois (for approval; nothing uses them yet)", "", "| slice | kidney px | cortex px | medulla px | blobs | old cortex / medulla px | ttp cortex / medulla (s) | plateau/peak cortex / medulla |", "|---|---|---|---|---|---|---|---|"]
     for Z, r in rep.items(): L.append(f"| {Z} | {r['px']['kidney']} | {r['px']['cortex']} | {r['px']['medulla']} | {r['blobs']} | {r['old_px']['cortex']} / {r['old_px']['medulla']} | {r['ttp_s']['cortex']:.0f} / {r['ttp_s']['medulla']:.0f} | {r['plateau_over_peak']['cortex']:.2f} / {r['plateau_over_peak']['medulla']:.2f} |")
-    open(f"{OUTD}/rois_proposed.md", "w").write("\n".join(L)); print("\n".join(L)); print("ROI_PROPOSE_DONE")
+    open(f"{OUTD}/rois_proposed{dsp.SFX}.md", "w").write("\n".join(L)); print("\n".join(L)); print("ROI_PROPOSE_DONE")
 
 if __name__ == "__main__": main()

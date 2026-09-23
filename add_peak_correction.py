@@ -2,10 +2,10 @@
 (mf_peak_check.py: 11-spoke window over 31-spoke, per-spoke normalized); every peak ratio vs the reference is divided by that factor so a nik peak
 above the 31-spoke reference is not read as overshoot. runs on the laptop from the synced json files. usage: python add_peak_correction.py invivo_k80_rms1 invivo_k80_oc"""
 import sys, json, os, numpy as np
-R = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "tofts_vs_patlak"); WIN = "11"
+R = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "tofts_vs_patlak"); WIN = "11"; SFX = "" if os.environ.get("DCE_DS", "p3") == "p3" else "_" + os.environ["DCE_DS"]
 corr = {}
 for Z in (18, 19, 21):
-    p = f"{R}/mf_peak_check_sl{Z}.json"
+    p = f"{R}/mf_peak_check{SFX}_sl{Z}.json"
     if not os.path.exists(p): continue
     o = json.load(open(p)); raw = {r: o[WIN][r]["peak"] / o["31"][r]["peak"] for r in ("aorta", "cortex", "medulla")}
     legacy = raw["cortex"] < 0.6                                                              # json written before the per-spoke normalization: peaks scale with the window width
