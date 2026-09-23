@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-23 22:52:54 on worker03.cluster, job 3361147, cycle 126
+updated 2026-09-23 22:54:58 on worker03.cluster, job 3361147, cycle 127
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3367418 | 065_p8_survey | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 065_p8_survey | 1 RUNNING None |
+| 065_p8_survey | 1 COMPLETED 00:02:08 |
 | 018_p8_header | exit 0 |
 | 017_p8_header | exit 127 |
 | 064_gradient_check | 1 COMPLETED 00:00:21 |
