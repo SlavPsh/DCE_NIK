@@ -33,5 +33,7 @@ Standard input for every in vivo comparison: k80 (v%10<8, 1368 of 1708 views), v
 3. Per-voxel span-loss map (where the tofts basis is the wrong model).
 4. Oblique readout of vp / Ktrans from the coefficients (phantom test vs the nonlinear fit).
 5. PISCO with the group's guidelines if they differ from the implementation here (both stencils were inert).
+6. z-coordinate input (added 2026-09-23): one model over several slices, (kx, ky, z, t, coil), sharing information across slices; test joint 18 / 19 / 21 vs three separate models.
+7. IMPORTANT (added 2026-09-23): test the best nik models (tofts8 + prior in both coil modes, nik-free, sub16) on a new dataset (second subject / scan), same k80 protocol and rulers, to show the results are not tuned to meas_p3_dce.
 
 Files: tables `results/tofts_vs_patlak/{invivo_k80_rms1,invivo_k80_oc,iq_track_sl21_*,span_diag_sl*_rms1,mf_peak_check_sl*}.md`; figures `results/tofts_vs_patlak/figures/` and `results/realdata_nik_vs_cs_figures/figures/`; presentation folder `presentation_figs_2026-09-10/` (README index, figures 45 / 48 / 49 to 54); full chronology in RESUME.md.
