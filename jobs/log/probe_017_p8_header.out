@@ -1,0 +1,27 @@
+ 
+6 .
+24 ..
+9 gv2_DCE_Rerun
+5389161984 meas_MID3000007_FID100985_DCE_Rerun_1.dat
+773295616 meas_p1_VFA_18_1.dat
+4292514304 meas_p3_dce.dat
+773295616 meas_p3_vfa.dat
+4294681600 meas_p8_dce.dat
+== envs
+torch29
+== results_ref
+shared.npz
+slice_13.npz
+slice_18.npz
+slice_19.npz
+slice_20.npz
+slice_21.npz
+results_ref
+results_ref_3s
+results_spoke_cs
+results_spoke_cs_fairphi
+== header p8 vs p3
+-- meas_p8_dce.dat
+/net/beegfs/users/P101440/DCE_NIK/jobs/probe/017_p8_header.sh: line 8: micromamba: command not found
+-- meas_p3_dce.dat
+/net/beegfs/users/P101440/DCE_NIK/jobs/probe/017_p8_header.sh: line 8: micromamba: command not found
