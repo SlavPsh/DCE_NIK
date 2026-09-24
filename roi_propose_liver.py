@@ -12,7 +12,15 @@ import dsp
 import consolidated as C
 OUTD = f"{B}/results/realdata_nik_vs_cs_figures"
 
-def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver_hi=0.97, spleen_q=0.90):
+def grow_seed(mf, tmf, seed, radius=16, t=60.0, erode=1):
+    """aorta from a user seed (row, col): connected bright region on the smoothed frame at t within the radius, filled, eroded"""
+    f = ndi.gaussian_filter(mf[..., (tmf > t - 8) & (tmf < t + 8)].mean(2), 1.0); r0, c0 = seed; yy, xx = np.ogrid[:f.shape[0], :f.shape[1]]; disc = (yy - r0) ** 2 + (xx - c0) ** 2 <= radius ** 2
+    loc = f[disc]; thr = 0.5 * (np.percentile(loc, 99) + np.median(loc)); m = disc & (f > thr); lab, n = ndi.label(m)
+    m = (lab == lab[r0, c0]) if lab[r0, c0] > 0 else (lab == (1 + int(np.argmax(ndi.sum(np.ones_like(lab), lab, range(1, n + 1)))))); m = ndi.binary_fill_holes(m)
+    return ndi.binary_erosion(m, iterations=erode) if erode else m
+
+def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver_hi=0.97, spleen_q=0.90, aorta_seed=None):
+    if aorta_seed is not None: ao = grow_seed(mf, tmf, aorta_seed)
     base = mf[..., tmf < 45].mean(2); late = mf[..., (tmf > 130) & (tmf < 200)].mean(2) - base; first = mf[..., (tmf > 60) & (tmf < 95)].mean(2) - base
     Ls = ndi.gaussian_filter(late * body, 1.5); Fs = ndi.gaussian_filter(first * body, 1.5); ratio = np.where(body, Fs / (np.abs(Ls) + 1e-9), 0.0)
     ref = np.quantile(Ls[body], 0.995)
@@ -25,7 +33,7 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
         m = ndi.binary_fill_holes(m); rr, cc = np.nonzero(m); rad = np.sqrt(area / np.pi); round_ = area / (np.pi * max(np.ptp(rr), np.ptp(cc), 1) ** 2 / 4)
         score = float(ratio[m].mean()) * min(round_, 1.0)
         if best is None or score > best[0]: best = (score, m)
-    if best is not None: ao = best[1]
+    if best is not None and aorta_seed is None: ao = best[1]
     # alternative aorta candidate for the user's decision: the roundest bright blob of the 60 s frame (top 3% intensity), area 150 to 1500 px, central third of the fov
     f60 = mf[..., (tmf > 52) & (tmf < 68)].mean(2) * inner; eb = inner & (f60 > np.quantile(f60[inner], 0.97)); eb = ndi.binary_opening(eb, iterations=2); labB, nB = ndi.label(eb); alt = None
     H, W = body.shape
@@ -51,14 +59,15 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
     return dict(liver=liver, spleen=spleen, aorta=ao, aorta_alt=aorta_alt, static=static), dict(late=late, first=first, ratio=ratio)
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode-liver", type=int, default=4); ap.add_argument("--erode-spleen", type=int, default=2); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode-liver", type=int, default=4); ap.add_argument("--erode-spleen", type=int, default=2); ap.add_argument("--aorta-seed", default="", help="per-slice row,col seeds: 21:145,137;24:...")
+    a = ap.parse_args(); seeds = {int(k): tuple(int(v) for v in rc.split(",")) for k, rc in (x.split(":") for x in a.aorta_seed.split(";") if x)}
     rep = {}; L = ["# proposed liver / spleen rois (for approval; nothing uses them yet)", "", "| slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |", "|---|---|---|---|---|---|---|"]
     for Z in [int(s) for s in a.slices.split(",")]:
         ctx = C.slice_ctx(Z); body = ctx["BODY"]; ao = ctx["rois"]["aorta"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
-        rois, aux = build(mf, tmf, body, ao, a.erode_liver, a.erode_spleen)
+        rois, aux = build(mf, tmf, body, ao, a.erode_liver, a.erode_spleen, aorta_seed=seeds.get(Z))
         cur = {r: np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])]) if rois[r].any() else np.zeros(mf.shape[-1]) for r in rois}; cur = {r: c - np.median(c[tmf < 40]) for r, c in cur.items()}
         ttp = {r: float(tmf[np.argmax(cur[r])]) for r in cur}; plat = {r: float(cur[r][tmf > 250].mean() / (cur[r].max() + 1e-9)) for r in cur}
-        rep[Z] = dict(px={r: int(rois[r].sum()) for r in rois}, ttp=ttp, plateau=plat); np.savez(dsp.ROIS(Z), **rois, source="model-free 31-spoke nufft, liver / spleen proposal v1")
+        rep[Z] = dict(px={r: int(rois[r].sum()) for r in rois}, ttp=ttp, plateau=plat); np.savez(dsp.ROIS(Z), **rois, source="model-free 31-spoke nufft, liver / spleen proposal v4", aorta_tag=np.array(f"seed {seeds.get(Z)}" if Z in seeds else "auto"))
         L.append(f"| {Z} | {rois['liver'].sum()} | {rois['spleen'].sum()} | {rois['aorta'].sum()} | {rois['static'].sum()} | {ttp['liver']:.0f} / {plat['liver']:.2f} | {ttp['spleen']:.0f} / {plat['spleen']:.2f} |")
         frame = lambda ts, w=8: mf[..., (tmf > ts - w) & (tmf < ts + w)].mean(2)
         fig, ax = plt.subplots(1, 5, figsize=(22, 4.8))
