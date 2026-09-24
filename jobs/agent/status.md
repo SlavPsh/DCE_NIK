@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-24 16:41:55 on worker01.cluster, job 3366217, cycle 304
+updated 2026-09-24 16:46:06 on worker01.cluster, job 3366217, cycle 306
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3373408 | 066_p14_survey | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 066_p14_survey | 1 PENDING Priority |
 | 019_p14_header | exit 0 |
 | 065_p8_survey | 1 COMPLETED 00:02:08 |
 | 018_p8_header | exit 0 |
@@ -30,4 +32,3 @@ updated 2026-09-24 16:41:55 on worker01.cluster, job 3366217, cycle 304
 | 057_pisco_rerun | 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06 |
 | 058_support_diag | 1 COMPLETED 00:27:44 |
 | 055_kspace_priors | 1 COMPLETED 00:00:11, 1 COMPLETED 00:00:12, 1 COMPLETED 02:38:52, 1 COMPLETED 02:49:31 |
-| 053_ctv_rerun | 1 COMPLETED 02:45:49, 1 COMPLETED 03:21:10 |
