@@ -1,5 +1,6 @@
 queue 072_roi_p14_sl21
 jid 3374299
 submitted 2026-09-24 22:33:38
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:38
 log jobs/log/072_roi_p14_sl21_3374299.out
+ended 2026-09-24 22:35:44

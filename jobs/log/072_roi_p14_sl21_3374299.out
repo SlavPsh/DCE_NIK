@@ -1,0 +1,11 @@
+error    libmamba Could not set lock (Resource temporarily unavailable)
+warning  libmamba Cannot lock '/home/P101440/.cache/mamba/proc'
+    Waiting for other mamba process to finish
+saved 21 {'px': {'liver': 2060, 'spleen': 1739, 'aorta': 26, 'static': 669}, 'ttp': {'liver': 98.94712430426716, 'spleen': 86.28478664192951, 'aorta': 86.28478664192951, 'static': 264.8237476808905}, 'plateau': {'liver': 0.700596272945404, 'spleen': 0.5671791434288025, 'aorta': 0.4936200976371765, 'static': 0.23470403254032135}}
+# proposed liver / spleen rois (for approval; nothing uses them yet)
+
+| slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |
+|---|---|---|---|---|---|---|
+| 21 | 2060 | 1739 | 26 | 669 | 99 / 0.70 | 86 / 0.57 |
+ROI_PROPOSE_DONE
+ROI exit 0

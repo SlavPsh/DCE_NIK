@@ -1,21 +1,20 @@
 # helios agent
 
-updated 2026-09-24 22:33:39 on worker01.cluster, job 3372168, cycle 132
+updated 2026-09-24 22:35:44 on worker01.cluster, job 3372168, cycle 133
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3374298 | 071_p14_prep_24_27 | 1 PENDING None |
-| 3374299 | 072_roi_p14_sl21 | 1 PENDING Priority |
+| 3374298 | 071_p14_prep_24_27 | 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 072_roi_p14_sl21 | 1 PENDING Priority |
+| 071_p14_prep_24_27 | 2 RUNNING None |
+| 072_roi_p14_sl21 | 1 COMPLETED 00:00:38 |
 | 022_dce_data_mount | exit 0 |
-| 071_p14_prep_24_27 | 1 PENDING None |
 | 070_p14_prep_array | 1 COMPLETED 00:00:09, 1 COMPLETED 00:00:11, 1 COMPLETED 00:21:01 |
 | 067_p14_prep | 1 CANCELLED+ 02:35:24 |
 | 021_cancel_067 | exit 0 |
