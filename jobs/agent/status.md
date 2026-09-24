@@ -1,19 +1,18 @@
 # helios agent
 
-updated 2026-09-24 23:02:51 on worker01.cluster, job 3372168, cycle 146
+updated 2026-09-24 23:04:56 on worker01.cluster, job 3372168, cycle 147
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3374298 | 071_p14_prep_24_27 | 2 RUNNING None |
-| 3375454 | 079_aorta_grid | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 079_aorta_grid | 1 PENDING Priority |
+| 079_aorta_grid | 1 COMPLETED 00:00:08 |
 | 078_aorta_candidates_v3 | 1 COMPLETED 00:00:09 |
 | 077_aorta_candidates_v2 | 1 COMPLETED 00:00:06 |
 | 076_aorta_candidates | 1 COMPLETED 00:00:06 |
