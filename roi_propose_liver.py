@@ -22,7 +22,7 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
     for i in range(1, nA + 1):
         m = labA == i; area = int(m.sum())
         if not 60 <= area <= 900: continue
-        m = ndi.binary_fill_holes(m); rr, cc = np.nonzero(m); rad = np.sqrt(area / np.pi); round_ = area / (np.pi * max(rr.ptp(), cc.ptp(), 1) ** 2 / 4)
+        m = ndi.binary_fill_holes(m); rr, cc = np.nonzero(m); rad = np.sqrt(area / np.pi); round_ = area / (np.pi * max(np.ptp(rr), np.ptp(cc), 1) ** 2 / 4)
         score = float(ratio[m].mean()) * min(round_, 1.0)
         if best is None or score > best[0]: best = (score, m)
     if best is not None: ao = best[1]
