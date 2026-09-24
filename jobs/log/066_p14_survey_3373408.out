@@ -1,0 +1,42 @@
+p3 geom {'TA': 375.0, 'nx': 384, 'bas': 192, 'ntviews': 1710} masks /net/beegfs/users/P101440/DCE_NIK/spoke_masks/keep_f80match.npy /net/beegfs/users/P101440/DCE_NIK/spoke_masks/val_k80_m8.npy /net/beegfs/users/P101440/DCE_NIK/spoke_masks/test_k80_m9.npy [True, True, True]
+slice_ctx(21) ok, TA 375.0
+imports ok
+REGRESSION exit 0
+loaded kdata (512, 2172, 25, 24) TA=390.0 geom={'nz_acq': 25, 'nz_full': 36, 'slab_os': 0.2, 'n_images_per_slab': 60, 'pf_slice_code': 2, 'slice_res': 0.5, 'n_keep': 30, 'nz_recon': 72, 'n_keep_full': 60, 'center_par': 7, 'center_col': 256}
+kz DC: MDH CenterPar=7 (energy argmax said 6); using MDH
+kz partial fourier: DC=7 -> zero-filled to 36 partitions (start=11)
+slab crop: slab_os=0.200 keep 30/36 [3:33] -> nzz=30
+front-end 32 s: kdata (512, 2157, 30, 24), nzz 30, geom {'nx': 512, 'ntviews': 2157, 'nzz': 30, 'nc': 24, 'nt': 431, 'nline': 5, 'ncc': 8, 'K': 5, 'bas': 256, 'Cut': 15, 'TA': 390.0, 'nz_full': 36, 'slab_os': 0.2, 'n_keep': 30, 'kz_dc': 7, 'slice_interp': 0, 'slice_res': 0.5}
+slice 00 done
+slice 01 done
+slice 02 done
+slice 03 done
+slice 04 done
+slice 05 done
+slice 06 done
+slice 07 done
+slice 08 done
+slice 09 done
+slice 10 done
+slice 11 done
+slice 12 done
+slice 13 done
+slice 14 done
+slice 15 done
+slice 16 done
+slice 17 done
+slice 18 done
+slice 19 done
+slice 20 done
+slice 21 done
+slice 22 done
+slice 23 done
+slice 24 done
+slice 25 done
+slice 26 done
+slice 27 done
+slice 28 done
+slice 29 done
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/survey_p14.png (50 s)
+SURVEY_DONE
+SURVEY exit 0
