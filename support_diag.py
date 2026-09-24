@@ -8,6 +8,7 @@ import os, sys, argparse, numpy as np, torch
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from types import SimpleNamespace
 B = "/net/beegfs/users/P101440/DCE_NIK"; REFD = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; sys.path.insert(0, B); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8 / p14)
 import nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
@@ -19,7 +20,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--runs", required=True); ap.add_argument("--slice", type=int, default=21); a = ap.parse_args(); Z = a.slice
     sh = A.load_shared(REFD); nx = int(sh["nx"]); bas = int(sh["bas"]); ds = A.make_radial_dataset(REFD, Z, compute_device=dev, shared=sh); b1 = ds["b1"]
     x, t, c, y_raw, sid = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"], ds["spoke_id_all"]
-    KEEP = np.load(f"{B}/spoke_masks/keep_f80match.npy"); tr = torch.where(torch.isin(sid, torch.as_tensor(KEEP, device=dev, dtype=sid.dtype)))[0]
+    KEEP = np.load(dsp.KEEP); tr = torch.where(torch.isin(sid, torch.as_tensor(KEEP, device=dev, dtype=sid.dtype)))[0]
     dcf = compute_dcf_radial(x, method="simple_ramp"); nz = KSpaceNormalizer(); nz.fit(x[tr], y_raw[tr], dcf=dcf[tr], envelope_exponent=0.75)
     mask = np.load(f"{B}/spoke_masks/support_sl{Z}.npy").astype(bool); ctx = C.slice_ctx(Z); body = ctx["BODY"]; air = ctx["AIR"]; s0 = (nx - bas) // 2
     cg = torch.from_numpy(A.cartesian_grid(nx)).to(dev); disk = (torch.sqrt((cg ** 2).sum(1)) <= 1.0).float().view(nx, nx, 1).cpu().numpy()

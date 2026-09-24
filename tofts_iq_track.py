@@ -13,7 +13,7 @@ import dsp                                                                      
 GV = dsp.GV; GP = dsp.GP
 import consolidated as C
 from story_figs import ls_scale
-TA = 375.0
+TA = dsp.TA
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); a = ap.parse_args(); Z = a.slice

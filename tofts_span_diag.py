@@ -14,7 +14,7 @@ from story_figs import ls_scale
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--arms", default="tofts,tofts8,patlak"); a = ap.parse_args(); Z = a.slice
-    ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); TA = 375.0
+    ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); TA = dsp.TA
     names = [r for r in ("aorta", "cortex", "medulla", "liver") if r in rois]
     bz = np.load(dsp.BASIS(Z, 8) if dsp.DS != "p3" else f"{B}/results/tofts_vs_patlak/basis_sl{Z}.npz", allow_pickle=True); atoms, tg = np.asarray(bz["atoms"], float), np.asarray(bz["tgrid_s"], float)
     Phi = np.stack([np.interp(tmf, tg, atoms[:, k]) for k in range(atoms.shape[1])], 1)                       # [F,R] atoms at the model-free frame times

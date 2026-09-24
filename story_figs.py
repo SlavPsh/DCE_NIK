@@ -80,7 +80,7 @@ def phantom(t_show, pro="k12", tag=""):
 
 def invivo(t_show, tofts_arm):
     import consolidated as C
-    ZS = int(os.environ.get("STORY_SLICE", "21")); ctx = C.slice_ctx(ZS); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(ZS)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"]).astype(np.float64); TA = 375.0
+    ZS = int(os.environ.get("STORY_SLICE", "21")); ctx = C.slice_ctx(ZS); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(dsp.STEP2(ZS)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"]).astype(np.float64); TA = dsp.TA
     def ft(nt): e = np.linspace(0, TA, nt + 1); return 0.5 * (e[:-1] + e[1:])
     def refwin(nt):
         e = np.linspace(0, TA, nt + 1); out = np.zeros((mf.shape[0], mf.shape[1], nt), np.float32)

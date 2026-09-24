@@ -8,7 +8,7 @@ B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
 import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 import consolidated as C
 from story_figs import ls_scale
-TA = 375.0
+TA = dsp.TA
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--items", required=True); ap.add_argument("--out", required=True); ap.add_argument("--t", type=float, default=90.0); a = ap.parse_args(); Z = a.slice

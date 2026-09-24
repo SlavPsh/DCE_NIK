@@ -12,7 +12,7 @@ import consolidated as C
 COL = dict(aorta="cyan", cortex="lime", medulla="orange", liver="magenta")
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--t-show", type=float, default=90.0); a = ap.parse_args(); TA = 375.0
+    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--t-show", type=float, default=90.0); a = ap.parse_args(); TA = dsp.TA
     L = ["# roi check, in vivo k80 (masks from consolidated.slice_ctx: grasp-pro 100% anatomy, identical for every method)", "", "| slice | " + " | ".join(f"{r} px" for r in COL) + " | cortex/medulla centroid (row, col) | aorta centroid |", "|---|" + "---|" * (len(COL) + 2)]
     for Z in [int(s) for s in a.slices.split(",")]:
         ctx = C.slice_ctx(Z); rois = ctx["rois"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0); tmf = np.asarray(z["tmf"], float)

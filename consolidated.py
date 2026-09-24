@@ -19,7 +19,7 @@ REF = dsp.REF
 # only the reference-METHOD image (ctx["cs_meth"]) follows CSPRE.
 CSD = os.environ.get("CSD", dsp.GP)
 CSPRE = os.environ.get("CSPRE", "cs")
-BATCH = f"{D}/results_batch"; TA = 375.0
+BATCH = f"{D}/results_batch"; TA = dsp.TA
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 
 # ---- config matrix ----

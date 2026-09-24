@@ -29,7 +29,7 @@ def build(mf, tmf, body, thr, erode, smooth=1.0, min_medulla_px=15, min_px=120):
     return dict(kidney=kid, cortex=cortex, medulla=medulla), dict(late=late, first=first, tail=tail, ratio=ratio, n_blobs=len(keep))
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--thr", type=float, default=0.35); ap.add_argument("--erode", type=int, default=1); ap.add_argument("--smooth", type=float, default=1.0); ap.add_argument("--min-medulla-px", type=int, default=15); a = ap.parse_args(); TA = 375.0
+    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--thr", type=float, default=0.35); ap.add_argument("--erode", type=int, default=1); ap.add_argument("--smooth", type=float, default=1.0); ap.add_argument("--min-medulla-px", type=int, default=15); a = ap.parse_args(); TA = dsp.TA
     rep = {}
     for Z in [int(s) for s in a.slices.split(",")]:
         ctx = C.slice_ctx(Z); body = ctx["BODY"]; old = ctx["rois"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)

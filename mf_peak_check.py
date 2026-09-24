@@ -9,7 +9,7 @@ D = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, D)
 import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 REF = dsp.REF; sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
 import consolidated as C
-TA = 375.0
+TA = dsp.TA
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--windows", default="31,21,15,11,7"); a = ap.parse_args(); Z = a.slice

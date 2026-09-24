@@ -7,6 +7,7 @@ import warnings; warnings.filterwarnings("ignore")
 import sys, argparse, numpy as np, torch
 from types import SimpleNamespace
 B = "/net/beegfs/users/P101440/DCE_NIK"; REFD = "/net/beegfs/users/P101440/grasp_pro_py/results_ref"; sys.path.insert(0, B); sys.path.insert(0, "/net/beegfs/users/P101440/grasp_pro_py")
+import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8 / p14)
 import nik_adapter as A
 from train_grasp_nik import build_model
 from kspace_normalization import KSpaceNormalizer, compute_dcf_radial
@@ -26,7 +27,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--runs", required=True); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--batch", type=int, default=4096); ap.add_argument("--n-params", type=int, default=6); a = ap.parse_args(); Z = a.slice
     torch.manual_seed(0); sh = A.load_shared(REFD); ds = A.make_radial_dataset(REFD, Z, compute_device=dev, shared=sh)
     x, t, c, y_raw, sid = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"], ds["spoke_id_all"]
-    KEEP = np.load(f"{B}/spoke_masks/keep_f80match.npy"); tr = torch.where(torch.isin(sid, torch.as_tensor(KEEP, dtype=sid.dtype)))[0]
+    KEEP = np.load(dsp.KEEP); tr = torch.where(torch.isin(sid, torch.as_tensor(KEEP, dtype=sid.dtype)))[0]
     dcf = compute_dcf_radial(x, method="simple_ramp"); nz = KSpaceNormalizer(); nz.fit(x[tr], y_raw[tr], dcf=dcf[tr], envelope_exponent=0.75); y = nz.normalize(x, y_raw)
     idx = tr[torch.randperm(tr.numel())[:a.batch]]; xb, tb, cb, yb = x[idx].double(), t[idx].double(), c[idx], y[idx].double()
     L = ["# gradient check on trained in vivo models (slice %d, one fixed batch of %d kept samples, float64)" % (Z, a.batch), "",
