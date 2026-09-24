@@ -1,0 +1,46 @@
+Submitted batch job 3373538
+tail chained afterany 3373535
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/grasp_pro_py/precompute_ref.py", line 219, in <module>
+    main()
+  File "/net/beegfs/users/P101440/grasp_pro_py/precompute_ref.py", line 180, in main
+    (kdata, Traj_g, Traj_u, Phi, view_time, frame_idx, frame_time, geom) = front_end(
+                                                                           ^^^^^^^^^^
+  File "/net/beegfs/users/P101440/grasp_pro_py/precompute_ref.py", line 37, in front_end
+    kdata, TA, geom_hdr = load_twix(path, return_geom=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/grasp_pro_py/main.py", line 60, in load_twix
+    kdata[:, b.cLin, b.cPar, :] = b.data.T
+                                  ^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/twixtools/mdb.py", line 292, in __get_data
+    self.fid = open(self.fid.name, self.fid.mode)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/net/beegfs/users/P101440/dce_data/orig/meas_topqmri_p14.dat'
+PRECOMPUTE 24 exit 1
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/build_rulers.py", line 18, in <module>
+    sl = np.load(f"{REF}/slice_{SL:02d}.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/net/beegfs/users/P101440/grasp_pro_py/results_ref_p14/slice_24.npz'
+RULERS 24 exit 1
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/step2_kidney.py", line 23, in <module>
+    sl = np.load(f"{REF}/slice_{Z:02d}.npz")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/net/beegfs/users/P101440/grasp_pro_py/results_ref_p14/slice_24.npz'
+STEP2 24 exit 1
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/aif_gate.py", line 15, in <module>
+    d = np.load(dsp.STEP2(Z)); mf = d["mf"]; tmf = d["tmf"]
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/net/beegfs/users/P101440/DCE_NIK/step2_p14_slice24.npz'
+AIF 24 exit 1

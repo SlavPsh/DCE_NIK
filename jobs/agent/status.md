@@ -1,19 +1,18 @@
 # helios agent
 
-updated 2026-09-24 19:38:01 on worker01.cluster, job 3372168, cycle 46
+updated 2026-09-24 19:58:27 on worker01.cluster, job 3372168, cycle 56
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3373535 | 070_p14_prep_array | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 070_p14_prep_array | 1 COMPLETED 00:00:09, 1 COMPLETED 00:00:11, 1 COMPLETED 00:21:01 |
 | 067_p14_prep | 1 CANCELLED+ 02:35:24 |
-| 070_p14_prep_array | 1 RUNNING None |
 | 021_cancel_067 | exit 0 |
 | 020_067_progress | exit 0 |
 | 066_p14_survey | 1 COMPLETED 00:00:57 |
