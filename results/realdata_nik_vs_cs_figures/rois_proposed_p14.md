@@ -2,4 +2,4 @@
 
 | slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |
 |---|---|---|---|---|---|---|
-| 21 | 2060 | 1739 | 26 | 669 | 99 / 0.70 | 86 / 0.57 |
+| 21 | 1991 | 1656 | 61 | 669 | 99 / 0.70 | 86 / 0.57 |
