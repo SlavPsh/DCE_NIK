@@ -1,0 +1,49 @@
+ 
+6 .
+24 ..
+9 gv2_DCE_Rerun
+5389161984 meas_MID3000007_FID100985_DCE_Rerun_1.dat
+773295616 meas_p1_VFA_18_1.dat
+4292514304 meas_p3_dce.dat
+773295616 meas_p3_vfa.dat
+5457026560 meas_topqmri_p14.dat
+-- meas_topqmri_p14.dat
+size 5457026560 measurements 2
+lRadialViews ['2172', '64']
+lPartitions ['36', '64']
+dSliceResolution ['0.5', '1.0']
+lImagesPerSlab ['60', '64']
+alTR[0] ['2060', '2900000', '5950']
+adFlipAngleDegree[0] ['15.0', '5.0', '90.0']
+alTE[0] ['1590', '46000', '710']
+lBaseResolution ['128', '256', '64']
+dReadoutFOV ['380.0', '500.0']
+dThickness ['100.0', '119.0', '120.0', '200.0', '5.0', '50.0']
+lTotalScanTimeSec ['-1', '309', '390']
+tSequenceFileName ['"%AdjustSeq%/AdjCoilSensSeq"', '"%CustomerSeq%\\wip_990_DWI_ep2d_diff"', '"%SiemensSeq%\\fl3d_vibe"']
+tProtocolName ['"AdjCoilSens"', '"DCE_t1_vibe-grasp_fs_TRA_adapt_6_test_timing"', '"RESEARCH_IVIM_XA60_dwepi_WEX_avg4_16_p2_OGC"']
+lRepetitions []
+lContrasts ['1']
+lAverages ['1']
+sKSpace.ucTrajectory ['1', '2']
+ucTrajectory ['1', '2']
+-- meas_p3_dce.dat
+size 4292514304 measurements 2
+lRadialViews ['2302', '292', '64']
+lPartitions ['32', '64']
+dSliceResolution ['0.5', '1.0']
+lImagesPerSlab ['54', '64']
+alTR[0] ['2060', '4660']
+adFlipAngleDegree[0] ['18.0', '25.0', '5.0']
+alTE[0] ['1680', '710']
+lBaseResolution ['192', '64']
+dReadoutFOV ['400.0', '500.0']
+dThickness ['100.0', '200.0', '216.0', '50.0', '500.0']
+lTotalScanTimeSec ['-1', '375', '49']
+tSequenceFileName ['"%AdjustSeq%/AdjCoilSensSeq"', '"%SiemensSeq%\\fl3d_vibe"']
+tProtocolName ['"AdjCoilSens"', '"DCE_FA18"', '"VFA_25_pre"']
+lRepetitions []
+lContrasts ['1']
+lAverages ['1']
+sKSpace.ucTrajectory ['1', '2']
+ucTrajectory ['1', '2']
