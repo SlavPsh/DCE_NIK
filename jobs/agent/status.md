@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-24 18:06:02 on worker01.cluster, job 3372168, cycle 1
+updated 2026-09-24 19:33:50 on worker01.cluster, job 3372168, cycle 44
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-09-24 18:06:02 on worker01.cluster, job 3372168, cycle 1
 
 | name | state |
 |---|---|
+| 020_067_progress | exit 0 |
 | 067_p14_prep | 1 RUNNING None |
 | 066_p14_survey | 1 COMPLETED 00:00:57 |
 | 019_p14_header | exit 0 |
@@ -31,4 +32,3 @@ updated 2026-09-24 18:06:02 on worker01.cluster, job 3372168, cycle 1
 | 061_claim_fig2 | 1 COMPLETED 00:00:04 |
 | 060_claim_figs | 1 COMPLETED 00:00:10 |
 | 057_pisco_rerun | 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06 |
-| 058_support_diag | 1 COMPLETED 00:27:44 |

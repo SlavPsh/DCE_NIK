@@ -1,0 +1,6 @@
+probe 020_067_progress
+host worker01.cluster
+start 2026-09-24 19:33:50
+end 2026-09-24 19:33:50
+exit 0
+log jobs/log/probe_020_067_progress.out

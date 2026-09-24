@@ -1,0 +1,31 @@
+log jobs/log/067_p14_prep_3373461.out
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.539192665717565e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 5.701699024029949e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 9.09869299903221e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.711268494858814e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.179159653474926e-06
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.1720817383320536e-06
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 8.951191716732865e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 7.131843631213997e-07
+  return f(*arrays, *other_args, **kwargs)
+/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/scipy/_lib/_util.py:1181: RuntimeWarning: logm result may be inaccurate, approximate err = 1.0088218687087647e-06
+  return f(*arrays, *other_args, **kwargs)
+0   , obj: 0.000182, L-S: 0
+1   , obj: 0.000160, L-S: 3
+2   , obj: 0.000152, L-S: 2
+3   , obj: 0.000139, L-S: 1
+4   , obj: 0.000136, L-S: 2
+5   , obj: 0.000135, L-S: 4
+0   , obj: 0.000132, L-S: 2
+  
+1 17:24 .
+166 17:00 ..
+17731094 17:24 shared.npz
+19:33:50
