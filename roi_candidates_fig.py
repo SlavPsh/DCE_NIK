@@ -13,7 +13,8 @@ def main():
     inner = ndi.binary_erosion(body, iterations=3); m = inner & (early > np.quantile(early[inner], a.q)); m = ndi.binary_opening(m, iterations=1); lab, n = ndi.label(m)
     blobs = sorted([(int((lab == i).sum()), i) for i in range(1, n + 1) if (lab == i).sum() >= a.min_px], reverse=True)[:a.max]
     # bright-at-baseline vessels (inflow): round blobs of the raw frame's top 2%, area 100 to 1500 px, appended as extra candidates
-    mb = inner & (f > np.quantile(f[inner], 0.98)); mb = ndi.binary_opening(mb, iterations=2); labB, nB = ndi.label(mb); nxt = lab.max() + 1
+    yy, xx = np.ogrid[-22:23, -22:23]; disk = (xx ** 2 + yy ** 2) <= 22 ** 2                                             # top-hat: round bright structures smaller than the disk (vessels), independent of the absolute level
+    th = ndi.white_tophat(ndi.gaussian_filter(f, 1.0) * inner, footprint=disk); mb = inner & (th > np.quantile(th[inner], 0.985)); mb = ndi.binary_opening(mb, iterations=2); labB, nB = ndi.label(mb); nxt = lab.max() + 1
     for i in range(1, nB + 1):
         m2 = ndi.binary_fill_holes(labB == i); area = int(m2.sum()); rr, cc = np.nonzero(m2)
         if not 100 <= area <= 1500: continue
