@@ -1,0 +1,28 @@
+       3373461       worker01 CANCELLED b+   02:35:24 
+ 3373461.batch       worker01    CANCELLED   02:35:27 
+3373461.extern       worker01    COMPLETED   02:35:24 
+     3373535_0       worker08    COMPLETED   00:00:09 
+3373535_0.bat+       worker08    COMPLETED   00:00:09 
+3373535_0.ext+       worker08    COMPLETED   00:00:10 
+     3373535_1       worker03    COMPLETED   00:00:11 
+3373535_1.bat+       worker03    COMPLETED   00:00:11 
+3373535_1.ext+       worker03    COMPLETED   00:00:11 
+     3373535_2       worker02    COMPLETED   00:21:01 
+3373535_2.bat+       worker02    COMPLETED   00:21:01 
+3373535_2.ext+       worker02    COMPLETED   00:21:01 
+drwxr-x---   7 P101440 P101440        24 Jun 16 16:39 dce_data
+total 1724505
+drwxr-x---  7 P101440 P101440         24 Jun 16 16:39 .
+drwxr-xr-x 15 P101440 P101440         22 Sep 16 17:31 ..
+drwxr-x---  2 P101440 P101440          1 Jun  8 16:04 .ipynb_checkpoints
+drwxr-x---  2 P101440 P101440          3 Jun  8 14:18 __pycache__
+drwxr-x---  2 P101440 P101440          0 Jun 16 16:40 anon
+-rw-r-----  1 P101440 P101440       2138 Jun  5 15:27 audit_hdr.py
+-rw-r-----  1 P101440 P101440       7718 Jun  8 14:26 cg_sense_reference.py
+-rw-r-----  1 P101440 P101440       2506 Jun  8 13:01 convention_sweep.py
+-rw-r-----  1 P101440 P101440      18196 Jun  5 16:42 dce_sos_dataset.py
+/net/beegfs/users/P101440/dce_data/orig
+beegfs_nodev    1.6P  1.3P  327T  80% /net/beegfs
+5457026560 /net/beegfs/users/P101440/dce_data/orig/meas_topqmri_p14.dat
+NODELIST STATE CPUS MEMORY
+worker[01-09] mixed 256 773519

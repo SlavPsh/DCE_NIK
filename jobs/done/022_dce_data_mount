@@ -1,0 +1,6 @@
+probe 022_dce_data_mount
+host worker01.cluster
+start 2026-09-24 22:33:38
+end 2026-09-24 22:33:38
+exit 0
+log jobs/log/probe_022_dce_data_mount.out
