@@ -21,8 +21,10 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
     cand = ndi.binary_opening(cand, iterations=2); lab, n = ndi.label(cand); sz = ndi.sum(np.ones_like(lab), lab, range(1, n + 1)) if n else []
     liver = (lab == (1 + int(np.argmax(sz)))) if n else cand; liver = ndi.binary_fill_holes(liver); liver = ndi.binary_erosion(liver, iterations=erode_liver)
     # spleen: fast ratio and high late enhancement, outside liver + aorta, largest compact blob
-    cand2 = core & ~ndi.binary_dilation(liver, iterations=8) & (Ls > 0.5 * ref) & (ratio > np.quantile(ratio[core], spleen_q))
-    cand2 = ndi.binary_opening(cand2, iterations=1); lab2, n2 = ndi.label(cand2); sz2 = ndi.sum(np.ones_like(lab2), lab2, range(1, n2 + 1)) if n2 else []
+    # spleen: enhances at least like the liver, faster ratio than the liver, outside liver + aorta; vessels removed by a 3-px opening; largest blob
+    rl = np.median(ratio[liver]) if liver.any() else np.quantile(ratio[core], 0.5)
+    cand2 = core & ~ndi.binary_dilation(liver, iterations=6) & (Ls > 0.45 * ref) & (ratio > rl)
+    cand2 = ndi.binary_opening(cand2, iterations=3); lab2, n2 = ndi.label(cand2); sz2 = ndi.sum(np.ones_like(lab2), lab2, range(1, n2 + 1)) if n2 else []
     spleen = (lab2 == (1 + int(np.argmax(sz2)))) if n2 else cand2; spleen = ndi.binary_fill_holes(spleen); spleen = ndi.binary_erosion(spleen, iterations=erode_spleen)
     static = ndi.binary_erosion(body, iterations=8) & (np.abs(Ls) < 0.15 * ref) & ~liver & ~spleen                                     # non-enhancing interior (muscle / fat)
     lab3, n3 = ndi.label(static); sz3 = ndi.sum(np.ones_like(lab3), lab3, range(1, n3 + 1)) if n3 else []; static = (lab3 == (1 + int(np.argmax(sz3)))) if n3 else static
