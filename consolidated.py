@@ -73,12 +73,12 @@ def slice_ctx(Z):
         if int(mask.sum()) == 0: continue
         rc = norm(tmf, np.array([im[mask].mean() for im in mf]))
         if np.isfinite(rc).all(): real[nm] = rc
-    rois = dict(cortex=cortex, medulla=medulla, aorta=ao, liver=liver); rois_old = dict(rois)
+    rois = dict(cortex=cortex, medulla=medulla, aorta=ao, liver=liver) if dsp.DS == "p3" else dict(aorta=ao, static=liver); rois_old = dict(rois)   # non-p3: tissue rois come from the approved file only
     _pp = dsp.ROIS(Z)                     # approved anatomical kidney rois (2026-09-15, roi_propose_invivo.py v2): both kidneys, cortex outer band / medulla interior
     if os.path.exists(_pp) and not os.environ.get("ROIS_OLD"):
-        _z = np.load(_pp, allow_pickle=True); rois.update(cortex=_z["cortex"].astype(bool), medulla=_z["medulla"].astype(bool), kidney=_z["kidney"].astype(bool))
+        _z = np.load(_pp, allow_pickle=True); rois.update({k: _z[k].astype(bool) for k in _z.files if _z[k].dtype == bool and _z[k].shape == BODY.shape})
         real = {}
-        for nm, mask in [("cortex", rois["cortex"]), ("medulla", rois["medulla"]), ("aorta", ao), ("liver", liver)]:
+        for nm, mask in [(dsp.T1, rois[dsp.T1]), (dsp.T2, rois[dsp.T2]), ("aorta", rois["aorta"]), (dsp.STATIC, rois[dsp.STATIC])]:
             rc = norm(tmf, np.array([im[mask].mean() for im in mf]))
             if int(mask.sum()) and np.isfinite(rc).all(): real[nm] = rc
     ctx = dict(ref_pre=ref_pre, ref_all=ref_all, t_pre=t_pre, BODY=BODY, AIR=AIR, NONENH=NONENH,

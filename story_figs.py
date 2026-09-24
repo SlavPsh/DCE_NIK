@@ -14,7 +14,7 @@ import dsp                                                                      
 GV = dsp.GV; GP = dsp.GP
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 COL = {"NIK-free": "#00838f", "NIK-sub16": "#1e8449", "NIK-sub16 (output-coil, other trainer)": "#1e8449", "NIK-patlak": "#0369a1", "NIK-tofts": "#c0392b", "NIK-tofts8": "#7b1fa2", "NIK-tofts8 (output-coil)": "#d81b60", "GRASP-Pro": "#8e44ad", "GRASP": "#e67e22"}
-ROIS = ("aorta", "cortex", "medulla")
+ROIS = dsp.ROI_NAMES
 
 def winavg(v, G):
     n = v.shape[-1] // G; return np.stack([v[:, :, g*G:(g+1)*G].mean(2) for g in range(n)], -1)
@@ -39,7 +39,7 @@ def panel(fig_path, title, M, rois, body, t_show, tref, ref_curves, ylab, note, 
     vmax = float(np.percentile(M[0][1][:, :, int(np.argmin(np.abs(M[0][2] - t_show)))][body], 99.5))
     for j, (nm, v, t) in enumerate(M):
         ax = fig.add_subplot(gt[0, j]); i = int(np.argmin(np.abs(np.asarray(t) - t_show))); ax.imshow(v[:, :, i], cmap="gray", vmin=0, vmax=vmax); ax.axis("off")
-        for roi, col in (("aorta", "cyan"), ("cortex", "lime"), ("medulla", "orange")):                                        # roi contours on every image
+        for roi, col in (("aorta", "cyan"), (dsp.T1, "lime"), (dsp.T2, "orange")):                                        # roi contours on every image
             if roi in rois and rois[roi].any(): ax.contour(rois[roi].astype(float), levels=[0.5], colors=[col], linewidths=0.6, alpha=0.8)
         ax.set_title(nm, fontsize=13, fontweight="bold", color=COL.get(nm, "k"))
         if metric_rows and nm in metric_rows:

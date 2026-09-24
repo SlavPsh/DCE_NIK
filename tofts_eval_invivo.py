@@ -13,7 +13,7 @@ dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 B = "/net/beegfs/users/P101440/DCE_NIK"; RES = f"{B}/results/tofts_vs_patlak"; IV = f"{RES}/invivo"; REFD = None
 import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 REFD = dsp.REF; GV = dsp.GV; GP = dsp.GP
-TA = dsp.TA; NTV = 1710; ROIS = ("aorta", "cortex", "medulla", "liver"); EDGES = np.linspace(0, 1, 17)
+TA = dsp.TA; NTV = 1710; ROIS = dsp.ROI_NAMES + (dsp.STATIC,); EDGES = np.linspace(0, 1, 17)
 KEEP = np.load(f"{B}/spoke_masks/keep_f25.npy"); VAL = np.load(f"{B}/spoke_masks/val_f25c_m8.npy"); TEST = np.load(f"{B}/spoke_masks/test_f25c_m9.npy")
 sh = A.load_shared(REFD)
 import argparse
@@ -65,8 +65,8 @@ def curves(v, t, ctx):
         if roi == "aorta":
             out["aorta_peak_ratio_vs_mf"] = float(cb.max()/mb.max()); out.update(fwhm(tmf, c)); mfw = fwhm(tmf, m); out["mf_aorta_fwhm_s"] = mfw["aorta_fwhm_s"]
     # cortex vs medulla separation preserved? (late-phase correlation, physiology says distinct)
-    if "cortex" in rois and "medulla" in rois:
-        tt = t; cc = np.array([v[..., i][rois["cortex"]].mean() for i in range(v.shape[-1])]); mm = np.array([v[..., i][rois["medulla"]].mean() for i in range(v.shape[-1])])
+    if dsp.T1 in rois and dsp.T2 in rois:
+        tt = t; cc = np.array([v[..., i][rois[dsp.T1]].mean() for i in range(v.shape[-1])]); mm = np.array([v[..., i][rois[dsp.T2]].mean() for i in range(v.shape[-1])])
         lt = tt > 120; out["cortex_medulla_late_corr"] = float(np.corrcoef(bs(cc)[lt], bs(mm)[lt])[0, 1])
     return out
 
@@ -122,7 +122,7 @@ for Z in SLICES:
         if not os.path.exists(p): continue
         v = np.abs(np.load(p)).astype(np.float32); r = dict(slice=Z, arm=lab, seed=-1, status="complete", frames=int(v.shape[-1])); r.update(curves(v, ft(v.shape[-1]), ctx)); rows.append(r)
 json.dump(rows, open(f"{RES}/invivo{SUF}.json", "w"), indent=1)
-keys = ["cortex_peak_ratio", "cortex_washout_ratio", "medulla_peak_ratio", "medulla_washout_ratio", "aorta_peak_ratio", "aorta_washout_ratio", "mf_aorta_affine", "mf_cortex_affine", "mf_medulla_affine", "mf_liver_affine", "mf_aorta_scale", "mf_cortex_scale", "mf_medulla_scale", "aorta_peak_ratio_vs_mf",
+keys = [f"{dsp.T1}_peak_ratio", f"{dsp.T1}_washout_ratio", f"{dsp.T2}_peak_ratio", f"{dsp.T2}_washout_ratio", "aorta_peak_ratio", "aorta_washout_ratio", "mf_aorta_affine", f"mf_{dsp.T1}_affine", f"mf_{dsp.T2}_affine", f"mf_{dsp.STATIC}_affine", "mf_aorta_scale", f"mf_{dsp.T1}_scale", f"mf_{dsp.T2}_scale", "aorta_peak_ratio_vs_mf",
         "aorta_fwhm_s", "aorta_ttp_s", "aorta_neg_frac", "aorta_rise_mono", "cortex_medulla_late_corr", "train_kNMSE", "val_kNMSE", "test_kNMSE", "wall_s", "peak_gpu_mb", "params"]
 lines = [f"# in vivo (meas_p3_dce, slices {'/'.join(map(str, SLICES))}, {SPK})", "",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]

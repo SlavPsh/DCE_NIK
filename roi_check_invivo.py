@@ -9,7 +9,7 @@ B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
 import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 GV = dsp.GV; GP = dsp.GP
 import consolidated as C
-COL = dict(aorta="cyan", cortex="lime", medulla="orange", liver="magenta")
+COL = {"aorta": "cyan", dsp.T1: "lime", dsp.T2: "orange", dsp.STATIC: "magenta"}
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--t-show", type=float, default=90.0); a = ap.parse_args(); TA = dsp.TA
@@ -30,14 +30,14 @@ def main():
             else: im = v[..., int(np.argmin(np.abs(t - a.t_show)))]
             ims.append((nm, im))
         cen = lambda m: tuple(int(x) for x in np.argwhere(m).mean(0)) if m.any() else None
-        L.append(f"| {Z} | " + " | ".join(str(int(rois[r].sum())) if r in rois else "-" for r in COL) + f" | {cen(rois['cortex'])} / {cen(rois['medulla'])} | {cen(rois['aorta'])} |")
+        L.append(f"| {Z} | " + " | ".join(str(int(rois[r].sum())) if r in rois else "-" for r in COL) + f" | {cen(rois[dsp.T1])} / {cen(rois[dsp.T2])} | {cen(rois['aorta'])} |")
         n = len(ims); fig, ax = plt.subplots(2, (n + 1) // 2, figsize=(3.6 * ((n + 1) // 2), 7.4)); ax = ax.ravel()
         for k, (nm, im) in enumerate(ims):
             ax[k].imshow(im, cmap="gray", vmin=0, vmax=np.percentile(im[ctx["BODY"]], 99.5)); ax[k].set_title(nm, fontsize=11); ax[k].axis("off")
             for r, c in COL.items():
                 if r in rois and rois[r].any(): ax[k].contour(rois[r].astype(float), levels=[0.5], colors=[c], linewidths=1.0)
         for k in range(n, len(ax)): ax[k].axis("off")
-        ax[0].plot([], [], color="cyan", label="aorta"); ax[0].plot([], [], color="lime", label="cortex"); ax[0].plot([], [], color="orange", label="medulla"); ax[0].plot([], [], color="magenta", label="liver (static)"); ax[0].legend(fontsize=7, loc="lower left")
+        ax[0].plot([], [], color="cyan", label="aorta"); ax[0].plot([], [], color="lime", label=dsp.T1); ax[0].plot([], [], color="orange", label=dsp.T2); ax[0].plot([], [], color="magenta", label="liver (static)"); ax[0].legend(fontsize=7, loc="lower left")
         fig.suptitle(f"slice {Z}, k80: the shared roi masks on every method at t = {a.t_show:.0f} s", fontsize=12); fig.tight_layout()
         out = f"{B}/results/realdata_nik_vs_cs_figures/figures/roi_check_k80{dsp.SFX}_sl{Z}.png"; fig.savefig(out, dpi=130, facecolor="white"); plt.close(fig); print("saved", out, flush=True)
     open(f"{B}/results/realdata_nik_vs_cs_figures/roi_check_k80{dsp.SFX}.md", "w").write("\n".join(L)); print("\n".join(L)); print("ROI_CHECK_DONE")

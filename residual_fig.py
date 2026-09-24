@@ -30,7 +30,7 @@ def main():
         zz = np.load(p, allow_pickle=True); v = np.abs(zz[key] if key else zz).astype(np.float32); t = ft(v.shape[-1]); v = ls_scale(v, refwin(v.shape[-1]), body); im = frame(v, t, a.t)
         rr = r * (np.sum(im[body] * r[body]) / (np.sum(r[body] ** 2) + 1e-12)); d = im - rr
         items.append((nm, im, d, float(np.sqrt((d[body] ** 2).mean()) / np.sqrt((rr[body] ** 2).mean())), float(np.sqrt(((d - ndi.gaussian_filter(d, 3.0))[body] ** 2).mean()) / np.sqrt((rr[body] ** 2).mean()))))
-    n = len(items); cc = np.argwhere(rois["cortex"]).mean(0).astype(int); h = 44; sl = (slice(max(cc[0] - h, 0), cc[0] + h), slice(max(cc[1] - 2 * h, 0), cc[1] + 2 * h))
+    n = len(items); cc = np.argwhere(rois[dsp.T1]).mean(0).astype(int); h = 44; sl = (slice(max(cc[0] - h, 0), cc[0] + h), slice(max(cc[1] - 2 * h, 0), cc[1] + 2 * h))
     vm = np.percentile(r[body], 99.5); dv = 0.25 * vm
     fig, ax = plt.subplots(3, n, figsize=(3.3 * n, 9.4), gridspec_kw=dict(height_ratios=[1.6, 0.8, 0.8]))
     for j, (nm, im, d, e, ef) in enumerate(items):

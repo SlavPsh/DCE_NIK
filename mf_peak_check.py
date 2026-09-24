@@ -17,7 +17,7 @@ def main():
     nx = int(sh["nx"]); bas = int(sh["bas"]); sl = np.load(f"{REF}/slice_{Z:02d}.npz"); kdata = np.asarray(sl["kdata_radial"]).astype(np.complex64)
     b1 = np.asarray(sl["b1"]).astype(np.complex64); ncc = kdata.shape[2]; den = np.sum(np.abs(b1) ** 2, 2) + 1e-12
     SIGN = json.load(open(f"{dsp.NUF(Z)}/meta.json"))["sign"]; order = np.argsort(vt)
-    ctx = C.slice_ctx(Z); rois = ctx["rois"]; names = [r for r in ("aorta", "cortex", "medulla") if r in rois]
+    ctx = C.slice_ctx(Z); rois = ctx["rois"]; names = [r for r in dsp.ROI_NAMES if r in rois]
     def win_img(idx):
         tr = traj[:, idx]; w = np.maximum(np.abs(tr), 1 / nx / 4)
         x = (SIGN * 2 * np.pi * tr.real).ravel().astype(np.float64); y = (SIGN * 2 * np.pi * tr.imag).ravel().astype(np.float64)

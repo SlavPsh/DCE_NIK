@@ -28,3 +28,7 @@ def BASIS(Z, r=None, rms1=True): return f"{D}/results/tofts_vs_patlak/basis{SFX}
 def GV_K80(Z): return f"{GV}/gv2_slice{Z}_n12_k80.npy"
 def GP_K80(Z): return f"{GP}/cs_slice{Z}_f80match.npy"
 FIGD = f"{D}/results/realdata_nik_vs_cs_figures"; RES = f"{D}/results/tofts_vs_patlak"
+# tissue rois per dataset: p3 = kidney (cortex / medulla, approved 2026-09-15); p14 = liver / spleen (user choice 2026-09-24). the static roi used for
+# temporal-noise readouts is the posterior 'liver' mask on p3 (historical name) and 'static' elsewhere.
+T1, T2 = ("cortex", "medulla") if DS == "p3" else ("liver", "spleen")
+ROI_NAMES = ("aorta", T1, T2); STATIC = "liver" if DS == "p3" else "static"

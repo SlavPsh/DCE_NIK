@@ -8,7 +8,7 @@ B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
 import dsp                                                                                   # dataset paths (DCE_DS=p3 default / p8)
 import consolidated as C
 from story_figs import ls_scale
-TA = dsp.TA; ROIS = ("aorta", "cortex", "medulla")
+TA = dsp.TA; ROIS = dsp.ROI_NAMES
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--items", required=True); ap.add_argument("--out", required=True); ap.add_argument("--t", type=float, default=90.0); ap.add_argument("--title", default=""); a = ap.parse_args(); Z = a.slice
@@ -34,13 +34,13 @@ def main():
         cur = {r: enh(np.array([v[..., i][rois[r]].mean() for i in range(v.shape[-1])]), t) for r in ROIS}
         nr = {r: float(np.linalg.norm(np.interp(tmf, t, cur[r]) - mfc[r]) / (np.linalg.norm(mfc[r]) + 1e-12)) for r in ROIS}
         items.append(dict(nm=nm, im=im, t=t, cur=cur, nr=nr, hp=s["haarpsi"], ae=ae))
-    n = len(items); cc = np.argwhere(rois["cortex"]).mean(0).astype(int); h = 44; sl = (slice(max(cc[0] - h, 0), cc[0] + h), slice(max(cc[1] - 2 * h, 0), cc[1] + 2 * h))
+    n = len(items); cc = np.argwhere(rois[dsp.T1]).mean(0).astype(int); h = 44; sl = (slice(max(cc[0] - h, 0), cc[0] + h), slice(max(cc[1] - 2 * h, 0), cc[1] + 2 * h))
     fig = plt.figure(figsize=(3.4 * n, 11.5)); gs = fig.add_gridspec(3, n, height_ratios=[1.5, 0.75, 1.3], hspace=0.35, wspace=0.08)
     for j, it in enumerate(items):
         ax = fig.add_subplot(gs[0, j]); ax.imshow(it["im"], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off"); ax.set_title(it["nm"], fontsize=10, fontweight="bold")
         ax.text(0.5, -0.03, f"HaarPSI {it['hp']:.3f}   air {it['ae']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=9)
         ax = fig.add_subplot(gs[1, j]); ax.imshow(it["im"][sl], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off")
-        for r, col in (("cortex", "lime"), ("medulla", "orange")): ax.contour(rois[r][sl].astype(float), levels=[0.5], colors=[col], linewidths=0.5, alpha=0.7)
+        for r, col in ((dsp.T1, "lime"), (dsp.T2, "orange")): ax.contour(rois[r][sl].astype(float), levels=[0.5], colors=[col], linewidths=0.5, alpha=0.7)
     cols = plt.cm.tab10(np.linspace(0, 1, 10))
     for k, r in enumerate(ROIS):
         ax = fig.add_subplot(gs[2, k * n // 3:(k + 1) * n // 3] if n >= 3 else gs[2, :]); ax.plot(tmf, mfc[r], "k", lw=2.2, label="model-free")

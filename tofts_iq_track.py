@@ -29,24 +29,24 @@ def main():
         return o
     RW = {}
     def frame(v, t, ts, w=10): m = (t > ts - w) & (t < ts + w); return v[..., m].mean(2) if m.any() else v[..., int(np.argmin(np.abs(t - ts)))]
-    static = rois.get("liver", body)
+    static = rois.get(dsp.STATIC, body)
     def enh(c, t): return c - np.median(c[t < 40])
     def amp(c, t): e = enh(c, t); return float(e[(t > 20) & (t < 210)].max()), float(e[t > 200].mean())
-    mfc = {r: np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])]) for r in ("cortex", "medulla")}; ref_amp = {r: amp(mfc[r], tmf) for r in mfc}
+    mfc = {r: np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])]) for r in (dsp.T1, dsp.T2)}; ref_amp = {r: amp(mfc[r], tmf) for r in mfc}
     def iq(v, t, label):
         nt = v.shape[-1]
         if nt not in RW: RW[nt] = refwin(nt)
         v = ls_scale(v, RW[nt], body); out = dict(label=label)
         for ts in (90.0, 300.0):
             p = frame(v, t, ts); r = frame(cs, tcs, ts); s = C.score(p, r, body); out.update({f"haarpsi_{int(ts)}": s["haarpsi"], f"ssim_{int(ts)}": s["ssim"], f"psnr_{int(ts)}": s["psnr"], f"airE_{int(ts)}": C.bgE(p, r, body, air)})
-        flat = ndi.binary_erosion(static, iterations=3) if static.sum() > 200 else static; kb = ndi.binary_dilation(rois["kidney"], iterations=2) & ~ndi.binary_erosion(rois["kidney"], iterations=2) if "kidney" in rois else None
+        flat = ndi.binary_erosion(static, iterations=3) if static.sum() > 200 else static; kb = ndi.binary_dilation(rois[_e], iterations=2) & ~ndi.binary_erosion(rois[_e], iterations=2) if (_e := ("kidney" if "kidney" in rois else dsp.T1)) in rois else None
         for ts in (90.0, 300.0):
             p = frame(v, t, ts); r = frame(cs, tcs, ts); r = r * (np.sum(p[body] * r[body]) / (np.sum(r[body] ** 2) + 1e-12))
             out[f"flatnoise_{int(ts)}"] = float(p[flat].std() / (p[flat].mean() + 1e-12))                                                   # spatial noise in flat tissue
             hp_p = p - ndi.gaussian_filter(p, 3.0); hp_r = r - ndi.gaussian_filter(r, 3.0); out[f"highpass_{int(ts)}"] = float(np.sqrt((hp_p[body] ** 2).mean()) / (np.sqrt((hp_r[body] ** 2).mean()) + 1e-12))   # fine-scale energy vs reference
             if kb is not None: gy, gx = np.gradient(p); out[f"edge_{int(ts)}"] = float(np.sqrt(gy ** 2 + gx ** 2)[kb].mean() / (p[rois["cortex"]].mean() + 1e-12))   # kidney edge sharpness
         cst = np.array([v[..., i][static].mean() for i in range(nt)]); hp = cst - np.convolve(cst, np.ones(9) / 9, mode="same"); out["static_noise"] = float(np.std(hp[5:-5]) / (np.abs(cst).mean() + 1e-12))
-        for r in ("cortex", "medulla"):
+        for r in (dsp.T1, dsp.T2):
             c = np.array([v[..., i][rois[r]].mean() for i in range(nt)]); pk, wo = amp(c, t); out[f"{r}_peak"] = pk / (ref_amp[r][0] + 1e-12); out[f"{r}_washout"] = wo / (ref_amp[r][1] + 1e-12)
             ci = np.interp(tmf, t, c); out[f"{r}_nrmse"] = float(np.linalg.norm(enh(ci, tmf) - enh(mfc[r], tmf)) / (np.linalg.norm(enh(mfc[r], tmf)) + 1e-12))
         return out
@@ -69,7 +69,7 @@ def main():
             step = int(re.search(r"step(\d+)", p).group(1)); v = np.load(p).astype(np.float32); rows["steps"][var][step] = iq(v, ft(v.shape[-1]), f"{var} {step}")
         if rows["steps"][var]: print(var, "steps", sorted(rows["steps"][var]), flush=True)
     R = f"{B}/results/tofts_vs_patlak"; TG = os.environ.get("IQ_TAG", ""); json.dump(rows, open(f"{R}/iq_track_sl{Z}{TG}.json", "w"), indent=1)
-    K = ["haarpsi_90", "ssim_90", "airE_90", "flatnoise_90", "highpass_90", "edge_90", "haarpsi_300", "airE_300", "flatnoise_300", "highpass_300", "edge_300", "cortex_peak", "cortex_washout", "cortex_nrmse", "medulla_nrmse"]
+    K = ["haarpsi_90", "ssim_90", "airE_90", "flatnoise_90", "highpass_90", "edge_90", "haarpsi_300", "airE_300", "flatnoise_300", "highpass_300", "edge_300", f"{dsp.T1}_peak", f"{dsp.T1}_washout", f"{dsp.T1}_nrmse", f"{dsp.T2}_nrmse"]
     L = [f"# image quality vs curve fidelity, slice {Z}, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)", "",
          "| recon | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
     for r in rows["final"]: L.append(f"| {r['label']} | " + " | ".join(f"{r[k]:.3f}" for k in K) + " |")
@@ -90,7 +90,7 @@ def main():
     ax[3].set_xlabel("cortex curve NRMSE vs model-free (lower = better dynamics)"); ax[3].set_ylabel("HaarPSI at 90 s (higher = sharper)"); ax[3].set_title("trade-off: snapshots coloured by step, stars = final recons", fontsize=10); ax[3].legend(fontsize=6, loc="lower left")
     fig.suptitle(f"slice {Z}: image quality vs curve fidelity along training and across methods", fontsize=11); fig.tight_layout(); fig.savefig(f"{R}/figures/iq_track_sl{Z}{TG}.png", dpi=130, facecolor="white")
     names = [n for n in ("cs100 (GRASP-Pro all spokes)", "GRASP", "GRASP-Pro", "NIK-tofts8 old (3k, restore)", "NIK-tofts8 new (10k, rms1)", "NIK-free", "NIK-sub16") if n in ims]
-    c = np.argwhere(rois["cortex"]).mean(0).astype(int); h = 46
+    c = np.argwhere(rois[dsp.T1]).mean(0).astype(int); h = 46
     fig, ax = plt.subplots(2, len(names), figsize=(3.1 * len(names), 6.4))
     for j, n in enumerate(names):
         for i in range(2):

@@ -14,7 +14,7 @@ from story_figs import ls_scale
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--runs", required=True); a = ap.parse_args(); Z = a.slice
     ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; z = np.load(f"{B}/step2_slice{Z}.npz"); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); TA = dsp.TA
-    names = [r for r in ("aorta", "cortex", "medulla", "liver") if r in rois]
+    names = [r for r in dsp.ROI_NAMES + (dsp.STATIC,) if r in rois]
     def ft(nt): e = np.linspace(0, TA, nt + 1); return 0.5 * (e[:-1] + e[1:])
     def refwin(nt):
         e = np.linspace(0, TA, nt + 1); o = np.zeros(mf.shape[:2] + (nt,), np.float32)
