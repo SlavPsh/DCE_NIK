@@ -1,5 +1,6 @@
 queue 073_roi_p14_sl21_v3
 jid 3374322
 submitted 2026-09-24 22:37:50
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:04
 log jobs/log/073_roi_p14_sl21_v3_3374322.out
+ended 2026-09-24 22:39:55

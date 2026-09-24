@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/roi_propose_liver.py", line 66, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/roi_propose_liver.py", line 49, in main
+    rois, aux = build(mf, tmf, body, ao, a.erode_liver, a.erode_spleen)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/roi_propose_liver.py", line 25, in build
+    m = ndi.binary_fill_holes(m); rr, cc = np.nonzero(m); rad = np.sqrt(area / np.pi); round_ = area / (np.pi * max(rr.ptp(), cc.ptp(), 1) ** 2 / 4)
+                                                                                                                    ^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'ptp'
+ROI exit 1
