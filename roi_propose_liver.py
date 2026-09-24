@@ -15,7 +15,18 @@ OUTD = f"{B}/results/realdata_nik_vs_cs_figures"
 def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver_hi=0.97, spleen_q=0.90):
     base = mf[..., tmf < 45].mean(2); late = mf[..., (tmf > 130) & (tmf < 200)].mean(2) - base; first = mf[..., (tmf > 60) & (tmf < 95)].mean(2) - base
     Ls = ndi.gaussian_filter(late * body, 1.5); Fs = ndi.gaussian_filter(first * body, 1.5); ratio = np.where(body, Fs / (np.abs(Ls) + 1e-9), 0.0)
-    ref = np.quantile(Ls[body], 0.995); core = ndi.binary_erosion(body, iterations=6) & ~ndi.binary_dilation(ao, iterations=6)
+    ref = np.quantile(Ls[body], 0.995)
+    # aorta, redone for this resolution: early-enhancing blobs (first-pass top 1% of the body interior) with a plausible cross-section
+    # (60 to 900 px at 1.5 mm / px) and roundness; among them the fastest ratio. the consolidated pick (0.5% top, largest blob) is kept as fallback.
+    inner = ndi.binary_erosion(body, iterations=4); ea = inner & (Fs > np.quantile(Fs[inner], 0.99)); ea = ndi.binary_opening(ea, iterations=1); labA, nA = ndi.label(ea); best = None
+    for i in range(1, nA + 1):
+        m = labA == i; area = int(m.sum())
+        if not 60 <= area <= 900: continue
+        m = ndi.binary_fill_holes(m); rr, cc = np.nonzero(m); rad = np.sqrt(area / np.pi); round_ = area / (np.pi * max(rr.ptp(), cc.ptp(), 1) ** 2 / 4)
+        score = float(ratio[m].mean()) * min(round_, 1.0)
+        if best is None or score > best[0]: best = (score, m)
+    if best is not None: ao = best[1]
+    core = ndi.binary_erosion(body, iterations=6) & ~ndi.binary_dilation(ao, iterations=6)
     # liver: moderate late enhancement, slow ratio (portal-dominated), largest blob
     cand = core & (Ls > liver_lo * ref) & (Ls < liver_hi * ref) & (ratio < np.quantile(ratio[core], 0.6))
     cand = ndi.binary_opening(cand, iterations=2); lab, n = ndi.label(cand); sz = ndi.sum(np.ones_like(lab), lab, range(1, n + 1)) if n else []
