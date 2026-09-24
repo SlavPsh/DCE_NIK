@@ -20,6 +20,11 @@ l, k = ndi.label(kid); kid = (l == (1 + np.argmax(ndi.sum(np.ones_like(l), l, ra
 early = enh[..., (tC > 40) & (tC < 80)].mean(-1); ao = body & (early > np.quantile(early[body], 0.995)) & (~kid); ao = ndi.binary_opening(ao, iterations=1)
 la, ka = ndi.label(ao); ao = (la == (1 + np.argmax(ndi.sum(np.ones_like(la), la, range(1, ka + 1))))) if ka else ao
 
+# approved aorta roi (dsp.ROIS, set by roi_set_aorta.py) overrides the automatic pick when present
+import os as _os
+if _os.path.exists(dsp.ROIS(Z)):
+    _r = np.load(dsp.ROIS(Z), allow_pickle=True)
+    if "aorta_blob" in _r.files: ao = _r["aorta"].astype(bool); print(f"aorta roi from the approved file (blob {int(_r['aorta_blob'])}, {int(ao.sum())} px)", flush=True)
 # raw (unnormalized) aorta AIF, model-free
 aif = np.array([im[ao].mean() for im in mf]); b0 = aif[tmf < 45].mean(); aif = aif - b0
 sm = savgol_filter(aif, 11, 3); pk = sm.max(); sm_n = sm / (pk + 1e-9); raw_n = aif / (pk + 1e-9)
