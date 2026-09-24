@@ -1,5 +1,6 @@
 queue 078_aorta_candidates_v3
 jid 3375233
 submitted 2026-09-24 22:58:41
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:09
 log jobs/log/078_aorta_candidates_v3_3375233.out
+ended 2026-09-24 23:00:45
