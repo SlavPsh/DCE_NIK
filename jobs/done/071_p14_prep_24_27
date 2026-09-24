@@ -1,5 +1,6 @@
 queue 071_p14_prep_24_27
 jid 3374298
 submitted 2026-09-24 22:33:38
-state 1 RUNNING None
+state 1 COMPLETED 00:33:45, 1 COMPLETED 00:49:26
 log jobs/log/071_p14_prep_24_27_3374298.out
+ended 2026-09-24 23:23:26
