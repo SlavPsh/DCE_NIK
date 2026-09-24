@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-09-24 23:07:02 on worker01.cluster, job 3372168, cycle 148
+updated 2026-09-24 23:09:06 on worker01.cluster, job 3372168, cycle 149
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3374298 | 071_p14_prep_24_27 | 2 RUNNING None |
-| 3375757 | 080_roi_p14_sl21_seed | 1 PENDING Priority |
+| 3374298 | 071_p14_prep_24_27 | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 080_roi_p14_sl21_seed | 1 PENDING Priority |
+| 071_p14_prep_24_27 | 1 RUNNING None |
+| 080_roi_p14_sl21_seed | 1 COMPLETED 00:00:06 |
 | 079_aorta_grid | 1 COMPLETED 00:00:08 |
 | 078_aorta_candidates_v3 | 1 COMPLETED 00:00:09 |
 | 077_aorta_candidates_v2 | 1 COMPLETED 00:00:06 |
@@ -21,7 +21,6 @@ updated 2026-09-24 23:07:02 on worker01.cluster, job 3372168, cycle 148
 | 075_roi_p14_sl21_v4 | 1 COMPLETED 00:00:05 |
 | 074_roi_p14_sl21_v3b | 1 COMPLETED 00:00:05 |
 | 073_roi_p14_sl21_v3 | 1 COMPLETED 00:00:04 |
-| 071_p14_prep_24_27 | 2 RUNNING None |
 | 072_roi_p14_sl21 | 1 COMPLETED 00:00:38 |
 | 022_dce_data_mount | exit 0 |
 | 070_p14_prep_array | 1 COMPLETED 00:00:09, 1 COMPLETED 00:00:11, 1 COMPLETED 00:21:01 |
