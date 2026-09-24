@@ -12,6 +12,14 @@ def main():
     base = mf[..., tmf < 45].mean(2); f = mf[..., (tmf > a.t - 8) & (tmf < a.t + 8)].mean(2); early = (f - base) * body
     inner = ndi.binary_erosion(body, iterations=3); m = inner & (early > np.quantile(early[inner], a.q)); m = ndi.binary_opening(m, iterations=1); lab, n = ndi.label(m)
     blobs = sorted([(int((lab == i).sum()), i) for i in range(1, n + 1) if (lab == i).sum() >= a.min_px], reverse=True)[:a.max]
+    # bright-at-baseline vessels (inflow): round blobs of the raw frame's top 2%, area 100 to 1500 px, appended as extra candidates
+    mb = inner & (f > np.quantile(f[inner], 0.98)); mb = ndi.binary_opening(mb, iterations=2); labB, nB = ndi.label(mb); nxt = lab.max() + 1
+    for i in range(1, nB + 1):
+        m2 = ndi.binary_fill_holes(labB == i); area = int(m2.sum()); rr, cc = np.nonzero(m2)
+        if not 100 <= area <= 1500: continue
+        if (lab[m2] > 0).mean() > 0.5: continue                                                       # already an early-enhancing blob
+        lab[m2 & (lab == 0)] = nxt; blobs.append((area, nxt)); nxt += 1
+    blobs = blobs[:a.max + 4]
     fig, ax = plt.subplots(1, 3, figsize=(19, 6.2)); vm = np.percentile(f[body], 99.5)
     ax[0].imshow(f, cmap="gray", vmin=0, vmax=vm); ax[0].set_title(f"model-free at {a.t:.0f} s, early-enhancing blobs (top {100 * (1 - a.q):.0f}%) numbered", fontsize=10); ax[0].axis("off")
     ax[1].imshow(early, cmap="gray", vmin=0, vmax=np.percentile(early[body], 99.5)); ax[1].set_title("enhancement at that time (frame minus baseline)", fontsize=10); ax[1].axis("off")
