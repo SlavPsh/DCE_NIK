@@ -26,7 +26,16 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
         score = float(ratio[m].mean()) * min(round_, 1.0)
         if best is None or score > best[0]: best = (score, m)
     if best is not None: ao = best[1]
-    core = ndi.binary_erosion(body, iterations=6) & ~ndi.binary_dilation(ao, iterations=6)
+    # alternative aorta candidate for the user's decision: the roundest bright blob of the 60 s frame (top 3% intensity), area 150 to 1500 px, central third of the fov
+    f60 = mf[..., (tmf > 52) & (tmf < 68)].mean(2) * inner; eb = inner & (f60 > np.quantile(f60[inner], 0.97)); eb = ndi.binary_opening(eb, iterations=2); labB, nB = ndi.label(eb); alt = None
+    H, W = body.shape
+    for i in range(1, nB + 1):
+        m = ndi.binary_fill_holes(labB == i); area = int(m.sum()); rr, cc = np.nonzero(m)
+        if not 150 <= area <= 1500 or not (W / 4 < cc.mean() < 3 * W / 4): continue
+        round_ = area / (np.pi * max(np.ptp(rr), np.ptp(cc), 1) ** 2 / 4)
+        if alt is None or round_ > alt[0]: alt = (round_, m)
+    aorta_alt = alt[1] if alt is not None else np.zeros_like(body)
+    core = ndi.binary_erosion(body, iterations=6) & ~ndi.binary_dilation(ao, iterations=6) & ~ndi.binary_dilation(aorta_alt, iterations=6)
     # liver: moderate late enhancement, slow ratio (portal-dominated), largest blob
     cand = core & (Ls > liver_lo * ref) & (Ls < liver_hi * ref) & (ratio < np.quantile(ratio[core], 0.6))
     cand = ndi.binary_opening(cand, iterations=2); lab, n = ndi.label(cand); sz = ndi.sum(np.ones_like(lab), lab, range(1, n + 1)) if n else []
@@ -39,7 +48,7 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
     spleen = (lab2 == (1 + int(np.argmax(sz2)))) if n2 else cand2; spleen = ndi.binary_fill_holes(spleen); spleen = ndi.binary_erosion(spleen, iterations=erode_spleen)
     static = ndi.binary_erosion(body, iterations=8) & (np.abs(Ls) < 0.15 * ref) & ~liver & ~spleen                                     # non-enhancing interior (muscle / fat)
     lab3, n3 = ndi.label(static); sz3 = ndi.sum(np.ones_like(lab3), lab3, range(1, n3 + 1)) if n3 else []; static = (lab3 == (1 + int(np.argmax(sz3)))) if n3 else static
-    return dict(liver=liver, spleen=spleen, aorta=ao, static=static), dict(late=late, first=first, ratio=ratio)
+    return dict(liver=liver, spleen=spleen, aorta=ao, aorta_alt=aorta_alt, static=static), dict(late=late, first=first, ratio=ratio)
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode-liver", type=int, default=4); ap.add_argument("--erode-spleen", type=int, default=2); a = ap.parse_args()
@@ -55,11 +64,11 @@ def main():
         fig, ax = plt.subplots(1, 5, figsize=(22, 4.8))
         for k, (ttl, im) in enumerate((("late enhancement 130 to 200 s", aux["late"]), ("first-pass / late ratio", aux["ratio"]), ("model-free at 60 s", frame(60)), ("model-free at 120 s", frame(120)))):
             ax[k].imshow(im, cmap="gray", vmin=0, vmax=np.percentile(im[body], 99.5) if im[body].max() > 0 else 1); ax[k].set_title(ttl, fontsize=9); ax[k].axis("off")
-            for r, c in (("liver", "lime"), ("spleen", "orange"), ("aorta", "cyan"), ("static", "magenta")):
+            for r, c in (("liver", "lime"), ("spleen", "orange"), ("aorta", "cyan"), ("aorta_alt", "red"), ("static", "magenta")):
                 if rois[r].any(): ax[k].contour(rois[r].astype(float), levels=[0.5], colors=[c], linewidths=0.9)
-        for r, c in (("aorta", "cyan"), ("liver", "lime"), ("spleen", "orange"), ("static", "magenta")): ax[4].plot(tmf, cur[r] / (cur["aorta"].max() + 1e-9), color=c, lw=1.4, label=f"{r} ({int(rois[r].sum())} px)")
+        for r, c in (("aorta", "cyan"), ("aorta_alt", "red"), ("liver", "lime"), ("spleen", "orange"), ("static", "magenta")): ax[4].plot(tmf, cur[r] / (cur["aorta"].max() + 1e-9), color=c, lw=1.4, label=f"{r} ({int(rois[r].sum())} px)")
         ax[4].set_title("model-free mean curves, proposed rois (norm to aorta peak)", fontsize=9); ax[4].set_xlabel("t [s]"); ax[4].legend(fontsize=7); ax[4].axhline(0, color="0.7", lw=0.6)
-        fig.suptitle(f"{dsp.DS} slice {Z}: proposed liver (lime) / spleen (orange) / aorta (cyan) / static (magenta) rois", fontsize=11); fig.tight_layout()
+        fig.suptitle(f"{dsp.DS} slice {Z}: proposed liver (lime) / spleen (orange) / aorta candidate A (cyan, fastest small blob) / candidate B (red, round central vessel) / static (magenta)", fontsize=11); fig.tight_layout()
         fig.savefig(f"{OUTD}/figures/roi_proposed{dsp.SFX}_sl{Z}.png", dpi=130, facecolor="white"); plt.close(fig); print("saved", Z, rep[Z], flush=True)
     json.dump(rep, open(f"{OUTD}/rois_proposed{dsp.SFX}.json", "w"), indent=1); open(f"{OUTD}/rois_proposed{dsp.SFX}.md", "w").write("\n".join(L)); print("\n".join(L)); print("ROI_PROPOSE_DONE")
 
