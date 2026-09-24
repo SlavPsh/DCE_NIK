@@ -22,7 +22,8 @@ def main():
         lab[m2 & (lab == 0)] = nxt; blobs.append((area, nxt)); nxt += 1
     blobs = blobs[:a.max + 4]
     fig, ax = plt.subplots(1, 3, figsize=(19, 6.2)); vm = np.percentile(f[body], 99.5)
-    ax[0].imshow(f, cmap="gray", vmin=0, vmax=vm); ax[0].set_title(f"model-free at {a.t:.0f} s, early-enhancing blobs (top {100 * (1 - a.q):.0f}%) numbered", fontsize=10); ax[0].axis("off")
+    ax[0].imshow(f, cmap="gray", vmin=0, vmax=vm); ax[0].set_title(f"model-free at {a.t:.0f} s, early-enhancing blobs numbered; grid every 20 px (row, col)", fontsize=10)
+    ax[0].set_xticks(range(0, f.shape[1], 20)); ax[0].set_yticks(range(0, f.shape[0], 20)); ax[0].grid(color="yellow", alpha=0.25, lw=0.5); ax[0].tick_params(labelsize=6)
     ax[1].imshow(early, cmap="gray", vmin=0, vmax=np.percentile(early[body], 99.5)); ax[1].set_title("enhancement at that time (frame minus baseline)", fontsize=10); ax[1].axis("off")
     cols = plt.cm.tab10(np.linspace(0, 1, 10)); curves = []
     for k, (area, i) in enumerate(blobs):
