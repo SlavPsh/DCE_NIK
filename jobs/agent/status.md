@@ -1,19 +1,22 @@
 # helios agent
 
-updated 2026-09-24 19:33:50 on worker01.cluster, job 3372168, cycle 44
+updated 2026-09-24 19:35:56 on worker01.cluster, job 3372168, cycle 45
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3373461 | 067_p14_prep | 1 RUNNING None |
+| 3373461 | 067_p14_prep | 1 COMPLETING None |
+| 3373535 | 070_p14_prep_array | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 021_cancel_067 | exit 0 |
+| 067_p14_prep | 1 COMPLETING None |
+| 070_p14_prep_array | 1 PENDING None |
 | 020_067_progress | exit 0 |
-| 067_p14_prep | 1 RUNNING None |
 | 066_p14_survey | 1 COMPLETED 00:00:57 |
 | 019_p14_header | exit 0 |
 | 065_p8_survey | 1 COMPLETED 00:02:08 |
@@ -30,5 +33,3 @@ updated 2026-09-24 19:33:50 on worker01.cluster, job 3372168, cycle 44
 | 059_kprior_v2 | 1 COMPLETED 02:11:24, 1 COMPLETED 02:11:34, 1 COMPLETED 02:38:10, 1 COMPLETED 02:38:23 |
 | 062_claim_fig2 | 1 COMPLETED 00:00:06 |
 | 061_claim_fig2 | 1 COMPLETED 00:00:04 |
-| 060_claim_figs | 1 COMPLETED 00:00:10 |
-| 057_pisco_rerun | 1 COMPLETED 02:10:46, 1 COMPLETED 02:16:06 |
