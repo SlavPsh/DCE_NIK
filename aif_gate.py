@@ -63,7 +63,7 @@ ax[1].plot(tmf, raw_n, "0.6", lw=1, label="model-free"); ax[1].plot(tmf, sm_n, "
 ax[1].axvline(ttp, color="b", ls="--", lw=1, label=f"TTP {ttp:.0f}s"); ax[1].set_xlim(0, 260); ax[1].grid(alpha=.3); ax[1].legend(fontsize=8)
 ax[1].set_title(f"AIF gate: {verdict}  (rise {rise:.0f}s, mono {mono_frac:.2f})")
 fig.suptitle(f"P3 AIF estimate + plausibility gate, slice {Z}", fontweight="bold"); fig.tight_layout()
-p = fpath("aif_gate_slice21.png"); fig.savefig(p, dpi=135); print("wrote", p.split("/")[-1])
+p = fpath(f"aif_gate{dsp.SFX}_slice{Z}.png"); fig.savefig(p, dpi=135); print("wrote", p.split("/")[-1])
 
 # save AIF on the CS frame grid (interp) for the Patlak basis, only meaningful if PASS
 aif_frame = np.interp(tC, tmf, sm); aif_frame = np.maximum(aif_frame, 0)
