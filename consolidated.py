@@ -48,7 +48,11 @@ def slice_ctx(Z):
         m0 = ndi.binary_opening(ref > np.quantile(ref, 0.55), iterations=2); l, n = ndi.label(m0)
         if n: m0 = (l == 1 + int(np.argmax(ndi.sum(np.ones_like(l), l, range(1, n + 1)))))
         return ndi.binary_closing(ndi.binary_fill_holes(m0), iterations=2)
-    BODY = clean_body(ref_all); AIR = ~ndi.binary_dilation(BODY, iterations=4)
+    def robust_body(ref):                                                                    # non-p3: absolute threshold on the smoothed all-spoke image, largest component, closed and filled
+        sm = ndi.gaussian_filter(ref, 2.0); m0 = sm > 0.12 * np.percentile(sm, 99.5); m0 = ndi.binary_opening(m0, iterations=3); l, n = ndi.label(m0)
+        if n: m0 = (l == 1 + int(np.argmax(ndi.sum(np.ones_like(l), l, range(1, n + 1)))))
+        return ndi.binary_fill_holes(ndi.binary_closing(m0, iterations=8))
+    BODY = clean_body(ref_all) if dsp.DS == "p3" else robust_body(ref_all); AIR = ~ndi.binary_dilation(BODY, iterations=4)
     cs100 = np.abs(np.asarray(np.load(f"{REF}/slice_{Z:02d}.npz")["cs_img"])).astype(np.float32)   # roi anatomy, always grasp-pro
     if CSPRE == "cs":
         cs_meth = cs100
