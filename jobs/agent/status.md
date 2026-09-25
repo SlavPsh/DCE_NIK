@@ -1,19 +1,18 @@
 # helios agent
 
-updated 2026-09-25 15:03:48 on worker01.cluster, job 3373495, cycle 272
+updated 2026-09-25 15:05:52 on worker01.cluster, job 3373495, cycle 273
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3380353 | 068_p14_basis_grasp | 1 RUNNING None |
-| 3380517 | 067_zprofile | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 067_zprofile | 1 PENDING None |
+| 067_zprofile | 1 COMPLETED 00:00:51 |
 | 066_z_profile | exit 0 |
 | 068_p14_basis_grasp | 1 RUNNING None |
 | 087_p14_roi_ingest | 1 COMPLETED 00:00:03 |
