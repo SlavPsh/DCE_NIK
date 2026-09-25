@@ -1,5 +1,6 @@
 queue 081_p14_grids
 jid 3380010
 submitted 2026-09-25 10:18:47
-state 1 PENDING None
+state 1 COMPLETED 00:00:20
 log jobs/log/081_p14_grids_3380010.out
+ended 2026-09-25 10:20:53
