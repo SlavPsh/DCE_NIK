@@ -1,0 +1,6 @@
+probe 023_mv_templates
+host worker01.cluster
+start 2026-09-25 12:22:20
+end 2026-09-25 12:22:20
+exit 0
+log jobs/log/probe_023_mv_templates.out

@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-25 12:18:12 on worker01.cluster, job 3373495, cycle 191
+updated 2026-09-25 12:22:20 on worker01.cluster, job 3373495, cycle 193
 
 ## active
 
@@ -11,6 +11,7 @@ updated 2026-09-25 12:18:12 on worker01.cluster, job 3373495, cycle 191
 
 | name | state |
 |---|---|
+| 023_mv_templates | exit 0 |
 | 086_p14_roi_templates | 1 COMPLETED 00:00:03 |
 | 085_p14_rois_sl24 | 1 COMPLETED 00:00:09 |
 | 084_p14_rois_seeded_v3 | 1 COMPLETED 00:00:16 |
@@ -30,4 +31,3 @@ updated 2026-09-25 12:18:12 on worker01.cluster, job 3373495, cycle 191
 | 022_dce_data_mount | exit 0 |
 | 070_p14_prep_array | 1 COMPLETED 00:00:09, 1 COMPLETED 00:00:11, 1 COMPLETED 00:21:01 |
 | 067_p14_prep | 1 CANCELLED+ 02:35:24 |
-| 021_cancel_067 | exit 0 |
