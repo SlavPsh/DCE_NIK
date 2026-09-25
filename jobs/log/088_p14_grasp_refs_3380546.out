@@ -1,0 +1,12 @@
+grasp v2 n12 k80 slices 21,24,27 15:28:24
+  gv2_slice21_n12_k80.npy: cached
+  gv2_slice24_n12_k80.npy: cached
+  gv2_slice27_n12_k80.npy: cached
+DONE_GV2_REAL 0s -> /net/beegfs/users/P101440/grasp_v2/results_grasp_v2_p14
+GV exit 0
+ 
+3 .
+139 ..
+46923904 gv2_slice21_n12_k80.npy
+46923904 gv2_slice24_n12_k80.npy
+46923904 gv2_slice27_n12_k80.npy

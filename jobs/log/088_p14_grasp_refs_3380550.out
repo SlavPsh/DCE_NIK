@@ -1,0 +1,8 @@
+grasp pro f80match slice 24 15:28:24
+slice 24: NLINE=14 NT=154 kept spokes 1726/2156 (80.1%)
+SAVED /net/beegfs/users/P101440/grasp_pro_py/results_spoke_cs_p14/cs_slice24_f80match.npy (256, 256, 154) (487s) DONE_NIKMATCH
+GP 24 exit 0
+ 
+0 .
+167 ..
+40370304 cs_slice24_f80match.npy

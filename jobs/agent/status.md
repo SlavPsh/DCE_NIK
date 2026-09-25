@@ -1,19 +1,18 @@
 # helios agent
 
-updated 2026-09-25 15:36:37 on worker01.cluster, job 3373495, cycle 288
+updated 2026-09-25 15:38:42 on worker01.cluster, job 3373495, cycle 289
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3380545 | 069_p14_nik | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
-| 3380546 | 088_p14_grasp_refs | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 088_p14_grasp_refs | 1 RUNNING None |
+| 088_p14_grasp_refs | 1 COMPLETED 00:00:01, 1 COMPLETED 00:08:09, 1 COMPLETED 00:08:10, 1 COMPLETED 00:08:25 |
 | 069_p14_nik | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 068_p14_basis_grasp | 1 FAILED 02:01:28 |
 | 067_zprofile | 1 COMPLETED 00:00:51 |
