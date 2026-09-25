@@ -1,17 +1,19 @@
 # helios agent
 
-updated 2026-09-25 17:45:39 on worker04.cluster, job 3379851, cycle 7
+updated 2026-09-25 18:04:03 on worker04.cluster, job 3379851, cycle 16
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3380545 | 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3380843 | 090_p14_grasp_preview | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 090_p14_grasp_preview | 1 PENDING None |
 | 024_p14_refs | exit 0 |
 | 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 068_tvweight_stat | 1 COMPLETED 00:00:40 |
@@ -31,4 +33,3 @@ updated 2026-09-25 17:45:39 on worker04.cluster, job 3379851, cycle 7
 | 080_roi_p14_sl21_seed | 1 COMPLETED 00:00:06 |
 | 079_aorta_grid | 1 COMPLETED 00:00:08 |
 | 078_aorta_candidates_v3 | 1 COMPLETED 00:00:09 |
-| 077_aorta_candidates_v2 | 1 COMPLETED 00:00:06 |
