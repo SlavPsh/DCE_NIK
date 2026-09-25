@@ -19,7 +19,14 @@ def grow_seed(mf, tmf, seed, radius=16, t=60.0, erode=1):
     m = (lab == lab[r0, c0]) if lab[r0, c0] > 0 else (lab == (1 + int(np.argmax(ndi.sum(np.ones_like(lab), lab, range(1, n + 1)))))); m = ndi.binary_fill_holes(m)
     return ndi.binary_erosion(m, iterations=erode) if erode else m
 
-def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver_hi=0.97, spleen_q=0.90, aorta_seed=None):
+def grow_organ(Ls, core, seed, radius=70, tol=0.35, erode=3):
+    """organ from a seed: pixels within the radius whose late enhancement is within tol of the seed's (local 5x5 mean), connected to the seed, opened, filled, eroded"""
+    r0, c0 = seed; ref = float(Ls[r0 - 2:r0 + 3, c0 - 2:c0 + 3].mean()); yy, xx = np.ogrid[:Ls.shape[0], :Ls.shape[1]]; disc = (yy - r0) ** 2 + (xx - c0) ** 2 <= radius ** 2
+    m = core & disc & (np.abs(Ls - ref) < tol * abs(ref)); m = ndi.binary_opening(m, iterations=2); lab, n = ndi.label(m)
+    m = (lab == lab[r0, c0]) if lab[r0, c0] > 0 else (lab == (1 + int(np.argmax(ndi.sum(np.ones_like(lab), lab, range(1, n + 1)))))) if n else m
+    return ndi.binary_erosion(ndi.binary_fill_holes(m), iterations=erode)
+
+def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver_hi=0.97, spleen_q=0.90, aorta_seed=None, liver_seed=None, spleen_seed=None):
     if aorta_seed is not None: ao = grow_seed(mf, tmf, aorta_seed)
     base = mf[..., tmf < 45].mean(2); late = mf[..., (tmf > 130) & (tmf < 200)].mean(2) - base; first = mf[..., (tmf > 60) & (tmf < 95)].mean(2) - base
     Ls = ndi.gaussian_filter(late * body, 1.5); Fs = ndi.gaussian_filter(first * body, 1.5); ratio = np.where(body, Fs / (np.abs(Ls) + 1e-9), 0.0)
@@ -54,17 +61,19 @@ def build(mf, tmf, body, ao, erode_liver=4, erode_spleen=2, liver_lo=0.35, liver
     cand2 = core & ~ndi.binary_dilation(liver, iterations=6) & (Ls > 0.45 * ref) & (ratio > rl)
     cand2 = ndi.binary_opening(cand2, iterations=3); lab2, n2 = ndi.label(cand2); sz2 = ndi.sum(np.ones_like(lab2), lab2, range(1, n2 + 1)) if n2 else []
     spleen = (lab2 == (1 + int(np.argmax(sz2)))) if n2 else cand2; spleen = ndi.binary_fill_holes(spleen); spleen = ndi.binary_erosion(spleen, iterations=erode_spleen)
+    if liver_seed is not None: liver = grow_organ(Ls, core, liver_seed, erode=erode_liver)
+    if spleen_seed is not None: spleen = grow_organ(Ls, core & ~ndi.binary_dilation(liver, iterations=4), spleen_seed, erode=erode_spleen)
     static = ndi.binary_erosion(body, iterations=8) & (np.abs(Ls) < 0.15 * ref) & ~liver & ~spleen                                     # non-enhancing interior (muscle / fat)
     lab3, n3 = ndi.label(static); sz3 = ndi.sum(np.ones_like(lab3), lab3, range(1, n3 + 1)) if n3 else []; static = (lab3 == (1 + int(np.argmax(sz3)))) if n3 else static
     return dict(liver=liver, spleen=spleen, aorta=ao, aorta_alt=aorta_alt, static=static), dict(late=late, first=first, ratio=ratio)
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode-liver", type=int, default=4); ap.add_argument("--erode-spleen", type=int, default=2); ap.add_argument("--aorta-seed", default="", help="per-slice row,col seeds: 21:145,137;24:...")
-    a = ap.parse_args(); seeds = {int(k): tuple(int(v) for v in rc.split(",")) for k, rc in (x.split(":") for x in a.aorta_seed.split(";") if x)}
+    ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode-liver", type=int, default=4); ap.add_argument("--erode-spleen", type=int, default=2); ap.add_argument("--aorta-seed", default="", help="per-slice row,col seeds: 21:145,137;24:..."); ap.add_argument("--liver-seed", default=""); ap.add_argument("--spleen-seed", default="")
+    a = ap.parse_args(); P_ = lambda t: {int(k): tuple(int(v) for v in rc.split(",")) for k, rc in (x.split(":") for x in t.split(";") if x)}; seeds, lseeds, sseeds = P_(a.aorta_seed), P_(a.liver_seed), P_(a.spleen_seed)
     rep = {}; L = ["# proposed liver / spleen rois (for approval; nothing uses them yet)", "", "| slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |", "|---|---|---|---|---|---|---|"]
     for Z in [int(s) for s in a.slices.split(",")]:
         ctx = C.slice_ctx(Z); body = ctx["BODY"]; ao = ctx["rois"]["aorta"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
-        rois, aux = build(mf, tmf, body, ao, a.erode_liver, a.erode_spleen, aorta_seed=seeds.get(Z))
+        rois, aux = build(mf, tmf, body, ao, a.erode_liver, a.erode_spleen, aorta_seed=seeds.get(Z), liver_seed=lseeds.get(Z), spleen_seed=sseeds.get(Z))
         cur = {r: np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])]) if rois[r].any() else np.zeros(mf.shape[-1]) for r in rois}; cur = {r: c - np.median(c[tmf < 40]) for r, c in cur.items()}
         ttp = {r: float(tmf[np.argmax(cur[r])]) for r in cur}; plat = {r: float(cur[r][tmf > 250].mean() / (cur[r].max() + 1e-9)) for r in cur}
         rep[Z] = dict(px={r: int(rois[r].sum()) for r in rois}, ttp=ttp, plateau=plat); np.savez(dsp.ROIS(Z), **rois, source="model-free 31-spoke nufft, liver / spleen proposal v4", aorta_tag=np.array(f"seed {seeds.get(Z)}" if Z in seeds else "auto"))
@@ -72,12 +81,13 @@ def main():
         frame = lambda ts, w=8: mf[..., (tmf > ts - w) & (tmf < ts + w)].mean(2)
         fig, ax = plt.subplots(1, 5, figsize=(22, 4.8))
         for k, (ttl, im) in enumerate((("late enhancement 130 to 200 s", aux["late"]), ("first-pass / late ratio", aux["ratio"]), ("model-free at 60 s", frame(60)), ("model-free at 120 s", frame(120)))):
-            ax[k].imshow(im, cmap="gray", vmin=0, vmax=np.percentile(im[body], 99.5) if im[body].max() > 0 else 1); ax[k].set_title(ttl, fontsize=9); ax[k].axis("off")
-            for r, c in (("liver", "lime"), ("spleen", "orange"), ("aorta", "cyan"), ("aorta_alt", "red"), ("static", "magenta")):
+            ax[k].imshow(im, cmap="gray", vmin=0, vmax=np.percentile(im[body], 99.5) if im[body].max() > 0 else 1); ax[k].set_title(ttl, fontsize=9)
+            ax[k].set_xticks(range(0, im.shape[1], 20)); ax[k].set_yticks(range(0, im.shape[0], 20)); ax[k].grid(color="yellow", alpha=0.2, lw=0.4); ax[k].tick_params(labelsize=5)
+            for r, c in (("liver", "lime"), ("spleen", "orange"), ("aorta", "cyan"), ("static", "magenta")):
                 if rois[r].any(): ax[k].contour(rois[r].astype(float), levels=[0.5], colors=[c], linewidths=0.9)
-        for r, c in (("aorta", "cyan"), ("aorta_alt", "red"), ("liver", "lime"), ("spleen", "orange"), ("static", "magenta")): ax[4].plot(tmf, cur[r] / (cur["aorta"].max() + 1e-9), color=c, lw=1.4, label=f"{r} ({int(rois[r].sum())} px)")
+        for r, c in (("aorta", "cyan"), ("liver", "lime"), ("spleen", "orange"), ("static", "magenta")): ax[4].plot(tmf, cur[r] / (cur["aorta"].max() + 1e-9), color=c, lw=1.4, label=f"{r} ({int(rois[r].sum())} px)")
         ax[4].set_title("model-free mean curves, proposed rois (norm to aorta peak)", fontsize=9); ax[4].set_xlabel("t [s]"); ax[4].legend(fontsize=7); ax[4].axhline(0, color="0.7", lw=0.6)
-        fig.suptitle(f"{dsp.DS} slice {Z}: proposed liver (lime) / spleen (orange) / aorta candidate A (cyan, fastest small blob) / candidate B (red, round central vessel) / static (magenta)", fontsize=11); fig.tight_layout()
+        fig.suptitle(f"{dsp.DS} slice {Z}: proposed liver (lime) / spleen (orange) / aorta (cyan) / static (magenta); grid every 20 px (row, col)", fontsize=11); fig.tight_layout()
         fig.savefig(f"{OUTD}/figures/roi_proposed{dsp.SFX}_sl{Z}.png", dpi=130, facecolor="white"); plt.close(fig); print("saved", Z, rep[Z], flush=True)
     json.dump(rep, open(f"{OUTD}/rois_proposed{dsp.SFX}.json", "w"), indent=1); open(f"{OUTD}/rois_proposed{dsp.SFX}.md", "w").write("\n".join(L)); print("\n".join(L)); print("ROI_PROPOSE_DONE")
 
