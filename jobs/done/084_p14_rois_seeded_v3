@@ -1,5 +1,6 @@
 queue 084_p14_rois_seeded_v3
 jid 3380028
 submitted 2026-09-25 10:31:32
-state 1 PENDING None
+state 1 COMPLETED 00:00:16
 log jobs/log/084_p14_rois_seeded_v3_3380028.out
+ended 2026-09-25 10:33:37
