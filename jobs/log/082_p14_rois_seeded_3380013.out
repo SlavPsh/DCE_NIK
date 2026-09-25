@@ -1,0 +1,12 @@
+saved 21 {'px': {'liver': 1734, 'spleen': 2020, 'aorta': 199, 'aorta_alt': 0, 'static': 669}, 'ttp': {'liver': 134.4016697588126, 'spleen': 78.6873840445269, 'aorta': 52.09647495361781, 'aorta_alt': 2.7133580705009277, 'static': 264.8237476808905}, 'plateau': {'liver': 0.6930114030838013, 'spleen': 0.5599734783172607, 'aorta': 0.46179765462875366, 'aorta_alt': 0.0, 'static': 0.23470403254032135}}
+saved 24 {'px': {'liver': 0, 'spleen': 0, 'aorta': 197, 'aorta_alt': 0, 'static': 511}, 'ttp': {'liver': 2.7133580705009277, 'spleen': 2.7133580705009277, 'aorta': 47.031539888682744, 'aorta_alt': 2.7133580705009277, 'static': 88.81725417439704}, 'plateau': {'liver': 0.0, 'spleen': 0.0, 'aorta': 0.4597294330596924, 'aorta_alt': 0.0, 'static': 0.22616435587406158}}
+saved 27 {'px': {'liver': 1567, 'spleen': 1435, 'aorta': 176, 'aorta_alt': 0, 'static': 389}, 'ttp': {'liver': 93.8821892393321, 'spleen': 76.15491651205936, 'aorta': 52.09647495361781, 'aorta_alt': 2.7133580705009277, 'static': 307.8756957328386}, 'plateau': {'liver': 0.6664829254150391, 'spleen': 0.555850088596344, 'aorta': 0.46431419253349304, 'aorta_alt': 0.0, 'static': 0.6195715665817261}}
+# proposed liver / spleen rois (for approval; nothing uses them yet)
+
+| slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |
+|---|---|---|---|---|---|---|
+| 21 | 1734 | 2020 | 199 | 669 | 134 / 0.69 | 79 / 0.56 |
+| 24 | 0 | 0 | 197 | 511 | 3 / 0.00 | 3 / 0.00 |
+| 27 | 1567 | 1435 | 176 | 389 | 94 / 0.67 | 76 / 0.56 |
+ROI_PROPOSE_DONE
+ROI exit 0
