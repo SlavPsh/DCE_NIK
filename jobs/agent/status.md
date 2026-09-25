@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-25 10:37:48 on worker01.cluster, job 3373495, cycle 142
+updated 2026-09-25 12:16:08 on worker01.cluster, job 3373495, cycle 190
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3380206 | 086_p14_roi_templates | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 086_p14_roi_templates | 1 PENDING None |
 | 085_p14_rois_sl24 | 1 COMPLETED 00:00:09 |
 | 084_p14_rois_seeded_v3 | 1 COMPLETED 00:00:16 |
 | 083_p14_rois_seeded_v2 | 1 COMPLETED 00:00:19 |
@@ -30,4 +32,3 @@ updated 2026-09-25 10:37:48 on worker01.cluster, job 3373495, cycle 142
 | 070_p14_prep_array | 1 COMPLETED 00:00:09, 1 COMPLETED 00:00:11, 1 COMPLETED 00:21:01 |
 | 067_p14_prep | 1 CANCELLED+ 02:35:24 |
 | 021_cancel_067 | exit 0 |
-| 020_067_progress | exit 0 |
