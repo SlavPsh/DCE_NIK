@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-25 13:15:23 on worker01.cluster, job 3373495, cycle 219
+updated 2026-09-25 13:17:27 on worker01.cluster, job 3373495, cycle 220
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3380350 | 087_p14_roi_ingest | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 087_p14_roi_ingest | 1 PENDING None |
+| 087_p14_roi_ingest | 1 COMPLETED 00:00:03 |
 | 023_mv_templates | exit 0 |
 | 086_p14_roi_templates | 1 COMPLETED 00:00:03 |
 | 085_p14_rois_sl24 | 1 COMPLETED 00:00:09 |

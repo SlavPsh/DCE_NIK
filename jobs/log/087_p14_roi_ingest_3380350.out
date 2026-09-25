@@ -1,0 +1,5 @@
+slice 21 {'liver': 7295, 'spleen': 3243, 'aorta': 217}
+slice 24 {'liver': 7762, 'spleen': 3422, 'aorta': 198}
+slice 27 {'liver': 7446, 'spleen': 3667, 'aorta': 176}
+MANUAL_ROI_DONE
+INGEST exit 0
