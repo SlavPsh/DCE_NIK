@@ -19,10 +19,10 @@ def grow_seed(mf, tmf, seed, radius=16, t=60.0, erode=1):
     m = (lab == lab[r0, c0]) if lab[r0, c0] > 0 else (lab == (1 + int(np.argmax(ndi.sum(np.ones_like(lab), lab, range(1, n + 1)))))); m = ndi.binary_fill_holes(m)
     return ndi.binary_erosion(m, iterations=erode) if erode else m
 
-def grow_organ(Ls, core, seed, radius=70, tol=0.35, erode=3):
-    """organ from a seed: pixels within the radius whose late enhancement is within tol of the seed's (local 5x5 mean), connected to the seed, opened, filled, eroded"""
-    r0, c0 = seed; ref = float(Ls[r0 - 2:r0 + 3, c0 - 2:c0 + 3].mean()); yy, xx = np.ogrid[:Ls.shape[0], :Ls.shape[1]]; disc = (yy - r0) ** 2 + (xx - c0) ** 2 <= radius ** 2
-    m = core & disc & (np.abs(Ls - ref) < tol * abs(ref)); m = ndi.binary_opening(m, iterations=2); lab, n = ndi.label(m)
+def grow_organ(Ls, core, seed, radius=80, tol=0.5, erode=3):
+    """organ from a seed: pixels within the radius whose smoothed late enhancement is within tol of the seed's (15x15 median), connected to the seed, opened, filled, eroded"""
+    r0, c0 = seed; Lm = ndi.median_filter(Ls, size=7); ref = float(np.median(Ls[r0 - 7:r0 + 8, c0 - 7:c0 + 8])); yy, xx = np.ogrid[:Ls.shape[0], :Ls.shape[1]]; disc = (yy - r0) ** 2 + (xx - c0) ** 2 <= radius ** 2
+    m = core & disc & (np.abs(Lm - ref) < tol * abs(ref)); m = ndi.binary_opening(m, iterations=2); lab, n = ndi.label(m)
     m = (lab == lab[r0, c0]) if lab[r0, c0] > 0 else (lab == (1 + int(np.argmax(ndi.sum(np.ones_like(lab), lab, range(1, n + 1)))))) if n else m
     return ndi.binary_erosion(ndi.binary_fill_holes(m), iterations=erode)
 
