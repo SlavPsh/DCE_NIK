@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-25 17:33:16 on worker04.cluster, job 3379851, cycle 1
+updated 2026-09-25 17:45:39 on worker04.cluster, job 3379851, cycle 7
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-09-25 17:33:16 on worker04.cluster, job 3379851, cycle 1
 
 | name | state |
 |---|---|
+| 024_p14_refs | exit 0 |
 | 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 068_tvweight_stat | 1 COMPLETED 00:00:40 |
 | 088_p14_grasp_refs | 1 COMPLETED 00:00:01, 1 COMPLETED 00:08:09, 1 COMPLETED 00:08:10, 1 COMPLETED 00:08:25 |
@@ -31,4 +32,3 @@ updated 2026-09-25 17:33:16 on worker04.cluster, job 3379851, cycle 1
 | 079_aorta_grid | 1 COMPLETED 00:00:08 |
 | 078_aorta_candidates_v3 | 1 COMPLETED 00:00:09 |
 | 077_aorta_candidates_v2 | 1 COMPLETED 00:00:06 |
-| 076_aorta_candidates | 1 COMPLETED 00:00:06 |

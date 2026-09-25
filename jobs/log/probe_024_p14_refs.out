@@ -1,0 +1,30 @@
+  
+  
+3 15:36 .
+167 15:28 ..
+40370304 15:36 cs_slice21_f80match.npy
+40370304 15:36 cs_slice24_f80match.npy
+40370304 15:36 cs_slice27_f80match.npy
+  
+  
+  
+3 15:21 .
+139 15:03 ..
+46923904 14:20 gv2_slice21_n12_k80.npy
+46923904 14:50 gv2_slice24_n12_k80.npy
+46923904 15:21 gv2_slice27_n12_k80.npy
+gv2 21 (256, 256, 179)
+gv2 24 (256, 256, 179)
+gv2 27 (256, 256, 179)
+== results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl21_s0
+    step  10000  train 9.525e-01  heldout 5.543e-01
+    final weights kept (best heldout 5.543e-01 at step 10000)
+== results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl24_s0
+    step   4000  train 1.099e+00  heldout 5.526e-01
+    step   5000  train 1.074e+00  heldout 5.385e-01
+3380809 helios-agent PENDING 0:00
+3379851 helios-agent RUNNING 12:25
+3380545_[4-20] p14nik PENDING 0:00
+3380552_[0] p14nik_eval PENDING 0:00
+3380545_2 p14nik RUNNING 44:19
+3380545_3 p14nik RUNNING 44:19
