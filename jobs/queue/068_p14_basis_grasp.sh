@@ -10,6 +10,7 @@ set -uo pipefail
 export MAMBA_ROOT_PREFIX=/net/beegfs/users/P101440/micromamba PATH=/net/beegfs/users/P101440/micromamba/bin:$PATH OMP_NUM_THREADS=16 DCE_DS=p14
 P="micromamba run -n torch29 python -u"; D=/net/beegfs/users/P101440/DCE_NIK; RES=$D/results/tofts_vs_patlak
 cd $D
+for Z in 21 24 27; do $P aif_gate.py $Z; done; echo "AIF (approved aorta) exit $?"
 for Z in 21 24 27; do
   [ -f $D/aif_p14_slice$Z.npz ] || { echo "aif for slice $Z missing (067 not done)"; exit 1; }
   [ -f $RES/basis_p14_sl${Z}_r8.npz ] || $P nik_tofts_basis.py --aif $D/aif_p14_slice$Z.npz --out $RES/basis_p14_sl${Z}_r8_tmp.npz --ranks 8 > $RES/basis_p14_sl${Z}_r8.log 2>&1 && mv -f $RES/basis_p14_sl${Z}_r8_tmp.npz $RES/basis_p14_sl${Z}_r8.npz 2>/dev/null; tail -2 $RES/basis_p14_sl${Z}_r8.log
