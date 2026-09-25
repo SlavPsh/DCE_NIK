@@ -1,16 +1,20 @@
 # helios agent
 
-updated 2026-09-25 15:22:13 on worker01.cluster, job 3373495, cycle 281
+updated 2026-09-25 15:28:23 on worker01.cluster, job 3373495, cycle 284
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3380545 | 069_p14_nik | 1 PENDING None |
+| 3380546 | 088_p14_grasp_refs | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 069_p14_nik | 1 PENDING None |
+| 088_p14_grasp_refs | 1 PENDING None |
 | 068_p14_basis_grasp | 1 FAILED 02:01:28 |
 | 067_zprofile | 1 COMPLETED 00:00:51 |
 | 066_z_profile | exit 0 |
@@ -29,5 +33,3 @@ updated 2026-09-25 15:22:13 on worker01.cluster, job 3373495, cycle 281
 | 077_aorta_candidates_v2 | 1 COMPLETED 00:00:06 |
 | 076_aorta_candidates | 1 COMPLETED 00:00:06 |
 | 075_roi_p14_sl21_v4 | 1 COMPLETED 00:00:05 |
-| 074_roi_p14_sl21_v3b | 1 COMPLETED 00:00:05 |
-| 073_roi_p14_sl21_v3 | 1 COMPLETED 00:00:04 |
