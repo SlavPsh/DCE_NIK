@@ -1,0 +1,6 @@
+probe 066_z_profile
+host worker01.cluster
+start 2026-09-25 14:59:36
+end 2026-09-25 14:59:40
+exit 0
+log jobs/log/probe_066_z_profile.out
