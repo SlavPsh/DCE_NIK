@@ -8,6 +8,7 @@ B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B); import dsp
 ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,24,27"); ap.add_argument("--erode", type=int, default=2); a = ap.parse_args()
 for Z in [int(s) for s in a.slices.split(",")]:
     p = f"{B}/results/rois_manual/{dsp.DS}_sl{Z}.png"
+    if not os.path.exists(p): p = f"{B}/results/rois_manual/template_{dsp.DS}_sl{Z}_t120.png"                      # outlines drawn on the template itself
     if not os.path.exists(p): print("no painting for slice", Z); continue
     z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float); H, W = mf.shape[:2]
     rgb = np.asarray(Image.open(p).convert("RGB")).astype(int); r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
@@ -15,6 +16,7 @@ for Z in [int(s) for s in a.slices.split(",")]:
     old = dict(np.load(dsp.ROIS(Z), allow_pickle=True)) if os.path.exists(dsp.ROIS(Z)) else {}; rois = {}
     for k, m in cls.items():
         if m.sum() < 20: rois[k] = old[k].astype(bool) if k in old else np.zeros((H, W), bool); print(f"slice {Z} {k}: not painted, kept previous ({int(rois[k].sum())} px)"); continue
+        m = ndi.binary_fill_holes(ndi.binary_closing(m, iterations=3))                                            # outline or filled: close gaps, fill the interior at full resolution
         mm = np.asarray(Image.fromarray(m.astype(np.uint8) * 255).resize((W, H), Image.BILINEAR)) > 127; mm = ndi.binary_fill_holes(mm); mm = ndi.binary_erosion(mm, iterations=a.erode) if a.erode else mm; rois[k] = mm
     np.savez(dsp.ROIS(Z), **rois, source=f"manual painting results/rois_manual/{dsp.DS}_sl{Z}.png, eroded {a.erode} px", aorta_tag=np.array("manual")); print("slice", Z, {k: int(v.sum()) for k, v in rois.items()})
     frame = lambda ts, w=10: mf[..., (tmf > ts - w) & (tmf < ts + w)].mean(2); cur = {k: np.array([mf[..., i][v].mean() for i in range(mf.shape[-1])]) for k, v in rois.items() if v.any()}; cur = {k: c - np.median(c[tmf < 40]) for k, c in cur.items()}
