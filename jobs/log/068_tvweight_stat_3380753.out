@@ -1,0 +1,16 @@
+2026-09-25 15:55:05 host worker03.cluster job 3380753
+0200d62 cs_nikmatch: create the output dir (p14 run failed at save)
+102 frames x 21 spokes, K=5, Weight1=0.001, Weight2=0.0005
+slice         max        mean      median         p99  mean/max  nonzero%
+   13  1.2769e-03  1.7706e-05  9.4157e-06  2.2157e-04    0.0139      32.7
+        -> TVWeight1 with max 1.2769e-06   with mean 1.7706e-08   (weaker by 72x)
+        -> per coefficient map max: ['1.28e-03', '3.11e-04', '1.08e-04', '1.22e-04', '9.59e-05']
+   27  8.3835e-04  1.7141e-05  9.1925e-06  2.1830e-04    0.0204      55.3
+        -> TVWeight1 with max 8.3835e-07   with mean 1.7141e-08   (weaker by 49x)
+        -> per coefficient map max: ['8.38e-04', '2.86e-04', '2.06e-04', '1.35e-04', '1.56e-04']
+   40  4.8926e-04  1.2399e-05  7.2274e-06  1.4390e-04    0.0253      70.7
+        -> TVWeight1 with max 4.8926e-07   with mean 1.2399e-08   (weaker by 39x)
+        -> per coefficient map max: ['4.89e-04', '1.14e-04', '2.48e-04', '1.29e-04', '7.40e-05']
+
+mean/max over slices: 0.0199 -> switching max to mean divides both TV weights by ~50
+TVWEIGHT_STAT_DONE
