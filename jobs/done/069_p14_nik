@@ -1,5 +1,5 @@
 queue 069_p14_nik
 jid 3380545
 submitted 2026-09-25 15:28:23
-state 1 PENDING None
+state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
 log jobs/log/069_p14_nik_3380545.out
