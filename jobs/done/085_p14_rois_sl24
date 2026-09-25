@@ -1,5 +1,6 @@
 queue 085_p14_rois_sl24
 jid 3380031
 submitted 2026-09-25 10:35:44
-state 1 PENDING None
+state 1 COMPLETED 00:00:09
 log jobs/log/085_p14_rois_sl24_3380031.out
+ended 2026-09-25 10:37:48

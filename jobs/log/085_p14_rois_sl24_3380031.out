@@ -1,0 +1,11 @@
+21 44187 body px
+24 44068 body px
+27 44181 body px
+saved 24 {'px': {'liver': 4578, 'spleen': 3324, 'aorta': 197, 'aorta_alt': 0, 'static': 2929}, 'ttp': {'liver': 98.94712430426716, 'spleen': 83.75231910946196, 'aorta': 47.031539888682744, 'aorta_alt': 2.7133580705009277, 'static': 81.21985157699443}, 'plateau': {'liver': 0.7040093541145325, 'spleen': 0.5694301128387451, 'aorta': 0.4597294330596924, 'aorta_alt': 0.0, 'static': 0.5584267377853394}}
+# proposed liver / spleen rois (for approval; nothing uses them yet)
+
+| slice | liver px | spleen px | aorta px | static px | liver ttp s / plateau | spleen ttp s / plateau |
+|---|---|---|---|---|---|---|
+| 24 | 4578 | 3324 | 197 | 2929 | 99 / 0.70 | 84 / 0.57 |
+ROI_PROPOSE_DONE
+ROI exit 0
