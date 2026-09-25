@@ -1,0 +1,27 @@
+23:48:56
+     JOBID PARTITION                         NAME ST       TIME NODELIST(REASON)
+3380545_12       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_13       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_14       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_15       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_16       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_17       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_18       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_19       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_20       gpu                       p14nik PD       0:00 (QOSMaxGRESPerUser)
+3380545_11       gpu                       p14nik  R      37:36 gpu02
+3380545_10       gpu                       p14nik  R      37:42 gpu03
+log jobs/log/069_p14_nik_3384054.out
+results/tofts_vs_patlak/basis_p14_sl21_r8.log
+results/tofts_vs_patlak/basis_p14_sl21_r8.npz
+results/tofts_vs_patlak/basis_p14_sl21_r8_rms1.npz
+results/tofts_vs_patlak/basis_p14_sl24_r8.log
+results/tofts_vs_patlak/basis_p14_sl24_r8.npz
+results/tofts_vs_patlak/basis_p14_sl24_r8_rms1.npz
+results/tofts_vs_patlak/basis_p14_sl27_r8.log
+results/tofts_vs_patlak/basis_p14_sl27_r8.npz
+results/tofts_vs_patlak/basis_p14_sl27_r8_rms1.npz
+
+results/tofts_vs_patlak/p14:
+invivo_prod
+invivo_prod_oc

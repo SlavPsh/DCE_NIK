@@ -1,0 +1,6 @@
+probe 025_p14_nik_progress
+host worker04.cluster
+start 2026-09-25 23:48:56
+end 2026-09-25 23:48:56
+exit 0
+log jobs/log/probe_025_p14_nik_progress.out
