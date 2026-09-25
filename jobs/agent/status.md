@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-25 05:49:20 on worker01.cluster, job 3373495, cycle 1
+updated 2026-09-25 10:18:47 on worker01.cluster, job 3373495, cycle 133
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3380010 | 081_p14_grids | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 081_p14_grids | 1 PENDING None |
 | 071_p14_prep_24_27 | 1 COMPLETED 00:33:45, 1 COMPLETED 00:49:26 |
 | 080_roi_p14_sl21_seed | 1 COMPLETED 00:00:06 |
 | 079_aorta_grid | 1 COMPLETED 00:00:08 |
@@ -30,4 +32,3 @@ updated 2026-09-25 05:49:20 on worker01.cluster, job 3373495, cycle 1
 | 019_p14_header | exit 0 |
 | 065_p8_survey | 1 COMPLETED 00:02:08 |
 | 018_p8_header | exit 0 |
-| 017_p8_header | exit 127 |
