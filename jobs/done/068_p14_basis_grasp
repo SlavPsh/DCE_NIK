@@ -1,5 +1,6 @@
 queue 068_p14_basis_grasp
 jid 3380353
 submitted 2026-09-25 13:19:33
-state 1 RUNNING None
+state 1 FAILED 02:01:28
 log jobs/log/068_p14_basis_grasp_3380353.out
+ended 2026-09-25 15:22:13
