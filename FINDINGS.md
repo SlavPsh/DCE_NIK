@@ -27,6 +27,16 @@ Standard input for every in vivo comparison: k80 (v%10<8, 1368 of 1708 views), v
 - The flattened held-out k-space mse must never select checkpoints or ranks. The affine / scale curve rulers hide amplitude; quote peak and washout ratios next to them.
 - One subject, three slices; free breathing, no motion handling on either side.
 
+## 7. Second dataset, meas_topqmri_p14 (liver slab, 2026-09-26)
+Same production protocol, same trainer, k80 of 2157 views, base 256 (512 grid, 1.8x the p3 cost), slices 21 / 24 / 27, manual liver / spleen / aorta rois (user-painted), aorta inflow-bright before contrast (state with every aorta number). Queue 069 (train) + 091 (render from the step-10000 ckpts after a 40 gb oom in the final render) + 092 (iq). Tables `invivo_p14_prod{,_oc}.md`, `iq_track_sl<Z>_p14_prod_sl<Z>.md`, figures `figures/p14_prod_sl<Z>.png`.
+- tofts8 in-coil + prior (3 seeds) transfers: aorta nrmse 0.042 / 0.052 / 0.045 vs grasp 0.063 / 0.080 / 0.059; liver 0.040 / 0.028 / 0.024 vs 0.029 / 0.024 / 0.020; spleen 0.031 / 0.035 / 0.032 vs 0.031 / 0.038 / 0.033; air energy 0.114 / 0.104 / 0.112 vs 0.141 / 0.129 / 0.133; HaarPSI 0.708 / 0.664 / 0.761 vs 0.703 / 0.722 / 0.731 (slice 24 grasp ahead by 0.06, slice 27 tofts8 ahead by 0.03). Seed sd 0.01 on liver / spleen peaks, 0.03 to 0.06 on the aorta.
+- Corrected first-pass peaks (clip factors 1.02 to 1.13): tofts8 liver 0.93 / 0.89 / 0.88, spleen 0.92 / 0.80 / 0.83, aorta 0.94 / 0.95 / 0.89; grasp liver 0.94 / 0.91 / 0.87, spleen 1.00 / 0.93 / 0.93, aorta 0.77 / 0.79 / 0.76. The spleen first pass is the open weakness (8 to 13% under grasp on slices 24 / 27), the aorta is better than grasp on every slice.
+- Output-coil head: HaarPSI +0.03 at equal air, liver and aorta equal, spleen peak damped a further 0.03 to 0.06. Same pattern as on p3.
+- Patlak + prior fails on liver and spleen (peaks 0.66 to 0.79, an aorta-shaped bump at 50 s then a plateau): dual-input, washing-out enhancement is outside the two-atom span. The eight residual atoms are what makes tofts8 work.
+- sub16 + prior worse than on p3 (aorta 0.40, liver 0.65, oscillating curves; highest nik HaarPSI, air 0.13 to 0.19). nik-free matches grasp on liver, clips the aorta peak (0.59 to 0.71 corrected).
+- FLAGGED, undecided: grasp-pro on p14 is far off the model-free curves (liver 0.61 to 0.69, spleen 0.50 to 0.98, aorta 0.40 to 0.73 corrected, noisy) while scoring the highest HaarPSI against its own all-spoke recon; on p3 it tracked the reference within 0.1. Suspected mis-set arm on the new geometry (K5 calibration, inflow aorta). Not to be quoted until checked; grasp (v2) is the valid cs reference on p14.
+- Pipeline: `dsp.py` namespaces every path by DCE_DS; the 512 grid render is frame-chunked (`nik_output_recon.recon_nik_cart`); legacy p3 inputs in the iq tracker / roi check are disabled on other datasets (slice numbers overlap).
+
 ## 6. Next steps (memory project_dce_nik_plan_after_045, updated)
 1. DONE 2026-09-22 (production rerun). Remaining: redo the in vivo pk maps (figure 47) on the production recons and the phantom tofts run with unit-rms atoms + prior.
 2. First-pass peak (0.81 to 0.9 of the reference, true peak higher still): per-atom weight decay or bandwidth, test on the phantom.
@@ -34,6 +44,6 @@ Standard input for every in vivo comparison: k80 (v%10<8, 1368 of 1708 views), v
 4. Oblique readout of vp / Ktrans from the coefficients (phantom test vs the nonlinear fit).
 5. PISCO with the group's guidelines if they differ from the implementation here (both stencils were inert).
 6. z-coordinate input (added 2026-09-23): one model over several slices, (kx, ky, z, t, coil), sharing information across slices; test joint 18 / 19 / 21 vs three separate models.
-7. IMPORTANT (added 2026-09-23): test the best nik models (tofts8 + prior in both coil modes, nik-free, sub16) on a new dataset (second subject / scan), same k80 protocol and rulers, to show the results are not tuned to meas_p3_dce.
+7. DONE 2026-09-26 (section 7): the best nik models on a second dataset (meas_topqmri_p14, liver). Open there: the grasp-pro arm check, the spleen first pass, pk maps on liver.
 
 Files: tables `results/tofts_vs_patlak/{invivo_k80_rms1,invivo_k80_oc,iq_track_sl21_*,span_diag_sl*_rms1,mf_peak_check_sl*}.md`; figures `results/tofts_vs_patlak/figures/` and `results/realdata_nik_vs_cs_figures/figures/`; presentation folder `presentation_figs_2026-09-10/` (README index, figures 45 / 48 / 49 to 54); full chronology in RESUME.md.
