@@ -1,0 +1,49 @@
+11:10:15
+== results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl21_s0
+  
+3 16:46 .
+18 06:05 ..
+88580916 16:46 ckpt_slice_21.pt
+2200 16:46 train.log
+1 15:28 wandb_runs
+wandb
+== results/tofts_vs_patlak/p14/invivo_prod/free_sl21_s0
+  
+3 05:50 .
+18 06:05 ..
+88839420 05:50 ckpt_slice_21.pt
+2059 05:50 train.log
+1 05:19 wandb_runs
+wandb
+== results/tofts_vs_patlak/p14/invivo_prod_oc/tofts8_sl21_s0
+  
+3 22:56 .
+3 23:11 ..
+90349649 22:56 ckpt_slice_21.pt
+2203 22:56 train.log
+1 21:39 wandb_runs
+wandb
+JobID|JobName|State|MaxRSS|ReqMem|Elapsed|ExitCode
+3380545_0|p14nik|OUT_OF_MEMORY||40G|01:32:29|0:125
+3380545_0.batch|batch|OUT_OF_MEMORY|26677264K||01:32:29|0:125
+3380545_1|p14nik|OUT_OF_MEMORY||40G|01:32:34|0:125
+3380545_1.batch|batch|OUT_OF_MEMORY|41936756K||01:32:34|0:125
+3380545_2|p14nik|OUT_OF_MEMORY||40G|01:32:45|0:125
+3380545_2.batch|batch|OUT_OF_MEMORY|35975476K||01:32:45|0:125
+3380545_3|p14nik|OUT_OF_MEMORY||40G|01:32:51|0:125
+3380545_3.batch|batch|OUT_OF_MEMORY|40164136K||01:32:51|0:125
+3380545_4|p14nik|OUT_OF_MEMORY||40G|01:32:40|0:125
+3380545_4.batch|batch|OUT_OF_MEMORY|37482960K||01:32:40|0:125
+3380545_5|p14nik|OUT_OF_MEMORY||40G|01:32:36|0:125
+3380545_5.batch|batch|OUT_OF_MEMORY|39528868K||01:32:36|0:125
+3380545_6|p14nik|OUT_OF_MEMORY||40G|01:32:11|0:125
+3380545_6.batch|batch|OUT_OF_MEMORY|36775860K||01:32:11|0:125
+3380545_7|p14nik|OUT_OF_MEMORY||40G|01:32:03|0:125
+3380545_7.batch|batch|OUT_OF_MEMORY|40805080K||01:32:03|0:125
+3380545_8|p14nik|OUT_OF_MEMORY||40G|01:31:53|0:125
+3380545_8.batch|batch|OUT_OF_MEMORY|35495000K||01:31:53|0:125
+3380545_9|p14nik|OUT_OF_MEMORY||40G|01:31:36|0:125
+slurmstepd-gpu03: error: Detected 1 oom_kill event in StepId=3380545.batch. Some of the step tasks have been OOM Killed.
+               total        used        free      shared  buff/cache   available
+Mem:             755          29          68           0         666         726
+2

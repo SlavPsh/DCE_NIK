@@ -1,0 +1,6 @@
+probe 026_p14_oom
+host worker02.cluster
+start 2026-09-26 11:10:15
+end 2026-09-26 11:10:16
+exit 0
+log jobs/log/probe_026_p14_oom.out
