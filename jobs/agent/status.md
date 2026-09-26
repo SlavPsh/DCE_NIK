@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-26 22:15:45 on worker01.cluster, job 3386992, cycle 155
+updated 2026-09-26 22:17:50 on worker01.cluster, job 3386992, cycle 156
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3387077 | 095_p14_bandwidth | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 095_p14_bandwidth | 1 RUNNING None |
+| 095_p14_bandwidth | 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:45 |
 | 029_095_start | exit 0 |
 | 094_radial_blur | 1 COMPLETED 00:00:28 |
 | 093_radial_blur | 1 COMPLETED 00:00:28 |
