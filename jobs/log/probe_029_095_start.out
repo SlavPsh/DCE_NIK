@@ -1,0 +1,15 @@
+19:12:23
+       JOBID         NAME ST     TIME NODELIST(REASON)
+     3387074 helios-agent PD     0:00 (Dependency)
+   3387077_2        p14bw PD     0:00 (QOSMaxGRESPerUser)
+   3387077_3        p14bw PD     0:00 (QOSMaxGRESPerUser)
+   3387077_0        p14bw  R     2:05 gpu02
+   3387077_1        p14bw  R     2:05 gpu03
+== jobs/log/095_p14_bandwidth_3387078.out
+2026-09-26 19:10:19 host gpu02.cluster job 3387078 task 0 stage train
+task 0: ks3.5 -> results/tofts_vs_patlak/p14/bw_test/ks3.5
+model=wire_ff_tofts h512 d12 w062 | FF k256/3.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+== jobs/log/095_p14_bandwidth_3387079.out
+2026-09-26 19:10:19 host gpu03.cluster job 3387079 task 1 stage train
+task 1: ks5 -> results/tofts_vs_patlak/p14/bw_test/ks5
+model=wire_ff_tofts h512 d12 w062 | FF k256/5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
