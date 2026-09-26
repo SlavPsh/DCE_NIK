@@ -36,3 +36,5 @@ MF_PEAK_DONE
 reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the peak by that factor (temporal smoothing of the window); the late noise column shows what the narrower window costs
 MF_PEAK_DONE
 [W926 06:59:19.013781141 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+31 {'aorta': 9e-06, 'liver': 6e-06, 'spleen': 5e-06}
+21 {'aorta': 9e-06, 'liver': 6e-06, 'spleen': 5e-06}
