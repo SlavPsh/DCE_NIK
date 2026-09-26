@@ -94,3 +94,19 @@ model-free aorta FWHM (s): 162.07792207792212
 | params | 5.531e+06 ± 0 (3) | 5.521e+06 ± 0 (1) | 5.558e+06 ± 0 (1) | nan ± nan (0) | -1.025e+04 | +2.68e+04 | +nan | nan | nan |
 
 model-free aorta FWHM (s): 196.26623376623377
+
+## reference peak correction
+
+the 31-spoke model-free reference (6.8 s window) clips the first-pass peak; factor = peak at an 11-spoke window / peak at 31 spokes (`mf_peak_check.py`, per-spoke normalized, approved rois). corrected ratio = ratio vs the 31-spoke reference / factor. state this with every peak comparison.
+
+| slice | roi | clip factor | free corrected peak ratio | patlak corrected peak ratio | sub16 corrected peak ratio | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|---|---|---|
+| 21 | liver | 1.06 | 0.87 (raw 0.93) | 0.66 (raw 0.70) | 0.61 (raw 0.65) | 0.93 (raw 0.99) | 0.94 (raw 1.01) | 0.68 (raw 0.72) |
+| 21 | spleen | 1.07 | 0.79 (raw 0.84) | 0.74 (raw 0.79) | 0.54 (raw 0.57) | 0.92 (raw 0.98) | 1.00 (raw 1.07) | 0.98 (raw 1.05) |
+| 21 | aorta | 1.09 | 0.71 (raw 0.78) | 0.87 (raw 0.95) | 0.37 (raw 0.40) | 0.94 (raw 1.02) | 0.77 (raw 0.85) | 0.73 (raw 0.79) |
+| 24 | liver | 1.09 | 0.87 (raw 0.95) | 0.61 (raw 0.66) | 0.55 (raw 0.60) | 0.89 (raw 0.97) | 0.91 (raw 1.00) | 0.61 (raw 0.66) |
+| 24 | spleen | 1.08 | 0.74 (raw 0.80) | 0.61 (raw 0.66) | 0.43 (raw 0.46) | 0.80 (raw 0.87) | 0.93 (raw 1.01) | 0.54 (raw 0.59) |
+| 24 | aorta | 1.02 | 0.59 (raw 0.61) | 0.79 (raw 0.80) | 0.33 (raw 0.33) | 0.95 (raw 0.97) | 0.79 (raw 0.81) | 0.43 (raw 0.44) |
+| 27 | liver | 1.13 | 0.84 (raw 0.95) | 0.58 (raw 0.66) | 0.60 (raw 0.68) | 0.88 (raw 0.99) | 0.87 (raw 0.98) | 0.69 (raw 0.78) |
+| 27 | spleen | 1.09 | 0.76 (raw 0.83) | 0.66 (raw 0.72) | 0.48 (raw 0.52) | 0.83 (raw 0.90) | 0.93 (raw 1.01) | 0.50 (raw 0.55) |
+| 27 | aorta | 1.07 | 0.65 (raw 0.70) | 0.72 (raw 0.77) | 0.35 (raw 0.37) | 0.89 (raw 0.95) | 0.76 (raw 0.82) | 0.40 (raw 0.43) |
