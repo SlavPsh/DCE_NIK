@@ -4,3 +4,6 @@ GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
 GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
 GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
 GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+31 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 5e-06}
+21 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 5e-06}
+15 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 6e-06}
