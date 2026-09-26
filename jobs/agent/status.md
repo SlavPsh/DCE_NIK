@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-26 19:04:03 on worker01.cluster, job 3386992, cycle 61
+updated 2026-09-26 19:06:08 on worker01.cluster, job 3386992, cycle 62
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3387076 | 094_radial_blur | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 094_radial_blur | 1 PENDING None |
 | 093_radial_blur | 1 COMPLETED 00:00:28 |
 | 092_p14_iq | 1 COMPLETED 00:00:35 |
 | 091_p14_nik_render | 1 COMPLETED 00:15:30, 2 COMPLETED 00:15:31, 1 COMPLETED 00:15:34, 3 COMPLETED 00:15:35, 4 COMPLETED 00:15:36, 1 COMPLETED 00:15:37, 2 COMPLETED 00:15:39, 4 COMPLETED 00:15:40, 3 COMPLETED 00:15:41 |
@@ -30,4 +32,3 @@ updated 2026-09-26 19:04:03 on worker01.cluster, job 3386992, cycle 61
 | 023_mv_templates | exit 0 |
 | 086_p14_roi_templates | 1 COMPLETED 00:00:03 |
 | 085_p14_rois_sl24 | 1 COMPLETED 00:00:09 |
-| 084_p14_rois_seeded_v3 | 1 COMPLETED 00:00:16 |
