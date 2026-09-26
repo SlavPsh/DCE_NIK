@@ -1,0 +1,10 @@
+{
+ "name": "gnik_sub16_sl27_s0_s27",
+ "mode": "online",
+ "best_heldout_mse": 0.3134077489376068,
+ "best_step": 10000,
+ "params": 5558016,
+ "peak_gpu_mb": 5203.5107421875,
+ "wall_s": 933.5536639690399,
+ "wall_total_s": 933.5496551990509
+}

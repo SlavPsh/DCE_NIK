@@ -1,20 +1,20 @@
 # helios agent
 
-updated 2026-09-26 11:49:09 on worker02.cluster, job 3380809, cycle 193
+updated 2026-09-26 13:37:22 on worker02.cluster, job 3380809, cycle 246
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3387046 | 091_p14_nik_render | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3387046 | 091_p14_nik_render | 1 PENDING QOSMaxGRESPerUser |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 091_p14_nik_render | 1 PENDING QOSMaxGRESPerUser |
 | 028_091_progress | exit 0 |
 | 027_091_start | exit 0 |
-| 091_p14_nik_render | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 026_p14_oom | exit 0 |
 | 069_p14_nik | 2 OUT_OF_ME+ 00:46:14, 1 OUT_OF_ME+ 00:46:27, 1 OUT_OF_ME+ 01:30:33, 1 OUT_OF_ME+ 01:30:34, 1 OUT_OF_ME+ 01:30:49, 1 OUT_OF_ME+ 01:31:21, 1 OUT_OF_ME+ 01:31:32, 1 OUT_OF_ME+ 01:31:36, 1 OUT_OF_ME+ 01:31:53, 1 OUT_OF_ME+ 01:32:03, 1 OUT_OF_ME+ 01:32:11, 1 OUT_OF_ME+ 01:32:29, 1 OUT_OF_ME+ 01:32:34, 1 OUT_OF_ME+ 01:32:36, 1 OUT_OF_ME+ 01:32:40, 1 OUT_OF_ME+ 01:32:45, 1 OUT_OF_ME+ 01:32:51, 1 OUT_OF_ME+ 01:34:48, 2 OUT_OF_ME+ 01:35:02 |
 | 025_p14_nik_progress | exit 0 |
