@@ -1,0 +1,39 @@
+2026-09-25 20:07:13 host gpu02.cluster job 3381107 task 6 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 2g.24gb     Device  0: (UUID: MIG-281c0c74-ddae-5f82-9b91-3e7d8a855877)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+task 6: tofts8 slice 27 seed 0 -> results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl27_s0
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 215 VAL spokes
+    spoke-reduction: 1727 acquired spokes, 7073792 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 1m578ew1
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl27_s0/wandb_runs/wandb/run-20260925_200719-1m578ew1
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl27_s0_s27
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/1m578ew1
+[wandb] gnik_tofts8_sl27_s0_s27: mode online
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.937, 'rot180': 0.937, 'fliplr': 0.937, 'flipud': 0.936})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:329: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 1.295e+00  heldout 6.544e-01
+    step   2000  train 1.194e+00  heldout 6.033e-01
+    step   3000  train 1.136e+00  heldout 5.769e-01
+    step   4000  train 1.091e+00  heldout 5.718e-01
+    step   5000  train 1.070e+00  heldout 5.555e-01
+    step   6000  train 1.037e+00  heldout 5.438e-01
+    step   7000  train 9.820e-01  heldout 5.295e-01
+    step   8000  train 9.516e-01  heldout 5.229e-01
+    step   9000  train 9.090e-01  heldout 5.187e-01
+    step  10000  train 8.793e-01  heldout 5.174e-01
+    final weights kept (best heldout 5.174e-01 at step 10000)
+2026-09-25 21:39:23 TRAIN_DONE tofts8 sl27 s0 exit 137
+slurmstepd-gpu02: error: Detected 1 oom_kill event in StepId=3381107.batch. Some of the step tasks have been OOM Killed.

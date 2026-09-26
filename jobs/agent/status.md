@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-26 06:12:33 on worker02.cluster, job 3380809, cycle 28
+updated 2026-09-26 06:53:21 on worker02.cluster, job 3380809, cycle 48
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3380545 | 069_p14_nik | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 069_p14_nik | 1 RUNNING None |
+| 069_p14_nik | 2 OUT_OF_ME+ 00:46:14, 1 OUT_OF_ME+ 00:46:27, 1 OUT_OF_ME+ 01:30:33, 1 OUT_OF_ME+ 01:30:34, 1 OUT_OF_ME+ 01:30:49, 1 OUT_OF_ME+ 01:31:21, 1 OUT_OF_ME+ 01:31:32, 1 OUT_OF_ME+ 01:31:36, 1 OUT_OF_ME+ 01:31:53, 1 OUT_OF_ME+ 01:32:03, 1 OUT_OF_ME+ 01:32:11, 1 OUT_OF_ME+ 01:32:29, 1 OUT_OF_ME+ 01:32:34, 1 OUT_OF_ME+ 01:32:36, 1 OUT_OF_ME+ 01:32:40, 1 OUT_OF_ME+ 01:32:45, 1 OUT_OF_ME+ 01:32:51, 1 OUT_OF_ME+ 01:34:48, 2 OUT_OF_ME+ 01:35:02 |
 | 025_p14_nik_progress | exit 0 |
 | 090_p14_grasp_preview | 1 COMPLETED 00:00:07 |
 | 024_p14_refs | exit 0 |

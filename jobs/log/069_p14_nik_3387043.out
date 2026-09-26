@@ -1,0 +1,37 @@
+2026-09-26 05:24:53 host gpu02.cluster job 3387043 task 19 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 2g.24gb     Device  0: (UUID: MIG-281c0c74-ddae-5f82-9b91-3e7d8a855877)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+task 19: free slice 24 seed 0 -> results/tofts_vs_patlak/p14/invivo_prod/free_sl24_s0
+device=cuda
+model=wire_ff_res h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 215 VAL spokes
+    spoke-reduction: 1727 acquired spokes, 7073792 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run m32xfkzd
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/p14/invivo_prod/free_sl24_s0/wandb_runs/wandb/run-20260926_052500-m32xfkzd
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_free_sl24_s0_s24
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/m32xfkzd
+[wandb] gnik_free_sl24_s0_s24: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:424: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last, support=sup_last, pisco=pisco_last,
+    step   1000  train 1.129e+00  heldout 5.521e-01
+    step   2000  train 1.058e+00  heldout 5.363e-01
+    step   3000  train 1.026e+00  heldout 5.286e-01
+    step   4000  train 9.462e-01  heldout 5.162e-01
+    step   5000  train 7.790e-01  heldout 4.587e-01
+    step   6000  train 6.680e-01  heldout 4.122e-01
+    step   7000  train 5.778e-01  heldout 3.768e-01
+    step   8000  train 5.188e-01  heldout 3.434e-01
+    step   9000  train 4.068e-01  heldout 3.010e-01
+    step  10000  train 3.535e-01  heldout 2.773e-01
+    final weights kept (best heldout 2.773e-01 at step 10000)
+2026-09-26 06:11:19 TRAIN_DONE free sl24 s0 exit 137
+slurmstepd-gpu02: error: Detected 1 oom_kill event in StepId=3387043.batch. Some of the step tasks have been OOM Killed.
