@@ -67,3 +67,16 @@ PEAK exit 0
   sl21 free s1: MISSING
   sl21 free s2: MISSING
   sl24 tofts8 s0: aorta_aff 0.0656 cortex_aff nan fwhm 344.4s | val 2.527e-01 test 2.561e-01
+  sl24 tofts8 s1: aorta_aff 0.0423 cortex_aff nan fwhm 214.0s | val 2.547e-01 test 2.578e-01
+  sl24 tofts8 s2: aorta_aff 0.0477 cortex_aff nan fwhm 210.2s | val 2.514e-01 test 2.548e-01
+  sl24 patlak s0: aorta_aff 0.0444 cortex_aff nan fwhm 214.0s | val 2.536e-01 test 2.552e-01
+  sl24 patlak s1: MISSING
+  sl24 patlak s2: MISSING
+  sl24 sub16 s0: aorta_aff 0.2224 cortex_aff nan fwhm 324.2s | val 1.007e-01 test 9.963e-02
+  sl24 sub16 s1: MISSING
+  sl24 sub16 s2: MISSING
+   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
+  sl24 free s0: aorta_aff 0.0971 cortex_aff nan fwhm 339.4s | val nan test nan
+  sl24 free s1: MISSING
+  sl24 free s2: MISSING
+  sl27 tofts8 s0: aorta_aff 0.0374 cortex_aff nan fwhm 233.0s | val 2.261e-01 test 2.292e-01
