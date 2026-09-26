@@ -1,21 +1,21 @@
 # helios agent
 
-updated 2026-09-25 23:48:56 on worker04.cluster, job 3379851, cycle 185
+updated 2026-09-26 03:49:33 on worker04.cluster, job 3379851, cycle 303
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3380545 | 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3380545 | 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 | 025_p14_nik_progress | exit 0 |
 | 090_p14_grasp_preview | 1 COMPLETED 00:00:07 |
 | 024_p14_refs | exit 0 |
-| 069_p14_nik | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 068_tvweight_stat | 1 COMPLETED 00:00:40 |
 | 088_p14_grasp_refs | 1 COMPLETED 00:00:01, 1 COMPLETED 00:08:09, 1 COMPLETED 00:08:10, 1 COMPLETED 00:08:25 |
 | 068_p14_basis_grasp | 1 FAILED 02:01:28 |
