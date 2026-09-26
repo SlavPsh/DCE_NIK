@@ -44,7 +44,7 @@ def main():
             p = frame(v, t, ts); r = frame(cs, tcs, ts); r = r * (np.sum(p[body] * r[body]) / (np.sum(r[body] ** 2) + 1e-12))
             out[f"flatnoise_{int(ts)}"] = float(p[flat].std() / (p[flat].mean() + 1e-12))                                                   # spatial noise in flat tissue
             hp_p = p - ndi.gaussian_filter(p, 3.0); hp_r = r - ndi.gaussian_filter(r, 3.0); out[f"highpass_{int(ts)}"] = float(np.sqrt((hp_p[body] ** 2).mean()) / (np.sqrt((hp_r[body] ** 2).mean()) + 1e-12))   # fine-scale energy vs reference
-            if kb is not None: gy, gx = np.gradient(p); out[f"edge_{int(ts)}"] = float(np.sqrt(gy ** 2 + gx ** 2)[kb].mean() / (p[rois["cortex"]].mean() + 1e-12))   # kidney edge sharpness
+            if kb is not None: gy, gx = np.gradient(p); out[f"edge_{int(ts)}"] = float(np.sqrt(gy ** 2 + gx ** 2)[kb].mean() / (p[rois[dsp.T1]].mean() + 1e-12))   # tissue edge sharpness (kidney on p3, liver elsewhere)
         cst = np.array([v[..., i][static].mean() for i in range(nt)]); hp = cst - np.convolve(cst, np.ones(9) / 9, mode="same"); out["static_noise"] = float(np.std(hp[5:-5]) / (np.abs(cst).mean() + 1e-12))
         for r in (dsp.T1, dsp.T2):
             c = np.array([v[..., i][rois[r]].mean() for i in range(nt)]); pk, wo = amp(c, t); out[f"{r}_peak"] = pk / (ref_amp[r][0] + 1e-12); out[f"{r}_washout"] = wo / (ref_amp[r][1] + 1e-12)
@@ -82,21 +82,21 @@ def main():
     for var, st in rows["steps"].items():
         if not st: continue
         s = sorted(st); ax[0].plot(s, [st[k]["haarpsi_90"] for k in s], "-o", ms=3, label=var); ax[1].plot(s, [st[k]["airE_90"] for k in s], "-o", ms=3, label=var); ax[2].plot(s, [st[k]["static_noise"] for k in s], "-o", ms=3, label=var)
-        ax[3].plot([st[k]["cortex_nrmse"] for k in s], [st[k]["haarpsi_90"] for k in s], "-", lw=0.8, alpha=0.6); ax[3].scatter([st[k]["cortex_nrmse"] for k in s], [st[k]["haarpsi_90"] for k in s], c=s, cmap="viridis", s=14, label=var)
+        ax[3].plot([st[k][f"{dsp.T1}_nrmse"] for k in s], [st[k]["haarpsi_90"] for k in s], "-", lw=0.8, alpha=0.6); ax[3].scatter([st[k][f"{dsp.T1}_nrmse"] for k in s], [st[k]["haarpsi_90"] for k in s], c=s, cmap="viridis", s=14, label=var)
     for r in rows["final"]:
         if r["label"] in ("model-free", "cs100 (GRASP-Pro all spokes)"): continue
-        ax[3].scatter(r["cortex_nrmse"], r["haarpsi_90"], marker="*", s=120, edgecolor="k", label=r["label"], zorder=5)
+        ax[3].scatter(r[f"{dsp.T1}_nrmse"], r["haarpsi_90"], marker="*", s=120, edgecolor="k", label=r["label"], zorder=5)
     for k, ttl in ((0, "HaarPSI at 90 s vs cs100"), (1, "air energy at 90 s (streaks + noise)"), (2, "temporal noise in the static roi")): ax[k].set_title(ttl, fontsize=10); ax[k].set_xlabel("step"); ax[k].legend(fontsize=7)
-    ax[3].set_xlabel("cortex curve NRMSE vs model-free (lower = better dynamics)"); ax[3].set_ylabel("HaarPSI at 90 s (higher = sharper)"); ax[3].set_title("trade-off: snapshots coloured by step, stars = final recons", fontsize=10); ax[3].legend(fontsize=6, loc="lower left")
+    ax[3].set_xlabel(f"{dsp.T1} curve NRMSE vs model-free (lower = better dynamics)"); ax[3].set_ylabel("HaarPSI at 90 s (higher = sharper)"); ax[3].set_title("trade-off: snapshots coloured by step, stars = final recons", fontsize=10); ax[3].legend(fontsize=6, loc="lower left")
     fig.suptitle(f"slice {Z}: image quality vs curve fidelity along training and across methods", fontsize=11); fig.tight_layout(); fig.savefig(f"{R}/figures/iq_track_sl{Z}{TG}.png", dpi=130, facecolor="white")
-    names = [n for n in ("cs100 (GRASP-Pro all spokes)", "GRASP", "GRASP-Pro", "NIK-tofts8 old (3k, restore)", "NIK-tofts8 new (10k, rms1)", "NIK-free", "NIK-sub16") if n in ims]
+    names = [n for n in ("cs100 (GRASP-Pro all spokes)", "GRASP", "GRASP-Pro", "NIK-tofts8 old (3k, restore)", "NIK-tofts8 new (10k, rms1)", "NIK-free", "NIK-sub16") if n in ims] + [n for n in ims if n not in ("cs100 (GRASP-Pro all spokes)", "GRASP", "GRASP-Pro", "NIK-tofts8 old (3k, restore)", "NIK-tofts8 new (10k, rms1)", "NIK-free", "NIK-sub16")]   # iq_extra items appended
     c = np.argwhere(rois[dsp.T1]).mean(0).astype(int); h = 46
     fig, ax = plt.subplots(2, len(names), figsize=(3.1 * len(names), 6.4))
     for j, n in enumerate(names):
         for i in range(2):
             im = ims[n][i]; sl = (slice(max(c[0] - h, 0), c[0] + h), slice(max(c[1] - 2 * h, 0), c[1] + 2 * h)); ax[i, j].imshow(im[sl], cmap="gray", vmin=0, vmax=np.percentile(im[body], 99.5)); ax[i, j].axis("off")
             if i == 0: ax[i, j].set_title(n, fontsize=8)
-    ax[0, 0].set_ylabel("t = 90 s"); ax[1, 0].set_ylabel("t = 300 s"); fig.suptitle(f"slice {Z}: kidney zoom at 90 s (top) and 300 s (bottom), one global scale, same k80 input", fontsize=10); fig.tight_layout()
+    ax[0, 0].set_ylabel("t = 90 s"); ax[1, 0].set_ylabel("t = 300 s"); fig.suptitle(f"slice {Z}: {dsp.T1} zoom at 90 s (top) and 300 s (bottom), one global scale, same k80 input", fontsize=10); fig.tight_layout()
     fig.savefig(f"{R}/figures/iq_zoom_sl{Z}{TG}.png", dpi=140, facecolor="white"); print("IQ_TRACK_DONE")
 
 if __name__ == "__main__": main()
