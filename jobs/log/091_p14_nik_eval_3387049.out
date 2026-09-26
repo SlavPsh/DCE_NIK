@@ -22,3 +22,4 @@ MF_PEAK_DONE
 [W926 14:13:00.047516808 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
 31 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 5e-06}
 21 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 5e-06}
+15 {'aorta': 8e-06, 'liver': 5e-06, 'spleen': 5e-06}
