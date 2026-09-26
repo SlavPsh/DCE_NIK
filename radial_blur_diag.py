@@ -7,7 +7,6 @@ import sys, os, argparse, json, numpy as np, scipy.ndimage as ndi
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 B = "/net/beegfs/users/P101440/DCE_NIK"; sys.path.insert(0, B)
 import dsp, consolidated as C
-from story_figs import ls_scale
 
 def frame(v, t, ts, w=10):
     m = (t > ts - w) & (t < ts + w); return v[..., m].mean(2) if m.any() else v[..., int(np.argmin(np.abs(t - ts)))]
@@ -28,7 +27,7 @@ def main():
         if not os.path.exists(path): print("missing", path); continue
         v = np.abs(np.load(path)).astype(np.float32)
         if v.shape[:2] != body.shape: print("wrong grid, skipped", lab, v.shape); continue
-        t = (np.arange(v.shape[-1]) + 0.5) * TA / v.shape[-1]; items.append((lab, frame(ls_scale(v, cs, body), t, a.t)))
+        t = (np.arange(v.shape[-1]) + 0.5) * TA / v.shape[-1]; f = frame(v, t, a.t); items.append((lab, f * (np.sum(f[body] * ref[body]) / (np.sum(f[body] ** 2) + 1e-12))))   # scalar ls scale of the frame to the reference frame
     rh = hp(ref); rows = []; maps = {}
     for lab, im in items:
         h = hp(im); r = []
