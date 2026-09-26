@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-09-26 11:10:16 on worker02.cluster, job 3380809, cycle 174
+updated 2026-09-26 11:14:23 on worker02.cluster, job 3380809, cycle 176
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3387046 | 091_p14_nik_render | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 091_p14_nik_render | 1 PENDING None |
 | 026_p14_oom | exit 0 |
 | 069_p14_nik | 2 OUT_OF_ME+ 00:46:14, 1 OUT_OF_ME+ 00:46:27, 1 OUT_OF_ME+ 01:30:33, 1 OUT_OF_ME+ 01:30:34, 1 OUT_OF_ME+ 01:30:49, 1 OUT_OF_ME+ 01:31:21, 1 OUT_OF_ME+ 01:31:32, 1 OUT_OF_ME+ 01:31:36, 1 OUT_OF_ME+ 01:31:53, 1 OUT_OF_ME+ 01:32:03, 1 OUT_OF_ME+ 01:32:11, 1 OUT_OF_ME+ 01:32:29, 1 OUT_OF_ME+ 01:32:34, 1 OUT_OF_ME+ 01:32:36, 1 OUT_OF_ME+ 01:32:40, 1 OUT_OF_ME+ 01:32:45, 1 OUT_OF_ME+ 01:32:51, 1 OUT_OF_ME+ 01:34:48, 2 OUT_OF_ME+ 01:35:02 |
 | 025_p14_nik_progress | exit 0 |
@@ -30,4 +32,3 @@ updated 2026-09-26 11:10:16 on worker02.cluster, job 3380809, cycle 174
 | 082_p14_rois_seeded | 1 COMPLETED 00:00:07 |
 | 081_p14_grids | 1 COMPLETED 00:00:20 |
 | 071_p14_prep_24_27 | 1 COMPLETED 00:33:45, 1 COMPLETED 00:49:26 |
-| 080_roi_p14_sl21_seed | 1 COMPLETED 00:00:06 |
