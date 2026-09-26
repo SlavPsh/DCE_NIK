@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-26 11:16:28 on worker02.cluster, job 3380809, cycle 177
+updated 2026-09-26 11:49:09 on worker02.cluster, job 3380809, cycle 193
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-09-26 11:16:28 on worker02.cluster, job 3380809, cycle 177
 
 | name | state |
 |---|---|
+| 028_091_progress | exit 0 |
 | 027_091_start | exit 0 |
 | 091_p14_nik_render | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 026_p14_oom | exit 0 |
@@ -31,4 +32,3 @@ updated 2026-09-26 11:16:28 on worker02.cluster, job 3380809, cycle 177
 | 084_p14_rois_seeded_v3 | 1 COMPLETED 00:00:16 |
 | 083_p14_rois_seeded_v2 | 1 COMPLETED 00:00:19 |
 | 082_p14_rois_seeded | 1 COMPLETED 00:00:07 |
-| 081_p14_grids | 1 COMPLETED 00:00:20 |

@@ -1,0 +1,6 @@
+probe 028_091_progress
+host worker02.cluster
+start 2026-09-26 11:49:09
+end 2026-09-26 11:49:09
+exit 0
+log jobs/log/probe_028_091_progress.out

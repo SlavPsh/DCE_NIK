@@ -1,0 +1,44 @@
+11:49:09
+       JOBID         NAME ST     TIME NODELIST(REASON)
+   3387046_6      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_7      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_8      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_9      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+  3387046_10      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+JobID|MaxRSS|AveRSS
+JobID|MaxRSS|AveRSS
+== jobs/log/091_p14_nik_render_3387056.out
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    resumed slice 24 from step 10000 (best heldout 4.504e-01)
+    final weights kept (best heldout 4.504e-01 at step 10000)
+== jobs/log/091_p14_nik_render_3387057.out
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    resumed slice 24 from step 10000 (best heldout 4.513e-01)
+    final weights kept (best heldout 4.513e-01 at step 9000)
+== jobs/log/091_p14_nik_render_3387051.out
+slice 21  nik (256, 256, 431)  (932s)  vs CS: corr 0.957  nrmse 0.198
+done 933s -> results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl21_s2
+2026-09-26 11:45:49 TRAIN_DONE tofts8 sl21 s2 exit 0
+== jobs/log/091_p14_nik_render_3387052.out
+slice 24  nik (256, 256, 431)  (932s)  vs CS: corr 0.957  nrmse 0.199
+done 933s -> results/tofts_vs_patlak/p14/invivo_prod/tofts8_sl24_s0
+2026-09-26 11:45:49 TRAIN_DONE tofts8 sl24 s0 exit 0
+  
+  
+5 11:29 .
+18 06:05 ..
+22154185 11:29 model_slice_21.pt
+112984192 11:29 nik_slice_21.npy
+225968256 11:29 nik_slice_21_cplx.npy
+4536 11:30 train.log
+2 11:29 wandb_runs
+  
+  
+  
+5 11:29 .
+18 06:05 ..
+22154185 11:29 model_slice_21.pt
+112984192 11:29 nik_slice_21.npy
+225968256 11:29 nik_slice_21_cplx.npy
+4536 11:29 train.log
+2 11:29 wandb_runs
