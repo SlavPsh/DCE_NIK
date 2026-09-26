@@ -53,3 +53,17 @@ reading: ratio > 1 at narrow windows = the 31-spoke reference under-reads the pe
 MF_PEAK_DONE
 [W926 14:19:55.143569309 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
 PEAK exit 0
+  sl21 tofts8 s0: aorta_aff 0.0351 cortex_aff nan fwhm 269.7s | val 2.723e-01 test 2.764e-01
+  sl21 tofts8 s1: aorta_aff 0.0444 cortex_aff nan fwhm 219.1s | val 2.691e-01 test 2.718e-01
+  sl21 tofts8 s2: aorta_aff 0.0460 cortex_aff nan fwhm 271.0s | val 2.690e-01 test 2.712e-01
+  sl21 patlak s0: aorta_aff 0.0369 cortex_aff nan fwhm 238.1s | val 2.711e-01 test 2.756e-01
+  sl21 patlak s1: MISSING
+  sl21 patlak s2: MISSING
+  sl21 sub16 s0: aorta_aff 0.1980 cortex_aff nan fwhm 198.8s | val 8.717e-02 test 8.691e-02
+  sl21 sub16 s1: MISSING
+  sl21 sub16 s2: MISSING
+   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
+  sl21 free s0: aorta_aff 0.0671 cortex_aff nan fwhm 317.8s | val nan test nan
+  sl21 free s1: MISSING
+  sl21 free s2: MISSING
+  sl24 tofts8 s0: aorta_aff 0.0656 cortex_aff nan fwhm 344.4s | val 2.527e-01 test 2.561e-01
