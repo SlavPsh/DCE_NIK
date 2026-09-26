@@ -1,0 +1,10 @@
+{
+ "name": "gnik_patlak_sl21_s0_s21",
+ "mode": "online",
+ "best_heldout_mse": 0.5003089308738708,
+ "best_step": 10000,
+ "params": 5520966,
+ "peak_gpu_mb": 5170.7744140625,
+ "wall_s": 934.5007197856903,
+ "wall_total_s": 934.4967248439789
+}
