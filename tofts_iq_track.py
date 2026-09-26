@@ -35,6 +35,7 @@ def main():
     mfc = {r: np.array([mf[..., i][rois[r]].mean() for i in range(mf.shape[-1])]) for r in (dsp.T1, dsp.T2)}; ref_amp = {r: amp(mfc[r], tmf) for r in mfc}
     def iq(v, t, label):
         nt = v.shape[-1]
+        if v.shape[:2] != body.shape: raise SystemExit(f"{label}: grid {v.shape[:2]} is not the dataset grid {body.shape} (wrong dataset file)")
         if nt not in RW: RW[nt] = refwin(nt)
         v = ls_scale(v, RW[nt], body); out = dict(label=label)
         for ts in (90.0, 300.0):
@@ -56,6 +57,7 @@ def main():
            ("NIK-tofts8 old (3k, restore)", f"{B}/results/tofts_vs_patlak/invivo_k80/tofts8_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None), ("NIK-tofts8 new (10k, rms1)", f"{B}/results/tofts_vs_patlak/invivo_k80_rms1/tofts8_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None),
            ("NIK-tofts new (10k, rms1)", f"{B}/results/tofts_vs_patlak/invivo_k80_rms1/tofts_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None), ("NIK-patlak new (10k)", f"{B}/results/tofts_vs_patlak/invivo_k80_rms1/patlak_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None),
            ("GRASP-Pro", f"{GP}/cs_slice{Z}_f80match.npy", None), ("GRASP", f"{GV}/gv2_slice{Z}_n12_k80.npy", None)]
+    if dsp.DS != "p3": fin = [f for f in fin if not f[0].startswith("NIK-")]                                    # legacy p3 run paths (slice numbers overlap across datasets)
     for spec in [x for x in os.environ.get("IQ_EXTRA", "").split(",") if x]: fin.append((spec.split(":")[0], spec.split(":")[1], None))   # IQ_EXTRA name:path,...
     ims = {}
     for nm, v, t in fin:

@@ -13,18 +13,20 @@ COL = {"aorta": "cyan", dsp.T1: "lime", dsp.T2: "orange", dsp.STATIC: "magenta"}
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slices", default="21,18,19"); ap.add_argument("--t-show", type=float, default=90.0); a = ap.parse_args(); TA = dsp.TA
-    L = ["# roi check, in vivo k80 (masks from consolidated.slice_ctx: grasp-pro 100% anatomy, identical for every method)", "", "| slice | " + " | ".join(f"{r} px" for r in COL) + " | cortex/medulla centroid (row, col) | aorta centroid |", "|---|" + "---|" * (len(COL) + 2)]
+    L = ["# roi check, in vivo k80 (masks from consolidated.slice_ctx: grasp-pro 100% anatomy, identical for every method)", "", "| slice | " + " | ".join(f"{r} px" for r in COL) + " | " + dsp.T1 + "/" + dsp.T2 + " centroid (row, col) | aorta centroid |", "|---|" + "---|" * (len(COL) + 2)]
     for Z in [int(s) for s in a.slices.split(",")]:
         ctx = C.slice_ctx(Z); rois = ctx["rois"]; z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0); tmf = np.asarray(z["tmf"], float)
         IV = f"{B}/results/tofts_vs_patlak/invivo_k80"
         src = [("model-free", mf, tmf), ("NIK-free", f"{B}/results_sl{Z}_k80/nik_slice_{Z}.npy", None), ("NIK-sub16", f"{B}/results/realdata_nik_vs_cs_figures/outcoil_subspace_output_slice{Z}.npy", None),
                ("NIK-patlak", f"{IV}/patlak_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None), ("NIK-tofts", f"{IV}/tofts_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None), ("NIK-tofts8", f"{IV}/tofts8_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None),
                ("GRASP-Pro", f"{GP}/cs_slice{Z}_f80match.npy", None), ("GRASP", f"{GV}/gv2_slice{Z}_n12_k80.npy", None)]
+        if dsp.DS != "p3": src = [s for s in src if not s[0].startswith("NIK-")] + [(f"NIK-{arm}", f"{B}/results/tofts_vs_patlak/{dsp.DS}/invivo_prod/{arm}_sl{Z}_s0/nik_slice_{Z}_cplx.npy", None) for arm in ("tofts8", "patlak", "sub16", "free")]   # legacy p3 paths overlap in slice number
         ims = []
         for nm, v, t in src:
             if isinstance(v, str):
                 if not os.path.exists(v): print("missing", v); continue
                 v = np.abs(np.load(v)).astype(np.float32)
+                if v.shape[:2] != ctx["BODY"].shape: print("wrong grid, skipped", nm, v.shape); continue
             nt = v.shape[-1]; t = t if t is not None else (np.arange(nt) + 0.5) * TA / nt
             if nm == "model-free": m = (tmf > a.t_show - 8) & (tmf < a.t_show + 8); im = v[..., m].mean(2)
             else: im = v[..., int(np.argmin(np.abs(t - a.t_show)))]

@@ -124,7 +124,7 @@ for Z in SLICES:
 json.dump(rows, open(f"{RES}/invivo{SUF}.json", "w"), indent=1)
 keys = [f"{dsp.T1}_peak_ratio", f"{dsp.T1}_washout_ratio", f"{dsp.T2}_peak_ratio", f"{dsp.T2}_washout_ratio", "aorta_peak_ratio", "aorta_washout_ratio", "mf_aorta_affine", f"mf_{dsp.T1}_affine", f"mf_{dsp.T2}_affine", f"mf_{dsp.STATIC}_affine", "mf_aorta_scale", f"mf_{dsp.T1}_scale", f"mf_{dsp.T2}_scale", "aorta_peak_ratio_vs_mf",
         "aorta_fwhm_s", "aorta_ttp_s", "aorta_neg_frac", "aorta_rise_mono", "cortex_medulla_late_corr", "train_kNMSE", "val_kNMSE", "test_kNMSE", "wall_s", "peak_gpu_mb", "params"]
-lines = [f"# in vivo (meas_p3_dce, slices {'/'.join(map(str, SLICES))}, {SPK})", "",
+lines = [f"# in vivo ({os.path.basename(dsp.RAW)[:-4]}, slices {'/'.join(map(str, SLICES))}, {SPK})", "",
          "rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).", ""]
 L = [LABEL.get(a, a) for a in ARMS]
 for Z in SLICES:
