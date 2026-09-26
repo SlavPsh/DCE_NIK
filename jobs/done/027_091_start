@@ -1,0 +1,6 @@
+probe 027_091_start
+host worker02.cluster
+start 2026-09-26 11:16:28
+end 2026-09-26 11:16:28
+exit 0
+log jobs/log/probe_027_091_start.out

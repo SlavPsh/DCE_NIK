@@ -1,0 +1,25 @@
+11:16:28
+ebee2ff recon_nik_cart: frame-chunked coil combine (512 grid render oom at 40G)
+b9d2ee0 probe 027: 091 start
+       JOBID PARTITION         NAME ST     TIME NODELIST(REASON)
+   3387049_0       gpu  p14nik_eval PD     0:00 (Dependency)
+   3387046_2       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_3       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_4       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_5       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_6       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+   3387046_7       gpu      p14nikR PD     0:00 (QOSMaxGRESPerUser)
+== jobs/log/091_p14_nik_render_3387047.out
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 215 VAL spokes
+    spoke-reduction: 1727 acquired spokes, 7073792 samples, heldout=yes (same input as CS)
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    resumed slice 21 from step 10000 (best heldout 5.543e-01)
+    final weights kept (best heldout 5.543e-01 at step 10000)
+== jobs/log/091_p14_nik_render_3387048.out
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 215 VAL spokes
+    spoke-reduction: 1727 acquired spokes, 7073792 samples, heldout=yes (same input as CS)
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    resumed slice 21 from step 10000 (best heldout 5.583e-01)
+    final weights kept (best heldout 5.583e-01 at step 10000)
