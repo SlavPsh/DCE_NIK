@@ -1,5 +1,6 @@
 queue 093_radial_blur
 jid 3387075
 submitted 2026-09-26 19:01:59
-state 1 PENDING None
+state 1 COMPLETED 00:00:28
 log jobs/log/093_radial_blur_3387075.out
+ended 2026-09-26 19:04:03
