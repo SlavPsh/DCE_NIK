@@ -1,5 +1,5 @@
 queue 095_p14_bandwidth
 jid 3387077
 submitted 2026-09-26 19:10:18
-state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
+state 2 RUNNING None
 log jobs/log/095_p14_bandwidth_3387077.out
