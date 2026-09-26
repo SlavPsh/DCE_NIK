@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-09-26 19:06:08 on worker01.cluster, job 3386992, cycle 62
+updated 2026-09-26 19:08:11 on worker01.cluster, job 3386992, cycle 63
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3387076 | 094_radial_blur | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 094_radial_blur | 1 PENDING None |
+| 094_radial_blur | 1 COMPLETED 00:00:28 |
 | 093_radial_blur | 1 COMPLETED 00:00:28 |
 | 092_p14_iq | 1 COMPLETED 00:00:35 |
 | 091_p14_nik_render | 1 COMPLETED 00:15:30, 2 COMPLETED 00:15:31, 1 COMPLETED 00:15:34, 3 COMPLETED 00:15:35, 4 COMPLETED 00:15:36, 1 COMPLETED 00:15:37, 2 COMPLETED 00:15:39, 4 COMPLETED 00:15:40, 3 COMPLETED 00:15:41 |
