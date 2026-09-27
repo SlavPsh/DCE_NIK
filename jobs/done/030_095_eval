@@ -1,0 +1,6 @@
+probe 030_095_eval
+host worker01.cluster
+start 2026-09-27 10:47:44
+end 2026-09-27 10:47:44
+exit 0
+log jobs/log/probe_030_095_eval.out

@@ -1,0 +1,9 @@
+10:47:44
+       JOBID           NAME ST     TIME NODELIST(REASON)
+     3391102   helios-agent PD     0:00 (Dependency)
+     3387074   helios-agent  R  6:02:41 worker01
+JobID|JobName|State|Elapsed|Reason
+results/tofts_vs_patlak/p14/bw_test/ks3.5/nik_slice_24_cplx.npy
+results/tofts_vs_patlak/p14/bw_test/ks3.5_w90/nik_slice_24_cplx.npy
+results/tofts_vs_patlak/p14/bw_test/ks5/nik_slice_24_cplx.npy
+results/tofts_vs_patlak/p14/bw_test/w90/nik_slice_24_cplx.npy

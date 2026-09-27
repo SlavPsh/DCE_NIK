@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-09-27 04:45:05 on worker01.cluster, job 3387074, cycle 1
+updated 2026-09-27 10:47:44 on worker01.cluster, job 3387074, cycle 179
 
 ## active
 
@@ -11,6 +11,7 @@ updated 2026-09-27 04:45:05 on worker01.cluster, job 3387074, cycle 1
 
 | name | state |
 |---|---|
+| 030_095_eval | exit 0 |
 | 095_p14_bandwidth | 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:45 |
 | 029_095_start | exit 0 |
 | 094_radial_blur | 1 COMPLETED 00:00:28 |
@@ -30,4 +31,3 @@ updated 2026-09-27 04:45:05 on worker01.cluster, job 3387074, cycle 1
 | 067_zprofile | 1 COMPLETED 00:00:51 |
 | 066_z_profile | exit 0 |
 | 087_p14_roi_ingest | 1 COMPLETED 00:00:03 |
-| 023_mv_templates | exit 0 |
