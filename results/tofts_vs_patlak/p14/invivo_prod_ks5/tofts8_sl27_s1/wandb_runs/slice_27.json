@@ -1,0 +1,17 @@
+{
+ "name": "gnik_tofts8_sl27_s1_s27",
+ "mode": "online",
+ "loss": 0.7458779215812683,
+ "heldout_mse": 0.5372224450111389,
+ "val_knmse": 0.6434837247061607,
+ "best_heldout_mse": 0.5207105278968811,
+ "coef_tv": 0.0,
+ "support": 0.0025480101467110217,
+ "pisco": 0.0,
+ "best_step": 5000,
+ "lr": 1e-05,
+ "wall_s": 5555.350780963898,
+ "peak_gpu_mb": 12837.71630859375,
+ "params": 5531216,
+ "wall_total_s": 5555.3467836380005
+}
