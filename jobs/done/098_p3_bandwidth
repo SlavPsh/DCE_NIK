@@ -1,5 +1,6 @@
 queue 098_p3_bandwidth
 jid 3391129
 submitted 2026-09-27 12:48:18
-state 2 RUNNING None
+state 1 COMPLETED 01:03:58, 1 COMPLETED 01:04:01
 log jobs/log/098_p3_bandwidth_3391129.out
+ended 2026-09-27 23:10:43

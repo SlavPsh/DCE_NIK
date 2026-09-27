@@ -1,0 +1,31 @@
+2026-09-27 23:09:05 host gpu02.cluster job 3391162 task 0 stage eval
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 1g.12gb     Device  0: (UUID: MIG-a52ef66e-5a7b-5c27-915b-53701fe3da22)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+# sharpness vs radius, p3 slice 21, 90 s frame; fine-scale rms (highpass sigma 3) / same of cs100 per annulus of the body mask; intensity ratio in brackets
+
+| recon | 0-16 px | 16-32 px | 32-48 px | 48-64 px | 64-80 px | 80-96 px |
+|---|---|---|---|---|---|---|
+| cs100 (ref) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) |
+| tofts8 sigma2.5 (prod) | 0.94 (1.11) | 1.10 (1.07) | 0.95 (1.00) | 0.93 (1.00) | 0.89 (1.00) | 0.80 (0.94) |
+| sigma3.5 | 0.96 (1.10) | 1.09 (1.06) | 0.96 (1.00) | 0.94 (0.99) | 0.89 (1.00) | 0.82 (0.94) |
+| sigma5 | 0.92 (1.06) | 1.06 (1.06) | 0.94 (1.01) | 0.91 (1.00) | 0.86 (1.00) | 0.82 (0.94) |
+| GRASP | 0.79 (1.07) | 0.88 (1.08) | 0.87 (1.04) | 0.83 (1.02) | 0.67 (0.97) | 0.67 (0.94) |
+| GRASP-Pro | 0.62 (0.89) | 0.76 (0.93) | 0.79 (0.96) | 0.85 (1.01) | 1.01 (1.05) | 0.99 (1.05) |
+
+relative to GRASP (fine-scale ratio item / grasp per annulus):
+
+| cs100 (ref) | 1.27 | 1.13 | 1.15 | 1.21 | 1.49 | 1.49 |
+| tofts8 sigma2.5 (prod) | 1.20 | 1.24 | 1.09 | 1.13 | 1.33 | 1.20 |
+| sigma3.5 | 1.22 | 1.24 | 1.10 | 1.14 | 1.32 | 1.22 |
+| sigma5 | 1.17 | 1.20 | 1.07 | 1.11 | 1.28 | 1.22 |
+| GRASP | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| GRASP-Pro | 0.79 | 0.86 | 0.91 | 1.03 | 1.51 | 1.48 |
+RADIAL_DONE
+[W927 23:09:12.170360211 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+RADIAL exit 0
+saved results/tofts_vs_patlak/figures/p3_bw_sl21.png
+[W927 23:09:17.432283812 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+FIG exit 0
