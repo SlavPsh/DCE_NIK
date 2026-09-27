@@ -154,3 +154,19 @@ TEST-spoke k-space NMSE per |k| annulus:
 | 0.81-0.88 | 1.073e+00 |
 | 0.88-0.94 | 1.108e+00 |
 | 0.94-1.00 | 1.123e+00 |
+
+## reference peak correction
+
+the 31-spoke model-free reference (6.8 s window) clips the first-pass peak; factor = peak at an 11-spoke window / peak at 31 spokes (`mf_peak_check.py`, per-spoke normalized, approved rois). corrected ratio = ratio vs the 31-spoke reference / factor. state this with every peak comparison.
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 21 | liver | 1.06 | 0.92 (raw 0.98) | 0.94 (raw 1.01) | 0.68 (raw 0.72) |
+| 21 | spleen | 1.07 | 0.90 (raw 0.96) | 1.00 (raw 1.07) | 0.98 (raw 1.05) |
+| 21 | aorta | 1.09 | 0.89 (raw 0.97) | 0.77 (raw 0.85) | 0.73 (raw 0.79) |
+| 24 | liver | 1.09 | 0.90 (raw 0.98) | 0.91 (raw 1.00) | 0.61 (raw 0.66) |
+| 24 | spleen | 1.08 | 0.82 (raw 0.89) | 0.93 (raw 1.01) | 0.54 (raw 0.59) |
+| 24 | aorta | 1.02 | 0.87 (raw 0.89) | 0.79 (raw 0.81) | 0.43 (raw 0.44) |
+| 27 | liver | 1.13 | 0.88 (raw 0.99) | 0.87 (raw 0.98) | 0.69 (raw 0.78) |
+| 27 | spleen | 1.09 | 0.82 (raw 0.89) | 0.93 (raw 1.01) | 0.50 (raw 0.55) |
+| 27 | aorta | 1.07 | 0.79 (raw 0.84) | 0.76 (raw 0.82) | 0.40 (raw 0.43) |

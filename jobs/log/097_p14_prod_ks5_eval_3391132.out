@@ -179,3 +179,359 @@ EVAL exit 0
   sl24 tofts8 s0: aorta_aff 0.0563 cortex_aff nan fwhm 339.4s | val 2.547e-01 test 2.562e-01
   sl24 tofts8 s1: MISSING
   sl24 tofts8 s2: MISSING
+  sl27 tofts8 s0: aorta_aff 0.0489 cortex_aff nan fwhm 341.9s | val 2.237e-01 test 2.259e-01
+  sl27 tofts8 s1: MISSING
+  sl27 tofts8 s2: MISSING
+# in vivo (meas_topqmri_p14, slices 21/24/27, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
+
+rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
+
+## slice 21
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| liver_peak_ratio | 1 ± 0 (1) |  | 1.005 | 0.7193 |
+| liver_washout_ratio | 1.066 ± 0 (1) |  | 1.073 | 0.8801 |
+| spleen_peak_ratio | 0.9167 ± 0 (1) |  | 1.069 | 1.051 |
+| spleen_washout_ratio | 0.9495 ± 0 (1) |  | 1.128 | 1.067 |
+| aorta_peak_ratio | 0.8584 ± 0 (1) |  | 0.8454 | 0.792 |
+| aorta_washout_ratio | 1.084 ± 0 (1) |  | 1.125 | 0.9252 |
+| mf_aorta_affine | 0.05646 ± 0 (1) |  | 0.06276 | 0.1551 |
+| mf_liver_affine | 0.03986 ± 0 (1) |  | 0.02897 | 0.06528 |
+| mf_spleen_affine | 0.03048 ± 0 (1) |  | 0.03147 | 0.05841 |
+| mf_static_affine | 0.01918 ± 0 (1) |  | 0.01614 | 0.03601 |
+| mf_aorta_scale | 0.08689 ± 0 (1) |  | 0.1004 | 0.246 |
+| mf_liver_scale | 0.07966 ± 0 (1) |  | 0.05826 | 0.1315 |
+| mf_spleen_scale | 0.05248 ± 0 (1) |  | 0.05689 | 0.1023 |
+| aorta_peak_ratio_vs_mf | 0.8584 ± 0 (1) |  | 0.8454 | 0.792 |
+| aorta_fwhm_s | 341.9 ± 0 (1) |  | 345.7 | 234.3 |
+| aorta_ttp_s | 54.63 ± 0 (1) |  | 53.36 | 62.23 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.006579 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.8511 |
+| cortex_medulla_late_corr | 0.9775 ± 0 (1) |  | 0.9812 | 0.3957 |
+| train_kNMSE | 0.2504 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2695 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2733 ± 0 (1) |  | nan | nan |
+| wall_s | 5522 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.283e+04 ± 0 (1) |  | nan | nan |
+| params | 5.642e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 164.61038961038963
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.537e-01 |
+| 0.06-0.12 | 5.552e-01 |
+| 0.12-0.19 | 7.762e-01 |
+| 0.19-0.25 | 8.210e-01 |
+| 0.25-0.31 | 7.852e-01 |
+| 0.31-0.38 | 7.859e-01 |
+| 0.38-0.44 | 8.285e-01 |
+| 0.44-0.50 | 8.478e-01 |
+| 0.50-0.56 | 8.406e-01 |
+| 0.56-0.62 | 8.599e-01 |
+| 0.62-0.69 | 9.310e-01 |
+| 0.69-0.75 | 9.324e-01 |
+| 0.75-0.81 | 9.693e-01 |
+| 0.81-0.88 | 9.409e-01 |
+| 0.88-0.94 | 9.942e-01 |
+| 0.94-1.00 | 1.020e+00 |
+
+## slice 24
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| liver_peak_ratio | 0.969 ± 0 (1) |  | 0.9963 | 0.6594 |
+| liver_washout_ratio | 1.02 ± 0 (1) |  | 1.071 | 0.7786 |
+| spleen_peak_ratio | 0.8565 ± 0 (1) |  | 1.006 | 0.5909 |
+| spleen_washout_ratio | 0.9038 ± 0 (1) |  | 1.082 | 0.6307 |
+| aorta_peak_ratio | 0.8566 ± 0 (1) |  | 0.8087 | 0.4435 |
+| aorta_washout_ratio | 1.025 ± 0 (1) |  | 1.093 | 0.4443 |
+| mf_aorta_affine | 0.05633 ± 0 (1) |  | 0.08018 | 0.1783 |
+| mf_liver_affine | 0.02776 ± 0 (1) |  | 0.02434 | 0.06781 |
+| mf_spleen_affine | 0.0288 ± 0 (1) |  | 0.03766 | 0.0698 |
+| mf_static_affine | 0.02393 ± 0 (1) |  | 0.01905 | 0.05442 |
+| mf_aorta_scale | 0.08044 ± 0 (1) |  | 0.1182 | 0.2871 |
+| mf_liver_scale | 0.057 ± 0 (1) |  | 0.05001 | 0.1391 |
+| mf_spleen_scale | 0.04949 ± 0 (1) |  | 0.06732 | 0.1199 |
+| aorta_peak_ratio_vs_mf | 0.8566 ± 0 (1) |  | 0.8087 | 0.4435 |
+| aorta_fwhm_s | 339.4 ± 0 (1) |  | 345.7 | 70.91 |
+| aorta_ttp_s | 48.3 ± 0 (1) |  | 69.82 | 59.69 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.009868 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.8 |
+| cortex_medulla_late_corr | 0.9937 ± 0 (1) |  | 0.9912 | -0.02402 |
+| train_kNMSE | 0.2381 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2547 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2562 ± 0 (1) |  | nan | nan |
+| wall_s | 5522 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.283e+04 ± 0 (1) |  | nan | nan |
+| params | 5.642e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 162.07792207792212
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.388e-01 |
+| 0.06-0.12 | 5.504e-01 |
+| 0.12-0.19 | 7.392e-01 |
+| 0.19-0.25 | 7.260e-01 |
+| 0.25-0.31 | 7.358e-01 |
+| 0.31-0.38 | 6.686e-01 |
+| 0.38-0.44 | 7.984e-01 |
+| 0.44-0.50 | 6.987e-01 |
+| 0.50-0.56 | 6.969e-01 |
+| 0.56-0.62 | 7.249e-01 |
+| 0.62-0.69 | 6.634e-01 |
+| 0.69-0.75 | 6.979e-01 |
+| 0.75-0.81 | 7.200e-01 |
+| 0.81-0.88 | 6.943e-01 |
+| 0.88-0.94 | 6.886e-01 |
+| 0.94-1.00 | 7.024e-01 |
+
+## slice 27
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| liver_peak_ratio | 0.9962 ± 0 (1) |  | 0.9778 | 0.7799 |
+| liver_washout_ratio | 1.054 ± 0 (1) |  | 1.047 | 0.8155 |
+| spleen_peak_ratio | 0.8459 ± 0 (1) |  | 1.005 | 0.5465 |
+| spleen_washout_ratio | 0.8965 ± 0 (1) |  | 1.08 | 0.7082 |
+| aorta_peak_ratio | 0.8377 ± 0 (1) |  | 0.8151 | 0.4317 |
+| aorta_washout_ratio | 0.9811 ± 0 (1) |  | 1.06 | 0.475 |
+| mf_aorta_affine | 0.04889 ± 0 (1) |  | 0.0594 | 0.1828 |
+| mf_liver_affine | 0.02401 ± 0 (1) |  | 0.02041 | 0.05849 |
+| mf_spleen_affine | 0.0291 ± 0 (1) |  | 0.03264 | 0.09962 |
+| mf_static_affine | 0.0213 ± 0 (1) |  | 0.02001 | 0.04029 |
+| mf_aorta_scale | 0.06771 ± 0 (1) |  | 0.08333 | 0.2832 |
+| mf_liver_scale | 0.05093 ± 0 (1) |  | 0.04324 | 0.1236 |
+| mf_spleen_scale | 0.05147 ± 0 (1) |  | 0.06003 | 0.1746 |
+| aorta_peak_ratio_vs_mf | 0.8377 ± 0 (1) |  | 0.8151 | 0.4317 |
+| aorta_fwhm_s | 341.9 ± 0 (1) |  | 345.7 | 46.85 |
+| aorta_ttp_s | 48.3 ± 0 (1) |  | 68.56 | 59.69 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.01316 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.8 |
+| cortex_medulla_late_corr | 0.9908 ± 0 (1) |  | 0.9975 | 0.2277 |
+| train_kNMSE | 0.215 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2237 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2259 ± 0 (1) |  | nan | nan |
+| wall_s | 5520 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.283e+04 ± 0 (1) |  | nan | nan |
+| params | 5.642e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 196.26623376623377
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.174e-01 |
+| 0.06-0.12 | 5.017e-01 |
+| 0.12-0.19 | 5.789e-01 |
+| 0.19-0.25 | 6.659e-01 |
+| 0.25-0.31 | 7.094e-01 |
+| 0.31-0.38 | 7.610e-01 |
+| 0.38-0.44 | 8.306e-01 |
+| 0.44-0.50 | 8.659e-01 |
+| 0.50-0.56 | 9.030e-01 |
+| 0.56-0.62 | 9.519e-01 |
+| 0.62-0.69 | 9.829e-01 |
+| 0.69-0.75 | 9.925e-01 |
+| 0.75-0.81 | 1.023e+00 |
+| 0.81-0.88 | 1.036e+00 |
+| 0.88-0.94 | 1.067e+00 |
+| 0.94-1.00 | 1.091e+00 |
+
+INVIVO_EVAL_DONE
+[W927 22:09:36.553418197 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+EVAL oc exit 0
+appended to /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_p14_prod_ks5.md
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 21 | liver | 1.06 | 0.92 (raw 0.98) | 0.94 (raw 1.01) | 0.68 (raw 0.72) |
+| 21 | spleen | 1.07 | 0.90 (raw 0.96) | 1.00 (raw 1.07) | 0.98 (raw 1.05) |
+| 21 | aorta | 1.09 | 0.89 (raw 0.97) | 0.77 (raw 0.85) | 0.73 (raw 0.79) |
+| 24 | liver | 1.09 | 0.90 (raw 0.98) | 0.91 (raw 1.00) | 0.61 (raw 0.66) |
+| 24 | spleen | 1.08 | 0.82 (raw 0.89) | 0.93 (raw 1.01) | 0.54 (raw 0.59) |
+| 24 | aorta | 1.02 | 0.87 (raw 0.89) | 0.79 (raw 0.81) | 0.43 (raw 0.44) |
+| 27 | liver | 1.13 | 0.88 (raw 0.99) | 0.87 (raw 0.98) | 0.69 (raw 0.78) |
+| 27 | spleen | 1.09 | 0.82 (raw 0.89) | 0.93 (raw 1.01) | 0.50 (raw 0.55) |
+| 27 | aorta | 1.07 | 0.79 (raw 0.84) | 0.76 (raw 0.82) | 0.40 (raw 0.43) |
+appended to /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_p14_prod_ks5_oc.md
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 21 | liver | 1.06 | 0.94 (raw 1.00) | 0.94 (raw 1.01) | 0.68 (raw 0.72) |
+| 21 | spleen | 1.07 | 0.86 (raw 0.92) | 1.00 (raw 1.07) | 0.98 (raw 1.05) |
+| 21 | aorta | 1.09 | 0.79 (raw 0.86) | 0.77 (raw 0.85) | 0.73 (raw 0.79) |
+| 24 | liver | 1.09 | 0.89 (raw 0.97) | 0.91 (raw 1.00) | 0.61 (raw 0.66) |
+| 24 | spleen | 1.08 | 0.79 (raw 0.86) | 0.93 (raw 1.01) | 0.54 (raw 0.59) |
+| 24 | aorta | 1.02 | 0.84 (raw 0.86) | 0.79 (raw 0.81) | 0.43 (raw 0.44) |
+| 27 | liver | 1.13 | 0.88 (raw 1.00) | 0.87 (raw 0.98) | 0.69 (raw 0.78) |
+| 27 | spleen | 1.09 | 0.78 (raw 0.85) | 0.93 (raw 1.01) | 0.50 (raw 0.55) |
+| 27 | aorta | 1.07 | 0.78 (raw 0.84) | 0.76 (raw 0.82) | 0.40 (raw 0.43) |
+PEAKCORR exit 0
+model-free {'haarpsi_90': 0.595, 'ssim_90': 0.68, 'psnr_90': np.float64(28.541), 'airE_90': 0.427, 'haarpsi_300': 0.613, 'ssim_300': 0.69, 'psnr_300': np.float64(25.239), 'airE_300': 0.442, 'flatnoise_90': 0.41, 'highpass_90': 0.965, 'edge_90': 0.165, 'flatnoise_300': 0.423, 'highpass_300': 0.953, 'edge_300': 0.149, 'static_noise': 0.014, 'liver_peak': 0.969, 'liver_washout': 0.969, 'liver_nrmse': 0.031, 'spleen_peak': 0.969, 'spleen_washout': 0.969, 'spleen_nrmse': 0.031}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(119.899), 'airE_90': 0.144, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(116.65), 'airE_300': 0.145, 'flatnoise_90': 0.449, 'highpass_90': 1.0, 'edge_90': 0.148, 'flatnoise_300': 0.445, 'highpass_300': 1.0, 'edge_300': 0.14, 'static_noise': 0.018, 'liver_peak': 1.029, 'liver_washout': 1.11, 'liver_nrmse': 0.137, 'spleen_peak': 1.06, 'spleen_washout': 1.181, 'spleen_nrmse': 0.175}
+GRASP-Pro {'haarpsi_90': 0.891, 'ssim_90': 0.962, 'psnr_90': np.float64(38.274), 'airE_90': 0.153, 'haarpsi_300': 0.946, 'ssim_300': 0.981, 'psnr_300': np.float64(39.853), 'airE_300': 0.152, 'flatnoise_90': 0.441, 'highpass_90': 0.985, 'edge_90': 0.145, 'flatnoise_300': 0.441, 'highpass_300': 1.012, 'edge_300': 0.143, 'static_noise': 0.033, 'liver_peak': 0.728, 'liver_washout': 0.888, 'liver_nrmse': 0.204, 'spleen_peak': 1.028, 'spleen_washout': 1.014, 'spleen_nrmse': 0.101}
+GRASP {'haarpsi_90': 0.703, 'ssim_90': 0.833, 'psnr_90': np.float64(31.456), 'airE_90': 0.141, 'haarpsi_300': 0.693, 'ssim_300': 0.831, 'psnr_300': np.float64(28.441), 'airE_300': 0.15, 'flatnoise_90': 0.397, 'highpass_90': 0.733, 'edge_90': 0.137, 'flatnoise_300': 0.412, 'highpass_300': 0.72, 'edge_300': 0.122, 'static_noise': 0.002, 'liver_peak': 1.016, 'liver_washout': 1.086, 'liver_nrmse': 0.1, 'spleen_peak': 1.065, 'spleen_washout': 1.117, 'spleen_nrmse': 0.119}
+tofts8 sigma2.5 (prod) {'haarpsi_90': 0.708, 'ssim_90': 0.822, 'psnr_90': np.float64(32.05), 'airE_90': 0.114, 'haarpsi_300': 0.757, 'ssim_300': 0.861, 'psnr_300': np.float64(30.63), 'airE_300': 0.115, 'flatnoise_90': 0.423, 'highpass_90': 0.846, 'edge_90': 0.148, 'flatnoise_300': 0.426, 'highpass_300': 0.873, 'edge_300': 0.139, 'static_noise': 0.003, 'liver_peak': 1.009, 'liver_washout': 1.071, 'liver_nrmse': 0.12, 'spleen_peak': 0.972, 'spleen_washout': 0.997, 'spleen_nrmse': 0.052}
+tofts8 sigma5 {'haarpsi_90': 0.764, 'ssim_90': 0.865, 'psnr_90': np.float64(34.003), 'airE_90': 0.122, 'haarpsi_300': 0.837, 'ssim_300': 0.923, 'psnr_300': np.float64(33.594), 'airE_300': 0.115, 'flatnoise_90': 0.424, 'highpass_90': 0.926, 'edge_90': 0.154, 'flatnoise_300': 0.431, 'highpass_300': 0.936, 'edge_300': 0.14, 'static_noise': 0.004, 'liver_peak': 0.988, 'liver_washout': 1.047, 'liver_nrmse': 0.104, 'spleen_peak': 0.964, 'spleen_washout': 0.995, 'spleen_nrmse': 0.053}
+tofts8 sigma5 s1 {'haarpsi_90': 0.757, 'ssim_90': 0.865, 'psnr_90': np.float64(34.532), 'airE_90': 0.123, 'haarpsi_300': 0.833, 'ssim_300': 0.92, 'psnr_300': np.float64(33.448), 'airE_300': 0.116, 'flatnoise_90': 0.427, 'highpass_90': 0.93, 'edge_90': 0.157, 'flatnoise_300': 0.44, 'highpass_300': 0.943, 'edge_300': 0.143, 'static_noise': 0.004, 'liver_peak': 0.974, 'liver_washout': 1.05, 'liver_nrmse': 0.1, 'spleen_peak': 0.948, 'spleen_washout': 0.998, 'spleen_nrmse': 0.059}
+tofts8 sigma5 s2 {'haarpsi_90': 0.752, 'ssim_90': 0.861, 'psnr_90': np.float64(33.128), 'airE_90': 0.116, 'haarpsi_300': 0.83, 'ssim_300': 0.918, 'psnr_300': np.float64(32.565), 'airE_300': 0.112, 'flatnoise_90': 0.423, 'highpass_90': 0.918, 'edge_90': 0.155, 'flatnoise_300': 0.43, 'highpass_300': 0.924, 'edge_300': 0.141, 'static_noise': 0.004, 'liver_peak': 0.989, 'liver_washout': 1.064, 'liver_nrmse': 0.109, 'spleen_peak': 0.961, 'spleen_washout': 1.008, 'spleen_nrmse': 0.055}
+tofts8 sigma5 out-coil {'haarpsi_90': 0.772, 'ssim_90': 0.868, 'psnr_90': np.float64(33.807), 'airE_90': 0.118, 'haarpsi_300': 0.851, 'ssim_300': 0.928, 'psnr_300': np.float64(33.458), 'airE_300': 0.111, 'flatnoise_90': 0.425, 'highpass_90': 0.921, 'edge_90': 0.154, 'flatnoise_300': 0.444, 'highpass_300': 0.937, 'edge_300': 0.141, 'static_noise': 0.002, 'liver_peak': 1.007, 'liver_washout': 1.073, 'liver_nrmse': 0.119, 'spleen_peak': 0.915, 'spleen_washout': 0.944, 'spleen_nrmse': 0.084}
+GRASP {'haarpsi_90': 0.703, 'ssim_90': 0.833, 'psnr_90': np.float64(31.456), 'airE_90': 0.141, 'haarpsi_300': 0.693, 'ssim_300': 0.831, 'psnr_300': np.float64(28.441), 'airE_300': 0.15, 'flatnoise_90': 0.397, 'highpass_90': 0.733, 'edge_90': 0.137, 'flatnoise_300': 0.412, 'highpass_300': 0.72, 'edge_300': 0.122, 'static_noise': 0.002, 'liver_peak': 1.016, 'liver_washout': 1.086, 'liver_nrmse': 0.1, 'spleen_peak': 1.065, 'spleen_washout': 1.117, 'spleen_nrmse': 0.119}
+GRASP-Pro {'haarpsi_90': 0.891, 'ssim_90': 0.962, 'psnr_90': np.float64(38.274), 'airE_90': 0.153, 'haarpsi_300': 0.946, 'ssim_300': 0.981, 'psnr_300': np.float64(39.853), 'airE_300': 0.152, 'flatnoise_90': 0.441, 'highpass_90': 0.985, 'edge_90': 0.145, 'flatnoise_300': 0.441, 'highpass_300': 1.012, 'edge_300': 0.143, 'static_noise': 0.033, 'liver_peak': 0.728, 'liver_washout': 0.888, 'liver_nrmse': 0.204, 'spleen_peak': 1.028, 'spleen_washout': 1.014, 'spleen_nrmse': 0.101}
+# image quality vs curve fidelity, slice 21, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)
+
+| recon | haarpsi_90 | ssim_90 | airE_90 | flatnoise_90 | highpass_90 | edge_90 | haarpsi_300 | airE_300 | flatnoise_300 | highpass_300 | edge_300 | liver_peak | liver_washout | liver_nrmse | spleen_nrmse |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| model-free | 0.595 | 0.680 | 0.427 | 0.410 | 0.965 | 0.165 | 0.613 | 0.442 | 0.423 | 0.953 | 0.149 | 0.969 | 0.969 | 0.031 | 0.031 |
+| cs100 (GRASP-Pro all spokes) | 1.000 | 1.000 | 0.144 | 0.449 | 1.000 | 0.148 | 1.000 | 0.145 | 0.445 | 1.000 | 0.140 | 1.029 | 1.110 | 0.137 | 0.175 |
+| GRASP-Pro | 0.891 | 0.962 | 0.153 | 0.441 | 0.985 | 0.145 | 0.946 | 0.152 | 0.441 | 1.012 | 0.143 | 0.728 | 0.888 | 0.204 | 0.101 |
+| GRASP | 0.703 | 0.833 | 0.141 | 0.397 | 0.733 | 0.137 | 0.693 | 0.150 | 0.412 | 0.720 | 0.122 | 1.016 | 1.086 | 0.100 | 0.119 |
+| tofts8 sigma2.5 (prod) | 0.708 | 0.822 | 0.114 | 0.423 | 0.846 | 0.148 | 0.757 | 0.115 | 0.426 | 0.873 | 0.139 | 1.009 | 1.071 | 0.120 | 0.052 |
+| tofts8 sigma5 | 0.764 | 0.865 | 0.122 | 0.424 | 0.926 | 0.154 | 0.837 | 0.115 | 0.431 | 0.936 | 0.140 | 0.988 | 1.047 | 0.104 | 0.053 |
+| tofts8 sigma5 s1 | 0.757 | 0.865 | 0.123 | 0.427 | 0.930 | 0.157 | 0.833 | 0.116 | 0.440 | 0.943 | 0.143 | 0.974 | 1.050 | 0.100 | 0.059 |
+| tofts8 sigma5 s2 | 0.752 | 0.861 | 0.116 | 0.423 | 0.918 | 0.155 | 0.830 | 0.112 | 0.430 | 0.924 | 0.141 | 0.989 | 1.064 | 0.109 | 0.055 |
+| tofts8 sigma5 out-coil | 0.772 | 0.868 | 0.118 | 0.425 | 0.921 | 0.154 | 0.851 | 0.111 | 0.444 | 0.937 | 0.141 | 1.007 | 1.073 | 0.119 | 0.084 |
+| GRASP | 0.703 | 0.833 | 0.141 | 0.397 | 0.733 | 0.137 | 0.693 | 0.150 | 0.412 | 0.720 | 0.122 | 1.016 | 1.086 | 0.100 | 0.119 |
+| GRASP-Pro | 0.891 | 0.962 | 0.153 | 0.441 | 0.985 | 0.145 | 0.946 | 0.152 | 0.441 | 1.012 | 0.143 | 0.728 | 0.888 | 0.204 | 0.101 |
+IQ_TRACK_DONE
+[W927 22:09:50.644287693 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+saved results/tofts_vs_patlak/figures/p14_ks5_sl21.png
+[W927 22:09:58.256687817 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+# sharpness vs radius, p14 slice 21, 90 s frame; fine-scale rms (highpass sigma 3) / same of cs100 per annulus of the body mask; intensity ratio in brackets
+
+| recon | 0-16 px | 16-32 px | 32-48 px | 48-64 px | 64-80 px | 80-96 px | 96-112 px | 112-128 px |
+|---|---|---|---|---|---|---|---|---|
+| cs100 (ref) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) |
+| tofts8 sigma2.5 (prod) | 1.14 (1.16) | 1.11 (1.06) | 1.12 (1.07) | 0.98 (1.03) | 0.85 (0.99) | 0.83 (0.96) | 0.79 (0.97) | 0.73 (0.97) |
+| tofts8 sigma5 | 1.18 (1.11) | 1.10 (1.04) | 1.18 (1.07) | 1.04 (1.03) | 0.95 (1.00) | 0.91 (0.98) | 0.87 (0.96) | 0.84 (0.95) |
+| tofts8 sigma5 s1 | 1.20 (1.03) | 1.13 (1.05) | 1.18 (1.05) | 1.07 (1.02) | 0.96 (1.00) | 0.91 (0.98) | 0.87 (0.97) | 0.86 (0.96) |
+| tofts8 sigma5 s2 | 1.17 (1.11) | 1.15 (1.10) | 1.19 (1.08) | 1.05 (1.01) | 0.94 (0.99) | 0.90 (0.97) | 0.85 (0.95) | 0.82 (0.93) |
+| tofts8 sigma5 out-coil | 1.08 (1.04) | 1.12 (1.08) | 1.18 (1.08) | 1.04 (1.03) | 0.94 (1.00) | 0.90 (0.97) | 0.86 (0.96) | 0.84 (0.96) |
+| GRASP | 0.90 (1.05) | 0.87 (1.07) | 0.92 (1.06) | 0.84 (1.02) | 0.78 (1.00) | 0.70 (0.97) | 0.68 (0.97) | 0.65 (0.96) |
+| GRASP-Pro | 0.94 (0.97) | 0.94 (0.97) | 0.97 (0.98) | 0.96 (0.98) | 0.97 (0.98) | 0.99 (1.01) | 0.99 (1.02) | 0.97 (1.03) |
+
+relative to GRASP (fine-scale ratio item / grasp per annulus):
+
+| cs100 (ref) | 1.11 | 1.15 | 1.09 | 1.18 | 1.28 | 1.43 | 1.47 | 1.53 |
+| tofts8 sigma2.5 (prod) | 1.26 | 1.27 | 1.22 | 1.16 | 1.09 | 1.19 | 1.16 | 1.12 |
+| tofts8 sigma5 | 1.32 | 1.26 | 1.29 | 1.23 | 1.21 | 1.30 | 1.28 | 1.29 |
+| tofts8 sigma5 s1 | 1.34 | 1.30 | 1.29 | 1.26 | 1.23 | 1.30 | 1.27 | 1.31 |
+| tofts8 sigma5 s2 | 1.30 | 1.32 | 1.30 | 1.25 | 1.20 | 1.29 | 1.25 | 1.26 |
+| tofts8 sigma5 out-coil | 1.20 | 1.29 | 1.28 | 1.23 | 1.21 | 1.28 | 1.27 | 1.29 |
+| GRASP | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| GRASP-Pro | 1.04 | 1.07 | 1.06 | 1.14 | 1.24 | 1.41 | 1.46 | 1.48 |
+RADIAL_DONE
+[W927 22:10:03.827359173 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+model-free {'haarpsi_90': 0.608, 'ssim_90': 0.683, 'psnr_90': np.float64(25.524), 'airE_90': 0.41, 'haarpsi_300': 0.632, 'ssim_300': 0.704, 'psnr_300': np.float64(24.73), 'airE_300': 0.425, 'flatnoise_90': 0.423, 'highpass_90': 0.954, 'edge_90': 0.18, 'flatnoise_300': 0.438, 'highpass_300': 0.954, 'edge_300': 0.163, 'static_noise': 0.017, 'liver_peak': 0.972, 'liver_washout': 0.972, 'liver_nrmse': 0.028, 'spleen_peak': 0.972, 'spleen_washout': 0.972, 'spleen_nrmse': 0.028}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(116.664), 'airE_90': 0.137, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(115.603), 'airE_300': 0.138, 'flatnoise_90': 0.466, 'highpass_90': 1.0, 'edge_90': 0.171, 'flatnoise_300': 0.461, 'highpass_300': 1.0, 'edge_300': 0.161, 'static_noise': 0.018, 'liver_peak': 0.998, 'liver_washout': 1.091, 'liver_nrmse': 0.115, 'spleen_peak': 0.98, 'spleen_washout': 1.136, 'spleen_nrmse': 0.138}
+GRASP-Pro {'haarpsi_90': 0.846, 'ssim_90': 0.95, 'psnr_90': np.float64(31.988), 'airE_90': 0.148, 'haarpsi_300': 0.957, 'ssim_300': 0.985, 'psnr_300': np.float64(40.037), 'airE_300': 0.139, 'flatnoise_90': 0.458, 'highpass_90': 0.988, 'edge_90': 0.162, 'flatnoise_300': 0.455, 'highpass_300': 0.997, 'edge_300': 0.164, 'static_noise': 0.029, 'liver_peak': 0.672, 'liver_washout': 0.791, 'liver_nrmse': 0.293, 'spleen_peak': 0.593, 'spleen_washout': 0.626, 'spleen_nrmse': 0.424}
+GRASP {'haarpsi_90': 0.722, 'ssim_90': 0.856, 'psnr_90': np.float64(29.345), 'airE_90': 0.129, 'haarpsi_300': 0.723, 'ssim_300': 0.854, 'psnr_300': np.float64(28.517), 'airE_300': 0.136, 'flatnoise_90': 0.418, 'highpass_90': 0.778, 'edge_90': 0.158, 'flatnoise_300': 0.434, 'highpass_300': 0.761, 'edge_300': 0.139, 'static_noise': 0.001, 'liver_peak': 1.004, 'liver_washout': 1.079, 'liver_nrmse': 0.086, 'spleen_peak': 1.007, 'spleen_washout': 1.08, 'spleen_nrmse': 0.096}
+tofts8 sigma2.5 (prod) {'haarpsi_90': 0.664, 'ssim_90': 0.759, 'psnr_90': np.float64(27.186), 'airE_90': 0.104, 'haarpsi_300': 0.692, 'ssim_300': 0.795, 'psnr_300': np.float64(26.838), 'airE_300': 0.106, 'flatnoise_90': 0.435, 'highpass_90': 0.736, 'edge_90': 0.16, 'flatnoise_300': 0.445, 'highpass_300': 0.742, 'edge_300': 0.153, 'static_noise': 0.003, 'liver_peak': 0.982, 'liver_washout': 1.041, 'liver_nrmse': 0.076, 'spleen_peak': 0.876, 'spleen_washout': 0.949, 'spleen_nrmse': 0.095}
+tofts8 sigma5 {'haarpsi_90': 0.761, 'ssim_90': 0.851, 'psnr_90': np.float64(30.489), 'airE_90': 0.114, 'haarpsi_300': 0.833, 'ssim_300': 0.914, 'psnr_300': np.float64(31.919), 'airE_300': 0.11, 'flatnoise_90': 0.448, 'highpass_90': 0.89, 'edge_90': 0.167, 'flatnoise_300': 0.457, 'highpass_300': 0.897, 'edge_300': 0.158, 'static_noise': 0.003, 'liver_peak': 1.008, 'liver_washout': 1.054, 'liver_nrmse': 0.09, 'spleen_peak': 0.872, 'spleen_washout': 0.943, 'spleen_nrmse': 0.092}
+tofts8 sigma5 s1 {'haarpsi_90': 0.755, 'ssim_90': 0.856, 'psnr_90': np.float64(30.749), 'airE_90': 0.116, 'haarpsi_300': 0.824, 'ssim_300': 0.917, 'psnr_300': np.float64(31.748), 'airE_300': 0.11, 'flatnoise_90': 0.449, 'highpass_90': 0.89, 'edge_90': 0.166, 'flatnoise_300': 0.457, 'highpass_300': 0.891, 'edge_300': 0.157, 'static_noise': 0.005, 'liver_peak': 1.008, 'liver_washout': 1.071, 'liver_nrmse': 0.098, 'spleen_peak': 0.895, 'spleen_washout': 0.978, 'spleen_nrmse': 0.075}
+tofts8 sigma5 s2 {'haarpsi_90': 0.759, 'ssim_90': 0.851, 'psnr_90': np.float64(30.801), 'airE_90': 0.116, 'haarpsi_300': 0.823, 'ssim_300': 0.911, 'psnr_300': np.float64(31.533), 'airE_300': 0.11, 'flatnoise_90': 0.459, 'highpass_90': 0.918, 'edge_90': 0.17, 'flatnoise_300': 0.458, 'highpass_300': 0.908, 'edge_300': 0.158, 'static_noise': 0.004, 'liver_peak': 0.944, 'liver_washout': 1.013, 'liver_nrmse': 0.062, 'spleen_peak': 0.912, 'spleen_washout': 1.004, 'spleen_nrmse': 0.063}
+tofts8 sigma5 out-coil {'haarpsi_90': 0.787, 'ssim_90': 0.873, 'psnr_90': np.float64(30.841), 'airE_90': 0.113, 'haarpsi_300': 0.852, 'ssim_300': 0.926, 'psnr_300': np.float64(32.137), 'airE_300': 0.106, 'flatnoise_90': 0.449, 'highpass_90': 0.904, 'edge_90': 0.167, 'flatnoise_300': 0.474, 'highpass_300': 0.921, 'edge_300': 0.159, 'static_noise': 0.001, 'liver_peak': 0.975, 'liver_washout': 1.027, 'liver_nrmse': 0.07, 'spleen_peak': 0.859, 'spleen_washout': 0.906, 'spleen_nrmse': 0.115}
+GRASP {'haarpsi_90': 0.722, 'ssim_90': 0.856, 'psnr_90': np.float64(29.345), 'airE_90': 0.129, 'haarpsi_300': 0.723, 'ssim_300': 0.854, 'psnr_300': np.float64(28.517), 'airE_300': 0.136, 'flatnoise_90': 0.418, 'highpass_90': 0.778, 'edge_90': 0.158, 'flatnoise_300': 0.434, 'highpass_300': 0.761, 'edge_300': 0.139, 'static_noise': 0.001, 'liver_peak': 1.004, 'liver_washout': 1.079, 'liver_nrmse': 0.086, 'spleen_peak': 1.007, 'spleen_washout': 1.08, 'spleen_nrmse': 0.096}
+GRASP-Pro {'haarpsi_90': 0.846, 'ssim_90': 0.95, 'psnr_90': np.float64(31.988), 'airE_90': 0.148, 'haarpsi_300': 0.957, 'ssim_300': 0.985, 'psnr_300': np.float64(40.037), 'airE_300': 0.139, 'flatnoise_90': 0.458, 'highpass_90': 0.988, 'edge_90': 0.162, 'flatnoise_300': 0.455, 'highpass_300': 0.997, 'edge_300': 0.164, 'static_noise': 0.029, 'liver_peak': 0.672, 'liver_washout': 0.791, 'liver_nrmse': 0.293, 'spleen_peak': 0.593, 'spleen_washout': 0.626, 'spleen_nrmse': 0.424}
+# image quality vs curve fidelity, slice 24, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)
+
+| recon | haarpsi_90 | ssim_90 | airE_90 | flatnoise_90 | highpass_90 | edge_90 | haarpsi_300 | airE_300 | flatnoise_300 | highpass_300 | edge_300 | liver_peak | liver_washout | liver_nrmse | spleen_nrmse |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| model-free | 0.608 | 0.683 | 0.410 | 0.423 | 0.954 | 0.180 | 0.632 | 0.425 | 0.438 | 0.954 | 0.163 | 0.972 | 0.972 | 0.028 | 0.028 |
+| cs100 (GRASP-Pro all spokes) | 1.000 | 1.000 | 0.137 | 0.466 | 1.000 | 0.171 | 1.000 | 0.138 | 0.461 | 1.000 | 0.161 | 0.998 | 1.091 | 0.115 | 0.138 |
+| GRASP-Pro | 0.846 | 0.950 | 0.148 | 0.458 | 0.988 | 0.162 | 0.957 | 0.139 | 0.455 | 0.997 | 0.164 | 0.672 | 0.791 | 0.293 | 0.424 |
+| GRASP | 0.722 | 0.856 | 0.129 | 0.418 | 0.778 | 0.158 | 0.723 | 0.136 | 0.434 | 0.761 | 0.139 | 1.004 | 1.079 | 0.086 | 0.096 |
+| tofts8 sigma2.5 (prod) | 0.664 | 0.759 | 0.104 | 0.435 | 0.736 | 0.160 | 0.692 | 0.106 | 0.445 | 0.742 | 0.153 | 0.982 | 1.041 | 0.076 | 0.095 |
+| tofts8 sigma5 | 0.761 | 0.851 | 0.114 | 0.448 | 0.890 | 0.167 | 0.833 | 0.110 | 0.457 | 0.897 | 0.158 | 1.008 | 1.054 | 0.090 | 0.092 |
+| tofts8 sigma5 s1 | 0.755 | 0.856 | 0.116 | 0.449 | 0.890 | 0.166 | 0.824 | 0.110 | 0.457 | 0.891 | 0.157 | 1.008 | 1.071 | 0.098 | 0.075 |
+| tofts8 sigma5 s2 | 0.759 | 0.851 | 0.116 | 0.459 | 0.918 | 0.170 | 0.823 | 0.110 | 0.458 | 0.908 | 0.158 | 0.944 | 1.013 | 0.062 | 0.063 |
+| tofts8 sigma5 out-coil | 0.787 | 0.873 | 0.113 | 0.449 | 0.904 | 0.167 | 0.852 | 0.106 | 0.474 | 0.921 | 0.159 | 0.975 | 1.027 | 0.070 | 0.115 |
+| GRASP | 0.722 | 0.856 | 0.129 | 0.418 | 0.778 | 0.158 | 0.723 | 0.136 | 0.434 | 0.761 | 0.139 | 1.004 | 1.079 | 0.086 | 0.096 |
+| GRASP-Pro | 0.846 | 0.950 | 0.148 | 0.458 | 0.988 | 0.162 | 0.957 | 0.139 | 0.455 | 0.997 | 0.164 | 0.672 | 0.791 | 0.293 | 0.424 |
+IQ_TRACK_DONE
+[W927 22:10:17.134919515 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+saved results/tofts_vs_patlak/figures/p14_ks5_sl24.png
+[W927 22:10:24.834787615 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+# sharpness vs radius, p14 slice 24, 90 s frame; fine-scale rms (highpass sigma 3) / same of cs100 per annulus of the body mask; intensity ratio in brackets
+
+| recon | 0-16 px | 16-32 px | 32-48 px | 48-64 px | 64-80 px | 80-96 px | 96-112 px | 112-128 px |
+|---|---|---|---|---|---|---|---|---|
+| cs100 (ref) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) |
+| tofts8 sigma2.5 (prod) | 1.09 (1.21) | 1.00 (1.12) | 0.99 (1.10) | 0.78 (1.04) | 0.73 (0.99) | 0.71 (0.97) | 0.72 (0.97) | 0.59 (0.96) |
+| tofts8 sigma5 | 1.07 (1.19) | 1.10 (1.13) | 1.17 (1.09) | 0.94 (1.05) | 0.89 (1.00) | 0.88 (0.97) | 0.86 (0.97) | 0.79 (0.94) |
+| tofts8 sigma5 s1 | 1.07 (1.17) | 1.09 (1.12) | 1.13 (1.05) | 0.96 (1.03) | 0.89 (1.00) | 0.88 (0.99) | 0.86 (0.98) | 0.80 (0.95) |
+| tofts8 sigma5 s2 | 1.11 (1.16) | 1.13 (1.11) | 1.21 (1.07) | 0.99 (1.03) | 0.92 (1.00) | 0.90 (0.97) | 0.89 (0.98) | 0.82 (0.96) |
+| tofts8 sigma5 out-coil | 1.12 (1.21) | 1.12 (1.16) | 1.13 (1.09) | 0.95 (1.04) | 0.92 (0.99) | 0.89 (0.97) | 0.87 (0.96) | 0.80 (0.94) |
+| GRASP | 0.93 (1.12) | 0.97 (1.10) | 0.95 (1.06) | 0.84 (1.03) | 0.81 (1.00) | 0.77 (0.99) | 0.76 (0.98) | 0.68 (0.96) |
+| GRASP-Pro | 0.91 (0.94) | 0.89 (0.96) | 0.90 (0.97) | 0.91 (0.97) | 0.93 (0.96) | 0.97 (1.01) | 1.02 (1.02) | 1.00 (1.06) |
+
+relative to GRASP (fine-scale ratio item / grasp per annulus):
+
+| cs100 (ref) | 1.08 | 1.03 | 1.05 | 1.19 | 1.23 | 1.30 | 1.32 | 1.47 |
+| tofts8 sigma2.5 (prod) | 1.18 | 1.03 | 1.04 | 0.93 | 0.90 | 0.93 | 0.95 | 0.87 |
+| tofts8 sigma5 | 1.15 | 1.14 | 1.24 | 1.12 | 1.10 | 1.15 | 1.14 | 1.16 |
+| tofts8 sigma5 s1 | 1.15 | 1.13 | 1.19 | 1.13 | 1.10 | 1.15 | 1.13 | 1.18 |
+| tofts8 sigma5 s2 | 1.20 | 1.17 | 1.27 | 1.17 | 1.13 | 1.18 | 1.17 | 1.20 |
+| tofts8 sigma5 out-coil | 1.21 | 1.16 | 1.19 | 1.13 | 1.13 | 1.17 | 1.15 | 1.18 |
+| GRASP | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| GRASP-Pro | 0.98 | 0.92 | 0.94 | 1.08 | 1.14 | 1.26 | 1.35 | 1.48 |
+RADIAL_DONE
+[W927 22:10:30.399189881 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+model-free {'haarpsi_90': 0.663, 'ssim_90': 0.731, 'psnr_90': np.float64(28.219), 'airE_90': 0.373, 'haarpsi_300': 0.671, 'ssim_300': 0.75, 'psnr_300': np.float64(28.267), 'airE_300': 0.393, 'flatnoise_90': 0.345, 'highpass_90': 0.998, 'edge_90': 0.161, 'flatnoise_300': 0.419, 'highpass_300': 0.982, 'edge_300': 0.142, 'static_noise': 0.017, 'liver_peak': 0.977, 'liver_washout': 0.977, 'liver_nrmse': 0.023, 'spleen_peak': 0.977, 'spleen_washout': 0.977, 'spleen_nrmse': 0.023}
+cs100 (GRASP-Pro all spokes) {'haarpsi_90': 1.0, 'ssim_90': 1.0, 'psnr_90': np.float64(119.585), 'airE_90': 0.136, 'haarpsi_300': 1.0, 'ssim_300': 1.0, 'psnr_300': np.float64(119.46), 'airE_300': 0.142, 'flatnoise_90': 0.408, 'highpass_90': 1.0, 'edge_90': 0.141, 'flatnoise_300': 0.45, 'highpass_300': 1.0, 'edge_300': 0.132, 'static_noise': 0.018, 'liver_peak': 0.992, 'liver_washout': 1.054, 'liver_nrmse': 0.101, 'spleen_peak': 0.974, 'spleen_washout': 1.103, 'spleen_nrmse': 0.119}
+GRASP-Pro {'haarpsi_90': 0.875, 'ssim_90': 0.954, 'psnr_90': np.float64(33.363), 'airE_90': 0.152, 'haarpsi_300': 0.961, 'ssim_300': 0.984, 'psnr_300': np.float64(41.186), 'airE_300': 0.15, 'flatnoise_90': 0.422, 'highpass_90': 1.0, 'edge_90': 0.136, 'flatnoise_300': 0.445, 'highpass_300': 1.004, 'edge_300': 0.137, 'static_noise': 0.018, 'liver_peak': 0.774, 'liver_washout': 0.801, 'liver_nrmse': 0.267, 'spleen_peak': 0.533, 'spleen_washout': 0.676, 'spleen_nrmse': 0.418}
+GRASP {'haarpsi_90': 0.731, 'ssim_90': 0.856, 'psnr_90': np.float64(30.011), 'airE_90': 0.133, 'haarpsi_300': 0.725, 'ssim_300': 0.861, 'psnr_300': np.float64(30.08), 'airE_300': 0.143, 'flatnoise_90': 0.327, 'highpass_90': 0.696, 'edge_90': 0.123, 'flatnoise_300': 0.403, 'highpass_300': 0.677, 'edge_300': 0.109, 'static_noise': 0.001, 'liver_peak': 0.985, 'liver_washout': 1.055, 'liver_nrmse': 0.067, 'spleen_peak': 0.995, 'spleen_washout': 1.058, 'spleen_nrmse': 0.077}
+tofts8 sigma2.5 (prod) {'haarpsi_90': 0.761, 'ssim_90': 0.879, 'psnr_90': np.float64(31.579), 'airE_90': 0.112, 'haarpsi_300': 0.819, 'ssim_300': 0.912, 'psnr_300': np.float64(32.694), 'airE_300': 0.113, 'flatnoise_90': 0.345, 'highpass_90': 0.869, 'edge_90': 0.14, 'flatnoise_300': 0.417, 'highpass_300': 0.873, 'edge_300': 0.126, 'static_noise': 0.001, 'liver_peak': 1.0, 'liver_washout': 1.05, 'liver_nrmse': 0.077, 'spleen_peak': 0.892, 'spleen_washout': 0.96, 'spleen_nrmse': 0.077}
+tofts8 sigma5 {'haarpsi_90': 0.805, 'ssim_90': 0.896, 'psnr_90': np.float64(32.487), 'airE_90': 0.117, 'haarpsi_300': 0.873, 'ssim_300': 0.94, 'psnr_300': np.float64(34.471), 'airE_300': 0.115, 'flatnoise_90': 0.347, 'highpass_90': 0.934, 'edge_90': 0.145, 'flatnoise_300': 0.402, 'highpass_300': 0.934, 'edge_300': 0.129, 'static_noise': 0.001, 'liver_peak': 1.01, 'liver_washout': 1.052, 'liver_nrmse': 0.08, 'spleen_peak': 0.899, 'spleen_washout': 0.93, 'spleen_nrmse': 0.089}
+tofts8 sigma5 s1 {'haarpsi_90': 0.797, 'ssim_90': 0.893, 'psnr_90': np.float64(32.447), 'airE_90': 0.118, 'haarpsi_300': 0.865, 'ssim_300': 0.938, 'psnr_300': np.float64(34.762), 'airE_300': 0.118, 'flatnoise_90': 0.356, 'highpass_90': 0.93, 'edge_90': 0.143, 'flatnoise_300': 0.429, 'highpass_300': 0.935, 'edge_300': 0.126, 'static_noise': 0.001, 'liver_peak': 1.001, 'liver_washout': 1.047, 'liver_nrmse': 0.074, 'spleen_peak': 0.901, 'spleen_washout': 0.975, 'spleen_nrmse': 0.073}
+tofts8 sigma5 s2 {'haarpsi_90': 0.803, 'ssim_90': 0.896, 'psnr_90': np.float64(33.029), 'airE_90': 0.12, 'haarpsi_300': 0.875, 'ssim_300': 0.938, 'psnr_300': np.float64(34.807), 'airE_300': 0.116, 'flatnoise_90': 0.345, 'highpass_90': 0.948, 'edge_90': 0.146, 'flatnoise_300': 0.406, 'highpass_300': 0.941, 'edge_300': 0.129, 'static_noise': 0.001, 'liver_peak': 0.962, 'liver_washout': 1.031, 'liver_nrmse': 0.061, 'spleen_peak': 0.852, 'spleen_washout': 0.932, 'spleen_nrmse': 0.103}
+tofts8 sigma5 out-coil {'haarpsi_90': 0.81, 'ssim_90': 0.898, 'psnr_90': np.float64(32.703), 'airE_90': 0.119, 'haarpsi_300': 0.881, 'ssim_300': 0.943, 'psnr_300': np.float64(34.671), 'airE_300': 0.11, 'flatnoise_90': 0.351, 'highpass_90': 0.946, 'edge_90': 0.147, 'flatnoise_300': 0.415, 'highpass_300': 0.952, 'edge_300': 0.129, 'static_noise': 0.001, 'liver_peak': 1.001, 'liver_washout': 1.059, 'liver_nrmse': 0.08, 'spleen_peak': 0.838, 'spleen_washout': 0.881, 'spleen_nrmse': 0.135}
+GRASP {'haarpsi_90': 0.731, 'ssim_90': 0.856, 'psnr_90': np.float64(30.011), 'airE_90': 0.133, 'haarpsi_300': 0.725, 'ssim_300': 0.861, 'psnr_300': np.float64(30.08), 'airE_300': 0.143, 'flatnoise_90': 0.327, 'highpass_90': 0.696, 'edge_90': 0.123, 'flatnoise_300': 0.403, 'highpass_300': 0.677, 'edge_300': 0.109, 'static_noise': 0.001, 'liver_peak': 0.985, 'liver_washout': 1.055, 'liver_nrmse': 0.067, 'spleen_peak': 0.995, 'spleen_washout': 1.058, 'spleen_nrmse': 0.077}
+GRASP-Pro {'haarpsi_90': 0.875, 'ssim_90': 0.954, 'psnr_90': np.float64(33.363), 'airE_90': 0.152, 'haarpsi_300': 0.961, 'ssim_300': 0.984, 'psnr_300': np.float64(41.186), 'airE_300': 0.15, 'flatnoise_90': 0.422, 'highpass_90': 1.0, 'edge_90': 0.136, 'flatnoise_300': 0.445, 'highpass_300': 1.004, 'edge_300': 0.137, 'static_noise': 0.018, 'liver_peak': 0.774, 'liver_washout': 0.801, 'liver_nrmse': 0.267, 'spleen_peak': 0.533, 'spleen_washout': 0.676, 'spleen_nrmse': 0.418}
+# image quality vs curve fidelity, slice 27, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)
+
+| recon | haarpsi_90 | ssim_90 | airE_90 | flatnoise_90 | highpass_90 | edge_90 | haarpsi_300 | airE_300 | flatnoise_300 | highpass_300 | edge_300 | liver_peak | liver_washout | liver_nrmse | spleen_nrmse |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| model-free | 0.663 | 0.731 | 0.373 | 0.345 | 0.998 | 0.161 | 0.671 | 0.393 | 0.419 | 0.982 | 0.142 | 0.977 | 0.977 | 0.023 | 0.023 |
+| cs100 (GRASP-Pro all spokes) | 1.000 | 1.000 | 0.136 | 0.408 | 1.000 | 0.141 | 1.000 | 0.142 | 0.450 | 1.000 | 0.132 | 0.992 | 1.054 | 0.101 | 0.119 |
+| GRASP-Pro | 0.875 | 0.954 | 0.152 | 0.422 | 1.000 | 0.136 | 0.961 | 0.150 | 0.445 | 1.004 | 0.137 | 0.774 | 0.801 | 0.267 | 0.418 |
+| GRASP | 0.731 | 0.856 | 0.133 | 0.327 | 0.696 | 0.123 | 0.725 | 0.143 | 0.403 | 0.677 | 0.109 | 0.985 | 1.055 | 0.067 | 0.077 |
+| tofts8 sigma2.5 (prod) | 0.761 | 0.879 | 0.112 | 0.345 | 0.869 | 0.140 | 0.819 | 0.113 | 0.417 | 0.873 | 0.126 | 1.000 | 1.050 | 0.077 | 0.077 |
+| tofts8 sigma5 | 0.805 | 0.896 | 0.117 | 0.347 | 0.934 | 0.145 | 0.873 | 0.115 | 0.402 | 0.934 | 0.129 | 1.010 | 1.052 | 0.080 | 0.089 |
+| tofts8 sigma5 s1 | 0.797 | 0.893 | 0.118 | 0.356 | 0.930 | 0.143 | 0.865 | 0.118 | 0.429 | 0.935 | 0.126 | 1.001 | 1.047 | 0.074 | 0.073 |
+| tofts8 sigma5 s2 | 0.803 | 0.896 | 0.120 | 0.345 | 0.948 | 0.146 | 0.875 | 0.116 | 0.406 | 0.941 | 0.129 | 0.962 | 1.031 | 0.061 | 0.103 |
+| tofts8 sigma5 out-coil | 0.810 | 0.898 | 0.119 | 0.351 | 0.946 | 0.147 | 0.881 | 0.110 | 0.415 | 0.952 | 0.129 | 1.001 | 1.059 | 0.080 | 0.135 |
+| GRASP | 0.731 | 0.856 | 0.133 | 0.327 | 0.696 | 0.123 | 0.725 | 0.143 | 0.403 | 0.677 | 0.109 | 0.985 | 1.055 | 0.067 | 0.077 |
+| GRASP-Pro | 0.875 | 0.954 | 0.152 | 0.422 | 1.000 | 0.136 | 0.961 | 0.150 | 0.445 | 1.004 | 0.137 | 0.774 | 0.801 | 0.267 | 0.418 |
+IQ_TRACK_DONE
+[W927 22:10:43.706375624 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+saved results/tofts_vs_patlak/figures/p14_ks5_sl27.png
+[W927 22:10:51.790167491 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+# sharpness vs radius, p14 slice 27, 90 s frame; fine-scale rms (highpass sigma 3) / same of cs100 per annulus of the body mask; intensity ratio in brackets
+
+| recon | 0-16 px | 16-32 px | 32-48 px | 48-64 px | 64-80 px | 80-96 px | 96-112 px | 112-128 px |
+|---|---|---|---|---|---|---|---|---|
+| cs100 (ref) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) | 1.00 (1.00) |
+| tofts8 sigma2.5 (prod) | 1.08 (1.08) | 1.08 (1.16) | 1.12 (1.10) | 0.98 (1.06) | 0.92 (1.01) | 0.87 (0.98) | 0.86 (0.96) | 0.73 (0.95) |
+| tofts8 sigma5 | 1.11 (1.12) | 1.08 (1.18) | 1.16 (1.11) | 1.00 (1.06) | 0.97 (1.02) | 0.92 (0.98) | 0.91 (0.96) | 0.86 (0.94) |
+| tofts8 sigma5 s1 | 1.11 (1.22) | 1.13 (1.20) | 1.18 (1.08) | 1.01 (1.03) | 0.97 (1.00) | 0.91 (0.99) | 0.90 (0.97) | 0.85 (0.94) |
+| tofts8 sigma5 s2 | 1.15 (1.27) | 1.14 (1.20) | 1.22 (1.07) | 1.03 (1.03) | 0.99 (1.00) | 0.93 (0.98) | 0.92 (0.98) | 0.87 (0.96) |
+| tofts8 sigma5 out-coil | 1.13 (1.16) | 1.14 (1.18) | 1.18 (1.10) | 1.02 (1.05) | 0.99 (1.02) | 0.93 (0.97) | 0.91 (0.95) | 0.87 (0.94) |
+| GRASP | 0.85 (1.15) | 0.84 (1.14) | 0.82 (1.06) | 0.76 (1.04) | 0.73 (1.01) | 0.70 (0.99) | 0.70 (0.98) | 0.56 (0.97) |
+| GRASP-Pro | 0.88 (0.91) | 0.87 (0.95) | 0.88 (0.97) | 0.94 (0.98) | 0.95 (0.98) | 0.98 (1.01) | 1.02 (1.01) | 1.01 (1.06) |
+
+relative to GRASP (fine-scale ratio item / grasp per annulus):
+
+| cs100 (ref) | 1.17 | 1.19 | 1.21 | 1.32 | 1.38 | 1.42 | 1.43 | 1.79 |
+| tofts8 sigma2.5 (prod) | 1.26 | 1.29 | 1.36 | 1.29 | 1.26 | 1.23 | 1.23 | 1.30 |
+| tofts8 sigma5 | 1.30 | 1.28 | 1.41 | 1.32 | 1.34 | 1.31 | 1.29 | 1.54 |
+| tofts8 sigma5 s1 | 1.30 | 1.34 | 1.43 | 1.33 | 1.33 | 1.30 | 1.29 | 1.53 |
+| tofts8 sigma5 s2 | 1.35 | 1.36 | 1.48 | 1.36 | 1.36 | 1.33 | 1.31 | 1.56 |
+| tofts8 sigma5 out-coil | 1.32 | 1.35 | 1.44 | 1.34 | 1.36 | 1.32 | 1.30 | 1.55 |
+| GRASP | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| GRASP-Pro | 1.03 | 1.03 | 1.07 | 1.23 | 1.31 | 1.39 | 1.46 | 1.81 |
+RADIAL_DONE
+[W927 22:10:57.337297123 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+IQ+FIGS exit 0
