@@ -1,16 +1,20 @@
 # helios agent
 
-updated 2026-09-27 10:51:53 on worker01.cluster, job 3387074, cycle 181
+updated 2026-09-27 12:48:18 on worker01.cluster, job 3387074, cycle 238
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3391128 | 097_p14_prod_ks5 | 1 PENDING None |
+| 3391129 | 098_p3_bandwidth | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 097_p14_prod_ks5 | 1 PENDING None |
+| 098_p3_bandwidth | 1 PENDING None |
 | 096_p14_bw_eval | 1 COMPLETED 00:00:16 |
 | 030_095_eval | exit 0 |
 | 095_p14_bandwidth | 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:45 |
@@ -29,5 +33,3 @@ updated 2026-09-27 10:51:53 on worker01.cluster, job 3387074, cycle 181
 | 068_tvweight_stat | 1 COMPLETED 00:00:40 |
 | 088_p14_grasp_refs | 1 COMPLETED 00:00:01, 1 COMPLETED 00:08:09, 1 COMPLETED 00:08:10, 1 COMPLETED 00:08:25 |
 | 068_p14_basis_grasp | 1 FAILED 02:01:28 |
-| 067_zprofile | 1 COMPLETED 00:00:51 |
-| 066_z_profile | exit 0 |
