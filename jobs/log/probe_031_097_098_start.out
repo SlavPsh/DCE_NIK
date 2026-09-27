@@ -1,0 +1,15 @@
+12:50:23
+       JOBID       NAME ST     TIME NODELIST(REASON)
+     3391102 helios-age PD     0:00 (Dependency)
+   3391132_0 p14ks5_eva PD     0:00 (Dependency)
+   3391128_2     p14ks5 PD     0:00 (QOSMaxGRESPerUser)
+   3391128_3     p14ks5 PD     0:00 (QOSMaxGRESPerUser)
+   3391128_4     p14ks5 PD     0:00 (QOSMaxGRESPerUser)
+   3391128_5     p14ks5 PD     0:00 (QOSMaxGRESPerUser)
+   3391128_6     p14ks5 PD     0:00 (QOSMaxGRESPerUser)
+== jobs/log/097_p14_prod_ks5_3391131.out
+task 1: tofts8ks5 slice 21 seed 1 -> results/tofts_vs_patlak/p14/invivo_prod_ks5/tofts8_sl21_s1
+model=wire_ff_tofts h512 d12 w062 | FF k256/5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+== jobs/log/097_p14_prod_ks5_3391130.out
+task 0: tofts8ks5 slice 21 seed 0 -> results/tofts_vs_patlak/p14/invivo_prod_ks5/tofts8_sl21_s0
+model=wire_ff_tofts h512 d12 w062 | FF k256/5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7

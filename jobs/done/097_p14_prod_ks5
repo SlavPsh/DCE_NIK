@@ -1,5 +1,5 @@
 queue 097_p14_prod_ks5
 jid 3391128
 submitted 2026-09-27 12:48:18
-state 1 PENDING None
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/097_p14_prod_ks5_3391128.out
