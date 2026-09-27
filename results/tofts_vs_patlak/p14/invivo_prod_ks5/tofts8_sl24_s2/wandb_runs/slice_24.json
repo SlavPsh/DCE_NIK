@@ -1,0 +1,17 @@
+{
+ "name": "gnik_tofts8_sl24_s2_s24",
+ "mode": "online",
+ "loss": 0.6167702078819275,
+ "heldout_mse": 0.5368135571479797,
+ "val_knmse": 0.7263236105091728,
+ "best_heldout_mse": 0.4817522168159485,
+ "coef_tv": 0.0,
+ "support": 0.0036204553034622222,
+ "pisco": 0.0,
+ "best_step": 5000,
+ "lr": 1e-05,
+ "wall_s": 5559.078838348389,
+ "peak_gpu_mb": 12837.71630859375,
+ "params": 5531216,
+ "wall_total_s": 5559.074852466583
+}
