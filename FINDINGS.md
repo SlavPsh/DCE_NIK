@@ -44,6 +44,7 @@ Same production protocol, same trainer, k80 of 2157 views, base 256 (512 grid, 1
 1. DONE 2026-09-22 (production rerun). Remaining: redo the in vivo pk maps (figure 47) on the production recons and the phantom tofts run with unit-rms atoms + prior.
 2. First-pass peak (0.81 to 0.9 of the reference, true peak higher still): per-atom weight decay or bandwidth, test on the phantom.
 3. Per-voxel span-loss map (where the tofts basis is the wrong model).
+8. (added 2026-09-28) sub16 warm start: the PCA target is our own construction, not GRASP-Pro's (100 frames of 17 to 21 spokes, 5 centre samples x 8 coils = 40 signals, covariance rank 39) vs GRASP-Pro (5 spokes per frame, 341 frames, 100 z partitions x coils = 800 signals). The 100-frame cap smooths the first pass in the target and atoms 10 to 16 start from near-noise; the navigator also seeds respiration modes. Test on one slice, same protocol: no cap (nsp // 5 frames), no warm start, warm start from the tofts atoms.
 4. Oblique readout of vp / Ktrans from the coefficients (phantom test vs the nonlinear fit).
 5. PISCO with the group's guidelines if they differ from the implementation here (both stencils were inert).
 6. z-coordinate input (added 2026-09-23): one model over several slices, (kx, ky, z, t, coil), sharing information across slices; test joint 18 / 19 / 21 vs three separate models.
