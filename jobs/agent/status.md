@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-09-28 10:14:21 on worker01.cluster, job 3391154, cycle 177
+updated 2026-09-28 14:50:23 on worker01.cluster, job 3391154, cycle 311
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3391349 | 099_p14_ks5_arms | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3391349 | 099_p14_ks5_arms | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 099_p14_ks5_arms | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 | 032_099_start | exit 0 |
-| 099_p14_ks5_arms | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 098_p3_bandwidth | 1 COMPLETED 01:03:58, 1 COMPLETED 01:04:01 |
 | 097_p14_prod_ks5 | 1 COMPLETED 01:32:07, 2 COMPLETED 01:32:08, 1 COMPLETED 01:32:36, 1 COMPLETED 01:32:38, 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:42, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:44, 2 COMPLETED 01:32:45 |
 | 031_097_098_start | exit 0 |
