@@ -1,48 +1,3 @@
-2026-09-28 21:10:18 host gpu02.cluster job 3391352 task 0 stage eval
-GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
-  MIG 1g.12gb     Device  0: (UUID: MIG-a52ef66e-5a7b-5c27-915b-53701fe3da22)
-GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
-GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
-GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
-  sl21 tofts8 s0: aorta_aff 0.0485 cortex_aff nan fwhm 286.2s | val 2.718e-01 test 2.753e-01
-  sl21 tofts8 s1: aorta_aff 0.0462 cortex_aff nan fwhm 236.8s | val 2.711e-01 test 2.734e-01
-  sl21 tofts8 s2: aorta_aff 0.0475 cortex_aff nan fwhm 286.2s | val 2.722e-01 test 2.749e-01
-  sl21 patlak s0: aorta_aff 0.0315 cortex_aff nan fwhm 217.8s | val 2.692e-01 test 2.735e-01
-  sl21 patlak s1: MISSING
-  sl21 patlak s2: MISSING
-  sl21 sub16 s0: aorta_aff 0.1982 cortex_aff nan fwhm 325.4s | val 7.942e-02 test 7.892e-02
-  sl21 sub16 s1: MISSING
-  sl21 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl21 free s0: aorta_aff 0.1306 cortex_aff nan fwhm 334.3s | val nan test nan
-  sl21 free s1: MISSING
-  sl21 free s2: MISSING
-  sl24 tofts8 s0: aorta_aff 0.0566 cortex_aff nan fwhm 320.4s | val 2.587e-01 test 2.631e-01
-  sl24 tofts8 s1: aorta_aff 0.0448 cortex_aff nan fwhm 220.3s | val 2.579e-01 test 2.629e-01
-  sl24 tofts8 s2: aorta_aff 0.0521 cortex_aff nan fwhm 317.8s | val 2.575e-01 test 2.639e-01
-  sl24 patlak s0: aorta_aff 0.0540 cortex_aff nan fwhm 319.1s | val 2.561e-01 test 2.584e-01
-  sl24 patlak s1: MISSING
-  sl24 patlak s2: MISSING
-  sl24 sub16 s0: aorta_aff 0.2190 cortex_aff nan fwhm 38.0s | val 7.830e-02 test 7.876e-02
-  sl24 sub16 s1: MISSING
-  sl24 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl24 free s0: aorta_aff 0.1301 cortex_aff nan fwhm 334.3s | val nan test nan
-  sl24 free s1: MISSING
-  sl24 free s2: MISSING
-  sl27 tofts8 s0: aorta_aff 0.0510 cortex_aff nan fwhm 344.4s | val 2.240e-01 test 2.271e-01
-  sl27 tofts8 s1: aorta_aff 0.0547 cortex_aff nan fwhm 302.6s | val 2.217e-01 test 2.258e-01
-  sl27 tofts8 s2: aorta_aff 0.0602 cortex_aff nan fwhm 344.4s | val 2.222e-01 test 2.255e-01
-  sl27 patlak s0: aorta_aff 0.0501 cortex_aff nan fwhm 344.4s | val 2.271e-01 test 2.289e-01
-  sl27 patlak s1: MISSING
-  sl27 patlak s2: MISSING
-  sl27 sub16 s0: aorta_aff 0.2162 cortex_aff nan fwhm 326.7s | val 6.769e-02 test 6.777e-02
-  sl27 sub16 s1: MISSING
-  sl27 sub16 s2: MISSING
-   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
-  sl27 free s0: aorta_aff 0.1135 cortex_aff nan fwhm 344.4s | val nan test nan
-  sl27 free s1: MISSING
-  sl27 free s2: MISSING
 # in vivo (meas_topqmri_p14, slices 21/24/27, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
 
 rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
@@ -139,11 +94,3 @@ model-free aorta FWHM (s): 162.07792207792212
 | params | 5.531e+06 ± 0 (3) | 5.521e+06 ± 0 (1) | 5.558e+06 ± 0 (1) | nan ± nan (0) | -1.025e+04 | +2.68e+04 | +nan | nan | nan |
 
 model-free aorta FWHM (s): 196.26623376623377
-
-INVIVO_EVAL_DONE
-[W928 21:16:27.392968169 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
-EVAL exit 0
-  sl21 tofts8 s0: aorta_aff 0.0565 cortex_aff nan fwhm 341.9s | val 2.695e-01 test 2.733e-01
-  sl21 tofts8 s1: aorta_aff 0.0510 cortex_aff nan fwhm 343.1s | val 2.689e-01 test 2.702e-01
-  sl21 tofts8 s2: aorta_aff 0.0515 cortex_aff nan fwhm 341.9s | val 2.683e-01 test 2.708e-01
-  sl24 tofts8 s0: aorta_aff 0.0563 cortex_aff nan fwhm 339.4s | val 2.547e-01 test 2.562e-01
