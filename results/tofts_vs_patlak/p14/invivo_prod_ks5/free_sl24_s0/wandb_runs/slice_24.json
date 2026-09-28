@@ -1,0 +1,17 @@
+{
+ "name": "gnik_free_sl24_s0_s24",
+ "mode": "online",
+ "loss": 0.33411964774131775,
+ "heldout_mse": 0.2721380889415741,
+ "val_knmse": 0.36821037152499264,
+ "best_heldout_mse": 0.2721380889415741,
+ "coef_tv": 0.0,
+ "support": 0.0,
+ "pisco": 0.0,
+ "best_step": 10000,
+ "lr": 1e-05,
+ "wall_s": 2821.8889021873474,
+ "peak_gpu_mb": 12848.66015625,
+ "params": 5549634,
+ "wall_total_s": 2821.8848950862885
+}
