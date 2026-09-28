@@ -1,0 +1,17 @@
+{
+ "name": "gnik_free_sl21_s0_s21",
+ "mode": "online",
+ "loss": 0.5005974769592285,
+ "heldout_mse": 0.4179479479789734,
+ "val_knmse": 0.5157309644826857,
+ "best_heldout_mse": 0.4179479479789734,
+ "coef_tv": 0.0,
+ "support": 0.0,
+ "pisco": 0.0,
+ "best_step": 10000,
+ "lr": 1e-05,
+ "wall_s": 2890.0724687576294,
+ "peak_gpu_mb": 12848.66015625,
+ "params": 5549634,
+ "wall_total_s": 2890.068448781967
+}
