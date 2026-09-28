@@ -10,3 +10,16 @@ GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
   sl21 patlak s0: aorta_aff 0.0315 cortex_aff nan fwhm 217.8s | val 2.692e-01 test 2.735e-01
   sl21 patlak s1: MISSING
   sl21 patlak s2: MISSING
+  sl21 sub16 s0: aorta_aff 0.1982 cortex_aff nan fwhm 325.4s | val 7.942e-02 test 7.892e-02
+  sl21 sub16 s1: MISSING
+  sl21 sub16 s2: MISSING
+   heldout failed: 'WIRE_FF_RES_KXY_COIL_T_REIM' object has no attribute 'rank'
+  sl21 free s0: aorta_aff 0.1306 cortex_aff nan fwhm 334.3s | val nan test nan
+  sl21 free s1: MISSING
+  sl21 free s2: MISSING
+  sl24 tofts8 s0: aorta_aff 0.0566 cortex_aff nan fwhm 320.4s | val 2.587e-01 test 2.631e-01
+  sl24 tofts8 s1: aorta_aff 0.0448 cortex_aff nan fwhm 220.3s | val 2.579e-01 test 2.629e-01
+  sl24 tofts8 s2: aorta_aff 0.0521 cortex_aff nan fwhm 317.8s | val 2.575e-01 test 2.639e-01
+  sl24 patlak s0: aorta_aff 0.0540 cortex_aff nan fwhm 319.1s | val 2.561e-01 test 2.584e-01
+  sl24 patlak s1: MISSING
+  sl24 patlak s2: MISSING
