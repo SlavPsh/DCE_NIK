@@ -1,0 +1,17 @@
+{
+ "name": "gnik_free_sl27_s0_s27",
+ "mode": "online",
+ "loss": 0.5508410334587097,
+ "heldout_mse": 0.5674238204956055,
+ "val_knmse": 0.6796588580582136,
+ "best_heldout_mse": 0.5030753016471863,
+ "coef_tv": 0.0,
+ "support": 0.0,
+ "pisco": 0.0,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 2821.8025076389313,
+ "peak_gpu_mb": 12848.66015625,
+ "params": 5549634,
+ "wall_total_s": 2821.798556804657
+}
