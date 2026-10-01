@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-01 11:36:26 on worker01.cluster, job 3411316, cycle 264
+updated 2026-10-01 11:38:31 on worker01.cluster, job 3411316, cycle 265
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3421190 | 101_mf_rulers | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 101_mf_rulers | 1 PENDING None |
+| 101_mf_rulers | 1 COMPLETED 00:01:40 |
 | 100_mf_rulers | 1 COMPLETED 00:02:03 |
 | 099_p14_ks5_arms | 1 COMPLETED 00:47:07, 1 COMPLETED 00:47:08, 1 COMPLETED 00:48:17, 1 COMPLETED 01:32:15, 1 COMPLETED 01:32:17, 1 COMPLETED 01:32:24, 1 COMPLETED 01:32:25, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:47, 1 COMPLETED 01:32:55, 1 COMPLETED 01:33:15, 1 COMPLETED 01:33:19, 1 COMPLETED 01:36:05, 1 COMPLETED 01:36:21, 1 COMPLETED 01:37:13 |
 | 032_099_start | exit 0 |
