@@ -1,5 +1,6 @@
 queue 100_mf_rulers
 jid 3421185
 submitted 2026-10-01 11:32:12
-state 1 PENDING None
+state 1 COMPLETED 00:02:03
 log jobs/log/100_mf_rulers_3421185.out
+ended 2026-10-01 11:34:17
