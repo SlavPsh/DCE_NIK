@@ -23,15 +23,22 @@ def ramp_dcf(tr): return np.maximum(np.abs(tr).astype(np.float64), (1.0 / nx) / 
 def crop(img, n=bas): s = (img.shape[0] - n) // 2; return img[s:s + n, s:s + n]
 
 def resp_navigator(kdata):
-    """per-spoke respiratory signal: k-centre magnitude per coil, contrast trend removed (running median over 15 s, in acquisition
-    order), first svd mode across coils, sign so that the mode (end-expiration plateau) sits at the histogram peak."""
+    """per-spoke respiratory signal from the k-centre. the raw |k(0)| per spoke is dominated by the spoke ANGLE (gradient delays shift the
+    sampled centre, golden angle makes this a 1.7 to 2.1 Hz alternation that is not breathing): fitted per coil as a fourier series in the
+    spoke angle (order 8) and removed; the contrast trend is removed by a 15 s running median; first svd mode across coils of the residual,
+    band-passed to 0.1 to 0.7 Hz; sign so that the end-expiration plateau (histogram mode) is the dense side. returns nav per spoke, mode, peak hz."""
     from scipy.ndimage import median_filter
-    c0 = nx // 2; o = np.argsort(ts); m = np.abs(kdata[c0 - 1:c0 + 2]).mean(0)[o]           # (nsp, ncc), 3 central samples, time order
+    from scipy.signal import butter, filtfilt
+    c0 = nx // 2; o = np.argsort(ts); m = np.abs(kdata[c0 - 1:c0 + 2]).mean(0)[o].astype(np.float64)       # (nsp, ncc), 3 central samples, time order
+    th = np.angle(traj[-1, :])[o]; X = np.column_stack([np.ones_like(th)] + [f(k * th) for k in range(1, 9) for f in (np.cos, np.sin)])
     k = max(5, int(round(15.0 / dt)) | 1); trend = median_filter(m, size=(k, 1), mode="nearest"); r = (m - trend) / (trend + 1e-9)
-    u, s, vh = np.linalg.svd(r - r.mean(0), full_matrices=False); nav_s = u[:, 0] * s[0]
+    beta, *_ = np.linalg.lstsq(X, r, rcond=None); r = r - X @ beta                                             # angular modulation out
+    u, s_, vh = np.linalg.svd(r - r.mean(0), full_matrices=False); nav_s = u[:, 0] * s_[0]
+    b, a = butter(2, [0.1, 0.7], btype="band", fs=1.0 / dt); nav_s = filtfilt(b, a, nav_s)
+    f = np.fft.rfftfreq(len(nav_s), dt); pw = np.abs(np.fft.rfft(nav_s)); f0 = float(f[1:][np.argmax(pw[1:])])
+    hist, edges = np.histogram(nav_s, bins=60); mode = 0.5 * (edges[np.argmax(hist)] + edges[np.argmax(hist) + 1])
+    if mode < np.median(nav_s): nav_s, mode = -nav_s, -mode                                                   # plateau on the positive side (convention only)
     nav = np.empty_like(nav_s); nav[o] = nav_s
-    hist, edges = np.histogram(nav, bins=60); mode = 0.5 * (edges[np.argmax(hist)] + edges[np.argmax(hist) + 1])
-    f = np.fft.rfftfreq(len(nav_s), dt); p = np.abs(np.fft.rfft(nav_s - nav_s.mean())); f0 = float(f[1:][np.argmax(p[1:])])
     return nav, float(mode), f0
 
 for SL in SLICES:
