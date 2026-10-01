@@ -1,0 +1,17 @@
+{
+ "name": "gnik_toftsinit_s21",
+ "mode": "online",
+ "loss": 0.17632487416267395,
+ "heldout_mse": 0.2889711260795593,
+ "val_knmse": 0.36086453899795956,
+ "best_heldout_mse": 0.28489431738853455,
+ "coef_tv": 0.0,
+ "support": 0.01053792837774381,
+ "pisco": 0.0,
+ "best_step": 7000,
+ "lr": 1e-05,
+ "wall_s": 4003.694182395935,
+ "peak_gpu_mb": 12462.2080078125,
+ "params": 5558016,
+ "wall_total_s": 4003.6919140815735
+}
