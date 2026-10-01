@@ -1,5 +1,6 @@
 queue 102_recon_gifs
 jid 3421216
 submitted 2026-10-01 11:52:54
-state 1 RUNNING None
+state 1 COMPLETED 00:05:30
 log jobs/log/102_recon_gifs_3421216.out
+ended 2026-10-01 11:59:06

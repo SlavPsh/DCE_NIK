@@ -1,0 +1,21 @@
+2026-10-01 11:52:55 host worker09.cluster job 3421216
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_sl18.gif 91 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_sl19.gif 91 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_sl21.gif 91 frames
+GIF_DONE
+GIF p3 exit 0
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl21.gif 95 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl24.gif 95 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl27.gif 95 frames
+GIF_DONE
+GIF p14 exit 0
+40085082 results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl21.gif
+40814256 results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl24.gif
+39105838 results/realdata_nik_vs_cs_figures/figures/recon_gif_p14_sl27.gif
+33141751 results/realdata_nik_vs_cs_figures/figures/recon_gif_sl18.gif
+35079744 results/realdata_nik_vs_cs_figures/figures/recon_gif_sl19.gif
+35016427 results/realdata_nik_vs_cs_figures/figures/recon_gif_sl21.gif
