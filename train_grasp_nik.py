@@ -41,7 +41,7 @@ from nik_focal_loss import composable_kspace_loss
 from nik_output_recon import recon_nik_cart
 
 
-def compute_pca_phi(out_dir, slc, sh, rank, n_frames=100):
+def compute_pca_phi(out_dir, slc, sh, rank, n_frames=100):          # n_frames: cap on the navigator frames (100 = historical default; 0 = no cap, 5-spoke frames like grasp-pro)
     """K=rank temporal PCA basis from the k-center navigator (same construction as grasp's
     front-end / build_phi), plus the frame times in the model's t convention (2*view_time-1).
     returns (frame_t[F] float32, Phi[F,rank] complex64) for warmstart_phi (Option 3 init)."""
@@ -49,7 +49,7 @@ def compute_pca_phi(out_dir, slc, sh, rank, n_frames=100):
     krad = np.asarray(sl['kdata_radial'])                        # [nx, nspokes, nc]
     vt = np.asarray(sh['view_time']).ravel()
     nx, nsp, nc = krad.shape
-    F = int(min(n_frames, nsp // 5))                             # keep >=5 spokes/frame
+    F = int(min(n_frames, nsp // 5)) if n_frames > 0 else nsp // 5   # keep >=5 spokes/frame
     nline = nsp // F; use = F * nline; c0 = nx // 2
     nav = np.abs(krad[c0 - 2:c0 + 3, :use, :]).reshape(5, nline, F, nc, order='F').mean(1)  # (5,F,nc)
     ds = nav.transpose(0, 2, 1).reshape(5 * nc, F, order='F')    # (5nc, F)
@@ -242,9 +242,16 @@ def train_one_slice(out_dir, slc, sh, args, device):
     torch.manual_seed(args.seed)
     model = build_model(args, ncc).to(device)
     if args.model == 'wire_ff_subspace' and args.warmstart:       # Option-3 init: Phi <- k-center PCA basis
-        ft, phi = compute_pca_phi(out_dir, slc, sh, args.rank)
+        if args.warmstart_source == 'tofts':                          # sub16 test (2026-10-02): physiological init, first R_t atoms = tofts basis, remaining atoms = the pca modes after them
+            bz = np.load(args.tofts_basis); at = np.asarray(bz['atoms'], np.float64); tgm = np.asarray(bz['tgrid_model'], np.float64)   # atoms on the model t grid [-1, 1]
+            ft, phi = compute_pca_phi(out_dir, slc, sh, args.rank, n_frames=args.warmstart_frames)
+            R_t = min(at.shape[1], args.rank); phi = phi.copy()
+            for r in range(R_t): phi[:, r] = np.interp(ft, tgm, at[:, r]) / (np.abs(at[:, r]).max() + 1e-9)
+            src = f'tofts atoms ({R_t}) + pca modes ({args.rank - R_t})'
+        else:
+            ft, phi = compute_pca_phi(out_dir, slc, sh, args.rank, n_frames=args.warmstart_frames); src = 'PCA basis'
         err = warmstart_phi(model, ft, phi, steps=args.warmstart_steps, lr=1e-3, device=device.type)
-        print(f'    warmstarted Phi from PCA basis (rank {args.rank}, {len(ft)} frames, fit MSE {err:.3e})', flush=True)
+        print(f'    warmstarted Phi from {src} (rank {args.rank}, {len(ft)} frames, fit MSE {err:.3e})', flush=True)
     if args.compile and device.type == 'cuda':
         try:
             model = torch.compile(model)
@@ -445,7 +452,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     model=args.model, rank=args.rank, hidden=args.hidden, depth=args.depth,
                     w0=args.w0, s0=args.s0, coil_embed_dim=args.coil_embed_dim,
                     k_freq=args.k_freq, k_sigma=args.k_sigma, t_freq=args.t_freq,
-                    t_sigma=args.t_sigma, ff_seed=args.ff_seed, ncc=ncc, slice=slc, coil_mode=getattr(args, 'coil_mode', 'input')),
+                    t_sigma=args.t_sigma, ff_seed=args.ff_seed, ncc=ncc, slice=slc, coil_mode=getattr(args, 'coil_mode', 'input'),
+                    phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0, phi_ortho=bool(args.phi_ortho)),   # atom-net settings, needed to rebuild sub16 variants
                os.path.join(args.save_dir, f'model_slice_{slc:02d}.pt'))
     np.save(os.path.join(args.save_dir, f'nik_slice_{slc:02d}_cplx.npy'), img_cplx)
     if device.type == 'cuda':
@@ -504,6 +512,8 @@ def main():
                     help='(subspace) init Phi from k-center PCA basis -- stabilizes the bilinear fit')
     ap.add_argument('--no-warmstart', dest='warmstart', action='store_false')
     ap.add_argument('--warmstart-steps', type=int, default=800)
+    ap.add_argument('--warmstart-frames', type=int, default=100, help='navigator frames for the pca warm start (100 = historical; 0 = no cap, 5-spoke frames)')
+    ap.add_argument('--warmstart-source', default='pca', choices=['pca', 'tofts'], help='pca (default) or the tofts basis atoms (--tofts-basis) for the first atoms')
     ap.add_argument('--hidden', type=int, default=512)
     ap.add_argument('--depth', type=int, default=12)     # d12 = sweet spot (d16 gains ~0, loses swing)
     ap.add_argument('--w0', type=float, default=62.0)
