@@ -1,0 +1,17 @@
+{
+ "name": "gnik_nowarm_s21",
+ "mode": "online",
+ "loss": 0.23668082058429718,
+ "heldout_mse": 0.35695478320121765,
+ "val_knmse": 0.4457619175680531,
+ "best_heldout_mse": 0.35695478320121765,
+ "coef_tv": 0.0,
+ "support": 0.0064780906395753846,
+ "pisco": 0.0,
+ "best_step": 10000,
+ "lr": 1e-05,
+ "wall_s": 4113.730452537537,
+ "peak_gpu_mb": 12462.2080078125,
+ "params": 5558016,
+ "wall_total_s": 4113.728089570999
+}
