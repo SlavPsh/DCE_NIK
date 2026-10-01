@@ -1,20 +1,20 @@
 # helios agent
 
-updated 2026-10-01 22:32:05 on worker07.cluster, job 3419773, cycle 235
+updated 2026-10-01 22:40:18 on worker07.cluster, job 3419773, cycle 239
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3426069 | 104_sub16_tests | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3426069 | 104_sub16_tests | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 104_sub16_tests | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 035_104_progress | exit 0 |
 | 034_104_start | exit 0 |
-| 104_sub16_tests | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 103_recon_gifs_single | 1 COMPLETED 00:01:29 |
 | 033_stage_gifs | exit 0 |
 | 102_recon_gifs | 1 COMPLETED 00:05:30 |
