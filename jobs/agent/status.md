@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-10-01 23:43:34 on worker07.cluster, job 3419773, cycle 270
+updated 2026-10-01 23:49:43 on worker07.cluster, job 3419773, cycle 273
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3426069 | 104_sub16_tests | 2 RUNNING None |
+| 3426069 | 104_sub16_tests | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 104_sub16_tests | 2 RUNNING None |
+| 104_sub16_tests | 1 RUNNING None |
 | 035_104_progress | exit 0 |
 | 034_104_start | exit 0 |
 | 103_recon_gifs_single | 1 COMPLETED 00:01:29 |
