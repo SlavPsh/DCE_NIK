@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-10-01 02:39:40 on worker01.cluster, job 3411316, cycle 1
+updated 2026-10-01 11:32:12 on worker01.cluster, job 3411316, cycle 262
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3421185 | 100_mf_rulers | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 100_mf_rulers | 1 PENDING None |
 | 099_p14_ks5_arms | 1 COMPLETED 00:47:07, 1 COMPLETED 00:47:08, 1 COMPLETED 00:48:17, 1 COMPLETED 01:32:15, 1 COMPLETED 01:32:17, 1 COMPLETED 01:32:24, 1 COMPLETED 01:32:25, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:47, 1 COMPLETED 01:32:55, 1 COMPLETED 01:33:15, 1 COMPLETED 01:33:19, 1 COMPLETED 01:36:05, 1 COMPLETED 01:36:21, 1 COMPLETED 01:37:13 |
 | 032_099_start | exit 0 |
 | 098_p3_bandwidth | 1 COMPLETED 01:03:58, 1 COMPLETED 01:04:01 |
@@ -30,4 +32,3 @@ updated 2026-10-01 02:39:40 on worker01.cluster, job 3411316, cycle 1
 | 069_p14_nik | 2 OUT_OF_ME+ 00:46:14, 1 OUT_OF_ME+ 00:46:27, 1 OUT_OF_ME+ 01:30:33, 1 OUT_OF_ME+ 01:30:34, 1 OUT_OF_ME+ 01:30:49, 1 OUT_OF_ME+ 01:31:21, 1 OUT_OF_ME+ 01:31:32, 1 OUT_OF_ME+ 01:31:36, 1 OUT_OF_ME+ 01:31:53, 1 OUT_OF_ME+ 01:32:03, 1 OUT_OF_ME+ 01:32:11, 1 OUT_OF_ME+ 01:32:29, 1 OUT_OF_ME+ 01:32:34, 1 OUT_OF_ME+ 01:32:36, 1 OUT_OF_ME+ 01:32:40, 1 OUT_OF_ME+ 01:32:45, 1 OUT_OF_ME+ 01:32:51, 1 OUT_OF_ME+ 01:34:48, 2 OUT_OF_ME+ 01:35:02 |
 | 025_p14_nik_progress | exit 0 |
 | 090_p14_grasp_preview | 1 COMPLETED 00:00:07 |
-| 024_p14_refs | exit 0 |
