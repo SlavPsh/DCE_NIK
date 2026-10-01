@@ -1,0 +1,121 @@
+2026-10-01 23:42:51 host gpu02.cluster job 3426069 task 6 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 2g.24gb     Device  0: (UUID: MIG-281c0c74-ddae-5f82-9b91-3e7d8a855877)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+task 6: sub16 ortho (--phi-ortho) -> results/tofts_vs_patlak/sub16_tests/ortho
+device=cuda
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run u5mpbuwt
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/sub16_tests/ortho/wandb_runs/wandb/run-20261001_234256-u5mpbuwt
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_ortho_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/u5mpbuwt
+[wandb] gnik_ortho_s21: mode online
+    warmstarted Phi from PCA basis (rank 16, 100 frames, fit MSE 7.079e-03)
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:409: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  print(f'    [ortho] step {step:6d}  loss {float(loss):.3e}  gradnorm {float(gnorm):.2e}  '
+    [ortho] step      1  loss 1.787e+00  gradnorm 5.08e+01  rawGramCond 7.48e+00
+    [ortho] step      2  loss 1.694e+00  gradnorm 3.93e+01  rawGramCond 7.43e+00
+    [ortho] step      3  loss 1.681e+00  gradnorm 3.79e+01  rawGramCond 7.37e+00
+    [ortho] step      4  loss 1.700e+00  gradnorm 3.67e+01  rawGramCond 7.32e+00
+    [ortho] step      5  loss 1.675e+00  gradnorm 3.49e+01  rawGramCond 7.28e+00
+    [ortho] step      6  loss 1.639e+00  gradnorm 3.33e+01  rawGramCond 7.23e+00
+    [ortho] step      7  loss 1.689e+00  gradnorm 3.38e+01  rawGramCond 7.20e+00
+    [ortho] step      8  loss 1.691e+00  gradnorm 3.37e+01  rawGramCond 7.16e+00
+    [ortho] step      9  loss 1.698e+00  gradnorm 3.30e+01  rawGramCond 7.13e+00
+    [ortho] step     10  loss 1.686e+00  gradnorm 3.19e+01  rawGramCond 7.10e+00
+    [ortho] step     11  loss 1.681e+00  gradnorm 3.16e+01  rawGramCond 7.07e+00
+    [ortho] step     12  loss 1.700e+00  gradnorm 3.17e+01  rawGramCond 7.06e+00
+    [ortho] step     13  loss 1.666e+00  gradnorm 3.06e+01  rawGramCond 7.02e+00
+    [ortho] step     14  loss 1.679e+00  gradnorm 2.96e+01  rawGramCond 7.00e+00
+    [ortho] step     15  loss 1.627e+00  gradnorm 2.95e+01  rawGramCond 6.98e+00
+    [ortho] step     16  loss 1.656e+00  gradnorm 2.94e+01  rawGramCond 6.97e+00
+    [ortho] step     17  loss 1.665e+00  gradnorm 2.84e+01  rawGramCond 6.96e+00
+    [ortho] step     18  loss 1.654e+00  gradnorm 2.88e+01  rawGramCond 6.95e+00
+    [ortho] step     19  loss 1.645e+00  gradnorm 2.81e+01  rawGramCond 6.93e+00
+    [ortho] step     20  loss 1.650e+00  gradnorm 2.76e+01  rawGramCond 6.91e+00
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.89, 'rot180': 0.891, 'fliplr': 0.889, 'flipud': 0.888})
+    [ortho] step     40  loss 1.646e+00  gradnorm 2.31e+01  rawGramCond 6.77e+00
+    [ortho] step     60  loss 1.618e+00  gradnorm 2.13e+01  rawGramCond 6.96e+00
+    [ortho] step     80  loss 1.596e+00  gradnorm 1.95e+01  rawGramCond 7.34e+00
+    [ortho] step    100  loss 1.617e+00  gradnorm 1.86e+01  rawGramCond 7.47e+00
+    [ortho] step    120  loss 1.612e+00  gradnorm 1.85e+01  rawGramCond 7.70e+00
+    [ortho] step    140  loss 1.571e+00  gradnorm 1.75e+01  rawGramCond 7.82e+00
+    [ortho] step    160  loss 1.514e+00  gradnorm 4.66e+02  rawGramCond 8.18e+00
+    [ortho] step    180  loss 1.494e+00  gradnorm 1.98e+01  rawGramCond 9.53e+00
+    [ortho] step    200  loss 1.477e+00  gradnorm 2.16e+01  rawGramCond 1.38e+01
+    [ortho] step    220  loss 1.447e+00  gradnorm 2.68e+01  rawGramCond 3.19e+01
+    [ortho] step    240  loss 1.385e+00  gradnorm 2.85e+01  rawGramCond 4.18e+01
+    [ortho] step    260  loss 1.376e+00  gradnorm 3.64e+01  rawGramCond 4.54e+01
+    [ortho] step    280  loss 1.306e+00  gradnorm 4.86e+01  rawGramCond 5.98e+01
+    [ortho] step    300  loss 1.269e+00  gradnorm 2.90e+01  rawGramCond 6.83e+01
+    [ortho] step   1000  loss 1.023e+00  gradnorm 3.01e+01  rawGramCond 2.20e+02
+    step   1000  train 1.023e+00  heldout 8.141e-01
+    [ortho] step   2000  loss 9.731e-01  gradnorm 8.52e+01  rawGramCond 3.02e+02
+    step   2000  train 9.731e-01  heldout 8.851e-01
+    [ortho] step   3000  loss 9.215e-01  gradnorm 1.04e+02  rawGramCond 1.06e+03
+    step   3000  train 9.215e-01  heldout 9.923e-01
+    [ortho] step   4000  loss 1.072e+00  gradnorm 9.91e+01  rawGramCond 8.91e+02
+    step   4000  train 1.072e+00  heldout 8.961e-01
+    [ortho] step   5000  loss 8.217e-01  gradnorm 5.58e+01  rawGramCond 4.84e+02
+    step   5000  train 8.217e-01  heldout 1.029e+00
+    [ortho] step   6000  loss 7.792e-01  gradnorm 7.79e+01  rawGramCond 7.71e+02
+    step   6000  train 7.792e-01  heldout 1.041e+00
+    [ortho] step   7000  loss 7.868e-01  gradnorm 3.89e+01  rawGramCond 8.32e+02
+    step   7000  train 7.868e-01  heldout 1.059e+00
+    [ortho] step   8000  loss 1.066e+00  gradnorm 7.33e+01  rawGramCond 6.30e+02
+    step   8000  train 1.066e+00  heldout 9.809e-01
+    [ortho] step   9000  loss 7.725e-01  gradnorm 4.12e+01  rawGramCond 4.82e+02
+    step   9000  train 7.725e-01  heldout 9.725e-01
+    [ortho] step  10000  loss 7.202e-01  gradnorm 4.25e+01  rawGramCond 5.18e+02
+    step  10000  train 7.202e-01  heldout 9.830e-01
+    final weights kept (best heldout 8.851e-01 at step 2000)
+    RESOURCES slice 21: peak_gpu_MB 12462 params 5558016 best_heldout 8.8515e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: uploading output.log
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  ▁▁▁▁▁▁▁▁▁
+wandb:        best_step ▁█████████
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse ▁▃▆▃▇▇█▆▆▆
+wandb:             loss ▇▆▅█▃▂▂█▂▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁
+wandb:          support █▃▂▂▁▁▁▁▃▃
+wandb:        val_knmse ▁▃▆▃▇▇█▆▆▆
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.88515
+wandb:        best_step 2000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.98299
+wandb:             loss 0.72018
+wandb:               lr 1e-05
+wandb:           params 5558016
+wandb:      peak_gpu_mb 12462.20801
+wandb:            pisco 0
+wandb:          support 0.01017
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_ortho_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/u5mpbuwt
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/sub16_tests/ortho/wandb_runs/wandb/run-20261001_234256-u5mpbuwt/logs
+slice 21  nik (192, 192, 342)  (4001s)  vs CS: corr 0.725  nrmse 0.541
+done 4002s -> results/tofts_vs_patlak/sub16_tests/ortho
+[W1002 00:49:36.425527018 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-02 00:49:36 TRAIN_DONE sub16 ortho exit 0

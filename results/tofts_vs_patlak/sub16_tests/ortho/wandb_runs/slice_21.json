@@ -1,0 +1,17 @@
+{
+ "name": "gnik_ortho_s21",
+ "mode": "online",
+ "loss": 0.7201783657073975,
+ "heldout_mse": 0.9829879999160767,
+ "val_knmse": 1.2275465588647723,
+ "best_heldout_mse": 0.8851491212844849,
+ "coef_tv": 0.0,
+ "support": 0.01017109164968133,
+ "pisco": 0.0,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 3998.690385580063,
+ "peak_gpu_mb": 12462.2080078125,
+ "params": 5558016,
+ "wall_total_s": 3998.6881034374237
+}
