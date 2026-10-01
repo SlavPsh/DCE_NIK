@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-10-01 12:01:18 on worker01.cluster, job 3411316, cycle 276
+updated 2026-10-01 13:23:33 on worker01.cluster, job 3411316, cycle 316
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3425652 | 103_recon_gifs_single | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 103_recon_gifs_single | 1 PENDING Priority |
 | 033_stage_gifs | exit 0 |
 | 102_recon_gifs | 1 COMPLETED 00:05:30 |
 | 101_mf_rulers | 1 COMPLETED 00:01:40 |
@@ -30,4 +32,3 @@ updated 2026-10-01 12:01:18 on worker01.cluster, job 3411316, cycle 276
 | 091_p14_nik_render | 1 COMPLETED 00:15:30, 2 COMPLETED 00:15:31, 1 COMPLETED 00:15:34, 3 COMPLETED 00:15:35, 4 COMPLETED 00:15:36, 1 COMPLETED 00:15:37, 2 COMPLETED 00:15:39, 4 COMPLETED 00:15:40, 3 COMPLETED 00:15:41 |
 | 028_091_progress | exit 0 |
 | 027_091_start | exit 0 |
-| 026_p14_oom | exit 0 |
