@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-01 20:23:33 on worker07.cluster, job 3419773, cycle 173
+updated 2026-10-01 22:32:05 on worker07.cluster, job 3419773, cycle 235
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-10-01 20:23:33 on worker07.cluster, job 3419773, cycle 173
 
 | name | state |
 |---|---|
+| 035_104_progress | exit 0 |
 | 034_104_start | exit 0 |
 | 104_sub16_tests | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 103_recon_gifs_single | 1 COMPLETED 00:01:29 |
@@ -31,4 +32,3 @@ updated 2026-10-01 20:23:33 on worker07.cluster, job 3419773, cycle 173
 | 094_radial_blur | 1 COMPLETED 00:00:28 |
 | 093_radial_blur | 1 COMPLETED 00:00:28 |
 | 092_p14_iq | 1 COMPLETED 00:00:35 |
-| 091_p14_nik_render | 1 COMPLETED 00:15:30, 2 COMPLETED 00:15:31, 1 COMPLETED 00:15:34, 3 COMPLETED 00:15:35, 4 COMPLETED 00:15:36, 1 COMPLETED 00:15:37, 2 COMPLETED 00:15:39, 4 COMPLETED 00:15:40, 3 COMPLETED 00:15:41 |

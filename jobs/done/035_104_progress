@@ -1,0 +1,6 @@
+probe 035_104_progress
+host worker07.cluster
+start 2026-10-01 22:32:05
+end 2026-10-01 22:32:05
+exit 0
+log jobs/log/probe_035_104_progress.out
