@@ -28,6 +28,8 @@ def main():
             o[:, :, g] = mf[:, :, m].mean(2)
         return o
     RW = {}
+    NUF = dsp.NUF(Z); MF = {k: (np.load(f"{NUF}/{k}.npy").astype(np.float32) if os.path.exists(f"{NUF}/{k}.npy") else None) for k in ("nufft_late", "nufft_late_gated", "nufft_pre_gated")}
+    T_PRE = float(json.load(open(f"{NUF}/meta.json")).get("t_pre_s", 30.0))
     def frame(v, t, ts, w=10): m = (t > ts - w) & (t < ts + w); return v[..., m].mean(2) if m.any() else v[..., int(np.argmin(np.abs(t - ts)))]
     static = rois.get(dsp.STATIC, body)
     def enh(c, t): return c - np.median(c[t < 40])
@@ -40,6 +42,12 @@ def main():
         v = ls_scale(v, RW[nt], body); out = dict(label=label)
         for ts in (90.0, 300.0):
             p = frame(v, t, ts); r = frame(cs, tcs, ts); s = C.score(p, r, body); out.update({f"haarpsi_{int(ts)}": s["haarpsi"], f"ssim_{int(ts)}": s["ssim"], f"psnr_{int(ts)}": s["psnr"], f"airE_{int(ts)}": C.bgE(p, r, body, air)})
+        for rn, rimg, ts in (("late", MF["nufft_late"], 300.0), ("lateg", MF["nufft_late_gated"], 300.0), ("preg", MF["nufft_pre_gated"], None)):   # model-free rulers: late window at the 300 s frame, gated pre window at the pre-contrast frame
+            if rimg is None: continue
+            p = frame(v, t, ts) if ts is not None else v[..., t < T_PRE].mean(2) if (t < T_PRE).any() else v[..., 0]
+            sc = C.score(p, rimg, body); out.update({f"haarpsi_{rn}": sc["haarpsi"], f"ssim_{rn}": sc["ssim"]})
+            rr = rimg * (np.sum(p[body] * rimg[body]) / (np.sum(rimg[body] ** 2) + 1e-12)); hp_p = p - ndi.gaussian_filter(p, 3.0); hp_r = rr - ndi.gaussian_filter(rr, 3.0)
+            out[f"highpass_{rn}"] = float(np.sqrt((hp_p[body] ** 2).mean()) / (np.sqrt((hp_r[body] ** 2).mean()) + 1e-12))
         flat = ndi.binary_erosion(static, iterations=3) if static.sum() > 200 else static; kb = ndi.binary_dilation(rois[_e], iterations=2) & ~ndi.binary_erosion(rois[_e], iterations=2) if (_e := ("kidney" if "kidney" in rois else dsp.T1)) in rois else None
         for ts in (90.0, 300.0):
             p = frame(v, t, ts); r = frame(cs, tcs, ts); r = r * (np.sum(p[body] * r[body]) / (np.sum(r[body] ** 2) + 1e-12))
@@ -71,10 +79,10 @@ def main():
             step = int(re.search(r"step(\d+)", p).group(1)); v = np.load(p).astype(np.float32); rows["steps"][var][step] = iq(v, ft(v.shape[-1]), f"{var} {step}")
         if rows["steps"][var]: print(var, "steps", sorted(rows["steps"][var]), flush=True)
     R = f"{B}/results/tofts_vs_patlak"; TG = os.environ.get("IQ_TAG", ""); json.dump(rows, open(f"{R}/iq_track_sl{Z}{TG}.json", "w"), indent=1)
-    K = ["haarpsi_90", "ssim_90", "airE_90", "flatnoise_90", "highpass_90", "edge_90", "haarpsi_300", "airE_300", "flatnoise_300", "highpass_300", "edge_300", f"{dsp.T1}_peak", f"{dsp.T1}_washout", f"{dsp.T1}_nrmse", f"{dsp.T2}_nrmse"]
-    L = [f"# image quality vs curve fidelity, slice {Z}, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)", "",
+    K = ["haarpsi_90", "ssim_90", "airE_90", "flatnoise_90", "highpass_90", "edge_90", "haarpsi_300", "airE_300", "flatnoise_300", "highpass_300", "edge_300", "haarpsi_late", "ssim_late", "highpass_late", "haarpsi_lateg", "ssim_lateg", "highpass_lateg", "haarpsi_preg", "ssim_preg", f"{dsp.T1}_peak", f"{dsp.T1}_washout", f"{dsp.T1}_nrmse", f"{dsp.T2}_nrmse"]
+    L = [f"# image quality vs curve fidelity, slice {Z}, k80 (image metrics vs cs100 = grasp-pro all spokes, body-masked, window-matched frames at 90 and 300 s; *_late / *_lateg = 300 s frame vs the model-free late-window nufft (t > 200 s), ungated / respiratory soft-gated; *_preg = pre-contrast frame vs the gated pre-contrast nufft; airE = rms in air / rms in body; static_noise = high-pass temporal std in the static roi; curves vs model-free)", "",
          "| recon | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
-    for r in rows["final"]: L.append(f"| {r['label']} | " + " | ".join(f"{r[k]:.3f}" for k in K) + " |")
+    for r in rows["final"]: L.append(f"| {r['label']} | " + " | ".join(f"{r[k]:.3f}" if k in r else "-" for k in K) + " |")
     for var, st in rows["steps"].items():
         if not st: continue
         L += ["", f"## {var}, per training step", "| step | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
