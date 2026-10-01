@@ -1,5 +1,5 @@
 queue 104_sub16_tests
 jid 3426069
 submitted 2026-10-01 20:21:28
-state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
+state 2 RUNNING None
 log jobs/log/104_sub16_tests_3426069.out
