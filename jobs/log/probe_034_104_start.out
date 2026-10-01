@@ -1,0 +1,18 @@
+20:23:33
+       JOBID         NAME ST     TIME NODELIST(REASON)
+   3426072_0  sub16t_eval PD     0:00 (Dependency)
+   3426069_2       sub16t PD     0:00 (QOSMaxGRESPerUser)
+   3426069_3       sub16t PD     0:00 (QOSMaxGRESPerUser)
+   3426069_4       sub16t PD     0:00 (QOSMaxGRESPerUser)
+   3426069_5       sub16t PD     0:00 (QOSMaxGRESPerUser)
+   3426069_6       sub16t PD     0:00 (QOSMaxGRESPerUser)
+   3426069_0       sub16t  R     1:46 gpu03
+== jobs/log/104_sub16_tests_3426070.out
+2026-10-01 20:21:47 host gpu03.cluster job 3426070 task 0 stage train
+task 0: sub16 nowarm (--no-warmstart) -> results/tofts_vs_patlak/sub16_tests/nowarm
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+== jobs/log/104_sub16_tests_3426071.out
+2026-10-01 20:21:47 host gpu03.cluster job 3426071 task 1 stage train
+task 1: sub16 nocap (--warmstart-frames 0) -> results/tofts_vs_patlak/sub16_tests/nocap
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    warmstarted Phi from PCA basis (rank 16, 342 frames, fit MSE 1.088e-03)

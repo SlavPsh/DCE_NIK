@@ -1,18 +1,19 @@
 # helios agent
 
-updated 2026-10-01 20:21:28 on worker07.cluster, job 3419773, cycle 172
+updated 2026-10-01 20:23:33 on worker07.cluster, job 3419773, cycle 173
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3426069 | 104_sub16_tests | 1 PENDING None |
+| 3426069 | 104_sub16_tests | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 104_sub16_tests | 1 PENDING None |
+| 034_104_start | exit 0 |
+| 104_sub16_tests | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 103_recon_gifs_single | 1 COMPLETED 00:01:29 |
 | 033_stage_gifs | exit 0 |
 | 102_recon_gifs | 1 COMPLETED 00:05:30 |
@@ -31,4 +32,3 @@ updated 2026-10-01 20:21:28 on worker07.cluster, job 3419773, cycle 172
 | 093_radial_blur | 1 COMPLETED 00:00:28 |
 | 092_p14_iq | 1 COMPLETED 00:00:35 |
 | 091_p14_nik_render | 1 COMPLETED 00:15:30, 2 COMPLETED 00:15:31, 1 COMPLETED 00:15:34, 3 COMPLETED 00:15:35, 4 COMPLETED 00:15:36, 1 COMPLETED 00:15:37, 2 COMPLETED 00:15:39, 4 COMPLETED 00:15:40, 3 COMPLETED 00:15:41 |
-| 028_091_progress | exit 0 |

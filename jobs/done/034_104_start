@@ -1,0 +1,6 @@
+probe 034_104_start
+host worker07.cluster
+start 2026-10-01 20:23:33
+end 2026-10-01 20:23:33
+exit 0
+log jobs/log/probe_034_104_start.out
