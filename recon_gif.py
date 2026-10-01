@@ -13,7 +13,7 @@ import dsp, consolidated as C
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, required=True); ap.add_argument("--items", required=True); ap.add_argument("--out", required=True)
-    ap.add_argument("--dt", type=float, default=4.0); ap.add_argument("--w", type=float, default=6.0); ap.add_argument("--fps", type=int, default=6); ap.add_argument("--rois", type=int, default=1); ap.add_argument("--note", default="")
+    ap.add_argument("--dt", type=float, default=4.0); ap.add_argument("--w", type=float, default=6.0); ap.add_argument("--fps", type=int, default=6); ap.add_argument("--rois", type=int, default=1); ap.add_argument("--note", default=""); ap.add_argument("--single", type=int, default=0, help="1 = one plain gif per arm into --out (a directory)"); ap.add_argument("--single-tag", default="")
     a = ap.parse_args(); Z = a.slice; TA = dsp.TA; ctx = C.slice_ctx(Z); body = ctx["BODY"]; rois = ctx["rois"]
     ref = np.load(f"{dsp.NUF(Z)}/nufft_late.npy").astype(np.float32)                                  # model-free late anatomy: one scale per arm
     z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
@@ -32,6 +32,16 @@ def main():
     s = np.sum(mf[..., tmf > 200].mean(2)[body] * ref[body]) / (np.sum(mf[..., tmf > 200].mean(2)[body] ** 2) + 1e-12); arms.insert(0, ("model-free 31-spoke", resample(mf * s, tmf), mf.shape[-1]))
     vmax = np.percentile(ref[body], 99.5) * 1.15; names = [r for r in dsp.ROI_NAMES if r in rois]; cols = dict(zip(names, ("cyan", "lime", "orange")))
     curves = {lab: {r: np.array([vv[..., i][rois[r]].mean() for i in range(len(tg))]) for r in names} for lab, vv, _ in arms}
+    if a.single:                                                                                       # one plain gif per arm: image, time stamp, 2x upscale, no rois, no curves
+        from PIL import Image, ImageDraw
+        os.makedirs(a.out, exist_ok=True); tag = "" if not a.single_tag else "_" + a.single_tag
+        for lab, vv, nt in arms:
+            fn = lab.split("(")[0].strip().replace(" ", "_").replace("+", "_").replace("-", "").lower(); frames = []
+            for i in range(len(tg)):
+                im = np.clip(vv[..., i] / vmax, 0, 1) * 255; pil = Image.fromarray(im.astype(np.uint8)).resize((vv.shape[1] * 2, vv.shape[0] * 2), Image.LANCZOS)
+                ImageDraw.Draw(pil).text((8, 6), f"{lab}   t = {tg[i]:4.0f} s", fill=255); frames.append(pil)
+            out = f"{a.out}/{dsp.DS}_sl{Z}_{fn}{tag}.gif"; frames[0].save(out, save_all=True, append_images=frames[1:], duration=1000 // a.fps, loop=0, optimize=False); print("saved", out, f"{os.path.getsize(out) / 1e6:.1f} MB")
+        print("GIF_DONE"); return
     n = len(arms); fig = plt.figure(figsize=(2.9 * n, 6.2)); gs = fig.add_gridspec(2, n, height_ratios=[1.0, 0.55])
     axs = [fig.add_subplot(gs[0, j]) for j in range(n)]; hs = []
     for ax, (lab, vv, nt) in zip(axs, arms):
