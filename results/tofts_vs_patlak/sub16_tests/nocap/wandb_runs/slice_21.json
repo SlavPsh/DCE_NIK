@@ -1,0 +1,17 @@
+{
+ "name": "gnik_nocap_s21",
+ "mode": "online",
+ "loss": 0.25202780961990356,
+ "heldout_mse": 0.3649870455265045,
+ "val_knmse": 0.4557925343997406,
+ "best_heldout_mse": 0.36030304431915283,
+ "coef_tv": 0.0,
+ "support": 0.007229826296679676,
+ "pisco": 0.0,
+ "best_step": 9000,
+ "lr": 1e-05,
+ "wall_s": 4006.98361992836,
+ "peak_gpu_mb": 12462.2080078125,
+ "params": 5558016,
+ "wall_total_s": 4006.981350660324
+}
