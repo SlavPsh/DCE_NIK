@@ -1,0 +1,6 @@
+probe 038_stage_v2_gifs
+host worker09.cluster
+start 2026-10-02 23:33:31
+end 2026-10-02 23:33:43
+exit 0
+log jobs/log/probe_038_stage_v2_gifs.out
