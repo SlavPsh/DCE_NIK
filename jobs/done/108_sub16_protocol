@@ -1,5 +1,6 @@
 queue 108_sub16_protocol
 jid 3440327
 submitted 2026-10-02 14:25:59
-state 1 RUNNING None
+state 1 COMPLETED 00:40:23, 1 COMPLETED 01:07:02
 log jobs/log/108_sub16_protocol_3440327.out
+ended 2026-10-02 15:33:20
