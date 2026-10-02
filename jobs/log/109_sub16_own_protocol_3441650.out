@@ -1,0 +1,76 @@
+2026-10-02 21:28:05 host gpu03.cluster job 3441650 task 4 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+  MIG 2g.24gb     Device  0: (UUID: MIG-bbe93c91-7dfa-5181-9573-fffd3e3ea5ce)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 4: sub16 own protocol p14 slice 27 -> results/tofts_vs_patlak/p14/invivo_prod_ks5_sub16wd/sub16_sl27_s0
+device=cuda
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 215 VAL spokes
+    spoke-reduction: 1727 acquired spokes, 7073792 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 5zunwtg9
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/p14/invivo_prod_ks5_sub16wd/sub16_sl27_s0/wandb_runs/wandb/run-20261002_212813-5zunwtg9
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_sub16_sl27_s0_s27
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/5zunwtg9
+[wandb] gnik_sub16_sl27_s0_s27: mode online
+    warmstarted Phi from PCA basis (rank 16, 100 frames, fit MSE 3.164e-04)
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.856, 'rot180': 0.856, 'fliplr': 0.855, 'flipud': 0.855})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:336: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 7.334e-01  heldout 4.488e-01
+    step   2000  train 4.788e-01  heldout 3.552e-01
+    step   3000  train 4.286e-01  heldout 3.381e-01
+    step   4000  train 4.002e-01  heldout 3.319e-01
+    step   5000  train 3.783e-01  heldout 3.265e-01
+    step   6000  train 3.761e-01  heldout 3.287e-01
+    step   7000  train 3.647e-01  heldout 3.230e-01
+    step   8000  train 3.521e-01  heldout 3.195e-01
+    step   9000  train 3.552e-01  heldout 3.235e-01
+    step  10000  train 3.349e-01  heldout 3.202e-01
+    final weights kept (best heldout 3.195e-01 at step 8000)
+    RESOURCES slice 27: peak_gpu_MB 12838 params 5558016 best_heldout 3.1950e-01
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  █▅▃▂▂▂▁▁▁
+wandb:        best_step ▁▃▄▅▅▅▇███
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse █▃▂▂▁▁▁▁▁▁
+wandb:             loss █▄▃▂▂▂▂▁▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁
+wandb:          support █▄▂▂▂▁▁▁▁▁
+wandb:        val_knmse █▃▂▂▁▁▁▁▁▁
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.3195
+wandb:        best_step 8000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.32019
+wandb:             loss 0.33492
+wandb:               lr 1e-05
+wandb:           params 5558016
+wandb:      peak_gpu_mb 12838.00977
+wandb:            pisco 0
+wandb:          support 0.00327
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_sub16_sl27_s0_s27 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/5zunwtg9
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/p14/invivo_prod_ks5_sub16wd/sub16_sl27_s0/wandb_runs/wandb/run-20261002_212813-5zunwtg9/logs
+slice 27  nik (256, 256, 431)  (5808s)  vs CS: corr 0.964  nrmse 0.183
+done 5811s -> results/tofts_vs_patlak/p14/invivo_prod_ks5_sub16wd/sub16_sl27_s0
+[W1002 23:05:01.850055967 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-02 23:05:01 TRAIN_DONE sub16wd p14 sl27 exit 0

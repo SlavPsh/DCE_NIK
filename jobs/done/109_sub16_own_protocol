@@ -1,5 +1,6 @@
 queue 109_sub16_own_protocol
 jid 3441650
 submitted 2026-10-02 18:45:25
-state 1 RUNNING None
+state 1 COMPLETED 01:06:19, 1 COMPLETED 01:06:27, 1 COMPLETED 01:36:02, 1 COMPLETED 01:36:11, 1 COMPLETED 01:36:56
 log jobs/log/109_sub16_own_protocol_3441650.out
+ended 2026-10-02 23:06:38
