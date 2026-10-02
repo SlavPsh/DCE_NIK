@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/sub16_atoms_diag.py", line 52, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/sub16_atoms_diag.py", line 29, in main
+    at = P[..., 0] + 1j * P[..., 1]; at = at - at.mean(0); pw = np.abs(np.fft.rfft(at, axis=0)) ** 2; hi = pw[f > 0.1].sum(0) / (pw[1:].sum(0) + 1e-12)
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/numpy/fft/_pocketfft.py", line 417, in rfft
+    output = _raw_fft(a, n, axis, True, True, norm, out=out)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/appdata/users/P101440/micromamba/envs/torch29/lib/python3.11/site-packages/numpy/fft/_pocketfft.py", line 101, in _raw_fft
+    return ufunc(a, fct, axes=[(axis,), (), (axis,)], out=out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ufunc 'rfft_n_even' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+ATOMS exit 1
