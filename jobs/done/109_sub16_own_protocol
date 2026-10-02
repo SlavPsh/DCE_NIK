@@ -1,5 +1,5 @@
 queue 109_sub16_own_protocol
 jid 3441650
 submitted 2026-10-02 18:45:25
-state 1 PENDING None
+state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
 log jobs/log/109_sub16_own_protocol_3441650.out
