@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-10-02 21:07:36 on worker09.cluster, job 3437829, cycle 211
+updated 2026-10-02 21:28:25 on worker09.cluster, job 3437829, cycle 221
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3441650 | 109_sub16_own_protocol | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3441650 | 109_sub16_own_protocol | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 109_sub16_own_protocol | 1 RUNNING None |
 | 036_109_progress | exit 0 |
-| 109_sub16_own_protocol | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 108_sub16_protocol | 1 COMPLETED 00:40:23, 1 COMPLETED 01:07:02 |
 | 107_sub16_atoms | 1 COMPLETED 00:00:08 |
 | 106_sub16_atoms | 1 COMPLETED 00:00:06 |
