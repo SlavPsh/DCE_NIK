@@ -1,5 +1,6 @@
 queue 106_sub16_atoms
 jid 3439886
 submitted 2026-10-02 08:44:41
-state 1 PENDING Priority
+state 1 COMPLETED 00:00:06
 log jobs/log/106_sub16_atoms_3439886.out
+ended 2026-10-02 08:46:44

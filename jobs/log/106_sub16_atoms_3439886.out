@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/sub16_atoms_diag.py", line 52, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/sub16_atoms_diag.py", line 30, in main
+    row.update(rank=int(at.shape[1]), resp_frac_mean=float(hi.mean()), resp_frac_max=float(hi.max()), n_atoms_resp_gt_0p3=int((hi > 0.3).sum()))
+                                                           ^^
+NameError: name 'hi' is not defined. Did you mean: 'ci'?
+ATOMS exit 1
