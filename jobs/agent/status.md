@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-10-02 14:28:03 on worker09.cluster, job 3437829, cycle 16
+updated 2026-10-02 15:06:48 on worker09.cluster, job 3437829, cycle 35
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3440327 | 108_sub16_protocol | 2 RUNNING None |
+| 3440327 | 108_sub16_protocol | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 108_sub16_protocol | 2 RUNNING None |
+| 108_sub16_protocol | 1 RUNNING None |
 | 107_sub16_atoms | 1 COMPLETED 00:00:08 |
 | 106_sub16_atoms | 1 COMPLETED 00:00:06 |
 | 105_sub16_atoms | 1 COMPLETED 00:00:06 |
