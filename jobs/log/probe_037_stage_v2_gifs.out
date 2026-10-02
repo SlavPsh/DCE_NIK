@@ -1,0 +1,8 @@
+ls: cannot access 'results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/*sub16_wd*.gif': No such file or directory
+39.8 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_p14_sl21.gif
+40.3 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_p14_sl24.gif
+38.7 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_p14_sl27.gif
+32.7 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_sl18.gif
+35.3 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_sl19.gif
+35.1 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_sl21.gif
+fatal: pathspec 'results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/*sub16_wd*.gif' did not match any files
