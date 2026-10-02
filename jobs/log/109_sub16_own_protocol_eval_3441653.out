@@ -587,3 +587,11 @@ IQ_TRACK_DONE
 [W1002 23:17:34.358803725 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
 saved results/tofts_vs_patlak/figures/p14_ks5_v2_sl27.png
 [W1002 23:17:44.931440305 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_v2_p14_sl27.gif 95 frames
+GIF_DONE
+[W1002 23:18:52.729866888 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl27_modelfree_31spoke.gif 23.2 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl27_sub16.gif 18.1 MB
+GIF_DONE
+[W1002 23:18:59.988823979 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+P14 FIGS exit 0
