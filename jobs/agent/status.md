@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-02 19:54:53 on worker09.cluster, job 3437829, cycle 176
+updated 2026-10-02 21:07:36 on worker09.cluster, job 3437829, cycle 211
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-10-02 19:54:53 on worker09.cluster, job 3437829, cycle 176
 
 | name | state |
 |---|---|
+| 036_109_progress | exit 0 |
 | 109_sub16_own_protocol | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 108_sub16_protocol | 1 COMPLETED 00:40:23, 1 COMPLETED 01:07:02 |
 | 107_sub16_atoms | 1 COMPLETED 00:00:08 |
@@ -31,4 +32,3 @@ updated 2026-10-02 19:54:53 on worker09.cluster, job 3437829, cycle 176
 | 097_p14_prod_ks5 | 1 COMPLETED 01:32:07, 2 COMPLETED 01:32:08, 1 COMPLETED 01:32:36, 1 COMPLETED 01:32:38, 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:42, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:44, 2 COMPLETED 01:32:45 |
 | 031_097_098_start | exit 0 |
 | 096_p14_bw_eval | 1 COMPLETED 00:00:16 |
-| 030_095_eval | exit 0 |

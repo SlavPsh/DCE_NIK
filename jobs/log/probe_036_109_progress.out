@@ -1,0 +1,18 @@
+21:07:36
+       JOBID           NAME ST     TIME NODELIST(REASON)
+   3441650_4       sub16own PD     0:00 (QOSMaxGRESPerUser)
+   3441653_0  sub16own_eval PD     0:00 (Dependency)
+   3441650_2       sub16own  R  1:15:35 gpu03
+   3441650_3       sub16own  R  1:15:35 gpu03
+== jobs/log/109_sub16_own_protocol_3441733.out
+    step   8000  train 3.166e-01  heldout 2.651e-01
+    step   9000  train 3.072e-01  heldout 2.630e-01
+== jobs/log/109_sub16_own_protocol_3441734.out
+    step   8000  train 2.101e-01  heldout 1.691e-01
+    step   9000  train 2.081e-01  heldout 1.688e-01
+== jobs/log/109_sub16_own_protocol_3441651.out
+    step  10000  train 1.019e-01  heldout 1.479e-01
+2026-10-02 19:51:57 TRAIN_DONE sub16wd p3 sl18 exit 0
+== jobs/log/109_sub16_own_protocol_3441652.out
+    step  10000  train 7.852e-02  heldout 1.068e-01
+2026-10-02 19:51:49 TRAIN_DONE sub16wd p3 sl19 exit 0
