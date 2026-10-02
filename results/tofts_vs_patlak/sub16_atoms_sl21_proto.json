@@ -1,0 +1,62 @@
+[
+ {
+  "label": "model-free (aorta osc only)",
+  "aorta_osc": 0.1080717937765115
+ },
+ {
+  "label": "sub16 051",
+  "rank": 16,
+  "resp_frac_mean": 0.048813311464301026,
+  "resp_frac_max": 0.1391487205772776,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.10570279976922646,
+  "aorta_nrmse": 0.9274412105488162,
+  "cortex_osc": 0.03624202792117505,
+  "cortex_nrmse": 0.9176189643776967,
+  "medulla_osc": 0.05090230462841096,
+  "medulla_nrmse": 0.9144991763985164,
+  "best_heldout": 0.28974512219429016
+ },
+ {
+  "label": "sub16 prod",
+  "rank": 16,
+  "resp_frac_mean": 0.01277505648755706,
+  "resp_frac_max": 0.02908665236976079,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.08524606172095088,
+  "aorta_nrmse": 0.9362293850241462,
+  "cortex_osc": 0.02839867520876132,
+  "cortex_nrmse": 0.9356537951445668,
+  "medulla_osc": 0.02756686632391762,
+  "medulla_nrmse": 0.9329912542506085,
+  "best_heldout": 0.29101619124412537
+ },
+ {
+  "label": "sub16 wd3e-3 prior",
+  "rank": 16,
+  "resp_frac_mean": 0.037215088845482525,
+  "resp_frac_max": 0.10607656526712257,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.12262876624175542,
+  "aorta_nrmse": 0.9248892065169357,
+  "cortex_osc": 0.03931028584894687,
+  "cortex_nrmse": 0.9177334808912513,
+  "medulla_osc": 0.05033462475565245,
+  "medulla_nrmse": 0.9140216816150458,
+  "best_heldout": 0.2909504175186157
+ },
+ {
+  "label": "sub16 wd1e-2 noprior",
+  "rank": 16,
+  "resp_frac_mean": 0.012282080801199654,
+  "resp_frac_max": 0.02721877668430841,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.07499301056593843,
+  "aorta_nrmse": 0.9298353266718279,
+  "cortex_osc": 0.0227296673520024,
+  "cortex_nrmse": 0.9372826415916421,
+  "medulla_osc": 0.025920833896758127,
+  "medulla_nrmse": 0.9338100032368043,
+  "best_heldout": 0.29030245542526245
+ }
+]
