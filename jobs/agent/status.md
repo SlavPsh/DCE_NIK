@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-10-02 08:46:44 on worker02.cluster, job 3425688, cycle 196
+updated 2026-10-02 08:48:49 on worker02.cluster, job 3425688, cycle 197
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3439890 | 107_sub16_atoms | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 107_sub16_atoms | 1 PENDING Priority |
 | 106_sub16_atoms | 1 COMPLETED 00:00:06 |
 | 105_sub16_atoms | 1 COMPLETED 00:00:06 |
 | 104_sub16_tests | 1 COMPLETED 01:06:45, 1 COMPLETED 01:06:50, 1 COMPLETED 01:06:54, 1 COMPLETED 01:06:55, 1 COMPLETED 01:08:29, 1 COMPLETED 01:08:44, 1 COMPLETED 01:08:54 |
@@ -30,4 +32,3 @@ updated 2026-10-02 08:46:44 on worker02.cluster, job 3425688, cycle 196
 | 030_095_eval | exit 0 |
 | 095_p14_bandwidth | 2 COMPLETED 01:32:41, 1 COMPLETED 01:32:43, 1 COMPLETED 01:32:45 |
 | 029_095_start | exit 0 |
-| 094_radial_blur | 1 COMPLETED 00:00:28 |
