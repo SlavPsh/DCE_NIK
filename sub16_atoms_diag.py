@@ -26,7 +26,7 @@ def main():
                                    aif_file=dsp.AIF(Z), tofts_basis=dsp.BASIS(Z, 8), phi_hidden=ck.get("phi_hidden", 64), phi_depth=ck.get("phi_depth", 3), phi_w0=ck.get("phi_w0", 30.0), phi_ortho=ck.get("phi_ortho", False), n_pk=-1, radial_alpha=1.0, coil_mode=ck.get("coil_mode", "input"))
             m = build_model(args, int(ck["ncc"])); m.load_state_dict(ck["state_dict"]); m.eval()
             with torch.no_grad(): P = m.basis(torch.as_tensor(tg, dtype=torch.float32)).numpy()                          # (G, R, 2)
-            at = P[..., 0] + 1j * P[..., 1]; at = at - at.mean(0); pw = np.abs(np.fft.rfft(at, axis=0)) ** 2; hi = pw[f > 0.1].sum(0) / (pw[1:].sum(0) + 1e-12)
+            at = P[..., 0].astype(np.float64) + 1j * P[..., 1].astype(np.float64); at = at - at.mean(0); pw = np.abs(np.fft.fft(at, axis=0))[: len(tg) // 2 + 1] ** 2   # complex atoms: full fft, positive half (rfft rejects complex input); hi = pw[f > 0.1].sum(0) / (pw[1:].sum(0) + 1e-12)
             row.update(rank=int(at.shape[1]), resp_frac_mean=float(hi.mean()), resp_frac_max=float(hi.max()), n_atoms_resp_gt_0p3=int((hi > 0.3).sum()))
             ax = axs[0, j]; sc = np.abs(at).max(0) + 1e-9
             for r in range(at.shape[1]): ax.plot((tg + 1) / 2 * TA, np.real(at[:, r]) / sc[r] + 1.2 * r, lw=0.6)
