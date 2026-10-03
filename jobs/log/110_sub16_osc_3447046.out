@@ -1,0 +1,75 @@
+2026-10-03 01:08:11 host gpu03.cluster job 3447046 task 2 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+  MIG 2g.24gb     Device  0: (UUID: MIG-7fdc2adf-8d97-57e9-a2a9-0e63797cb117)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 2: sub16 wd3e-3 prior nowarm_w0_10 (--no-warmstart --phi-w0 10) -> results/tofts_vs_patlak/sub16_osc/nowarm_w0_10/sub16_sl21_s0
+device=cuda
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run nfpn46gj
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/sub16_osc/nowarm_w0_10/sub16_sl21_s0/wandb_runs/wandb/run-20261003_010815-nfpn46gj
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_sub16_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/nfpn46gj
+[wandb] gnik_sub16_sl21_s0_s21: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.862, 'rot180': 0.863, 'fliplr': 0.861, 'flipud': 0.861})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:336: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 8.317e-01  heldout 5.102e-01
+    step   2000  train 5.292e-01  heldout 4.714e-01
+    step   3000  train 4.280e-01  heldout 4.646e-01
+    step   4000  train 3.635e-01  heldout 4.568e-01
+    step   5000  train 3.250e-01  heldout 4.506e-01
+    step   6000  train 2.949e-01  heldout 4.417e-01
+    step   7000  train 2.785e-01  heldout 4.371e-01
+    step   8000  train 2.582e-01  heldout 4.305e-01
+    step   9000  train 2.496e-01  heldout 4.253e-01
+    step  10000  train 2.488e-01  heldout 4.265e-01
+    final weights kept (best heldout 4.253e-01 at step 9000)
+    RESOURCES slice 21: peak_gpu_MB 12462 params 5558016 best_heldout 4.2526e-01
+wandb: updating run metadata
+wandb: uploading config.yaml
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  █▇▆▅▃▃▂▁▁
+wandb:        best_step ▁▃▃▄▅▆▆▇██
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse █▅▄▄▃▂▂▁▁▁
+wandb:             loss █▄▃▂▂▂▁▁▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁
+wandb:          support █▅▃▂▁▁▁▁▁▁
+wandb:        val_knmse █▅▄▄▃▂▂▁▁▁
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.42526
+wandb:        best_step 9000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.42651
+wandb:             loss 0.2488
+wandb:               lr 1e-05
+wandb:           params 5558016
+wandb:      peak_gpu_mb 12462.20801
+wandb:            pisco 0
+wandb:          support 0.00351
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_sub16_sl21_s0_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/nfpn46gj
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/sub16_osc/nowarm_w0_10/sub16_sl21_s0/wandb_runs/wandb/run-20261003_010815-nfpn46gj/logs
+slice 21  nik (192, 192, 342)  (3982s)  vs CS: corr 0.953  nrmse 0.223
+done 3982s -> results/tofts_vs_patlak/sub16_osc/nowarm_w0_10/sub16_sl21_s0
+[W1003 02:14:36.817468487 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-03 02:14:36 TRAIN_DONE sub16osc nowarm_w0_10 exit 0
