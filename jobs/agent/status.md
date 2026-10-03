@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-03 21:37:05 on worker02.cluster, job 3447504, cycle 243
+updated 2026-10-03 21:39:08 on worker02.cluster, job 3447504, cycle 244
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3451686 | 111_ripple_vs_resp | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 111_ripple_vs_resp | 1 PENDING None |
+| 111_ripple_vs_resp | 1 COMPLETED 00:00:17 |
 | 110_sub16_osc | 1 COMPLETED 01:06:26, 1 COMPLETED 01:06:38, 1 COMPLETED 01:07:05 |
 | 038_stage_v2_gifs | exit 0 |
 | 037_stage_v2_gifs | exit 128 |

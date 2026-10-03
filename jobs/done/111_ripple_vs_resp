@@ -1,5 +1,6 @@
 queue 111_ripple_vs_resp
 jid 3451686
 submitted 2026-10-03 21:37:05
-state 1 PENDING None
+state 1 COMPLETED 00:00:17
 log jobs/log/111_ripple_vs_resp_3451686.out
+ended 2026-10-03 21:39:08
