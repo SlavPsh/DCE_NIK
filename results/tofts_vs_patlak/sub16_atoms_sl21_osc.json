@@ -1,0 +1,76 @@
+[
+ {
+  "label": "model-free (aorta osc only)",
+  "aorta_osc": 0.1080717937765115
+ },
+ {
+  "label": "sub16 wd3e-3 prior (pca warm w0 30)",
+  "rank": 16,
+  "resp_frac_mean": 0.037215088845482525,
+  "resp_frac_max": 0.10607656526712257,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.12262876624175542,
+  "aorta_nrmse": 0.9248892065169357,
+  "cortex_osc": 0.03931028584894687,
+  "cortex_nrmse": 0.9177334808912513,
+  "medulla_osc": 0.05033462475565245,
+  "medulla_nrmse": 0.9140216816150458,
+  "best_heldout": 0.2909504175186157
+ },
+ {
+  "label": "tofts8 prod",
+  "rank": 8,
+  "resp_frac_mean": 0.0033106771580196028,
+  "resp_frac_max": 0.012651396545316341,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.047819613332914034,
+  "aorta_nrmse": 0.9116551011804315,
+  "cortex_osc": 0.012500527057672352,
+  "cortex_nrmse": 0.905841575714391,
+  "medulla_osc": 0.008635623988373664,
+  "medulla_nrmse": 0.9032369804038024,
+  "best_heldout": 0.5460655093193054
+ },
+ {
+  "label": "sub16 wd3e-3 nowarm",
+  "rank": 16,
+  "resp_frac_mean": 0.002352215965964994,
+  "resp_frac_max": 0.0077612209230450745,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.04738013127041507,
+  "aorta_nrmse": 0.9218958643340277,
+  "cortex_osc": 0.018476874548853137,
+  "cortex_nrmse": 0.9244718204994203,
+  "medulla_osc": 0.016466363426939256,
+  "medulla_nrmse": 0.9178279969972344,
+  "best_heldout": 0.3664301633834839
+ },
+ {
+  "label": "sub16 wd3e-3 w0_10",
+  "rank": 16,
+  "resp_frac_mean": 0.00291658524624664,
+  "resp_frac_max": 0.007731158054805221,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.021242517415779132,
+  "aorta_nrmse": 0.9258958505307767,
+  "cortex_osc": 0.007024872312752729,
+  "cortex_nrmse": 0.9217488697756072,
+  "medulla_osc": 0.005643304519314364,
+  "medulla_nrmse": 0.9131745992637422,
+  "best_heldout": 0.3991878926753998
+ },
+ {
+  "label": "sub16 wd3e-3 nowarm_w0_10",
+  "rank": 16,
+  "resp_frac_mean": 0.004548976687404699,
+  "resp_frac_max": 0.01246495831974012,
+  "n_atoms_resp_gt_0p3": 0,
+  "aorta_osc": 0.01350478881194341,
+  "aorta_nrmse": 0.9186398317421116,
+  "cortex_osc": 0.0052099494255232505,
+  "cortex_nrmse": 0.9239542679778991,
+  "medulla_osc": 0.0044984796963692605,
+  "medulla_nrmse": 0.9126219253509326,
+  "best_heldout": 0.425260990858078
+ }
+]
