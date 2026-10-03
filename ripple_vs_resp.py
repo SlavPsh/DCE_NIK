@@ -35,14 +35,16 @@ def main():
             c = np.array([v[..., i][rois[r]].mean() for i in range(v.shape[-1])]); h = hp(c); row[f"{r}_ripple"] = float(np.std(h[5:-5]) / (np.abs(c).mean() + 1e-12))
             row[f"{r}_corr_nav"] = corr(h[5:-5], hp(nv)[5:-5])
             ci = np.interp(tmf, t, c); cs = np.interp(tmf, t, smooth_to_ref(c, t)); ref = enh(mfc[r], tmf)
-            row[f"{r}_nrmse"] = float(np.linalg.norm(enh(ci, tmf) - ref) / (np.linalg.norm(ref) + 1e-12)); row[f"{r}_nrmse_smoothed"] = float(np.linalg.norm(enh(cs, tmf) - ref) / (np.linalg.norm(ref) + 1e-12))
+            def nrmse(x):                                                           # affine ruler as in tofts_eval_invivo: recon units differ from the reference
+                X = np.column_stack([x, np.ones_like(x)]); b, *_ = np.linalg.lstsq(X, ref, rcond=None); return float(np.linalg.norm(X @ b - ref) / (np.linalg.norm(ref) + 1e-12))
+            row[f"{r}_nrmse"] = nrmse(enh(ci, tmf)); row[f"{r}_nrmse_smoothed"] = nrmse(enh(cs, tmf)); row[f"{r}_ripple_smoothed"] = float(np.std(hp(np.interp(t, tmf, cs))[5:-5]) / (np.abs(c).mean() + 1e-12))
             if r == names[1] if len(names) > 1 else r == names[0]:
                 k = names.index(r); ax[k].plot(t, h / (np.abs(c).mean() + 1e-12), lw=0.7, label=f"{lab} ({r} high-pass)")
         rows.append(row); print(row, flush=True)
     for k, r in enumerate(names):
         nvv = hp(navm); ax[k].plot(tmf, 0.05 * nvv / (np.abs(nvv).max() + 1e-12), color="k", lw=0.6, alpha=0.6, label="navigator (scaled)"); ax[k].set_xlim(100, 160); ax[k].set_ylabel(r); ax[k].legend(fontsize=6, ncol=3)
     ax[-1].set_xlabel("t [s] (60 s excerpt)"); fig.suptitle(f"{dsp.DS} slice {Z}: high-passed roi curves vs the respiratory navigator (resp {meta.get('resp_freq_hz', 0):.2f} Hz)", fontsize=10); fig.tight_layout()
-    K = ["frames"] + [f"{r}_ripple" for r in names] + [f"{r}_corr_nav" for r in names] + [f"{r}_nrmse" for r in names] + [f"{r}_nrmse_smoothed" for r in names]
+    K = ["frames"] + [f"{r}_ripple" for r in names] + [f"{r}_ripple_smoothed" for r in names] + [f"{r}_corr_nav" for r in names] + [f"{r}_nrmse" for r in names] + [f"{r}_nrmse_smoothed" for r in names]
     L = [f"# ripple vs respiration, {dsp.DS} slice {Z}: ripple = high-pass temporal std / mean; corr_nav = correlation of the high-passed curve with the k-centre respiratory navigator; nrmse vs model-free before / after smoothing the recon curve with the reference window ({win_s:.1f} s)", "",
          "| recon | " + " | ".join(K) + " |", "|---|" + "---|" * len(K)]
     for r in rows: L.append(f"| {r['label']} | " + " | ".join((f"{r[k]:.3f}" if isinstance(r.get(k), float) else str(r[k])) if k in r else "-" for k in K) + " |")
