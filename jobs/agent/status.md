@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-05 21:56:56 on worker08.cluster, job 3459563, cycle 286
+updated 2026-10-05 21:59:00 on worker08.cluster, job 3459563, cycle 287
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3467051 | 113_arrival_diag | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 113_arrival_diag | 1 PENDING Priority |
+| 113_arrival_diag | 1 COMPLETED 00:01:06 |
 | 112_ripple_vs_resp | 1 COMPLETED 00:00:10 |
 | 111_ripple_vs_resp | 1 COMPLETED 00:00:17 |
 | 110_sub16_osc | 1 COMPLETED 01:06:26, 1 COMPLETED 01:06:38, 1 COMPLETED 01:07:05 |

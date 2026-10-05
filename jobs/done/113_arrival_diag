@@ -1,5 +1,6 @@
 queue 113_arrival_diag
 jid 3467051
 submitted 2026-10-05 21:56:56
-state 1 PENDING Priority
+state 1 COMPLETED 00:01:06
 log jobs/log/113_arrival_diag_3467051.out
+ended 2026-10-05 21:59:00
