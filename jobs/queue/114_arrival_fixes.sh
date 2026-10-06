@@ -43,7 +43,7 @@ fi
 i=$SLURM_ARRAY_TASK_ID; T=${TAGS[$i]}; R=${RANKS[$i]}
 if [ "$i" = 0 ]; then
   prep; echo "PREP exit $?"
-  sbatch --dependency=afterany:$SLURM_ARRAY_JOB_ID --export=ALL,STAGE=eval --array=0 -J arrfix_eval \
+  [ -n "${NOCHAIN:-}" ] || sbatch --dependency=afterany:$SLURM_ARRAY_JOB_ID --export=ALL,STAGE=eval --array=0 -J arrfix_eval \
     --gres=gpu:1g.12gb:1 -c 4 --mem 48G -t 4:00:00 --output=$D/jobs/log/114_arrival_fixes_eval_%j.out --error=$D/jobs/log/114_arrival_fixes_eval_%j.out $SELF && echo "eval chained afterany $SLURM_ARRAY_JOB_ID"
 else
   for k in $(seq 1 90); do [ -f $RES/basis_sl${Z}_r8_param_rms1.npz ] && [ -f $RES/basis_sl${Z}_r5_rms1.npz ] && [ -f $RES/basis_sl${Z}_r6_rms1.npz ] && break; sleep 20; done   # wait for task 0's prep

@@ -33,7 +33,7 @@ def main():
         for a1 in (2.0, 4.0, 8.0):
             b1 = max(0.5, (ttp - t0) / a1)
             p0 = [pk * 1.2, t0, a1, b1, 0.3 * pk, 18.0, 3.0, 6.0, 0.35 * pk, 8.0, 300.0]
-            lo = [0, onset - 15, 0.5, 0.2, 0, 5, 0.5, 0.5, 0, 1, 30]; hi = [5 * pk, ttp, 30, 60, 2 * pk, 60, 30, 60, 2 * pk, 120, 5000]
+            lo = [0, onset - 15, 1.5, 0.2, 0, 5, 2.0, 0.5, 0, 1, 30]; hi = [5 * pk, ttp, 30, 60, 2 * pk, 60, 30, 60, 2 * pk, 120, 5000]   # gamma exponents >= 1.5 / 2: smooth onsets, no kink at the recirculation
             try:
                 r = least_squares(resid, p0, bounds=(lo, hi), max_nfev=4000)
                 if best is None or r.cost < best.cost: best = r
