@@ -1,0 +1,6 @@
+probe 043_param_refit
+host worker04.cluster
+start 2026-10-06 08:56:19
+end 2026-10-06 08:56:29
+exit 0
+log jobs/log/probe_043_param_refit.out

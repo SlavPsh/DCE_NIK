@@ -1,0 +1,9 @@
+cancelled 3469930_0
+params [0.002, 53.576, 3.743, 2.441, 0.0, 28.713, 2.0, 4.766, 0.001, 21.023, 410.587]
+fit rms 0.0185 (savgol 0.0160) | peak gain 1.071 | predicted 11/31 ratio 1.061 vs measured 1.1039452951610738 | ttp 63.0 s | wrote /net/beegfs/users/P101440/DCE_NIK/aif_param_slice21.npz /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/aif_param_slice21.png
+wrote results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz rms 1.0
+   8      5   0.0241   0.0428   0.0185  0.9948
+param resubmitted 3470108
+cancelled eval 3470094
+Submitted batch job 3470109
+fig staged
