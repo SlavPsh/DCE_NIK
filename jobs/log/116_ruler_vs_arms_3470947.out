@@ -1,0 +1,9 @@
+saved results/realdata_nik_vs_cs_figures/figures/ruler_vs_arms_sl21.png {'late NUFFT ruler': None, 'tofts8 in-coil': 0.903, 'tofts8 out-coil': 0.913, 'patlak': 0.892, 'sub16 (wd 3e-3)': 0.745, 'NIK-free': 0.752, 'GRASP': 0.762, 'GRASP-Pro': 0.799}
+RULER_ARMS_DONE
+saved results/realdata_nik_vs_cs_figures/figures/ruler_vs_arms_gated_sl21.png {'late NUFFT ruler (gated)': None, 'tofts8 in-coil': 0.731, 'tofts8 out-coil': 0.736, 'patlak': 0.724, 'sub16 (wd 3e-3)': 0.612, 'NIK-free': 0.628, 'GRASP': 0.618, 'GRASP-Pro': 0.629}
+RULER_ARMS_DONE
+saved results/realdata_nik_vs_cs_figures/figures/ruler_vs_arms_p14_sl24.png {'late NUFFT ruler': None, 'tofts8 in-coil': 0.844, 'tofts8 out-coil': 0.862, 'patlak': 0.82, 'sub16 (wd 3e-3)': 0.839, 'NIK-free': 0.73, 'GRASP': 0.734, 'GRASP-Pro': 0.91}
+RULER_ARMS_DONE
+saved results/realdata_nik_vs_cs_figures/figures/ruler_vs_arms_gated_p14_sl24.png {'late NUFFT ruler (gated)': None, 'tofts8 in-coil': 0.671, 'tofts8 out-coil': 0.678, 'patlak': 0.665, 'sub16 (wd 3e-3)': 0.687, 'NIK-free': 0.621, 'GRASP': 0.6, 'GRASP-Pro': 0.729}
+RULER_ARMS_DONE
+RULERARMS exit 0
