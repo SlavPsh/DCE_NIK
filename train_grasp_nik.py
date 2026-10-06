@@ -312,6 +312,11 @@ def train_one_slice(out_dir, slc, sh, args, device):
         print(f'    [coef-tv] grid {nxc} every {args.coef_tv_every} weight {args.coef_tv_weight:g} delta {args.coef_tv_delta:g}', flush=True)
         from torch.utils.checkpoint import checkpoint as _ckpt
         _CH = int(args.coef_tv_chunk)
+        _K = min(int(args.prior_slow_atoms), int(model.rank))                                                                        # slow group = the first K atoms (patlak span of the tofts basis)
+        _w_tv = torch.tensor([args.tv_slow_weight] * _K + [args.tv_fast_weight] * (int(model.rank) - _K), device=device)
+        _w_sup = torch.tensor([args.support_slow_weight] * _K + [args.support_fast_weight] * (int(model.rank) - _K), device=device)
+        if any(v != 1.0 for v in (args.tv_slow_weight, args.tv_fast_weight, args.support_slow_weight, args.support_fast_weight)):
+            print(f'    [prior groups] slow atoms 0..{_K - 1}: tv {args.tv_slow_weight:g} support {args.support_slow_weight:g} | fast atoms {_K}..{int(model.rank) - 1}: tv {args.tv_fast_weight:g} support {args.support_fast_weight:g}', flush=True)
         def _coil_kspace(cc, c):                                                                                                 # raw coefficient k-space of one chunk, one coil [n,R,2]
             cd = torch.full((cc.shape[0],), c, dtype=torch.long, device=device); Amp = model.amplitudes(cc, cd)
             return torch.stack([normalizer.denormalize(cc, Amp[:, r, :]) for r in range(int(model.rank))], 1)
@@ -326,13 +331,13 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     rms = torch.sqrt(E.mean(dim=(0, 1))).detach() + 1e-12
                     dx = (im[1:, :] - im[:-1, :]).abs(); dy = (im[:, 1:] - im[:, :-1]).abs(); d = args.coef_tv_delta * rms
                     hub = lambda a: torch.where(a <= d, 0.5 * a ** 2 / d, a - 0.5 * d)
-                    pen = ((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms).sum() / (ncc * Rk)
+                    pen = (((hub(dx).mean(dim=(0, 1)) + hub(dy).mean(dim=(0, 1))) / rms) * _w_tv).sum() / (ncc * float(_w_tv.sum()))     # per-atom-group weights (slow / fast), 1 / 1 = the old mean
                 if scale_sup > 0:
                     if _smask[0] is None:                                                                                        # orientation fixed by --support-orient (rot180 verified by support_diag.py on trained models: inside fraction 0.91 vs 0.79 for id); the energy check is informational only
                         Ed = E.detach().sum(-1); fr = {k: float(Ed[m].sum() / Ed.sum()) for k, m in _mcands.items()}
                         _smask[0] = _mcands[args.support_orient]; print(f'    [support] mask orientation {args.support_orient} (inside-energy fractions now, untrained model: {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
                     m = _smask[0]; air = _crop & ~m
-                    pen_s = (E[air].sum(0) / (E[m].sum(0) + 1e-12)).sum() / (ncc * Rk)                                            # air-ring energy / body energy per map (sums, inside the crop)
+                    pen_s = ((E[air].sum(0) / (E[m].sum(0) + 1e-12)) * _w_sup).sum() / (ncc * float(_w_sup.sum()))                  # air-ring energy / body energy per map (sums, inside the crop), per-atom-group weights
                 (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
             return tot, tot_s
     # PISCO-style self-supervised k-space consistency: random acquired centres with a (2s+1)^2-1 cartesian stencil at 1/fov spacing, all coils,
@@ -536,6 +541,9 @@ def main():
     ap.add_argument('--lr-schedule', default='plateau', choices=['plateau', 'cosine'], help='plateau = ReduceLROnPlateau on the held-out mse (default); cosine = decay to --scheduler-min-lr at --steps')
     ap.add_argument('--coef-tv-weight', type=float, default=0.0, help='huber tv on the per-coil coefficient maps (fixed-basis models); 0 = off')
     ap.add_argument('--coef-tv-every', type=int, default=8, help='evaluate the coefficient-map tv every N steps (weight scaled by N)')
+    ap.add_argument('--prior-slow-atoms', type=int, default=3, help='the first K atoms form the slow group for the per-group prior weights (3 = patlak span of the tofts basis)')
+    ap.add_argument('--tv-slow-weight', type=float, default=1.0); ap.add_argument('--tv-fast-weight', type=float, default=1.0)
+    ap.add_argument('--support-slow-weight', type=float, default=1.0); ap.add_argument('--support-fast-weight', type=float, default=1.0, help='relative weight of the fast (residual) atoms in the support prior; 1 / 1 = the production prior')
     ap.add_argument('--coef-tv-grid', type=int, default=0, help='cartesian grid for the tv render; 0 = the data nx (full resolution, no fov wrap)')
     ap.add_argument('--coef-tv-delta', type=float, default=0.1, help='huber knee as a fraction of the map rms')
     ap.add_argument('--coef-tv-chunk', type=int, default=16384, help='grid points per checkpointed chunk in the tv render (memory)')
