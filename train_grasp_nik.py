@@ -431,7 +431,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
                                     for i in range(0, xhe.shape[0], 262144)], 0)
                     hl = float(F.mse_loss(hp, yhe).item())
                 model.train()
-                if not cosine: sched.step(hl)
+                if not cosine: sched.step(_tr_sum / max(_tr_n, 1) if args.sched_on == 'train' else hl)
+                _tr_sum = 0.0; _tr_n = 0
                 if step >= args.warmup_steps and hl < best_heldout:
                     best_heldout = hl
                     best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -553,6 +554,7 @@ def main():
     ap.add_argument('--lr-schedule', default='plateau', choices=['plateau', 'cosine'], help='plateau = ReduceLROnPlateau on the held-out mse (default); cosine = decay to --scheduler-min-lr at --steps')
     ap.add_argument('--coef-tv-weight', type=float, default=0.0, help='huber tv on the per-coil coefficient maps (fixed-basis models); 0 = off')
     ap.add_argument('--coef-tv-every', type=int, default=8, help='evaluate the coefficient-map tv every N steps (weight scaled by N)')
+    ap.add_argument('--sched-on', default='heldout', choices=['heldout', 'train'], help='plateau scheduler signal when held-out spokes exist (train = running mean of the train loss, as in k100 runs)')
     ap.add_argument('--delay-tv-weight', type=float, default=0.0, help='smooth-delay prior: huber tv on the residual-atom coefficients per unit aif coefficient (weighted by the aif-atom energy); 0 = off')
     ap.add_argument('--delay-tv-delta', type=float, default=0.1); ap.add_argument('--delay-eps', type=float, default=0.1, help='ratio regularization, fraction of the aif-atom rms')
     ap.add_argument('--prior-slow-atoms', type=int, default=3, help='the first K atoms form the slow group for the per-group prior weights (3 = patlak span of the tofts basis)')
