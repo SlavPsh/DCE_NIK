@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-10-06 12:48:26 on worker02.cluster, job 3467429, cycle 33
+updated 2026-10-06 13:08:55 on worker02.cluster, job 3467429, cycle 43
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3471850 | 118_delay_prior | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 118_delay_prior | 1 PENDING None |
 | 117_arrfix_diag_rerun | 1 COMPLETED 00:00:52 |
 | 114_arrival_fixes | 1 CANCELLED+ 00:24:46, 1 COMPLETED 01:04:14, 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:41, 1 COMPLETED 01:05:07, 1 COMPLETED 01:06:04 |
 | 116_ruler_vs_arms | 1 COMPLETED 00:00:23 |
@@ -30,4 +32,3 @@ updated 2026-10-06 12:48:26 on worker02.cluster, job 3467429, cycle 33
 | 036_109_progress | exit 0 |
 | 108_sub16_protocol | 1 COMPLETED 00:40:23, 1 COMPLETED 01:07:02 |
 | 107_sub16_atoms | 1 COMPLETED 00:00:08 |
-| 106_sub16_atoms | 1 COMPLETED 00:00:06 |
