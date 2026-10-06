@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-10-06 08:33:38 on worker04.cluster, job 3463632, cycle 253
+updated 2026-10-06 08:35:42 on worker04.cluster, job 3463632, cycle 254
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3469930 | 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3469930 | 114_arrival_fixes | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 114_arrival_fixes | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 039_114_prep | exit 128 |
-| 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 113_arrival_diag | 1 COMPLETED 00:01:06 |
 | 112_ripple_vs_resp | 1 COMPLETED 00:00:10 |
 | 111_ripple_vs_resp | 1 COMPLETED 00:00:17 |

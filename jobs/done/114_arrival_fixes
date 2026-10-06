@@ -1,5 +1,5 @@
 queue 114_arrival_fixes
 jid 3469930
 submitted 2026-10-06 08:31:33
-state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
+state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
 log jobs/log/114_arrival_fixes_3469930.out
