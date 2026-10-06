@@ -1,5 +1,5 @@
 queue 120_free_tsigma
 jid 3473114
 submitted 2026-10-06 15:32:25
-state 1 PENDING None
+state 1 PENDING MaxGRESPerAccount
 log jobs/log/120_free_tsigma_3473114.out

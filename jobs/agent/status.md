@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-06 15:32:25 on worker02.cluster, job 3467429, cycle 113
+updated 2026-10-06 15:34:30 on worker02.cluster, job 3467429, cycle 114
 
 ## active
 
@@ -8,13 +8,13 @@ updated 2026-10-06 15:32:25 on worker02.cluster, job 3467429, cycle 113
 |---|---|---|
 | 3471850 | 118_delay_prior | 1 RUNNING None |
 | 3472661 | 119_k100 | 1 PENDING MaxGRESPerAccount |
-| 3473114 | 120_free_tsigma | 1 PENDING None |
+| 3473114 | 120_free_tsigma | 1 PENDING MaxGRESPerAccount |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 120_free_tsigma | 1 PENDING None |
+| 120_free_tsigma | 1 PENDING MaxGRESPerAccount |
 | 118_delay_prior | 1 RUNNING None |
 | 049_queue_state | exit 0 |
 | 119_k100 | 1 PENDING MaxGRESPerAccount |
