@@ -1,0 +1,42 @@
+2026-10-06 08:31:34 host gpu03.cluster job 3469931 task 0 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 2g.24gb     Device  0: (UUID: MIG-f328f7be-cd56-503a-9bd5-4e010efe4fe5)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+Traceback (most recent call last):
+  File "/net/beegfs/users/P101440/DCE_NIK/aif_param_fit.py", line 61, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/net/beegfs/users/P101440/DCE_NIK/aif_param_fit.py", line 55, in main
+    ax[k].set_xlim(*xl); ax[k].set_xlabel("t [s]"); ax[k].grid(alpha=0.3)
+    ^^^^^^^^^^^^^^^^^^^
+TypeError: matplotlib.axes._base._AxesBase.set_xlim() argument after * must be an iterable, not int
+wrote results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz rms 0.9999999403953552
+wrote results/tofts_vs_patlak/basis_sl21_r5_rms1.npz rms 1.0
+wrote results/tofts_vs_patlak/basis_sl21_r6_rms1.npz rms 1.0
+-rw-rw---- 1 P101440 P101440 52726 Oct  6 08:31 /net/beegfs/users/P101440/DCE_NIK/aif_param_slice21.npz
+-rw-rw---- 1 P101440 P101440 21120 Oct  6 08:31 results/tofts_vs_patlak/basis_sl21_r5_rms1.npz
+-rw-rw---- 1 P101440 P101440 22504 Oct  6 08:31 results/tofts_vs_patlak/basis_sl21_r6_rms1.npz
+-rw-rw---- 1 P101440 P101440 25256 Oct  6 08:31 results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz
+PREP exit 0
+Submitted batch job 3469933
+eval chained afterany 3469930
+task 0: param (--tofts-basis results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz --support-weight 1 --support-mask spoke_masks/support_sl21_d6.npy --support-orient rot180 --coef-tv-every 32) -> results/tofts_vs_patlak/arrival_fix/param/tofts6_sl21_s0
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run brqqlvi7
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/arrival_fix/param/tofts6_sl21_s0/wandb_runs/wandb/run-20261006_083148-brqqlvi7
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts6_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/brqqlvi7
+[wandb] gnik_tofts6_sl21_s0_s21: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+No such file or directory
+52726 08:31 aif_param_slice21.npz  
