@@ -1,0 +1,18 @@
+15:03:44
+       JOBID           NAME ST      TIME NODELIST(REASON)
+     3471573   helios-agent PD      0:00 (Dependency)
+     3467429   helios-agent  R   3:20:57 worker02
+   3472661_0           k100 PD      0:00 (MaxGRESPerAccount)
+   3472661_1           k100 PD      0:00 (MaxGRESPerAccount)
+   3472661_2           k100 PD      0:00 (MaxGRESPerAccount)
+   3472661_3           k100 PD      0:00 (MaxGRESPerAccount)
+   3472661_4           k100 PD      0:00 (MaxGRESPerAccount)
+   3471850_2       dlyprior PD      0:00 (MaxGRESPerAccount)
+   3471852_0  dlyprior_eval PD      0:00 (Dependency)
+   3471850_1       dlyprior  R     50:11 gpu03
+== jobs/log/118_delay_prior_3472482.out
+    step   7000  train 6.329e-01  heldout 5.874e-01
+    step   8000  train 5.947e-01  heldout 5.889e-01
+== jobs/log/118_delay_prior_3471851.out
+    step  10000  train 5.491e-01  heldout 6.210e-01
+2026-10-06 14:13:16 TRAIN_DONE dly0.1 exit 0
