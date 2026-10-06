@@ -1,22 +1,22 @@
 # helios agent
 
-updated 2026-10-06 08:56:29 on worker04.cluster, job 3463632, cycle 264
+updated 2026-10-06 09:47:32 on worker04.cluster, job 3463632, cycle 289
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3469930 | 114_arrival_fixes | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 3469930 | 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 043_param_refit | exit 0 |
 | 042_114_eval_resubmit | exit 0 |
 | 041_aif_fit_log | exit 128 |
 | 040_aif_fit | exit 0 |
-| 114_arrival_fixes | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 039_114_prep | exit 128 |
 | 113_arrival_diag | 1 COMPLETED 00:01:06 |
 | 112_ripple_vs_resp | 1 COMPLETED 00:00:10 |
