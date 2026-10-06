@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-10-06 15:18:03 on worker02.cluster, job 3467429, cycle 106
+updated 2026-10-06 15:20:07 on worker02.cluster, job 3467429, cycle 107
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3471850 | 118_delay_prior | 1 PENDING MaxGRESPerAccount |
+| 3471850 | 118_delay_prior | 1 RUNNING None |
 | 3472661 | 119_k100 | 1 PENDING MaxGRESPerAccount |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 118_delay_prior | 1 PENDING MaxGRESPerAccount |
+| 118_delay_prior | 1 RUNNING None |
 | 049_queue_state | exit 0 |
 | 119_k100 | 1 PENDING MaxGRESPerAccount |
 | 048_allspoke_refs | exit 0 |
