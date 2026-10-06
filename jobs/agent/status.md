@@ -1,23 +1,24 @@
 # helios agent
 
-updated 2026-10-06 15:34:30 on worker02.cluster, job 3467429, cycle 114
+updated 2026-10-06 16:07:15 on worker02.cluster, job 3467429, cycle 130
 
 ## active
 
 | jid | script | state |
 |---|---|---|
 | 3471850 | 118_delay_prior | 1 RUNNING None |
-| 3472661 | 119_k100 | 1 PENDING MaxGRESPerAccount |
+| 3472661 | 119_k100 | 1 PENDING MaxGRESPerAccount, 1 RUNNING None |
 | 3473114 | 120_free_tsigma | 1 PENDING MaxGRESPerAccount |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 050_queue_state | exit 0 |
+| 119_k100 | 1 PENDING MaxGRESPerAccount, 1 RUNNING None |
 | 120_free_tsigma | 1 PENDING MaxGRESPerAccount |
 | 118_delay_prior | 1 RUNNING None |
 | 049_queue_state | exit 0 |
-| 119_k100 | 1 PENDING MaxGRESPerAccount |
 | 048_allspoke_refs | exit 0 |
 | 047_118_progress | exit 1 |
 | 046_118_values | exit 0 |
@@ -33,4 +34,3 @@ updated 2026-10-06 15:34:30 on worker02.cluster, job 3467429, cycle 114
 | 040_aif_fit | exit 0 |
 | 039_114_prep | exit 128 |
 | 113_arrival_diag | 1 COMPLETED 00:01:06 |
-| 112_ripple_vs_resp | 1 COMPLETED 00:00:10 |
