@@ -216,3 +216,6 @@ NIK-free t_sigma 6 {'haarpsi_90': 0.728, 'ssim_90': 0.868, 'psnr_90': np.float64
 IQ_TRACK_DONE
 [W1006 19:53:17.154484097 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
 IQ exit 0
+saved results/tofts_vs_patlak/figures/free_tsigma_sl21.png
+[W1006 19:53:24.720096862 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+FIG exit 0
