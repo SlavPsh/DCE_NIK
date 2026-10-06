@@ -1,5 +1,5 @@
 queue 119_k100
 jid 3472661
 submitted 2026-10-06 14:26:56
-state 1 PENDING None
+state 1 PENDING MaxGRESPerAccount
 log jobs/log/119_k100_3472661.out
