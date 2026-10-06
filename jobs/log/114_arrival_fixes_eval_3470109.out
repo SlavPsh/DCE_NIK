@@ -1,0 +1,295 @@
+2026-10-06 12:11:48 host gpu02.cluster job 3470109 task 0 stage eval
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+  MIG 1g.12gb     Device  0: (UUID: MIG-4ca0e25d-bb07-596e-8f7c-c08315f0c058)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+  sl21 tofts8 s0: aorta_aff 0.0657 cortex_aff 0.0418 fwhm 16.9s | val 2.398e-01 test 2.412e-01
+  sl21 tofts8 s1: MISSING
+  sl21 tofts8 s2: MISSING
+# in vivo (meas_p3_dce, slices 21, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
+
+rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
+
+## slice 21
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| cortex_peak_ratio | 0.8324 ± 0 (1) |  | 0.7667 | 0.638 |
+| cortex_washout_ratio | 0.9883 ± 0 (1) |  | 1.048 | 0.9215 |
+| medulla_peak_ratio | 0.9092 ± 0 (1) |  | 1.008 | 0.9193 |
+| medulla_washout_ratio | 0.9944 ± 0 (1) |  | 1.069 | 0.897 |
+| aorta_peak_ratio | 0.9858 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_washout_ratio | 0.96 ± 0 (1) |  | 0.9795 | 0.7434 |
+| mf_aorta_affine | 0.06572 ± 0 (1) |  | 0.1013 | 0.384 |
+| mf_cortex_affine | 0.04182 ± 0 (1) |  | 0.04423 | 0.1056 |
+| mf_medulla_affine | 0.0464 ± 0 (1) |  | 0.02758 | 0.07839 |
+| mf_liver_affine | 0.02691 ± 0 (1) |  | 0.02368 | 0.03818 |
+| mf_aorta_scale | 0.08401 ± 0 (1) |  | 0.1419 | 0.5084 |
+| mf_cortex_scale | 0.06314 ± 0 (1) |  | 0.06828 | 0.1632 |
+| mf_medulla_scale | 0.06809 ± 0 (1) |  | 0.04174 | 0.1151 |
+| aorta_peak_ratio_vs_mf | 0.9858 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_fwhm_s | 16.9 ± 0 (1) |  | 52.22 | 98.3 |
+| aorta_ttp_s | 63.19 ± 0 (1) |  | 64.73 | 207.6 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.02083 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.6466 |
+| cortex_medulla_late_corr | -0.3356 ± 0 (1) |  | -0.1166 | 0.9698 |
+| train_kNMSE | 0.2226 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2398 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2412 ± 0 (1) |  | nan | nan |
+| wall_s | 3899 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (1) |  | nan | nan |
+| params | 5.531e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 16.89584552369808
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.218e-01 |
+| 0.06-0.12 | 4.301e-01 |
+| 0.12-0.19 | 5.082e-01 |
+| 0.19-0.25 | 7.003e-01 |
+| 0.25-0.31 | 8.680e-01 |
+| 0.31-0.38 | 9.538e-01 |
+| 0.38-0.44 | 1.021e+00 |
+| 0.44-0.50 | 1.200e+00 |
+| 0.50-0.56 | 1.348e+00 |
+| 0.56-0.62 | 1.362e+00 |
+| 0.62-0.69 | 1.461e+00 |
+| 0.69-0.75 | 1.501e+00 |
+| 0.75-0.81 | 1.500e+00 |
+| 0.81-0.88 | 1.493e+00 |
+| 0.88-0.94 | 1.389e+00 |
+| 0.94-1.00 | 1.481e+00 |
+
+INVIVO_EVAL_DONE
+[W1006 12:12:08.785031287 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+appended to /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_arrfix_param.md
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 18 | cortex | 1.12 | - | - | - |
+| 18 | medulla | 1.07 | - | - | - |
+| 18 | aorta | 1.09 | - | - | - |
+| 19 | cortex | 1.09 | - | - | - |
+| 19 | medulla | 1.06 | - | - | - |
+| 19 | aorta | 1.09 | - | - | - |
+| 21 | cortex | 1.07 | 0.78 (raw 0.83) | 0.72 (raw 0.77) | 0.60 (raw 0.64) |
+| 21 | medulla | 1.04 | 0.88 (raw 0.91) | 0.97 (raw 1.01) | 0.89 (raw 0.92) |
+| 21 | aorta | 1.10 | 0.89 (raw 0.99) | 0.64 (raw 0.71) | 0.21 (raw 0.23) |
+# artifacts at contrast arrival, p3 slice 21; arrival 55 s, aif peak 64 s; windows pre 0-40 s, arrival 50-75 s, plateau 90-150 s, late 200-375 s
+
+## (1) artifact level per window (air energy / fine-scale fraction / temporal roughness)
+
+| arm | pre | arrival | plateau | late |
+|---|---|---|---|---|
+| model-free 31-spoke | 0.563 / 0.323 / 0.234 | 0.545 / 0.343 / 0.261 | 0.464 / 0.316 / 0.244 | 0.459 / 0.300 / 0.234 |
+| tofts8 param | 0.156 / 0.229 / 0.000 | 0.170 / 0.266 / 0.070 | 0.125 / 0.239 / 0.004 | 0.131 / 0.223 / 0.001 |
+| tofts8 prod in-coil | 0.157 / 0.226 / 0.002 | 0.165 / 0.263 / 0.050 | 0.132 / 0.240 / 0.007 | 0.135 / 0.224 / 0.003 |
+| tofts8 prod out-coil | 0.162 / 0.222 / 0.001 | 0.157 / 0.253 / 0.036 | 0.133 / 0.237 / 0.005 | 0.136 / 0.221 / 0.002 |
+| GRASP | 0.173 / 0.184 / 0.024 | 0.154 / 0.214 / 0.026 | 0.135 / 0.199 / 0.021 | 0.137 / 0.184 / 0.021 |
+
+## (2) tofts8 param: per-atom coefficient images
+
+| atom | n_eff spokes | air energy | fine fraction | rms body | share at arrival | share late |
+|---|---|---|---|---|---|---|
+| 0 | 357 | 0.112 | 0.221 | 4.21e-05 | 0.53 | 0.49 |
+| 1 | 399 | 0.158 | 0.235 | 2.1e-05 | 0.24 | 0.43 |
+| 2 | 266 | 0.148 | 0.228 | 1.7e-05 | 0.11 | 0.04 |
+| 3 | 185 | 0.284 | 0.359 | 4.24e-06 | 0.06 | 0.02 |
+| 4 | 61 | 0.246 | 0.377 | 1.96e-06 | 0.01 | 0.00 |
+| 5 | 114 | 0.411 | 0.434 | 2.82e-06 | 0.01 | 0.01 |
+| 6 | 108 | 0.449 | 0.446 | 2.07e-06 | 0.00 | 0.00 |
+| 7 | 104 | 0.440 | 0.460 | 2.87e-06 | 0.03 | 0.00 |
+
+## (3) tofts8 param: k-space residual per spoke by window
+
+| window | spokes | NMSE | MSE (normalized) |
+|---|---|---|---|
+| pre | 147 | 0.4920 | 0.4504 |
+| arrival | 90 | 0.2993 | 0.3288 |
+| plateau | 219 | 0.4424 | 0.6199 |
+| late | 638 | 0.4757 | 0.6686 |
+ARRIVAL_DONE
+[W1006 12:12:27.253086117 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+  sl21 tofts8 s0: aorta_aff 0.0606 cortex_aff 0.0365 fwhm 15.4s | val 2.454e-01 test 2.492e-01
+  sl21 tofts8 s1: MISSING
+  sl21 tofts8 s2: MISSING
+# in vivo (meas_p3_dce, slices 21, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
+
+rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
+
+## slice 21
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| cortex_peak_ratio | 0.8559 ± 0 (1) |  | 0.7667 | 0.638 |
+| cortex_washout_ratio | 0.9893 ± 0 (1) |  | 1.048 | 0.9215 |
+| medulla_peak_ratio | 0.959 ± 0 (1) |  | 1.008 | 0.9193 |
+| medulla_washout_ratio | 1.01 ± 0 (1) |  | 1.069 | 0.897 |
+| aorta_peak_ratio | 0.9994 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_washout_ratio | 0.9879 ± 0 (1) |  | 0.9795 | 0.7434 |
+| mf_aorta_affine | 0.0606 ± 0 (1) |  | 0.1013 | 0.384 |
+| mf_cortex_affine | 0.03655 ± 0 (1) |  | 0.04423 | 0.1056 |
+| mf_medulla_affine | 0.02852 ± 0 (1) |  | 0.02758 | 0.07839 |
+| mf_liver_affine | 0.02638 ± 0 (1) |  | 0.02368 | 0.03818 |
+| mf_aorta_scale | 0.07749 ± 0 (1) |  | 0.1419 | 0.5084 |
+| mf_cortex_scale | 0.05539 ± 0 (1) |  | 0.06828 | 0.1632 |
+| mf_medulla_scale | 0.04187 ± 0 (1) |  | 0.04174 | 0.1151 |
+| aorta_peak_ratio_vs_mf | 0.9994 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_fwhm_s | 15.36 ± 0 (1) |  | 52.22 | 98.3 |
+| aorta_ttp_s | 64.73 ± 0 (1) |  | 64.73 | 207.6 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.02083 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.6466 |
+| cortex_medulla_late_corr | 0.1272 ± 0 (1) |  | -0.1166 | 0.9698 |
+| train_kNMSE | 0.2257 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2454 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2492 ± 0 (1) |  | nan | nan |
+| wall_s | 3938 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (1) |  | nan | nan |
+| params | 5.531e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 16.89584552369808
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.271e-01 |
+| 0.06-0.12 | 4.717e-01 |
+| 0.12-0.19 | 5.877e-01 |
+| 0.19-0.25 | 8.001e-01 |
+| 0.25-0.31 | 9.582e-01 |
+| 0.31-0.38 | 1.008e+00 |
+| 0.38-0.44 | 1.021e+00 |
+| 0.44-0.50 | 1.220e+00 |
+| 0.50-0.56 | 1.333e+00 |
+| 0.56-0.62 | 1.384e+00 |
+| 0.62-0.69 | 1.437e+00 |
+| 0.69-0.75 | 1.507e+00 |
+| 0.75-0.81 | 1.486e+00 |
+| 0.81-0.88 | 1.513e+00 |
+| 0.88-0.94 | 1.463e+00 |
+| 0.94-1.00 | 1.494e+00 |
+
+INVIVO_EVAL_DONE
+[W1006 12:12:47.239969581 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+appended to /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_arrfix_supfast5.md
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 18 | cortex | 1.12 | - | - | - |
+| 18 | medulla | 1.07 | - | - | - |
+| 18 | aorta | 1.09 | - | - | - |
+| 19 | cortex | 1.09 | - | - | - |
+| 19 | medulla | 1.06 | - | - | - |
+| 19 | aorta | 1.09 | - | - | - |
+| 21 | cortex | 1.07 | 0.80 (raw 0.86) | 0.72 (raw 0.77) | 0.60 (raw 0.64) |
+| 21 | medulla | 1.04 | 0.92 (raw 0.96) | 0.97 (raw 1.01) | 0.89 (raw 0.92) |
+| 21 | aorta | 1.10 | 0.91 (raw 1.00) | 0.64 (raw 0.71) | 0.21 (raw 0.23) |
+# artifacts at contrast arrival, p3 slice 21; arrival 55 s, aif peak 64 s; windows pre 0-40 s, arrival 50-75 s, plateau 90-150 s, late 200-375 s
+
+## (1) artifact level per window (air energy / fine-scale fraction / temporal roughness)
+
+| arm | pre | arrival | plateau | late |
+|---|---|---|---|---|
+| model-free 31-spoke | 0.563 / 0.323 / 0.234 | 0.545 / 0.343 / 0.261 | 0.464 / 0.316 / 0.244 | 0.459 / 0.300 / 0.234 |
+| tofts8 supfast5 | 0.175 / 0.229 / 0.002 | 0.169 / 0.265 / 0.050 | 0.133 / 0.241 / 0.007 | 0.141 / 0.224 / 0.003 |
+| tofts8 prod in-coil | 0.157 / 0.226 / 0.002 | 0.165 / 0.263 / 0.050 | 0.132 / 0.240 / 0.007 | 0.135 / 0.224 / 0.003 |
+| tofts8 prod out-coil | 0.162 / 0.222 / 0.001 | 0.157 / 0.253 / 0.036 | 0.133 / 0.237 / 0.005 | 0.136 / 0.221 / 0.002 |
+| GRASP | 0.173 / 0.184 / 0.024 | 0.154 / 0.214 / 0.026 | 0.135 / 0.199 / 0.021 | 0.137 / 0.184 / 0.021 |
+
+## (2) tofts8 supfast5: per-atom coefficient images
+
+| atom | n_eff spokes | air energy | fine fraction | rms body | share at arrival | share late |
+|---|---|---|---|---|---|---|
+| 0 | 427 | 0.121 | 0.220 | 4.27e-05 | 0.54 | 0.51 |
+| 1 | 440 | 0.173 | 0.241 | 2e-05 | 0.24 | 0.41 |
+| 2 | 254 | 0.168 | 0.230 | 1.63e-05 | 0.11 | 0.03 |
+| 3 | 195 | 0.241 | 0.360 | 4.24e-06 | 0.07 | 0.02 |
+| 4 | 71 | 0.238 | 0.383 | 2.36e-06 | 0.01 | 0.00 |
+| 5 | 143 | 0.362 | 0.417 | 2.97e-06 | 0.01 | 0.02 |
+| 6 | 136 | 0.312 | 0.436 | 2.42e-06 | 0.01 | 0.01 |
+| 7 | 439 | 0.466 | 0.476 | 3e-06 | 0.02 | 0.00 |
+
+## (3) tofts8 supfast5: k-space residual per spoke by window
+
+| window | spokes | NMSE | MSE (normalized) |
+|---|---|---|---|
+| pre | 147 | 0.4744 | 0.4244 |
+| arrival | 90 | 0.3238 | 0.3511 |
+| plateau | 219 | 0.4098 | 0.5479 |
+| late | 638 | 0.4495 | 0.6106 |
+ARRIVAL_DONE
+[W1006 12:13:04.040330333 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+  sl21 tofts8 s0: aorta_aff 0.0468 cortex_aff 0.0349 fwhm 16.9s | val 2.444e-01 test 2.495e-01
+  sl21 tofts8 s1: MISSING
+  sl21 tofts8 s2: MISSING
+# in vivo (meas_p3_dce, slices 21, k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method)
+
+rulers: mf_* = NRMSE vs model-free NUFFT ROI curve on its 240-pt grid (affine = raw+affine fit; scale = baseline-subtracted single scale). physical bounds on aorta. *_kNMSE = complex k-space NMSE at held-out spokes (NIK only). CS rows are references, NOT truth; CS held-out blocked (magnitude-only files).
+
+## slice 21
+| metric | tofts8 mean±SD (n) |  | GRASP-v2 k80 | GRASP-Pro f80match |
+|---|---|---|---|
+| cortex_peak_ratio | 0.8754 ± 0 (1) |  | 0.7667 | 0.638 |
+| cortex_washout_ratio | 0.987 ± 0 (1) |  | 1.048 | 0.9215 |
+| medulla_peak_ratio | 0.9595 ± 0 (1) |  | 1.008 | 0.9193 |
+| medulla_washout_ratio | 1.005 ± 0 (1) |  | 1.069 | 0.897 |
+| aorta_peak_ratio | 0.9922 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_washout_ratio | 1.018 ± 0 (1) |  | 0.9795 | 0.7434 |
+| mf_aorta_affine | 0.04681 ± 0 (1) |  | 0.1013 | 0.384 |
+| mf_cortex_affine | 0.03486 ± 0 (1) |  | 0.04423 | 0.1056 |
+| mf_medulla_affine | 0.03052 ± 0 (1) |  | 0.02758 | 0.07839 |
+| mf_liver_affine | 0.02655 ± 0 (1) |  | 0.02368 | 0.03818 |
+| mf_aorta_scale | 0.06102 ± 0 (1) |  | 0.1419 | 0.5084 |
+| mf_cortex_scale | 0.05295 ± 0 (1) |  | 0.06828 | 0.1632 |
+| mf_medulla_scale | 0.04481 ± 0 (1) |  | 0.04174 | 0.1151 |
+| aorta_peak_ratio_vs_mf | 0.9922 ± 0 (1) |  | 0.7097 | 0.2285 |
+| aorta_fwhm_s | 16.9 ± 0 (1) |  | 52.22 | 98.3 |
+| aorta_ttp_s | 64.73 ± 0 (1) |  | 64.73 | 207.6 |
+| aorta_neg_frac | 0 ± 0 (1) |  | 0 | 0.02083 |
+| aorta_rise_mono | 1 ± 0 (1) |  | 1 | 0.6466 |
+| cortex_medulla_late_corr | 0.214 ± 0 (1) |  | -0.1166 | 0.9698 |
+| train_kNMSE | 0.2255 ± 0 (1) |  | nan | nan |
+| val_kNMSE | 0.2444 ± 0 (1) |  | nan | nan |
+| test_kNMSE | 0.2495 ± 0 (1) |  | nan | nan |
+| wall_s | 3901 ± 0 (1) |  | nan | nan |
+| peak_gpu_mb | 1.246e+04 ± 0 (1) |  | nan | nan |
+| params | 5.531e+06 ± 0 (1) |  | nan | nan |
+
+model-free aorta FWHM (s): 16.89584552369808
+
+TEST-spoke k-space NMSE per |k| annulus:
+| annulus | tofts8 |
+|---|---|
+| 0.00-0.06 | 2.274e-01 |
+| 0.06-0.12 | 4.709e-01 |
+| 0.12-0.19 | 5.851e-01 |
+| 0.19-0.25 | 7.958e-01 |
+| 0.25-0.31 | 9.580e-01 |
+| 0.31-0.38 | 1.016e+00 |
+| 0.38-0.44 | 1.024e+00 |
+| 0.44-0.50 | 1.207e+00 |
+| 0.50-0.56 | 1.322e+00 |
+| 0.56-0.62 | 1.382e+00 |
+| 0.62-0.69 | 1.441e+00 |
+| 0.69-0.75 | 1.526e+00 |
+| 0.75-0.81 | 1.482e+00 |
+| 0.81-0.88 | 1.502e+00 |
+| 0.88-0.94 | 1.500e+00 |
+| 0.94-1.00 | 1.502e+00 |
+
+INVIVO_EVAL_DONE
+[W1006 12:13:24.081170279 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+appended to /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/invivo_arrfix_supfast20.md
+
+| slice | roi | clip factor | tofts8 corrected peak ratio | GRASP-v2 corrected | GRASP-Pro corrected |
+|---|---|---|---|---|---|
+| 18 | cortex | 1.12 | - | - | - |
+| 18 | medulla | 1.07 | - | - | - |
+| 18 | aorta | 1.09 | - | - | - |
+| 19 | cortex | 1.09 | - | - | - |
+| 19 | medulla | 1.06 | - | - | - |
+| 19 | aorta | 1.09 | - | - | - |
+| 21 | cortex | 1.07 | 0.82 (raw 0.88) | 0.72 (raw 0.77) | 0.60 (raw 0.64) |
+| 21 | medulla | 1.04 | 0.93 (raw 0.96) | 0.97 (raw 1.01) | 0.89 (raw 0.92) |
+| 21 | aorta | 1.10 | 0.90 (raw 0.99) | 0.64 (raw 0.71) | 0.21 (raw 0.23) |
