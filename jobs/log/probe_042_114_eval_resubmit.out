@@ -1,0 +1,5 @@
+cancelled 3469933
+Submitted batch job 3470094
+params [0.002, 53.73, 3.507, 2.557, 0.0, 31.376, 0.5, 9.57, 0.001, 21.88, 422.45]
+fit rms 0.0183 (savgol 0.0160) | peak gain 1.070 | predicted 11/31 ratio 1.060 vs measured 1.1039452951610738 | ttp 63.0 s | wrote /net/beegfs/users/P101440/DCE_NIK/aif_param_slice21.npz /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/aif_param_slice21.png
+fig staged
