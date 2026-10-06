@@ -1,5 +1,6 @@
 queue 115_arrival_gifs
 jid 3470921
 submitted 2026-10-06 10:44:52
-state 1 PENDING Priority
+state 1 COMPLETED 00:01:57
 log jobs/log/115_arrival_gifs_3470921.out
+ended 2026-10-06 10:46:56

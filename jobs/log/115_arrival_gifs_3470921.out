@@ -1,0 +1,49 @@
+2026-10-06 10:44:53 host worker08.cluster job 3470921
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_arrival_sl21.gif 71 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_modelfree_31spoke_arrival.gif 9.9 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_tofts8_incoil_prior_arrival.gif 7.5 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_tofts8_outcoil_prior_arrival.gif 7.5 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_patlak_prior_arrival.gif 6.7 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_sub16_arrival.gif 7.7 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_nikfree_arrival.gif 7.8 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_grasp_12spf_k80_arrival.gif 5.6 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_grasppro_k5_k80_arrival.gif 4.7 MB
+GIF_DONE
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/rulers_slide_sl21.png
+RULERS_SLIDE_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gif_arrival_p14_sl24.gif 71 frames
+GIF_DONE
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_modelfree_31spoke_arrival.gif 18.1 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_tofts8_incoil_prior_arrival.gif 14.0 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_tofts8_outcoil_prior_arrival.gif 13.6 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_patlak_prior_arrival.gif 12.8 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_sub16_arrival.gif 14.8 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_nikfree_arrival.gif 15.1 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_grasp_12spf_k80_arrival.gif 9.3 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_grasppro_k5_k80_arrival.gif 11.3 MB
+GIF_DONE
+saved /net/beegfs/users/P101440/DCE_NIK/results/realdata_nik_vs_cs_figures/figures/rulers_slide_p14_sl24.png
+RULERS_SLIDE_DONE
+GIFS exit 0
+29.8 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_arrival_p14_sl24.gif
+25.5 MB results/realdata_nik_vs_cs_figures/figures/recon_gif_arrival_sl21.gif
+9.3 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_grasp_12spf_k80_arrival.gif
+11.3 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_grasppro_k5_k80_arrival.gif
+18.1 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_modelfree_31spoke_arrival.gif
+15.1 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_nikfree_arrival.gif
+12.8 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_patlak_prior_arrival.gif
+14.8 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_sub16_arrival.gif
+14.0 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_tofts8_incoil_prior_arrival.gif
+13.6 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p14_sl24_tofts8_outcoil_prior_arrival.gif
+5.6 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_grasp_12spf_k80_arrival.gif
+4.7 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_grasppro_k5_k80_arrival.gif
+9.9 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_modelfree_31spoke_arrival.gif
+7.8 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_nikfree_arrival.gif
+6.7 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_patlak_prior_arrival.gif
+7.7 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_sub16_arrival.gif
+7.5 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_tofts8_incoil_prior_arrival.gif
+7.5 MB results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_tofts8_outcoil_prior_arrival.gif
+1.1 MB results/realdata_nik_vs_cs_figures/figures/rulers_slide_p14_sl24.png
+0.9 MB results/realdata_nik_vs_cs_figures/figures/rulers_slide_sl21.png
+staged
