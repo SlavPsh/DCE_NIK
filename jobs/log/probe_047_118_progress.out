@@ -1,0 +1,10 @@
+14:04:19
+       JOBID         NAME ST     TIME NODELIST(REASON)
+   3471852_0 dlyprior_eva PD     0:00 (Dependency)
+   3471850_1     dlyprior PD     0:00 (MaxGRESPerAccount)
+   3471850_2     dlyprior PD     0:00 (MaxGRESPerAccount)
+   3471850_0     dlyprior  R    55:25 gpu03
+== jobs/log/118_delay_prior_3471851.out
+    step   7000  train 6.236e-01  heldout 5.959e-01
+    step   8000  train 5.924e-01  heldout 5.992e-01
+    step   9000  train 5.616e-01  heldout 6.114e-01

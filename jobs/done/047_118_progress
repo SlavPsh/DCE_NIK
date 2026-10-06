@@ -1,0 +1,6 @@
+probe 047_118_progress
+host worker02.cluster
+start 2026-10-06 14:04:19
+end 2026-10-06 14:04:20
+exit 1
+log jobs/log/probe_047_118_progress.out
