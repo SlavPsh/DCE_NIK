@@ -53,7 +53,7 @@ def main():
     if a.model:
         nm, d = a.model.split(":", 1); ck = torch.load(f"{d}/model_slice_{Z:02d}.pt", map_location="cpu", weights_only=False)
         args = SimpleNamespace(**{k: ck[k] for k in ("model", "rank", "hidden", "depth", "w0", "s0", "coil_embed_dim", "k_freq", "k_sigma", "t_freq", "t_sigma", "ff_seed")}, patlak_free=0,
-                               aif_file=dsp.AIF(Z), tofts_basis=(a.basis or dsp.BASIS(Z, int(ck['rank']))), phi_hidden=ck.get("phi_hidden", 64), phi_depth=ck.get("phi_depth", 3), phi_w0=ck.get("phi_w0", 30.0), phi_ortho=ck.get("phi_ortho", False), n_pk=-1, radial_alpha=1.0, coil_mode=ck.get("coil_mode", "input"))
+                               aif_file=dsp.AIF(Z), tofts_basis=(a.basis or dsp.BASIS(Z, int(ck['state_dict']['atoms'].shape[1]) if 'atoms' in ck['state_dict'] else int(ck['rank']))), phi_hidden=ck.get("phi_hidden", 64), phi_depth=ck.get("phi_depth", 3), phi_w0=ck.get("phi_w0", 30.0), phi_ortho=ck.get("phi_ortho", False), n_pk=-1, radial_alpha=1.0, coil_mode=ck.get("coil_mode", "input"))
         m = build_model(args, int(ck["ncc"])); m.load_state_dict(ck["state_dict"]); m = m.to(dev).eval(); ncc = int(ck["ncc"]); Rk = int(m.rank)
         sh = A.load_shared(dsp.REF); ds = A.make_radial_dataset(dsp.REF, Z, compute_device="cpu", shared=sh)
         x, t, c, y_raw, sid, ro = ds["x_all"], ds["t_all"], ds["coil_all"], ds["y_all_raw"], ds["spoke_id_all"], ds["ro_id_all"]
