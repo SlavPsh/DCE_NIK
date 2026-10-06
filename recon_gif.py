@@ -13,11 +13,11 @@ import dsp, consolidated as C
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, required=True); ap.add_argument("--items", required=True); ap.add_argument("--out", required=True)
-    ap.add_argument("--dt", type=float, default=4.0); ap.add_argument("--w", type=float, default=6.0); ap.add_argument("--fps", type=int, default=6); ap.add_argument("--rois", type=int, default=1); ap.add_argument("--note", default=""); ap.add_argument("--single", type=int, default=0, help="1 = one plain gif per arm into --out (a directory)"); ap.add_argument("--single-tag", default="")
+    ap.add_argument("--dt", type=float, default=4.0); ap.add_argument("--w", type=float, default=6.0); ap.add_argument("--fps", type=int, default=6); ap.add_argument("--rois", type=int, default=1); ap.add_argument("--note", default=""); ap.add_argument("--single", type=int, default=0, help="1 = one plain gif per arm into --out (a directory)"); ap.add_argument("--single-tag", default=""); ap.add_argument("--t0", type=float, default=None); ap.add_argument("--t1", type=float, default=None)
     a = ap.parse_args(); Z = a.slice; TA = dsp.TA; ctx = C.slice_ctx(Z); body = ctx["BODY"]; rois = ctx["rois"]
     ref = np.load(f"{dsp.NUF(Z)}/nufft_late.npy").astype(np.float32)                                  # model-free late anatomy: one scale per arm
     z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
-    tg = np.arange(a.w, TA - a.w + 1e-6, a.dt); arms = []
+    tg = np.arange(a.t0 if a.t0 is not None else a.w, (a.t1 if a.t1 is not None else TA - a.w) + 1e-6, a.dt); arms = []    # --t0 / --t1: a time excerpt (the arrival window)
     def resample(v, t):
         o = np.empty(body.shape + (len(tg),), np.float32)
         for i, ts in enumerate(tg):
