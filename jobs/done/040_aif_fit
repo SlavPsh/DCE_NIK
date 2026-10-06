@@ -1,0 +1,6 @@
+probe 040_aif_fit
+host worker04.cluster
+start 2026-10-06 08:39:49
+end 2026-10-06 08:39:49
+exit 0
+log jobs/log/probe_040_aif_fit.out

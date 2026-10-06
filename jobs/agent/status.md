@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-06 08:35:42 on worker04.cluster, job 3463632, cycle 254
+updated 2026-10-06 08:39:49 on worker04.cluster, job 3463632, cycle 256
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-10-06 08:35:42 on worker04.cluster, job 3463632, cycle 254
 
 | name | state |
 |---|---|
+| 040_aif_fit | exit 0 |
 | 114_arrival_fixes | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 039_114_prep | exit 128 |
 | 113_arrival_diag | 1 COMPLETED 00:01:06 |
@@ -31,4 +32,3 @@ updated 2026-10-06 08:35:42 on worker04.cluster, job 3463632, cycle 254
 | 034_104_start | exit 0 |
 | 103_recon_gifs_single | 1 COMPLETED 00:01:29 |
 | 033_stage_gifs | exit 0 |
-| 102_recon_gifs | 1 COMPLETED 00:05:30 |

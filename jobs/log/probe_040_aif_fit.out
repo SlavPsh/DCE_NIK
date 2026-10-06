@@ -1,0 +1,5 @@
+ls: cannot access 'results/realdata_nik_vs_cs_figures/figures/aif_param_slice21.png': No such file or directory
+results/tofts_vs_patlak/basis_sl21_r8_param.log:   8      5   0.0252   0.0433   0.0195  0.9944
+results/tofts_vs_patlak/basis_sl21_r5.log:   5      2   0.0825   0.1659   0.0536  0.9301
+results/tofts_vs_patlak/basis_sl21_r6.log:   6      3   0.0416   0.0833   0.0240  0.9829
+results/tofts_vs_patlak/basis_sl21_r8.log:   8      5   0.0131   0.0285   0.0069  0.9984
