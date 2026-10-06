@@ -1,0 +1,6 @@
+probe 048_allspoke_refs
+host worker02.cluster
+start 2026-10-06 14:22:47
+end 2026-10-06 14:22:48
+exit 0
+log jobs/log/probe_048_allspoke_refs.out

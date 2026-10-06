@@ -1,0 +1,37 @@
+17989760 07-25 grasp_pro_py/results_spoke_cs/cs_slice21_f100.npy
+40370304 09-25 grasp_pro_py/results_spoke_cs_p14/cs_slice21_f80match.npy
+40370304 09-25 grasp_pro_py/results_spoke_cs_p14/cs_slice24_f80match.npy
+40370304 09-25 grasp_pro_py/results_spoke_cs_p14/cs_slice27_f80match.npy
+20938880 09-11 grasp_v2/results_grasp_v2/gv2_slice18_n12_k80.npy
+20938880 09-11 grasp_v2/results_grasp_v2/gv2_slice19_n12_k80.npy
+20938880 09-05 grasp_v2/results_grasp_v2/gv2_slice21_n12.npy
+20938880 09-07 grasp_v2/results_grasp_v2/gv2_slice21_n12_k80.npy
+20938880 09-06 grasp_v2/results_grasp_v2/gv2_slice21_n12_lam0.02.npy
+20938880 09-06 grasp_v2/results_grasp_v2/gv2_slice21_n12_lam0.05.npy
+46923904 09-25 grasp_v2/results_grasp_v2_p14/gv2_slice21_n12_k80.npy
+46923904 09-25 grasp_v2/results_grasp_v2_p14/gv2_slice24_n12_k80.npy
+46923904 09-25 grasp_v2/results_grasp_v2_p14/gv2_slice27_n12_k80.npy
+grasp_pro_py/results_ref/slice_21.npz cs_img (192, 192, 342) ['b1', 'cs_img', 'kdata_radial', 'Vcc']
+grasp_pro_py/results_ref_p14/slice_24.npz cs_img (256, 256, 431) ['b1', 'cs_img', 'kdata_radial', 'Vcc']
+keep_f100.npy
+keep_f25.npy
+keep_f35.npy
+keep_f50.npy
+keep_f70.npy
+keep_f80match.npy
+keep_k80_p14.npy
+support_p14_sl21_d6.npy
+support_p14_sl24_d6.npy
+support_p14_sl27_d6.npy
+support_sl18.npy
+support_sl18_d6.npy
+support_sl19.npy
+support_sl19_d6.npy
+support_sl21.npy
+support_sl21_d6.npy
+test_f25c_m9.npy
+test_k80_m9.npy
+test_k80_m9_p14.npy
+val_f25c_m8.npy
+val_k80_m8.npy
+val_k80_m8_p14.npy

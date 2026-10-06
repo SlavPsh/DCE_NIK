@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-06 14:04:20 on worker02.cluster, job 3467429, cycle 70
+updated 2026-10-06 14:22:48 on worker02.cluster, job 3467429, cycle 79
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-10-06 14:04:20 on worker02.cluster, job 3467429, cycle 70
 
 | name | state |
 |---|---|
+| 048_allspoke_refs | exit 0 |
 | 047_118_progress | exit 1 |
 | 046_118_values | exit 0 |
 | 045_118_values | exit 0 |
@@ -31,4 +32,3 @@ updated 2026-10-06 14:04:20 on worker02.cluster, job 3467429, cycle 70
 | 111_ripple_vs_resp | 1 COMPLETED 00:00:17 |
 | 110_sub16_osc | 1 COMPLETED 01:06:26, 1 COMPLETED 01:06:38, 1 COMPLETED 01:07:05 |
 | 038_stage_v2_gifs | exit 0 |
-| 037_stage_v2_gifs | exit 128 |
