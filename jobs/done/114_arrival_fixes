@@ -1,5 +1,6 @@
 queue 114_arrival_fixes
 jid 3469930
 submitted 2026-10-06 08:31:33
-state 1 RUNNING None
+state 1 CANCELLED+ 00:24:46, 1 COMPLETED 01:04:14, 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:41, 1 COMPLETED 01:05:07, 1 COMPLETED 01:06:04
 log jobs/log/114_arrival_fixes_3469930.out
+ended 2026-10-06 11:46:56

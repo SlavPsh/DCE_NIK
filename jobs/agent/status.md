@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-06 11:42:49 on worker02.cluster, job 3467429, cycle 1
+updated 2026-10-06 11:46:56 on worker02.cluster, job 3467429, cycle 3
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3469930 | 114_arrival_fixes | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 114_arrival_fixes | 1 RUNNING None |
+| 114_arrival_fixes | 1 CANCELLED+ 00:24:46, 1 COMPLETED 01:04:14, 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:41, 1 COMPLETED 01:05:07, 1 COMPLETED 01:06:04 |
 | 116_ruler_vs_arms | 1 COMPLETED 00:00:23 |
 | 115_arrival_gifs | 1 COMPLETED 00:01:57 |
 | 043_param_refit | exit 0 |

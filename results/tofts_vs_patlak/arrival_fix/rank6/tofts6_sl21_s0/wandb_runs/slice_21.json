@@ -1,0 +1,17 @@
+{
+ "name": "gnik_tofts6_sl21_s0_s21",
+ "mode": "online",
+ "loss": 0.6034071445465088,
+ "heldout_mse": 0.6029877066612244,
+ "val_knmse": 0.7530056159515085,
+ "best_heldout_mse": 0.5418179631233215,
+ "coef_tv": 0.0,
+ "support": 0.027224206365644932,
+ "pisco": 0.0,
+ "best_step": 2000,
+ "lr": 1e-05,
+ "wall_s": 3847.9307401180267,
+ "peak_gpu_mb": 12461.86328125,
+ "params": 5527116,
+ "wall_total_s": 3847.9284460544586
+}

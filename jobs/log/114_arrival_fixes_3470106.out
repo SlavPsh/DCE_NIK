@@ -1,0 +1,77 @@
+2026-10-06 08:56:21 host gpu03.cluster job 3470106 task 2 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 2g.24gb     Device  0: (UUID: MIG-f328f7be-cd56-503a-9bd5-4e010efe4fe5)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 2: supfast20 (--tofts-basis results/tofts_vs_patlak/basis_sl21_r8_rms1.npz --support-weight 1 --support-mask spoke_masks/support_sl21_d6.npy --support-orient rot180 --coef-tv-every 32 --support-fast-weight 20) -> results/tofts_vs_patlak/arrival_fix/supfast20/tofts8_sl21_s0
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    explicit heldout: 170 VAL spokes
+    spoke-reduction: 1368 acquired spokes, 4202496 samples, heldout=yes (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run eg8c2nqq
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/arrival_fix/supfast20/tofts8_sl21_s0/wandb_runs/wandb/run-20261006_085625-eg8c2nqq
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/eg8c2nqq
+[wandb] gnik_tofts8_sl21_s0_s21: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+    [prior groups] slow atoms 0..2: tv 1 support 1 | fast atoms 3..7: tv 1 support 20
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.816, 'rot180': 0.815, 'fliplr': 0.815, 'flipud': 0.814})
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:341: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
+    step   1000  train 1.141e+00  heldout 6.235e-01
+    step   2000  train 9.417e-01  heldout 5.447e-01
+    step   3000  train 8.585e-01  heldout 5.436e-01
+    step   4000  train 7.897e-01  heldout 5.553e-01
+    step   5000  train 7.226e-01  heldout 5.651e-01
+    step   6000  train 6.763e-01  heldout 5.806e-01
+    step   7000  train 6.345e-01  heldout 5.952e-01
+    step   8000  train 6.005e-01  heldout 5.971e-01
+    step   9000  train 5.688e-01  heldout 6.126e-01
+    step  10000  train 5.531e-01  heldout 6.235e-01
+    final weights kept (best heldout 5.436e-01 at step 3000)
+    RESOURCES slice 21: peak_gpu_MB 12462 params 5531216 best_heldout 5.4356e-01
+wandb: updating run metadata
+wandb: uploading config.yaml; uploading output.log; uploading wandb-summary.json
+wandb: uploading history steps 9-9, summary, console lines 18-18
+wandb: 
+wandb: Run history:
+wandb: best_heldout_mse  █▁▁▁▁▁▁▁▁
+wandb:        best_step ▁▆████████
+wandb:          coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:      heldout_mse █▁▁▂▃▄▆▆▇█
+wandb:             loss █▆▅▄▃▂▂▂▁▁
+wandb:               lr ▁▁▁▁▁▁▁▁▁▁
+wandb:      peak_gpu_mb ▁█████████
+wandb:            pisco ▁▁▁▁▁▁▁▁▁▁
+wandb:          support ▅▁▁▂▃▄▆▇▇█
+wandb:        val_knmse █▁▁▂▃▄▆▆▇█
+wandb:               +1 ...
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse 0.54356
+wandb:        best_step 3000
+wandb:          coef_tv 0
+wandb:      heldout_mse 0.62346
+wandb:             loss 0.55307
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12461.9126
+wandb:            pisco 0
+wandb:          support 0.02234
+wandb:               +3 ...
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl21_s0_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/eg8c2nqq
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/arrival_fix/supfast20/tofts8_sl21_s0/wandb_runs/wandb/run-20261006_085625-eg8c2nqq/logs
+slice 21  nik (192, 192, 342)  (3903s)  vs CS: corr 0.957  nrmse 0.212
+done 3904s -> results/tofts_vs_patlak/arrival_fix/supfast20/tofts8_sl21_s0
+[W1006 10:01:28.392200261 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-06 10:01:28 TRAIN_DONE supfast20 exit 0
