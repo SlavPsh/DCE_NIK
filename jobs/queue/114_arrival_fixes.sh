@@ -25,10 +25,11 @@ BASE=$D/$RES/invivo_prod/tofts8_sl${Z}_s0; OC=$D/$RES/invivo_prod_oc/tofts8_sl${
 prep() {
   [ -f $D/aif_param_slice$Z.npz ] || $P aif_param_fit.py --slice $Z
   [ -f $RES/basis_sl${Z}_r8_param_rms1.npz ] || { $P nik_tofts_basis.py --aif $D/aif_param_slice$Z.npz --out $RES/basis_sl${Z}_r8_param.npz --ranks 8 > $RES/basis_sl${Z}_r8_param.log 2>&1; $P basis_rms1.py $RES/basis_sl${Z}_r8_param.npz; }
-  for R in 5 6; do [ -f $RES/basis_sl${Z}_r${R}_rms1.npz ] || { $P nik_tofts_basis.py --aif $D/aif_slice$Z.npz --out $RES/basis_sl${Z}_r${R}.npz --ranks $R > $RES/basis_sl${Z}_r${R}.log 2>&1; $P basis_rms1.py $RES/basis_sl${Z}_r${R}.npz; }; done
+  for RR in 5 6; do [ -f $RES/basis_sl${Z}_r${RR}_rms1.npz ] || { $P nik_tofts_basis.py --aif $D/aif_slice$Z.npz --out $RES/basis_sl${Z}_r${RR}.npz --ranks $RR > $RES/basis_sl${Z}_r${RR}.log 2>&1; $P basis_rms1.py $RES/basis_sl${Z}_r${RR}.npz; }; done   # RR: a loop var R would clobber the task's rank
   ls -la $D/aif_param_slice$Z.npz $RES/basis_sl${Z}_r8_param_rms1.npz $RES/basis_sl${Z}_r5_rms1.npz $RES/basis_sl${Z}_r6_rms1.npz
 }
 if [ "${STAGE:-train}" = eval ]; then
+  [ -d $OUTR/param/tofts6_sl21_s0 ] && [ ! -d $OUTR/param/tofts8_sl21_s0 ] && mv -v $OUTR/param/tofts6_sl21_s0 $OUTR/param/tofts8_sl21_s0   # first submission: the prep loop clobbered R for task 0
   for i in 0 1 2 3 4 5; do T=${TAGS[$i]}; R=${RANKS[$i]}; SFX=_rms1; [ $T = param ] && SFX=_param_rms1
     $P tofts_eval_invivo.py --spokes k80 --slices $Z --arms tofts$R --iv-dir arrival_fix/$T --basis-suffix $SFX --suffix _arrfix_$T; $P add_peak_correction.py invivo_arrfix_$T
     $P arrival_artifact_diag.py --slice $Z --tag _arrfix_$T --model "tofts$R $T:$D/$OUTR/$T/tofts${R}_sl${Z}_s0" --items "tofts$R $T:$D/$OUTR/$T/tofts${R}_sl${Z}_s0/nik_slice_${Z}_cplx.npy,tofts8 prod in-coil:$BASE/nik_slice_${Z}_cplx.npy,tofts8 prod out-coil:$OC/nik_slice_${Z}_cplx.npy,GRASP:$GV/gv2_slice${Z}_n12_k80.npy"

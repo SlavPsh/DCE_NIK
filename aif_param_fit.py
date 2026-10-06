@@ -49,7 +49,7 @@ def main():
     np.savez(out, aif_tmf=raw, tmf=tmf, aif_frame=aif_frame, tC=tC, ao=z["ao"], aif_frame_conv=np.interp(tC, tf, Cb), params=p, window_s=W, peak_gain=gain, pred_ratio_11=pred_ratio,
              meas_ratio_11=(meas if meas is not None else np.nan), verdict=str(z["verdict"]) if "verdict" in z.files else "n/a", ttp=float(tf[np.argmax(C)]), source=dsp.AIF(Z))
     fig, ax = plt.subplots(1, 2, figsize=(13, 4.4))
-    for k, (xl, ttl) in enumerate(((0, TA), (max(0, onset - 15), onset + 60))):
+    for k, xl in enumerate(((0.0, TA), (max(0.0, onset - 15.0), onset + 60.0))):
         ax[k].plot(tmf, raw / pk, "0.6", lw=0.8, label="measured (31-spoke roi curve, raw)"); ax[k].plot(tmf, sm / pk, "b", lw=1.2, label="savgol 11 (current basis input)")
         ax[k].plot(tf, Cb / pk, "g", lw=1.2, label=f"fit convolved with the {W:.1f} s window (rms {rms_fit:.3f})"); ax[k].plot(tf, C / pk, "r", lw=1.4, label=f"fit deconvolved = new basis input (peak x{gain:.2f})")
         ax[k].set_xlim(*xl); ax[k].set_xlabel("t [s]"); ax[k].grid(alpha=0.3)
