@@ -1,18 +1,18 @@
 # helios agent
 
-updated 2026-10-06 09:47:32 on worker04.cluster, job 3463632, cycle 289
+updated 2026-10-06 10:42:43 on worker04.cluster, job 3463632, cycle 316
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3469930 | 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3469930 | 114_arrival_fixes | 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 114_arrival_fixes | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 114_arrival_fixes | 2 RUNNING None |
 | 043_param_refit | exit 0 |
 | 042_114_eval_resubmit | exit 0 |
 | 041_aif_fit_log | exit 128 |
