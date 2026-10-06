@@ -392,7 +392,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                         sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state, best_step=best_step), tmp)
         os.replace(tmp, ckpt_path)
 
-    model.train(); ctv_last = 0.0; sup_last = 0.0; dly_last = 0.0; pisco_last = 0.0
+    model.train(); ctv_last = 0.0; sup_last = 0.0; dly_last = 0.0; pisco_last = 0.0; _tr_sum = 0.0; _tr_n = 0                 # running train loss (scheduler without held-out spokes)
     for step in range(start_step, args.steps + 1):
         idx = torch.randint(0, N_train, (args.batch_size,), device=device)
         opt.zero_grad(set_to_none=True)
@@ -413,6 +413,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
         if pisco_on and step % args.pisco_every == 0:
             pv = pisco_term(); loss = loss + args.pisco_weight * args.pisco_every * pv; pisco_last = float(pv)
         loss.backward()
+        _tr_sum += float(loss); _tr_n += 1
         if ctv_on and step % args.coef_tv_every == 0: ctv_last, sup_last, dly_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every, args.support_weight * args.coef_tv_every, args.delay_tv_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         opt.step()
@@ -446,9 +447,12 @@ def train_one_slice(out_dir, slc, sh, args, device):
                              peak_gpu_mb=W.peak_gpu_mb()), step=step)
                 if step % args.console_every == 0 or step == args.steps:
                     print(f'    step {step:6d}  train {float(loss):.3e}  heldout {hl:.3e}', flush=True)
-            elif step % args.console_every == 0 or step == args.steps:
-                print(f'    step {step:6d}  train {float(loss):.3e}', flush=True)
-                run.log(dict(loss=float(loss), wall_s=time.time() - t_slice, peak_gpu_mb=W.peak_gpu_mb()), step=step)
+            else:                                                                          # no held-out spokes (k100): plateau scheduler on the running train loss, checkpoint as usual
+                tr_avg = _tr_sum / max(_tr_n, 1); _tr_sum = 0.0; _tr_n = 0
+                if not cosine: sched.step(tr_avg)
+                save_ckpt(step)
+                run.log(dict(loss=float(loss), train_avg=tr_avg, lr=opt.param_groups[0]['lr'], coef_tv=ctv_last, support=sup_last, delay_tv=dly_last, wall_s=time.time() - t_slice, peak_gpu_mb=W.peak_gpu_mb()), step=step)
+                if step % args.console_every == 0 or step == args.steps: print(f'    step {step:6d}  train {float(loss):.3e}  (avg {tr_avg:.3e}, no held-out)', flush=True)
 
     if best_state is not None and not args.no_restore:
         model.load_state_dict({k: v.to(device) for k, v in best_state.items()})

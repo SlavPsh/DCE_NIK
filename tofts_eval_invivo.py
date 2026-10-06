@@ -19,13 +19,17 @@ sh = A.load_shared(REFD)
 import argparse
 _ap = argparse.ArgumentParser(); _ap.add_argument("--slices", default="18,19,21"); _ap.add_argument("--arms", default="patlak,tofts")
 _ap.add_argument("--suffix", default=None, help="outputs invivo<suffix>.{json,md}; default '' for f25, '_k80' for k80")
-_ap.add_argument("--spokes", default="f25", choices=["f25", "k80"], help="k80 = the standard: keep v%10<8 (1368 views), val v%10==8, test v%10==9, runs in invivo_k80/, grasp k80 refs")
+_ap.add_argument("--spokes", default="f25", choices=["f25", "k80", "k100"], help="k80 = the standard: keep v%10<8 (1368 views), val v%10==8, test v%10==9, runs in invivo_k80/, grasp k80 refs")
 _ap.add_argument("--iv-dir", default=None, help="run dir under results/tofts_vs_patlak (default invivo / invivo_k80)"); _ap.add_argument("--basis-suffix", default="", help="basis file suffix for the held-out eval, e.g. _rms1"); _a = _ap.parse_args()
 SLICES = [int(z) for z in _a.slices.split(",")]; ARMS = _a.arms.split(",")
 if _a.spokes == "k80":
     KEEP = np.load(dsp.KEEP); VAL = np.load(dsp.VAL); TEST = np.load(dsp.TEST); IV = f"{RES}/invivo_k80"
     REFS = (("GRASP-v2 k80 (1368 views, 142 fr, n12 lam0.25)", "{GV}/gv2_slice{Z}_n12_k80.npy"), ("GRASP-Pro f80match (1368 views, 122 fr, K5)", "{GP}/cs_slice{Z}_f80match.npy"))
     SUF = "_k80" if _a.suffix is None else _a.suffix; SPK = "k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method"
+elif _a.spokes == "k100":
+    KEEP = np.load(f"{dsp.D}/spoke_masks/keep_f100{dsp.SFX}.npy"); VAL = np.load(dsp.VAL); TEST = np.load(dsp.TEST); IV = f"{RES}/invivo_k100"
+    REFS = (("GRASP-v2 all spokes (n12 lam0.25)", "{GV}/gv2_slice{Z}_n12.npy"), ("GRASP-Pro all spokes (14 spf, K5)", "{GP}/cs_slice{Z}_f100.npy"))
+    SUF = "_k100" if _a.suffix is None else _a.suffix; SPK = "k100 = every view in training (no held-out spokes; the val / test kNMSE columns are TRAIN-set numbers here); same views for every method"
 else:
     REFS = (("GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", "{GV}/gv2_slice{Z}_f25.npy"), ("GRASP-Pro f25 (488 spokes, 122 fr, K5)", "{GP}/cs_slice{Z}_f25.npy"))
     SUF = _a.suffix or ""; SPK = "keep_f25 = 488/1710 spokes, VAL v%10==8 of complement for early stop, TEST v%10==9 untouched"
