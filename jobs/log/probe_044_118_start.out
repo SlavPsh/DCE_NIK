@@ -1,0 +1,10 @@
+13:11:00
+       JOBID         NAME ST     TIME NODELIST(REASON)
+   3471852_0 dlyprior_eva PD     0:00 (Dependency)
+   3471850_1     dlyprior PD     0:00 (MaxGRESPerAccount)
+   3471850_2     dlyprior PD     0:00 (MaxGRESPerAccount)
+   3471850_0     dlyprior  R     2:05 gpu03
+== jobs/log/118_delay_prior_3471851.out
+2026-10-06 13:08:56 host gpu03.cluster job 3471851 task 0 stage train
+task 0: delay-tv weight 0.1 -> results/tofts_vs_patlak/delay_prior/dly0.1/tofts8_sl21_s0
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
