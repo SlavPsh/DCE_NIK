@@ -1,0 +1,6 @@
+probe 045_118_values
+host worker02.cluster
+start 2026-10-06 13:13:06
+end 2026-10-06 13:13:06
+exit 0
+log jobs/log/probe_045_118_values.out

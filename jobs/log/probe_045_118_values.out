@@ -1,0 +1,5 @@
+13:13:06
+No directory
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: 'results/tofts_vs_patlak/delay_prior/dly0.1/tofts8_sl21_s0/wandb_runs/slice_21.json'
