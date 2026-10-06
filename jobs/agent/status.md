@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-06 19:36:54 on worker02.cluster, job 3467429, cycle 232
+updated 2026-10-06 19:53:20 on worker02.cluster, job 3467429, cycle 240
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3473114 | 120_free_tsigma | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 120_free_tsigma | 1 RUNNING None |
+| 120_free_tsigma | 1 COMPLETED 00:38:34, 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:10 |
 | 119_k100 | 1 COMPLETED 00:39:13, 1 COMPLETED 01:03:52, 1 COMPLETED 01:04:39, 1 COMPLETED 01:05:26, 1 COMPLETED 01:05:58 |
 | 121_delay_gif | 1 COMPLETED 00:01:27 |
 | 051_118_eval_resubmit | exit 0 |
