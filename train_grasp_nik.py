@@ -299,7 +299,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
     # backward per coil so the graph never holds all coils. the grasp-pro move (tv on subspace coefficients), no image rendering per frame.
     # k-space support prior (same render): the coefficient images must vanish outside the body; penalty = energy outside / energy inside per map.
     # streaks extend outside the body, so this targets them directly; the mask orientation is checked once against the model's own energy.
-    ctv_on = (args.coef_tv_weight > 0 or args.support_weight > 0) and hasattr(model, 'amplitudes')
+    ctv_on = (args.coef_tv_weight > 0 or args.support_weight > 0 or args.delay_tv_weight > 0) and hasattr(model, 'amplitudes')
     _smask = [None]
     if args.support_weight > 0:
         _m0 = torch.from_numpy(np.load(args.support_mask).astype(bool)).to(device)
@@ -320,13 +320,21 @@ def train_one_slice(out_dir, slc, sh, args, device):
         def _coil_kspace(cc, c):                                                                                                 # raw coefficient k-space of one chunk, one coil [n,R,2]
             cd = torch.full((cc.shape[0],), c, dtype=torch.long, device=device); Amp = model.amplitudes(cc, cd)
             return torch.stack([normalizer.denormalize(cc, Amp[:, r, :]) for r in range(int(model.rank))], 1)
-        def coef_tv_backward(scale_tv, scale_sup=0.0):
-            tot = 0.0; tot_s = 0.0; Rk = int(model.rank)
+        def coef_tv_backward(scale_tv, scale_sup=0.0, scale_dly=0.0):
+            tot = 0.0; tot_s = 0.0; tot_d = 0.0; Rk = int(model.rank)
             for c in range(ncc):
                 pr = torch.cat([_ckpt(_coil_kspace, _cg[i:i + _CH], c, use_reentrant=False) for i in range(0, _cg.shape[0], _CH)], 0)   # activations recomputed in backward: peak memory = one chunk
                 K = torch.complex(pr[..., 0], pr[..., 1]).view(nxc, nxc, Rk) * _cmask
                 im = torch.fft.fftshift(torch.fft.ifft2(torch.fft.ifftshift(K, dim=(0, 1)), dim=(0, 1)), dim=(0, 1))          # [nx,nx,R] coil image per atom
-                E = im.abs() ** 2; pen = torch.zeros((), device=device); pen_s = torch.zeros((), device=device)
+                E = im.abs() ** 2; pen = torch.zeros((), device=device); pen_s = torch.zeros((), device=device); pen_d = torch.zeros((), device=device)
+                if scale_dly > 0 and Rk > _K:                                                                                   # smooth-delay prior: huber tv on the residual-atom coefficients per unit aif coefficient
+                    a0 = im[..., 0]; wt = a0.abs() ** 2; wt = wt / (wt.mean() + 1e-12)                                           # tissue weight = aif-atom energy (coil sensitivity cancels in the ratio)
+                    eps2 = (args.delay_eps * torch.sqrt((a0.abs() ** 2).mean()).detach()) ** 2
+                    r = im[..., _K:] * a0.conj().unsqueeze(-1) / (a0.abs().unsqueeze(-1) ** 2 + eps2)                            # [nx,nx,R-K] complex ratio ~ delay / dispersion per voxel
+                    rr = torch.sqrt((r.abs() ** 2 * wt.unsqueeze(-1)).mean(dim=(0, 1))).detach() + 1e-12                          # weighted rms per residual atom (scale-free threshold)
+                    gx = (r[1:, :] - r[:-1, :]).abs() * torch.sqrt(wt[1:, :] * wt[:-1, :]).unsqueeze(-1); gy = (r[:, 1:] - r[:, :-1]).abs() * torch.sqrt(wt[:, 1:] * wt[:, :-1]).unsqueeze(-1)
+                    dd = args.delay_tv_delta * rr; hub_d = lambda a: torch.where(a <= dd, 0.5 * a ** 2 / dd, a - 0.5 * dd)
+                    pen_d = ((hub_d(gx).mean(dim=(0, 1)) + hub_d(gy).mean(dim=(0, 1))) / rr).sum() / (ncc * (Rk - _K))
                 if scale_tv > 0:
                     rms = torch.sqrt(E.mean(dim=(0, 1))).detach() + 1e-12
                     dx = (im[1:, :] - im[:-1, :]).abs(); dy = (im[:, 1:] - im[:, :-1]).abs(); d = args.coef_tv_delta * rms
@@ -338,8 +346,8 @@ def train_one_slice(out_dir, slc, sh, args, device):
                         _smask[0] = _mcands[args.support_orient]; print(f'    [support] mask orientation {args.support_orient} (inside-energy fractions now, untrained model: {({k: round(v, 3) for k, v in fr.items()})})', flush=True)
                     m = _smask[0]; air = _crop & ~m
                     pen_s = ((E[air].sum(0) / (E[m].sum(0) + 1e-12)) * _w_sup).sum() / (ncc * float(_w_sup.sum()))                  # air-ring energy / body energy per map (sums, inside the crop), per-atom-group weights
-                (scale_tv * pen + scale_sup * pen_s).backward(); tot += float(pen); tot_s += float(pen_s)
-            return tot, tot_s
+                (scale_tv * pen + scale_sup * pen_s + scale_dly * pen_d).backward(); tot += float(pen); tot_s += float(pen_s); tot_d += float(pen_d)
+            return tot, tot_s, tot_d
     # PISCO-style self-supervised k-space consistency: random acquired centres with a (2s+1)^2-1 cartesian stencil at 1/fov spacing, all coils,
     # own spoke time; one shift-invariant kernel solved from the batch (ridge), residual of the relation penalized. calibration-free, no render.
     pisco_on = args.pisco_weight > 0
@@ -384,7 +392,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                         sched=sched.state_dict(), best_heldout=best_heldout, best_state=best_state, best_step=best_step), tmp)
         os.replace(tmp, ckpt_path)
 
-    model.train(); ctv_last = 0.0; sup_last = 0.0; pisco_last = 0.0
+    model.train(); ctv_last = 0.0; sup_last = 0.0; dly_last = 0.0; pisco_last = 0.0
     for step in range(start_step, args.steps + 1):
         idx = torch.randint(0, N_train, (args.batch_size,), device=device)
         opt.zero_grad(set_to_none=True)
@@ -405,7 +413,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
         if pisco_on and step % args.pisco_every == 0:
             pv = pisco_term(); loss = loss + args.pisco_weight * args.pisco_every * pv; pisco_last = float(pv)
         loss.backward()
-        if ctv_on and step % args.coef_tv_every == 0: ctv_last, sup_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every, args.support_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
+        if ctv_on and step % args.coef_tv_every == 0: ctv_last, sup_last, dly_last = coef_tv_backward(args.coef_tv_weight * args.coef_tv_every, args.support_weight * args.coef_tv_every, args.delay_tv_weight * args.coef_tv_every)   # grads accumulate onto the data-term grads
         gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         opt.step()
         if cosine: sched.step()
@@ -433,7 +441,7 @@ def train_one_slice(out_dir, slc, sh, args, device):
                     with torch.no_grad():
                         snap = recon_nik_cart(A.reconstruct_cartesian(model, normalizer, out_dir, device=device.type, shared=sh, support_radius=args.support_radius, verbose=False), b1, bas)
                     np.save(os.path.join(args.save_dir, f'snap_slice_{slc:02d}_step{step:06d}.npy'), np.abs(snap).astype(np.float16)); model.train()
-                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last, support=sup_last, pisco=pisco_last,
+                run.log(dict(loss=float(loss), heldout_mse=hl, val_knmse=hl / yhe_energy, best_heldout_mse=best_heldout, coef_tv=ctv_last, support=sup_last, delay_tv=dly_last, pisco=pisco_last,
                              best_step=best_step, lr=opt.param_groups[0]['lr'], wall_s=time.time() - t_slice,
                              peak_gpu_mb=W.peak_gpu_mb()), step=step)
                 if step % args.console_every == 0 or step == args.steps:
@@ -541,6 +549,8 @@ def main():
     ap.add_argument('--lr-schedule', default='plateau', choices=['plateau', 'cosine'], help='plateau = ReduceLROnPlateau on the held-out mse (default); cosine = decay to --scheduler-min-lr at --steps')
     ap.add_argument('--coef-tv-weight', type=float, default=0.0, help='huber tv on the per-coil coefficient maps (fixed-basis models); 0 = off')
     ap.add_argument('--coef-tv-every', type=int, default=8, help='evaluate the coefficient-map tv every N steps (weight scaled by N)')
+    ap.add_argument('--delay-tv-weight', type=float, default=0.0, help='smooth-delay prior: huber tv on the residual-atom coefficients per unit aif coefficient (weighted by the aif-atom energy); 0 = off')
+    ap.add_argument('--delay-tv-delta', type=float, default=0.1); ap.add_argument('--delay-eps', type=float, default=0.1, help='ratio regularization, fraction of the aif-atom rms')
     ap.add_argument('--prior-slow-atoms', type=int, default=3, help='the first K atoms form the slow group for the per-group prior weights (3 = patlak span of the tofts basis)')
     ap.add_argument('--tv-slow-weight', type=float, default=1.0); ap.add_argument('--tv-fast-weight', type=float, default=1.0)
     ap.add_argument('--support-slow-weight', type=float, default=1.0); ap.add_argument('--support-fast-weight', type=float, default=1.0, help='relative weight of the fast (residual) atoms in the support prior; 1 / 1 = the production prior')
