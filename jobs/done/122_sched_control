@@ -1,5 +1,6 @@
 queue 122_sched_control
 jid 3477084
 submitted 2026-10-06 22:59:18
-state 1 RUNNING None
+state 1 COMPLETED 00:39:07, 1 COMPLETED 01:04:26
 log jobs/log/122_sched_control_3477084.out
+ended 2026-10-07 00:05:03
