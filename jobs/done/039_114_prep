@@ -1,0 +1,6 @@
+probe 039_114_prep
+host worker04.cluster
+start 2026-10-06 08:33:38
+end 2026-10-06 08:33:38
+exit 128
+log jobs/log/probe_039_114_prep.out

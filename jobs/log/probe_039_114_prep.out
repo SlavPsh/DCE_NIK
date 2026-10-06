@@ -1,0 +1,21 @@
+08:33:38
+       JOBID         NAME ST     TIME NODELIST(REASON)
+   3469933_0  arrfix_eval PD     0:00 (Dependency)
+   3469930_2       arrfix PD     0:00 (QOSMaxGRESPerUser)
+   3469930_3       arrfix PD     0:00 (QOSMaxGRESPerUser)
+   3469930_4       arrfix PD     0:00 (QOSMaxGRESPerUser)
+   3469930_5       arrfix PD     0:00 (QOSMaxGRESPerUser)
+   3469930_1       arrfix  R     2:04 gpu02
+   3469930_0       arrfix  R     2:05 gpu03
+== jobs/log/114_arrival_fixes_3469932.out
+2026-10-06 08:31:34 host gpu02.cluster job 3469932 task 1 stage train
+task 1: supfast5 (--tofts-basis results/tofts_vs_patlak/basis_sl21_r8_rms1.npz --support-weight 1 --support-mask spoke_masks/support_sl21_d6.npy --support-orient rot180 --coef-tv-every 32 --support-fa
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    [prior groups] slow atoms 0..2: tv 1 support 1 | fast atoms 3..7: tv 1 support 5
+== jobs/log/114_arrival_fixes_3469931.out
+wrote results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz rms 0.9999999403953552
+wrote results/tofts_vs_patlak/basis_sl21_r5_rms1.npz rms 1.0
+wrote results/tofts_vs_patlak/basis_sl21_r6_rms1.npz rms 1.0
+PREP exit 0
+task 0: param (--tofts-basis results/tofts_vs_patlak/basis_sl21_r8_param_rms1.npz --support-weight 1 --support-mask spoke_masks/support_sl21_d6.npy --support-orient rot180 --coef-tv-every 32) -> resul
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
