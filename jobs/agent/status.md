@@ -1,16 +1,24 @@
 # helios agent
 
-updated 2026-10-07 00:05:03 on worker05.cluster, job 3471573, cycle 20
+updated 2026-10-07 10:41:01 on worker05.cluster, job 3471573, cycle 331
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3482576 | 123_grasp_allspokes | 2 RUNNING Prolog |
+| 3482577 | 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING Prolog |
+| 3482578 | 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser |
+| 3482579 | 126_k100_eval | 1 RUNNING Prolog |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 123_grasp_allspokes | 2 RUNNING Prolog |
+| 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING Prolog |
+| 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser |
+| 126_k100_eval | 1 RUNNING Prolog |
 | 122_sched_control | 1 COMPLETED 00:39:07, 1 COMPLETED 01:04:26 |
 | 120_free_tsigma | 1 COMPLETED 00:38:34, 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:10 |
 | 119_k100 | 1 COMPLETED 00:39:13, 1 COMPLETED 01:03:52, 1 COMPLETED 01:04:39, 1 COMPLETED 01:05:26, 1 COMPLETED 01:05:58 |
@@ -27,7 +35,3 @@ updated 2026-10-07 00:05:03 on worker05.cluster, job 3471573, cycle 20
 | 117_arrfix_diag_rerun | 1 COMPLETED 00:00:52 |
 | 114_arrival_fixes | 1 CANCELLED+ 00:24:46, 1 COMPLETED 01:04:14, 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:41, 1 COMPLETED 01:05:07, 1 COMPLETED 01:06:04 |
 | 116_ruler_vs_arms | 1 COMPLETED 00:00:23 |
-| 115_arrival_gifs | 1 COMPLETED 00:01:57 |
-| 043_param_refit | exit 0 |
-| 042_114_eval_resubmit | exit 0 |
-| 041_aif_fit_log | exit 128 |
