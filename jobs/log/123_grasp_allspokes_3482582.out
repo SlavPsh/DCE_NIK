@@ -1,0 +1,8 @@
+2026-10-07 10:41:01 host worker02.cluster job 3482582 task 0
+SAVED gv2_slice18_n12.npy (192, 192, 142) (2158s)
+SAVED gv2_slice19_n12.npy (192, 192, 142) (3100s)
+DONE_GV2_REAL 5258s -> /net/beegfs/users/P101440/grasp_v2/results_grasp_v2
+GV2ALL exit 0
+20938880 results_grasp_v2/gv2_slice18_n12.npy
+20938880 results_grasp_v2/gv2_slice19_n12.npy
+46923904 results_grasp_v2_p14/gv2_slice21_n12.npy
