@@ -1,20 +1,20 @@
 # helios agent
 
-updated 2026-10-07 18:58:20 on worker05.cluster, job 3480001, cycle 225
+updated 2026-10-07 19:47:55 on worker05.cluster, job 3480001, cycle 249
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3482578 | 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3482578 | 125_k100_p14 | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 3482579 | 126_k100_eval | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 125_k100_p14 | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
 | 124_k100_p3 | 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:15, 1 COMPLETED 01:04:15, 2 COMPLETED 01:04:22, 1 COMPLETED 01:04:23, 1 COMPLETED 01:04:26, 1 COMPLETED 01:04:30, 1 COMPLETED 01:04:42, 1 COMPLETED 01:04:50, 1 COMPLETED 01:05:04, 1 COMPLETED 01:05:06, 1 COMPLETED 01:05:40, 1 COMPLETED 01:05:54, 1 COMPLETED 01:06:49, 1 COMPLETED 01:06:52 |
-| 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 054_k100_progress | exit 0 |
 | 053_k100_progress | exit 0 |
 | 123_grasp_allspokes | 1 COMPLETED 01:27:40, 1 COMPLETED 02:16:41 |
