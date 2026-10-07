@@ -1,0 +1,25 @@
+10:43:06
+       JOBID       NAME ST     TIME NODELIST(REASON)
+   3482576_0     gv2all  R     2:05 worker02
+     3482579   k100eval  R     2:05 worker01
+   3482576_1     gv2all  R     2:05 worker08
+   3482577_2     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_3     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_4     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_5     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_6     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_7     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_8     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+   3482577_9     k100p3 PD     0:00 (QOSMaxGRESPerUser)
+== jobs/log/124_k100_p3_3482583.out
+2026-10-07 10:41:01 host gpu03.cluster job 3482583 task 0
+task 0: tofts8 k100 slice 18 seed 0 -> results/tofts_vs_patlak/invivo_k100/tofts8_sl18_s0
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+== jobs/log/124_k100_p3_3482584.out
+2026-10-07 10:41:01 host gpu03.cluster job 3482584 task 1
+task 1: tofts8 k100 slice 18 seed 1 -> results/tofts_vs_patlak/invivo_k100/tofts8_sl18_s1
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+== jobs/log/123_grasp_allspokes_3482576.out
+2026-10-07 10:41:01 host worker08.cluster job 3482576 task 1
+== jobs/log/123_grasp_allspokes_3482582.out
+2026-10-07 10:41:01 host worker02.cluster job 3482582 task 0
