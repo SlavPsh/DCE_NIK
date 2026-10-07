@@ -1,12 +1,12 @@
 # helios agent
 
-updated 2026-10-07 18:07:51 on worker05.cluster, job 3480001, cycle 201
+updated 2026-10-07 18:18:06 on worker05.cluster, job 3480001, cycle 206
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3482577 | 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
+| 3482577 | 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 | 3482578 | 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser |
 | 3482579 | 126_k100_eval | 1 RUNNING None |
 
@@ -14,11 +14,11 @@ updated 2026-10-07 18:07:51 on worker05.cluster, job 3480001, cycle 201
 
 | name | state |
 |---|---|
+| 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
 | 054_k100_progress | exit 0 |
 | 053_k100_progress | exit 0 |
 | 123_grasp_allspokes | 1 COMPLETED 01:27:40, 1 COMPLETED 02:16:41 |
 | 052_k100_start | exit 0 |
-| 124_k100_p3 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 126_k100_eval | 1 RUNNING None |
 | 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser |
 | 122_sched_control | 1 COMPLETED 00:39:07, 1 COMPLETED 01:04:26 |
