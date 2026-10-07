@@ -1,0 +1,71 @@
+2026-10-07 16:06:48 host gpu03.cluster job 3484764 task 11
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+  MIG 2g.24gb     Device  0: (UUID: MIG-7fdc2adf-8d97-57e9-a2a9-0e63797cb117)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 11: patlak k100 slice 19 seed 0 -> results/tofts_vs_patlak/invivo_k100/patlak_sl19_s0
+device=cuda
+model=wire_ff_patlak h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    spoke-reduction: 1708 acquired spokes, 5246976 samples, heldout=NO (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 3af4rr77
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/invivo_k100/patlak_sl19_s0/wandb_runs/wandb/run-20261007_160654-3af4rr77
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_patlak_sl19_s0_s19
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/3af4rr77
+[wandb] gnik_patlak_sl19_s0_s19: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:416: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  _tr_sum += float(loss); _tr_n += 1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.847, 'rot180': 0.85, 'fliplr': 0.848, 'flipud': 0.849})
+    step   1000  train 9.303e-01  (avg 1.289e+00, no held-out)
+    step   2000  train 8.566e-01  (avg 8.816e-01, no held-out)
+    step   3000  train 8.149e-01  (avg 8.356e-01, no held-out)
+    step   4000  train 8.111e-01  (avg 8.168e-01, no held-out)
+    step   5000  train 8.098e-01  (avg 8.028e-01, no held-out)
+    step   6000  train 7.793e-01  (avg 7.940e-01, no held-out)
+    step   7000  train 7.834e-01  (avg 7.864e-01, no held-out)
+    step   8000  train 8.031e-01  (avg 7.811e-01, no held-out)
+    step   9000  train 7.729e-01  (avg 7.766e-01, no held-out)
+    step  10000  train 7.493e-01  (avg 7.728e-01, no held-out)
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 19: peak_gpu_MB 12480 params 5520966 best_heldout inf
+wandb: updating run metadata
+wandb: uploading wandb-summary.json; uploading config.yaml
+wandb: 
+wandb: Run history:
+wandb:     coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:    delay_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:        loss █▅▄▃▃▂▂▃▂▁
+wandb:          lr ▁▁▁▁▁▁▁▁▁▁
+wandb: peak_gpu_mb ▁▁▁▁▁▁▁▁▁▁
+wandb:     support █▅▃▂▂▂▁▁▁▁
+wandb:   train_avg █▂▂▂▁▁▁▁▁▁
+wandb:      wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse inf
+wandb:        best_step 0
+wandb:          coef_tv 0
+wandb:         delay_tv 0
+wandb:             loss 0.74933
+wandb:               lr 1e-05
+wandb:           params 5520966
+wandb:      peak_gpu_mb 12479.71777
+wandb:          support 0.01133
+wandb:        train_avg 0.77283
+wandb:               +2 ...
+wandb: 
+wandb: 🚀 View run gnik_patlak_sl19_s0_s19 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/3af4rr77
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/invivo_k100/patlak_sl19_s0/wandb_runs/wandb/run-20261007_160654-3af4rr77/logs
+slice 19  nik (192, 192, 342)  (3851s)  vs CS: corr 0.964  nrmse 0.198
+done 3852s -> results/tofts_vs_patlak/invivo_k100/patlak_sl19_s0
+[W1007 17:11:02.515444694 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-07 17:11:02 TRAIN_DONE patlak k100 sl19 s0 exit 0

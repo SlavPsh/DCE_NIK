@@ -1,5 +1,5 @@
 queue 125_k100_p14
 jid 3482578
 submitted 2026-10-07 10:41:00
-state 1 PENDING QOSMaxGRESPerUser
+state 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None
 log jobs/log/125_k100_p14_3482578.out
