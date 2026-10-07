@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-07 20:14:39 on worker05.cluster, job 3480001, cycle 262
+updated 2026-10-07 21:34:34 on worker05.cluster, job 3480001, cycle 301
 
 ## active
 
@@ -13,6 +13,7 @@ updated 2026-10-07 20:14:39 on worker05.cluster, job 3480001, cycle 262
 
 | name | state |
 |---|---|
+| 055_k100_progress | exit 0 |
 | 125_k100_p14 | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 124_k100_p3 | 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:15, 1 COMPLETED 01:04:15, 2 COMPLETED 01:04:22, 1 COMPLETED 01:04:23, 1 COMPLETED 01:04:26, 1 COMPLETED 01:04:30, 1 COMPLETED 01:04:42, 1 COMPLETED 01:04:50, 1 COMPLETED 01:05:04, 1 COMPLETED 01:05:06, 1 COMPLETED 01:05:40, 1 COMPLETED 01:05:54, 1 COMPLETED 01:06:49, 1 COMPLETED 01:06:52 |
 | 054_k100_progress | exit 0 |
@@ -32,4 +33,3 @@ updated 2026-10-07 20:14:39 on worker05.cluster, job 3480001, cycle 262
 | 047_118_progress | exit 1 |
 | 046_118_values | exit 0 |
 | 045_118_values | exit 0 |
-| 044_118_start | exit 1 |
