@@ -28,7 +28,7 @@ if _a.spokes == "k80":
     SUF = "_k80" if _a.suffix is None else _a.suffix; SPK = "k80 = 1368/1708 views (v%10<8), VAL v%10==8 for early stop, TEST v%10==9 untouched; same views for every method"
 elif _a.spokes == "k100":
     KEEP = np.load(f"{dsp.D}/spoke_masks/keep_f100{dsp.SFX}.npy"); VAL = np.load(dsp.VAL); TEST = np.load(dsp.TEST); IV = f"{RES}/invivo_k100"
-    REFS = (("GRASP-v2 all spokes (n12 lam0.25)", "{GV}/gv2_slice{Z}_n12.npy"), ("GRASP-Pro all spokes (14 spf, K5)", "{GP}/cs_slice{Z}_f100.npy"))
+    REFS = (("GRASP-v2 all spokes (n12 lam0.25)", "{GV}/gv2_slice{Z}_n12.npy"),)                      # k100 standard (2026-10-07): grasp only, grasp-pro dropped
     SUF = "_k100" if _a.suffix is None else _a.suffix; SPK = "k100 = every view in training (no held-out spokes; the val / test kNMSE columns are TRAIN-set numbers here); same views for every method"
 else:
     REFS = (("GRASP-v2 f25 (488 spokes, 122 fr, lam0.25)", "{GV}/gv2_slice{Z}_f25.npy"), ("GRASP-Pro f25 (488 spokes, 122 fr, K5)", "{GP}/cs_slice{Z}_f25.npy"))
