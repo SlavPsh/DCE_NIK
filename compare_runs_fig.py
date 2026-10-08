@@ -13,6 +13,7 @@ TA = dsp.TA; ROIS = dsp.ROI_NAMES
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--slice", type=int, default=21); ap.add_argument("--items", required=True); ap.add_argument("--out", required=True); ap.add_argument("--t", type=float, default=90.0); ap.add_argument("--title", default=""); a = ap.parse_args(); Z = a.slice
     ctx = C.slice_ctx(Z); rois = ctx["rois"]; body = ctx["BODY"]; air = ctx["AIR"]; cs = ctx["cs100"]; tcs = np.linspace(0, TA, cs.shape[-1])
+    REF_LATE = np.load(f"{dsp.NUF(Z)}/nufft_late.npy").astype(np.float32)                                  # primary image ruler: late-window model-free nufft
     z = np.load(dsp.STEP2(Z)); mf = np.abs(z["mf"]).transpose(1, 2, 0).astype(np.float32); tmf = np.asarray(z["tmf"], float)
     def ft(nt): e = np.linspace(0, TA, nt + 1); return 0.5 * (e[:-1] + e[1:])
     def refwin(nt):
@@ -30,7 +31,7 @@ def main():
         parts = spec.split(":"); nm, p = parts[0], parts[1]; key = parts[2] if len(parts) > 2 else None
         if not os.path.exists(p): print("missing", p); continue
         zz = np.load(p, allow_pickle=True); v = np.abs(zz[key] if key else zz).astype(np.float32); t = ft(v.shape[-1]); v = ls_scale(v, refwin(v.shape[-1]), body)
-        im = frame(v, t, a.t); s = C.score(im, r90, body); ae = C.bgE(im, r90, body, air)
+        im = frame(v, t, a.t); ae = C.bgE(im, r90, body, air); s = C.score(frame(v, t, 300.0), REF_LATE, body)      # haarpsi = 300 s frame vs the late model-free nufft ruler (primary, 2026-10-08); air at t_show
         cur = {r: enh(np.array([v[..., i][rois[r]].mean() for i in range(v.shape[-1])]), t) for r in ROIS}
         nr = {r: float(np.linalg.norm(np.interp(tmf, t, cur[r]) - mfc[r]) / (np.linalg.norm(mfc[r]) + 1e-12)) for r in ROIS}
         items.append(dict(nm=nm, im=im, t=t, cur=cur, nr=nr, hp=s["haarpsi"], ae=ae))
@@ -38,7 +39,7 @@ def main():
     fig = plt.figure(figsize=(3.4 * n, 11.5)); gs = fig.add_gridspec(3, n, height_ratios=[1.5, 0.75, 1.3], hspace=0.35, wspace=0.08)
     for j, it in enumerate(items):
         ax = fig.add_subplot(gs[0, j]); ax.imshow(it["im"], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off"); ax.set_title(it["nm"], fontsize=10, fontweight="bold")
-        ax.text(0.5, -0.03, f"HaarPSI {it['hp']:.3f}   air {it['ae']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=9)
+        ax.text(0.5, -0.03, f"HaarPSI {it['hp']:.3f} (300 s vs late NUFFT)   air {it['ae']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=9)
         ax = fig.add_subplot(gs[1, j]); ax.imshow(it["im"][sl], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off")
         for r, col in ((dsp.T1, "lime"), (dsp.T2, "orange")): ax.contour(rois[r][sl].astype(float), levels=[0.5], colors=[col], linewidths=0.5, alpha=0.7)
     cols = plt.cm.tab10(np.linspace(0, 1, 10))
