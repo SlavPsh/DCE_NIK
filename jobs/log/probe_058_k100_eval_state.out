@@ -1,0 +1,12 @@
+15:24:06
+JOBID NAME ST TIME NODELIST(REASON)
+3482579 k100eval R 1-04:43:05 worker01
+p14 outputs: 21 / 21
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_sub16_k100_arrival.gif 7.6 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_nikfree_k100_arrival.gif 7.8 MB
+saved results/realdata_nik_vs_cs_figures/figures/recon_gifs_single/p3_sl21_grasp_all_spokes_k100_arrival.gif 5.5 MB
+GIF_DONE
+ARRIVAL_DONE
+ARRIVAL_DONE
+GIFS+DIAG p3 exit 0
+INVIVO_EVAL_DONE
