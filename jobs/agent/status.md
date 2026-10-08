@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-08 10:38:36 on worker07.cluster, job 3490301, cycle 1
+updated 2026-10-08 14:16:14 on worker07.cluster, job 3490301, cycle 107
 
 ## active
 
@@ -12,6 +12,7 @@ updated 2026-10-08 10:38:36 on worker07.cluster, job 3490301, cycle 1
 
 | name | state |
 |---|---|
+| 057_k100_eval_state | exit 0 |
 | 125_k100_p14 | 1 COMPLETED 00:47:00, 1 COMPLETED 00:47:03, 1 COMPLETED 00:47:25, 1 COMPLETED 01:31:19, 1 COMPLETED 01:31:21, 1 COMPLETED 01:31:22, 1 COMPLETED 01:32:11, 1 COMPLETED 01:32:12, 1 COMPLETED 01:32:25, 1 COMPLETED 01:32:47, 1 COMPLETED 01:32:49, 1 COMPLETED 01:32:54, 1 COMPLETED 01:32:57, 1 COMPLETED 01:32:58, 1 COMPLETED 01:35:01, 1 COMPLETED 01:35:02, 2 COMPLETED 01:35:29, 2 COMPLETED 01:35:32, 1 COMPLETED 01:35:38 |
 | 056_k100_progress | exit 0 |
 | 055_k100_progress | exit 0 |
@@ -31,4 +32,3 @@ updated 2026-10-08 10:38:36 on worker07.cluster, job 3490301, cycle 1
 | 049_queue_state | exit 0 |
 | 048_allspoke_refs | exit 0 |
 | 047_118_progress | exit 1 |
-| 046_118_values | exit 0 |

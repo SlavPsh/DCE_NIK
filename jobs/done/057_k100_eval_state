@@ -1,0 +1,6 @@
+probe 057_k100_eval_state
+host worker07.cluster
+start 2026-10-08 14:16:14
+end 2026-10-08 14:16:14
+exit 0
+log jobs/log/probe_057_k100_eval_state.out
