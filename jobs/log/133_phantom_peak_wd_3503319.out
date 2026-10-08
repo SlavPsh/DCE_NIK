@@ -1,0 +1,106 @@
+2026-10-08 21:44:20 host gpu03.cluster job 3503319 task 0 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 2g.24gb     Device  0: (UUID: MIG-f328f7be-cd56-503a-9bd5-4e010efe4fe5)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+wrote results/tofts_vs_patlak/basis_xph_rms1.npz rms 0.9999999403953552
+Submitted batch job 3503320
+cpu stage chained afterany 3503254
+task 0: rms1_wd3e-3 (--weight-decay 0.003)
+w768_ks2.5_s0_tofts16_rms1_wd3e-3: train 3027200 samples | params {'total': 12253536, 'spatial': 12253472, 'coil': 64}
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run fny7ybk0
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in /net/beegfs/users/P101440/DCE_NIK/results/xcat_physical_nomotion_nik_vs_grasp/wandb_runs/wandb/run-20261008_214452-fny7ybk0
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run xph_nomotion_w768_ks2.5_s0_tofts16_rms1_wd3e-3
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/fny7ybk0
+[wandb] xph_nomotion_w768_ks2.5_s0_tofts16_rms1_wd3e-3: mode online
+  step 2000 VAL nmse {'nmse': 0.0037700010475685323, 'inner': 0.0036707746259643215, 'mid': 0.33084771269224117, 'outer': 0.6331644973551187}
+  step 4000 VAL nmse {'nmse': 0.0016303023434233851, 'inner': 0.001585614732691236, 'mid': 0.15011053349167094, 'outer': 0.25944706496082376}
+  step 5000 loss 4.1057e-02 (396s)
+  step 6000 VAL nmse {'nmse': 0.0013353568047622265, 'inner': 0.001299979778598425, 'mid': 0.11952295619174153, 'outer': 0.19144015193919742}
+  step 8000 VAL nmse {'nmse': 0.0008800351785629265, 'inner': 0.0008494919849503328, 'mid': 0.10312088450754718, 'outer': 0.16061364724563854}
+  step 10000 VAL nmse {'nmse': 0.0005002045294313608, 'inner': 0.0004725851882248158, 'mid': 0.09300534485653071, 'outer': 0.14381849004542982}
+  step 10000 loss 2.4390e-02 (790s)
+  step 12000 VAL nmse {'nmse': 0.0005114996135190514, 'inner': 0.00048636836806465573, 'mid': 0.08469070435361975, 'outer': 0.13075983080216047}
+  step 14000 VAL nmse {'nmse': 0.0005626624942556047, 'inner': 0.0005395565543784704, 'mid': 0.07801862706242356, 'outer': 0.11898914990890266}
+  step 15000 loss 2.0286e-02 (1184s)
+  step 16000 VAL nmse {'nmse': 0.00041515679256829227, 'inner': 0.0003916356155646369, 'mid': 0.0793232231150463, 'outer': 0.11966241426670164}
+  step 18000 VAL nmse {'nmse': 0.0004425954994904051, 'inner': 0.0004205836505943692, 'mid': 0.07430893533335584, 'outer': 0.11156588952283444}
+  step 20000 VAL nmse {'nmse': 0.00028270141804184127, 'inner': 0.00026170201126193116, 'mid': 0.07077040953271792, 'outer': 0.1058832687061876}
+  step 20000 loss 1.3716e-02 (1578s)
+  step 22000 VAL nmse {'nmse': 0.0003630948300354564, 'inner': 0.0003433003550367264, 'mid': 0.06672341446165996, 'outer': 0.10170768021777626}
+  step 24000 VAL nmse {'nmse': 0.0002626991798017532, 'inner': 0.00024294034018814437, 'mid': 0.06651464947406169, 'outer': 0.10118276493189007}
+  step 25000 loss 1.1762e-02 (1972s)
+  step 26000 VAL nmse {'nmse': 0.0003826677245951291, 'inner': 0.0003636078000812051, 'mid': 0.06424491175112969, 'outer': 0.09874030977099625}
+  step 28000 VAL nmse {'nmse': 0.00028616532397857515, 'inner': 0.00026756496991504295, 'mid': 0.0625584727304048, 'outer': 0.09736378213391193}
+  step 30000 VAL nmse {'nmse': 0.00030266182824590206, 'inner': 0.00028451373497441663, 'mid': 0.06108132325637748, 'outer': 0.09457304346507625}
+  step 30000 loss 1.0385e-02 (2367s)
+  step 32000 VAL nmse {'nmse': 0.0003031372799228437, 'inner': 0.0002852601237355314, 'mid': 0.06021551873347802, 'outer': 0.09227088134810203}
+  step 34000 VAL nmse {'nmse': 0.0002749492973308851, 'inner': 0.00025754895685432664, 'mid': 0.058512154249928894, 'outer': 0.0914701192826748}
+  step 35000 loss 9.3294e-03 (2761s)
+  step 36000 VAL nmse {'nmse': 0.00031619034142667284, 'inner': 0.00029858731865559367, 'mid': 0.059241061685838904, 'outer': 0.0923709765872836}
+  step 38000 VAL nmse {'nmse': 0.0002916808473468419, 'inner': 0.00027522005986256305, 'mid': 0.05531246496981531, 'outer': 0.0881249299059853}
+  step 40000 VAL nmse {'nmse': 0.00027054891514976707, 'inner': 0.0002539878781518915, 'mid': 0.05565236714574829, 'outer': 0.08807483561261958}
+  step 40000 loss 8.8004e-03 (3156s)
+DONE w768_ks2.5_s0_tofts16_rms1_wd3e-3: 21 checkpoints | wall 3156s | params {'total': 12253536, 'spatial': 12253472, 'coil': 64} | peak_gpu_MB 5056
+wandb: updating run metadata
+wandb: 
+wandb: Run history:
+wandb:       best_step ▁▂▂▃▄▄▄▅▅▇▇█████████
+wandb:  best_val_knmse █▄▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:            loss █▃▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:     peak_gpu_mb ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:       val_knmse █▄▃▂▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: val_knmse_inner █▄▃▂▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:   val_knmse_mid █▃▃▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: val_knmse_outer █▃▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:          wall_s ▁▁▂▂▂▂▃▃▃▄▄▄▅▅▅▅▆▆▇▇▇▇██
+wandb: 
+wandb: Run summary:
+wandb:       best_step 24000
+wandb:  best_val_knmse 0.00026
+wandb:            loss 0.0088
+wandb:          n_ckpt 21
+wandb:     peak_gpu_mb 5055.80811
+wandb:       val_knmse 0.00027
+wandb: val_knmse_inner 0.00025
+wandb:   val_knmse_mid 0.05565
+wandb: val_knmse_outer 0.08807
+wandb:          wall_s 3155.57024
+wandb:              +1 ...
+wandb: 
+wandb: 🚀 View run xph_nomotion_w768_ks2.5_s0_tofts16_rms1_wd3e-3 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/fny7ybk0
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./results/xcat_physical_nomotion_nik_vs_grasp/wandb_runs/wandb/run-20261008_214452-fny7ybk0/logs
+[W1008 22:37:28.835338301 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+  tofts model rank 16 basis /net/beegfs/users/P101440/DCE_NIK/results/tofts_vs_patlak/basis_xph_rms1.npz
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step     0 train 2.975e+00 val 2.961e+00
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step  2000 train 3.504e-03 val 3.770e-03
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step  4000 train 1.513e-03 val 1.630e-03
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step  6000 train 1.221e-03 val 1.335e-03
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step  8000 train 7.569e-04 val 8.800e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 10000 train 4.019e-04 val 5.002e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 12000 train 4.150e-04 val 5.115e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 14000 train 4.734e-04 val 5.627e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 16000 train 3.294e-04 val 4.152e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 18000 train 3.798e-04 val 4.426e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 20000 train 2.022e-04 val 2.827e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 22000 train 2.796e-04 val 3.631e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 24000 train 1.882e-04 val 2.627e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 26000 train 3.047e-04 val 3.827e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 28000 train 2.317e-04 val 2.862e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 30000 train 2.211e-04 val 3.027e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 32000 train 2.274e-04 val 3.031e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 34000 train 1.931e-04 val 2.749e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 36000 train 2.504e-04 val 3.162e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 38000 train 2.321e-04 val 2.917e-04
+  w768_ks2.5_s0_tofts16_rms1_wd3e-3 step 40000 train 1.981e-04 val 2.705e-04
+DONE w768_ks2.5_s0_tofts16_rms1_wd3e-3: best_step 24000 val 2.627e-04 test 2.776e-04 imgNRMSE 0.027 aortaCurve 0.066 | pruned ckpts -> [24000, 40000]
+[W1008 22:41:06.943770008 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-08 22:41:06 PH rms1_wd3e-3 exit 0

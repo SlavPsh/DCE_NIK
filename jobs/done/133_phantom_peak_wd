@@ -1,5 +1,6 @@
 queue 133_phantom_peak_wd
 jid 3503254
 submitted 2026-10-08 21:35:43
-state 1 RUNNING None
+state 1 COMPLETED 00:56:39, 1 COMPLETED 00:56:46, 1 COMPLETED 00:56:47, 1 COMPLETED 00:56:48, 1 COMPLETED 00:56:58
 log jobs/log/133_phantom_peak_wd_3503254.out
+ended 2026-10-09 00:36:50
