@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-10-08 22:25:28 on worker09.cluster, job 3496800, cycle 2
+updated 2026-10-08 23:39:18 on worker09.cluster, job 3496800, cycle 38
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3503254 | 133_phantom_peak_wd | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 3503254 | 133_phantom_peak_wd | 2 RUNNING None |
 | 3503289 | 134_patlak13_confirm | 1 PENDING MaxGRESPerAccount |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 133_phantom_peak_wd | 1 PENDING MaxGRESPerAccount, 2 RUNNING None |
+| 133_phantom_peak_wd | 2 RUNNING None |
 | 134_patlak13_confirm | 1 PENDING MaxGRESPerAccount |
 | 130_peak_levers_3seeds | 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:25, 2 COMPLETED 01:04:27, 1 COMPLETED 01:04:28, 1 COMPLETED 01:04:42 |
 | 060_queue_state | exit 0 |

@@ -1,5 +1,5 @@
 queue 133_phantom_peak_wd
 jid 3503254
 submitted 2026-10-08 21:35:43
-state 1 PENDING MaxGRESPerAccount, 2 RUNNING None
+state 2 RUNNING None
 log jobs/log/133_phantom_peak_wd_3503254.out
