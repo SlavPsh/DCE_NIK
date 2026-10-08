@@ -1336,6 +1336,33 @@ def warmstart_phi(model, t_frames, phi_pca, steps=800, lr=1e-3, device="cpu"):
 # Physics caveat: k-space oscillation rate is ~uniform in |k|; high-|k| is noise-dominated,
 # so expect grain more than sharpness. Separate class -- does NOT touch the working model.
 # ---------------------------------------------------------------------------
+class WIRE_FF_RES_AIF_KXY_COIL_T_REIM(WIRE_FF_RES_KXY_COIL_T_REIM):
+    """nik-free + aif features (2026-10-08, FINDINGS next steps 9): the measured aif(t) and its integral (peak / max normalized, linear interp of
+    a fixed grid, as in WIRE_FF_PATLAK) are appended to the time encoding, so the network has the arrival shape explicitly instead of
+    synthesizing the first pass from fourier features of t. everything else = the production nik-free class (separate class, checkpoints of
+    the old model unchanged). model name wire_ff_res_aif."""
+    def __init__(self, n_coils, aif_tgrid, aif_vals, iaif_vals, **kw):
+        super().__init__(n_coils, **kw)
+        self.register_buffer('aif_tgrid', torch.as_tensor(aif_tgrid, dtype=torch.float32))
+        self.register_buffer('aif_vals', torch.as_tensor(aif_vals, dtype=torch.float32))
+        self.register_buffer('iaif_vals', torch.as_tensor(iaif_vals, dtype=torch.float32))
+        hidden = self.head.in_features // 2
+        self.first = GaborLayer(self.first.linear.in_features + 2, hidden, w0=self.first.w0, s0=self.first.s0, is_first=True)   # first layer rebuilt for the 2 extra inputs
+
+    def _interp(self, t, vals):
+        xg = self.aif_tgrid; G = xg.numel(); tc = t.clamp(float(xg[0]), float(xg[-1]))
+        idx = torch.searchsorted(xg, tc).clamp(1, G - 1); x0 = xg[idx - 1]; x1 = xg[idx]; w = (tc - x0) / (x1 - x0 + 1e-9)
+        return vals[idx - 1] * (1 - w) + vals[idx] * w
+
+    def forward(self, kcoords, t, coil_idx):
+        tt = t.view(-1, 1); ec = self.coil_embed(coil_idx.long()); tf = t.view(-1)
+        af = torch.stack([self._interp(tf, self.aif_vals), self._interp(tf, self.iaif_vals)], dim=1)   # (N, 2)
+        h = self.first(torch.cat([self.ff_k(kcoords), self.ff_t(tt), ec, af], dim=-1))
+        for blk in self.blocks:
+            h = h + blk(h)
+        return self.head(h)
+
+
 class WIRE_FF_RES_RADIAL_KXY_COIL_T_REIM(nn.Module):
     def __init__(self, n_coils, coil_embed_dim=8, hidden=512, depth=12, w0=62.0, s0=15.0,
                  k_freq=256, k_sigma=2.5, t_freq=32, t_sigma=1.5, ff_seed=0, dropout=0.0,

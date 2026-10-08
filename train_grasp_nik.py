@@ -150,6 +150,14 @@ def build_model(args, ncc):
             t_freq=args.t_freq, t_sigma=args.t_sigma, ff_seed=args.ff_seed, residual=True,
             phi_hidden=args.phi_hidden, phi_depth=args.phi_depth, phi_w0=args.phi_w0,
             ortho=args.phi_ortho, coil_mode=getattr(args, 'coil_mode', 'input'))
+    if args.model == 'wire_ff_res_aif':                                       # nik-free + aif features (new class, production nik-free untouched)
+        from nik_model import WIRE_FF_RES_AIF_KXY_COIL_T_REIM
+        az = np.load(args.aif_file)
+        TA = float(az['tC'][-1]); tgrid = 2.0 * (np.asarray(az['tC']) / TA) - 1.0
+        aif = np.asarray(az['aif_frame'], dtype=np.float64); aif = aif / (aif.max() + 1e-9)
+        iaif = np.cumsum(0.5 * (aif[1:] + aif[:-1]) * np.diff(np.asarray(az['tC']))); iaif = np.concatenate([[0.0], iaif]); iaif = iaif / (iaif.max() + 1e-9)
+        return WIRE_FF_RES_AIF_KXY_COIL_T_REIM(n_coils=ncc, aif_tgrid=tgrid, aif_vals=aif, iaif_vals=iaif, coil_embed_dim=args.coil_embed_dim, hidden=args.hidden,
+                                              depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma, t_freq=args.t_freq, t_sigma=args.t_sigma, ff_seed=args.ff_seed)
     cls = WIRE_FF_RES_KXY_COIL_T_REIM if args.model == 'wire_ff_res' else WIRE_FF_KXY_COIL_T_REIM
     return cls(n_coils=ncc, coil_embed_dim=args.coil_embed_dim, hidden=args.hidden,
                depth=args.depth, w0=args.w0, s0=args.s0, k_freq=args.k_freq, k_sigma=args.k_sigma,
@@ -495,7 +503,7 @@ def main():
     # model
     ap.add_argument('--model', default='wire_ff_res',
                     choices=['wire', 'wire_ff', 'wire_ff_res', 'wire_ff_subspace',
-                             'wire_ff_res_radial', 'wire_ff_pk', 'wire_ff_patlak', 'wire_ff_tofts'])
+                             'wire_ff_res_radial', 'wire_ff_pk', 'wire_ff_patlak', 'wire_ff_tofts', 'wire_ff_res_aif'])
     ap.add_argument('--aif-file', default='/net/beegfs/users/P101440/DCE_NIK/aif_slice21.npz')
     ap.add_argument('--tofts-basis', default=None, help='basis npz from nik_tofts_basis.py (model wire_ff_tofts)')
     ap.add_argument('--patlak-free', type=int, default=0, help='F free SIREN atoms appended to the fixed Patlak basis')
