@@ -1,0 +1,70 @@
+2026-10-08 20:02:30 host gpu03.cluster job 3502715 task 3 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+  MIG 2g.24gb     Device  0: (UUID: MIG-7fdc2adf-8d97-57e9-a2a9-0e63797cb117)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 3: tofts8 dly0.1 seed 0 -> results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s0
+device=cuda
+model=wire_ff_tofts h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    spoke-reduction: 1708 acquired spokes, 5246976 samples, heldout=NO (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run b8r004pz
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s0/wandb_runs/wandb/run-20261008_200234-b8r004pz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_tofts8_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/b8r004pz
+[wandb] gnik_tofts8_sl21_s0_s21: mode online
+    [coef-tv] grid 384 every 32 weight 0 delta 0.1
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:424: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  _tr_sum += float(loss); _tr_n += 1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.818, 'rot180': 0.819, 'fliplr': 0.817, 'flipud': 0.816})
+    step   1000  train 1.124e+00  (avg 2.282e+00, no held-out)
+    step   2000  train 9.487e-01  (avg 1.023e+00, no held-out)
+    step   3000  train 8.892e-01  (avg 9.269e-01, no held-out)
+    step   4000  train 8.333e-01  (avg 8.693e-01, no held-out)
+    step   5000  train 7.830e-01  (avg 8.120e-01, no held-out)
+    step   6000  train 7.402e-01  (avg 7.623e-01, no held-out)
+    step   7000  train 7.015e-01  (avg 7.219e-01, no held-out)
+    step   8000  train 6.722e-01  (avg 6.877e-01, no held-out)
+    step   9000  train 6.498e-01  (avg 6.595e-01, no held-out)
+    step  10000  train 6.261e-01  (avg 6.366e-01, no held-out)
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 21: peak_gpu_MB 12480 params 5531216 best_heldout inf
+wandb: updating run metadata
+wandb: 
+wandb: Run history:
+wandb:     coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:    delay_tv ▁▃▄▆▆▇████
+wandb:        loss █▆▅▄▃▃▂▂▁▁
+wandb:          lr ▁▁▁▁▁▁▁▁▁▁
+wandb: peak_gpu_mb ▁▁▁▁▁▁▁▁▁▁
+wandb:     support ▂▁▂▃▄▄▅▇▇█
+wandb:   train_avg █▃▂▂▂▂▁▁▁▁
+wandb:      wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse inf
+wandb:        best_step 0
+wandb:          coef_tv 0
+wandb:         delay_tv 0.00659
+wandb:             loss 0.62614
+wandb:               lr 1e-05
+wandb:           params 5531216
+wandb:      peak_gpu_mb 12479.84326
+wandb:          support 0.02531
+wandb:        train_avg 0.63656
+wandb:               +2 ...
+wandb: 
+wandb: 🚀 View run gnik_tofts8_sl21_s0_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/b8r004pz
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s0/wandb_runs/wandb/run-20261008_200234-b8r004pz/logs
+slice 21  nik (192, 192, 342)  (3863s)  vs CS: corr 0.960  nrmse 0.206
+done 3863s -> results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s0
+[W1008 21:06:56.327335025 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-08 21:06:56 TRAIN_DONE dly0.1 s0 exit 0

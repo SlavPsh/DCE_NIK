@@ -1,5 +1,6 @@
 queue 130_peak_levers_3seeds
 jid 3501934
 submitted 2026-10-08 17:51:23
-state 1 RUNNING None
+state 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:25, 2 COMPLETED 01:04:27, 1 COMPLETED 01:04:28, 1 COMPLETED 01:04:42
 log jobs/log/130_peak_levers_3seeds_3501934.out
+ended 2026-10-08 22:12:49

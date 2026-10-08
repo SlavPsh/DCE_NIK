@@ -1,21 +1,20 @@
 # helios agent
 
-updated 2026-10-08 21:46:09 on worker07.cluster, job 3490301, cycle 325
+updated 2026-10-08 22:12:49 on worker07.cluster, job 3490301, cycle 338
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3501934 | 130_peak_levers_3seeds | 1 RUNNING None |
-| 3503254 | 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
+| 3503254 | 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 3503289 | 134_patlak13_confirm | 1 PENDING QOSMaxGRESPerUser |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 130_peak_levers_3seeds | 1 RUNNING None |
-| 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
+| 130_peak_levers_3seeds | 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:25, 2 COMPLETED 01:04:27, 1 COMPLETED 01:04:28, 1 COMPLETED 01:04:42 |
+| 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser, 2 RUNNING None |
 | 134_patlak13_confirm | 1 PENDING QOSMaxGRESPerUser |
 | 060_queue_state | exit 0 |
 | 129_aif_features | 1 COMPLETED 00:39:14, 1 COMPLETED 01:06:16 |
