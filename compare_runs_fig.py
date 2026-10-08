@@ -39,7 +39,7 @@ def main():
     fig = plt.figure(figsize=(3.4 * n, 11.5)); gs = fig.add_gridspec(3, n, height_ratios=[1.5, 0.75, 1.3], hspace=0.35, wspace=0.08)
     for j, it in enumerate(items):
         ax = fig.add_subplot(gs[0, j]); ax.imshow(it["im"], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off"); ax.set_title(it["nm"], fontsize=10, fontweight="bold")
-        ax.text(0.5, -0.03, f"HaarPSI {it['hp']:.3f} (300 s vs late NUFFT)   air {it['ae']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=9)
+        ax.text(0.5, -0.03, f"HaarPSI {it['hp']:.3f}   air {it['ae']:.3f}", transform=ax.transAxes, ha="center", va="top", fontsize=9)
         ax = fig.add_subplot(gs[1, j]); ax.imshow(it["im"][sl], cmap="gray", vmin=0, vmax=np.percentile(it["im"][body], 99.5)); ax.axis("off")
         for r, col in ((dsp.T1, "lime"), (dsp.T2, "orange")): ax.contour(rois[r][sl].astype(float), levels=[0.5], colors=[col], linewidths=0.5, alpha=0.7)
     cols = plt.cm.tab10(np.linspace(0, 1, 10))
