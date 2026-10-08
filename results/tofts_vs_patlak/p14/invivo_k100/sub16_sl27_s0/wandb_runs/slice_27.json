@@ -1,0 +1,16 @@
+{
+ "name": "gnik_sub16_sl27_s0_s27",
+ "mode": "online",
+ "loss": 0.3726736307144165,
+ "train_avg": 0.37709469667077067,
+ "lr": 1e-05,
+ "coef_tv": 0.0,
+ "support": 0.003319745126646012,
+ "delay_tv": 0.0,
+ "wall_s": 5723.3005492687225,
+ "peak_gpu_mb": 12868.24658203125,
+ "best_heldout_mse": Infinity,
+ "best_step": 0,
+ "params": 5558016,
+ "wall_total_s": 5723.300500869751
+}
