@@ -21,6 +21,9 @@ def main():
     ap.add_argument("--no-wandb", action="store_true", help="skip wandb (project dce_nik, offline fallback)")
     ap.add_argument("--tag-suffix", default="", help="appended to the run tag (loss-weighting variants)")
     ap.add_argument("--dcf-power", type=float, default=0.0, help="ramp dcf weight exponent in the k-space loss; 0 = unweighted (default)")
+    ap.add_argument("--weight-decay", type=float, default=None, help="adam l2 weight decay on every parameter (default P.WD)")
+    ap.add_argument("--wd-fast", type=float, default=None, help="per-atom weight decay (wire_ff_tofts): l2 on the amplitude-head rows of the residual atoms (index >= --wd-slow-atoms); span rows keep --weight-decay, backbone shared. exact adam l2 added to the grad after clipping, state dict unchanged")
+    ap.add_argument("--wd-slow-atoms", type=int, default=3, help="atoms 0..n-1 = patlak span rows, decayed with --weight-decay")
     a = ap.parse_args()
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X_, Yn, T_, C_, nz, dims = P.build_train(dev); C = dims[3]
@@ -32,7 +35,15 @@ def main():
     torch.cuda.reset_peak_memory_stats() if dev.type == "cuda" else None
     rundir = f"{P.OUT}/checkpoints/{tag}"; os.makedirs(rundir, exist_ok=True)
     print(f"{tag}: train {X_.shape[0]} samples | params {pc}", flush=True)
-    opt = torch.optim.Adam(model.parameters(), lr=P.LR, weight_decay=P.WD); N = X_.shape[0]; t0 = time.time()
+    wd = P.WD if a.weight_decay is None else float(a.weight_decay); head_wd = None
+    if a.wd_fast is None: opt = torch.optim.Adam(model.parameters(), lr=P.LR, weight_decay=wd)
+    else:                                                                        # per-atom wd on the amplitude head only
+        head = [model.a_head.weight, model.a_head.bias]; hid = {id(q) for q in head}
+        opt = torch.optim.Adam([dict(params=[q for q in model.parameters() if id(q) not in hid], weight_decay=wd), dict(params=head, weight_decay=0.0)], lr=P.LR)
+        r = (torch.arange(model.a_head.out_features, device=dev) // 2) % model.rank   # head row -> atom (re/im pairs, coils outermost)
+        head_wd = torch.full((len(r),), wd, device=dev); head_wd[r >= a.wd_slow_atoms] = float(a.wd_fast)
+        print(f"per-atom wd: span rows {wd:g}, residual rows {a.wd_fast:g} ({int((r >= a.wd_slow_atoms).sum())} of {len(r)} head rows)", flush=True)
+    N = X_.shape[0]; t0 = time.time()
     sim = os.environ.get("XPH_SIM", "nomotion")
     run = W.Run(f"xph_{sim}_{tag}", config=dict(vars(a), sim=sim, params=pc, env=os.environ.get("XPH_ENV", P.FIX["env"])), group="xph_train", tags=[a.model],
                 local_json=f"{P.OUT}/wandb_runs/{tag}.json", enabled=not a.no_wandb)
@@ -40,7 +51,7 @@ def main():
     def save(step):
         sd = {k: v.cpu() for k, v in model.state_dict().items()}
         torch.save(dict(state_dict=sd, hidden_width=a.hidden_width, k_sigma=a.k_sigma, seed=a.seed, step=step, ncc=C, params=pc,
-                        model=a.model, basis_file=(a.basis_file or P.TOFTS_BASIS) if a.model == "wire_ff_tofts" else None,
+                        weight_decay=wd, wd_fast=a.wd_fast, model=a.model, basis_file=(a.basis_file or P.TOFTS_BASIS) if a.model == "wire_ff_tofts" else None,
                         wall_s=time.time() - t0, peak_gpu_mb=(torch.cuda.max_memory_allocated() / 2**20 if dev.type == "cuda" else 0.0)),
                    f"{rundir}/ck_{step:05d}.pt")
     save(0)
@@ -48,7 +59,10 @@ def main():
         idx = torch.randint(0, N, (P.BATCH,), device=dev); opt.zero_grad(set_to_none=True)
         loss = composable_kspace_loss(model(X_[idx], T_[idx], C_[idx]), Yn[idx], dcf=dcf_all[idx] if a.dcf_power > 0 else torch.ones(P.BATCH, device=dev),
                                       use_dcf=a.dcf_power > 0, dcf_power=a.dcf_power, use_focal=False, focal_warmup_progress=1.0)
-        loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step()
+        loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        if head_wd is not None:                                                  # coupled l2 as adam applies it (grad += wd * p)
+            with torch.no_grad(): model.a_head.weight.grad += head_wd[:, None] * model.a_head.weight; model.a_head.bias.grad += head_wd * model.a_head.bias
+        opt.step()
         if step % a.ckpt_every == 0: save(step)
         if step % a.val_every == 0:
             model.eval(); v = P.kspace_nmse(model, nz, P.masks()["val"], dev); model.train()
