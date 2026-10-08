@@ -1,0 +1,16 @@
+{
+ "name": "gnik_patlak_sl24_s0_s24",
+ "mode": "online",
+ "loss": 0.769458532333374,
+ "train_avg": 0.770210946559906,
+ "lr": 1e-05,
+ "coef_tv": 0.0,
+ "support": 0.004118364071473479,
+ "delay_tv": 0.0,
+ "wall_s": 5474.480210542679,
+ "peak_gpu_mb": 12867.826171875,
+ "best_heldout_mse": Infinity,
+ "best_step": 0,
+ "params": 5520966,
+ "wall_total_s": 5474.48015499115
+}
