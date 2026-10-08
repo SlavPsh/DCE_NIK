@@ -1,5 +1,6 @@
 queue 127_k100_panels_lateruler
 jid 3501506
 submitted 2026-10-08 16:53:41
-state 1 RUNNING Prolog
+state 1 COMPLETED 00:00:49
 log jobs/log/127_k100_panels_lateruler_3501506.out
+ended 2026-10-08 16:55:46
