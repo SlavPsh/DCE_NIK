@@ -1,17 +1,17 @@
 # helios agent
 
-updated 2026-10-08 15:24:06 on worker07.cluster, job 3490301, cycle 140
+updated 2026-10-08 15:40:45 on worker07.cluster, job 3490301, cycle 148
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3482579 | 126_k100_eval | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 126_k100_eval | 1 COMPLETED 1-04:59:19 |
 | 058_k100_eval_state | exit 0 |
 | 057_k100_eval_state | exit 0 |
 | 125_k100_p14 | 1 COMPLETED 00:47:00, 1 COMPLETED 00:47:03, 1 COMPLETED 00:47:25, 1 COMPLETED 01:31:19, 1 COMPLETED 01:31:21, 1 COMPLETED 01:31:22, 1 COMPLETED 01:32:11, 1 COMPLETED 01:32:12, 1 COMPLETED 01:32:25, 1 COMPLETED 01:32:47, 1 COMPLETED 01:32:49, 1 COMPLETED 01:32:54, 1 COMPLETED 01:32:57, 1 COMPLETED 01:32:58, 1 COMPLETED 01:35:01, 1 COMPLETED 01:35:02, 2 COMPLETED 01:35:29, 2 COMPLETED 01:35:32, 1 COMPLETED 01:35:38 |
@@ -22,7 +22,6 @@ updated 2026-10-08 15:24:06 on worker07.cluster, job 3490301, cycle 140
 | 053_k100_progress | exit 0 |
 | 123_grasp_allspokes | 1 COMPLETED 01:27:40, 1 COMPLETED 02:16:41 |
 | 052_k100_start | exit 0 |
-| 126_k100_eval | 1 RUNNING None |
 | 122_sched_control | 1 COMPLETED 00:39:07, 1 COMPLETED 01:04:26 |
 | 120_free_tsigma | 1 COMPLETED 00:38:34, 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:10 |
 | 119_k100 | 1 COMPLETED 00:39:13, 1 COMPLETED 01:03:52, 1 COMPLETED 01:04:39, 1 COMPLETED 01:05:26, 1 COMPLETED 01:05:58 |
