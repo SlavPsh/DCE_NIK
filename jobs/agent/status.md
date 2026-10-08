@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-08 16:57:55 on worker07.cluster, job 3490301, cycle 185
+updated 2026-10-08 17:00:00 on worker07.cluster, job 3490301, cycle 186
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3501536 | 128_k100_panels | 1 PENDING Priority |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 128_k100_panels | 1 PENDING Priority |
+| 128_k100_panels | 1 COMPLETED 00:00:38 |
 | 127_k100_panels_lateruler | 1 COMPLETED 00:00:49 |
 | 126_k100_eval | 1 COMPLETED 1-04:59:19 |
 | 058_k100_eval_state | exit 0 |
