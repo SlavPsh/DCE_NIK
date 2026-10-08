@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-08 17:55:36 on worker07.cluster, job 3490301, cycle 213
+updated 2026-10-08 17:57:40 on worker07.cluster, job 3490301, cycle 214
 
 ## active
 
@@ -8,13 +8,13 @@ updated 2026-10-08 17:55:36 on worker07.cluster, job 3490301, cycle 213
 |---|---|---|
 | 3501933 | 129_aif_features | 2 RUNNING None |
 | 3501934 | 130_peak_levers_3seeds | 1 PENDING QOSMaxGRESPerUser |
-| 3501962 | 131_pk_maps_k100 | 1 PENDING None |
+| 3501962 | 131_pk_maps_k100 | 2 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 131_pk_maps_k100 | 1 PENDING None |
+| 131_pk_maps_k100 | 2 RUNNING None |
 | 129_aif_features | 2 RUNNING None |
 | 130_peak_levers_3seeds | 1 PENDING QOSMaxGRESPerUser |
 | 128_k100_panels | 1 COMPLETED 00:00:38 |
