@@ -1,5 +1,6 @@
 queue 131_pk_maps_k100
 jid 3501962
 submitted 2026-10-08 17:55:36
-state 1 RUNNING None
+state 1 COMPLETED 00:17:09, 1 COMPLETED 00:36:03
 log jobs/log/131_pk_maps_k100_3501962.out
+ended 2026-10-08 18:32:51
