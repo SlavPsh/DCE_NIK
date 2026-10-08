@@ -1,0 +1,6 @@
+probe 059_cancel_132
+host worker07.cluster
+start 2026-10-08 18:43:11
+end 2026-10-08 18:43:12
+exit 0
+log jobs/log/probe_059_cancel_132.out

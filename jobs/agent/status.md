@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-08 18:32:51 on worker07.cluster, job 3490301, cycle 231
+updated 2026-10-08 18:43:12 on worker07.cluster, job 3490301, cycle 236
 
 ## active
 
@@ -8,16 +8,16 @@ updated 2026-10-08 18:32:51 on worker07.cluster, job 3490301, cycle 231
 |---|---|---|
 | 3501933 | 129_aif_features | 1 RUNNING None |
 | 3501934 | 130_peak_levers_3seeds | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
-| 3501995 | 132_jointz | 1 PENDING QOSMaxGRESPerUser |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 059_cancel_132 | exit 0 |
+| 132_jointz | 1 CANCELLED+ 00:00:00 |
 | 131_pk_maps_k100 | 1 COMPLETED 00:17:09, 1 COMPLETED 00:36:03 |
 | 129_aif_features | 1 RUNNING None |
 | 130_peak_levers_3seeds | 1 PENDING QOSMaxGRESPerUser, 1 RUNNING None |
-| 132_jointz | 1 PENDING QOSMaxGRESPerUser |
 | 128_k100_panels | 1 COMPLETED 00:00:38 |
 | 127_k100_panels_lateruler | 1 COMPLETED 00:00:49 |
 | 126_k100_eval | 1 COMPLETED 1-04:59:19 |
@@ -33,4 +33,3 @@ updated 2026-10-08 18:32:51 on worker07.cluster, job 3490301, cycle 231
 | 052_k100_start | exit 0 |
 | 122_sched_control | 1 COMPLETED 00:39:07, 1 COMPLETED 01:04:26 |
 | 120_free_tsigma | 1 COMPLETED 00:38:34, 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:10 |
-| 119_k100 | 1 COMPLETED 00:39:13, 1 COMPLETED 01:03:52, 1 COMPLETED 01:04:39, 1 COMPLETED 01:05:26, 1 COMPLETED 01:05:58 |

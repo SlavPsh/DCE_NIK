@@ -1,0 +1,14 @@
+18:43:12
+cancelled 3501995
+       JOBID       NAME ST     TIME NODELIST(REASON)
+     3496800 helios-age PD     0:00 (Dependency)
+     3490301 helios-age  R  8:04:39 worker07
+   3502178_0 peak3s_eva PD     0:00 (Dependency)
+   3501934_1     peak3s PD     0:00 (QOSMaxGRESPerUser)
+   3501934_2     peak3s PD     0:00 (QOSMaxGRESPerUser)
+   3501934_3     peak3s PD     0:00 (QOSMaxGRESPerUser)
+   3501934_4     peak3s PD     0:00 (QOSMaxGRESPerUser)
+   3501934_5     peak3s PD     0:00 (QOSMaxGRESPerUser)
+   3501936_0 aiffeat_ev PD     0:00 (Dependency)
+   3501934_0     peak3s  R    12:33 gpu03
+   3501933_1    aiffeat  R    51:48 gpu02
