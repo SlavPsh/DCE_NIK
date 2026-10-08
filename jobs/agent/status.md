@@ -1,16 +1,18 @@
 # helios agent
 
-updated 2026-10-08 15:40:45 on worker07.cluster, job 3490301, cycle 148
+updated 2026-10-08 16:53:42 on worker07.cluster, job 3490301, cycle 183
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3501506 | 127_k100_panels_lateruler | 1 RUNNING Prolog |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 127_k100_panels_lateruler | 1 RUNNING Prolog |
 | 126_k100_eval | 1 COMPLETED 1-04:59:19 |
 | 058_k100_eval_state | exit 0 |
 | 057_k100_eval_state | exit 0 |
@@ -30,4 +32,3 @@ updated 2026-10-08 15:40:45 on worker07.cluster, job 3490301, cycle 148
 | 118_delay_prior | 1 COMPLETED 01:04:20, 1 COMPLETED 01:04:21, 1 COMPLETED 01:04:24 |
 | 050_queue_state | exit 0 |
 | 049_queue_state | exit 0 |
-| 048_allspoke_refs | exit 0 |
