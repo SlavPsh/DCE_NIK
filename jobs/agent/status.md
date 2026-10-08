@@ -1,6 +1,6 @@
 # helios agent
 
-updated 2026-10-08 21:39:56 on worker07.cluster, job 3490301, cycle 322
+updated 2026-10-08 21:42:00 on worker07.cluster, job 3490301, cycle 323
 
 ## active
 
@@ -8,13 +8,13 @@ updated 2026-10-08 21:39:56 on worker07.cluster, job 3490301, cycle 322
 |---|---|---|
 | 3501934 | 130_peak_levers_3seeds | 2 RUNNING None |
 | 3503254 | 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser |
-| 3503289 | 134_patlak13_confirm | 1 PENDING None |
+| 3503289 | 134_patlak13_confirm | 1 PENDING QOSMaxGRESPerUser |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 134_patlak13_confirm | 1 PENDING None |
+| 134_patlak13_confirm | 1 PENDING QOSMaxGRESPerUser |
 | 133_phantom_peak_wd | 1 PENDING QOSMaxGRESPerUser |
 | 060_queue_state | exit 0 |
 | 130_peak_levers_3seeds | 2 RUNNING None |
