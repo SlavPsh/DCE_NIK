@@ -1,0 +1,16 @@
+{
+ "name": "gnik_patlak_sl27_s0_s27",
+ "mode": "online",
+ "loss": 0.8322968482971191,
+ "train_avg": 0.8562883076071739,
+ "lr": 1e-05,
+ "coef_tv": 0.0,
+ "support": 0.004167040664469823,
+ "delay_tv": 0.0,
+ "wall_s": 5476.001109838486,
+ "peak_gpu_mb": 12867.826171875,
+ "best_heldout_mse": Infinity,
+ "best_step": 0,
+ "params": 5520966,
+ "wall_total_s": 5476.001066446304
+}
