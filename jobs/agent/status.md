@@ -1,19 +1,19 @@
 # helios agent
 
-updated 2026-10-08 09:45:01 on worker01.cluster, job 3482794, cycle 318
+updated 2026-10-08 09:51:12 on worker01.cluster, job 3482794, cycle 321
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3482578 | 125_k100_p14 | 2 RUNNING None |
+| 3482578 | 125_k100_p14 | 1 RUNNING None |
 | 3482579 | 126_k100_eval | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 125_k100_p14 | 2 RUNNING None |
+| 125_k100_p14 | 1 RUNNING None |
 | 056_k100_progress | exit 0 |
 | 055_k100_progress | exit 0 |
 | 124_k100_p3 | 1 COMPLETED 00:38:39, 1 COMPLETED 00:39:15, 1 COMPLETED 01:04:15, 2 COMPLETED 01:04:22, 1 COMPLETED 01:04:23, 1 COMPLETED 01:04:26, 1 COMPLETED 01:04:30, 1 COMPLETED 01:04:42, 1 COMPLETED 01:04:50, 1 COMPLETED 01:05:04, 1 COMPLETED 01:05:06, 1 COMPLETED 01:05:40, 1 COMPLETED 01:05:54, 1 COMPLETED 01:06:49, 1 COMPLETED 01:06:52 |
