@@ -1,0 +1,20 @@
+{
+ "name": "xph_nomotion_w768_ks2.5_s0_tofts16_rms1_wd1e-2_wdf0",
+ "mode": "online",
+ "loss": 0.09063585847616196,
+ "val_knmse": 0.0033171015483104394,
+ "best_val_knmse": 0.0033171015483104394,
+ "best_step": 40000,
+ "wall_s": 3158.5430421829224,
+ "peak_gpu_mb": 5055.80908203125,
+ "val_knmse_inner": 0.0032739793535024857,
+ "val_knmse_mid": 0.14681863390134403,
+ "val_knmse_outer": 0.24724972282373392,
+ "params": {
+  "total": 12253536,
+  "spatial": 12253472,
+  "coil": 64
+ },
+ "n_ckpt": 21,
+ "wall_total_s": 3158.5432765483856
+}
