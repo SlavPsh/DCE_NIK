@@ -1,0 +1,72 @@
+2026-10-08 07:26:18 host gpu03.cluster job 3496232 task 17
+GPU 0: NVIDIA H100 NVL (UUID: GPU-ba65053c-72ed-1c58-80be-07549e6f1e8a)
+  MIG 2g.24gb     Device  0: (UUID: MIG-f328f7be-cd56-503a-9bd5-4e010efe4fe5)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-eaa03982-4105-4fd4-05b4-dfe14a5475f9)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-c8d1c94c-c938-e03b-b589-eac076bd5f3f)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-11c2853b-6154-8665-333f-81dc10b2382c)
+task 17: sub16 k100 p14 slice 27 seed 0 -> results/tofts_vs_patlak/p14/invivo_k100/sub16_sl27_s0
+device=cuda
+model=wire_ff_subspace rank16 h512 d12 w062 | FF k256/5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    spoke-reduction: 2157 acquired spokes, 8835072 samples, heldout=NO (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run os5xia93
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/p14/invivo_k100/sub16_sl27_s0/wandb_runs/wandb/run-20261008_072623-os5xia93
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_sub16_sl27_s0_s27
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/os5xia93
+[wandb] gnik_sub16_sl27_s0_s27: mode online
+    warmstarted Phi from PCA basis (rank 16, 100 frames, fit MSE 3.164e-04)
+    [coef-tv] grid 512 every 32 weight 0 delta 0.1
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:416: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  _tr_sum += float(loss); _tr_n += 1
+    [support] mask orientation rot180 (inside-energy fractions now, untrained model: {'id': 0.862, 'rot180': 0.861, 'fliplr': 0.861, 'flipud': 0.861})
+    step   1000  train 7.637e-01  (avg 1.095e+00, no held-out)
+    step   2000  train 5.214e-01  (avg 5.999e-01, no held-out)
+    step   3000  train 4.655e-01  (avg 4.859e-01, no held-out)
+    step   4000  train 4.357e-01  (avg 4.498e-01, no held-out)
+    step   5000  train 4.204e-01  (avg 4.276e-01, no held-out)
+    step   6000  train 4.032e-01  (avg 4.115e-01, no held-out)
+    step   7000  train 3.927e-01  (avg 3.996e-01, no held-out)
+    step   8000  train 3.911e-01  (avg 3.914e-01, no held-out)
+    step   9000  train 3.829e-01  (avg 3.865e-01, no held-out)
+    step  10000  train 3.727e-01  (avg 3.771e-01, no held-out)
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 27: peak_gpu_MB 12868 params 5558016 best_heldout inf
+wandb: updating run metadata
+wandb: uploading config.yaml; uploading output.log; uploading wandb-summary.json
+wandb: 
+wandb: Run history:
+wandb:     coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:    delay_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:        loss █▄▃▂▂▂▁▁▁▁
+wandb:          lr ▁▁▁▁▁▁▁▁▁▁
+wandb: peak_gpu_mb ▁▁▁▁▁▁▁▁▁▁
+wandb:     support █▄▂▂▁▁▁▁▁▁
+wandb:   train_avg █▃▂▂▁▁▁▁▁▁
+wandb:      wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse inf
+wandb:        best_step 0
+wandb:          coef_tv 0
+wandb:         delay_tv 0
+wandb:             loss 0.37267
+wandb:               lr 1e-05
+wandb:           params 5558016
+wandb:      peak_gpu_mb 12868.24658
+wandb:          support 0.00332
+wandb:        train_avg 0.37709
+wandb:               +2 ...
+wandb: 
+wandb: 🚀 View run gnik_sub16_sl27_s0_s27 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/os5xia93
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/p14/invivo_k100/sub16_sl27_s0/wandb_runs/wandb/run-20261008_072623-os5xia93/logs
+slice 27  nik (256, 256, 431)  (5725s)  vs CS: corr 0.965  nrmse 0.179
+done 5726s -> results/tofts_vs_patlak/p14/invivo_k100/sub16_sl27_s0
+[W1008 09:01:47.910080878 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-08 09:01:47 TRAIN_DONE sub16 k100 p14 sl27 s0 exit 0
