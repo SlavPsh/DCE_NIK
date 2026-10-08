@@ -1,5 +1,6 @@
 queue 129_aif_features
 jid 3501933
 submitted 2026-10-08 17:51:23
-state 1 RUNNING None
+state 1 COMPLETED 00:39:14, 1 COMPLETED 01:06:16
 log jobs/log/129_aif_features_3501933.out
+ended 2026-10-08 18:59:40

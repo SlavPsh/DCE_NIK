@@ -1,0 +1,71 @@
+2026-10-08 17:51:24 host gpu02.cluster job 3501935 task 0 stage train
+GPU 0: NVIDIA H100 NVL (UUID: GPU-8e413919-ea16-cb0a-3a38-410620ba1bbd)
+  MIG 2g.24gb     Device  0: (UUID: MIG-281c0c74-ddae-5f82-9b91-3e7d8a855877)
+GPU 1: NVIDIA H100 NVL (UUID: GPU-6525825b-42ba-d600-6e82-921c05f7390b)
+GPU 2: NVIDIA H100 NVL (UUID: GPU-64ef941c-2af9-b1a4-b0f1-3dea68d79f02)
+GPU 3: NVIDIA H100 NVL (UUID: GPU-daac2482-6ad0-32bd-5511-a75765fd3610)
+Submitted batch job 3501936
+eval chained afterany 3501933
+task 0: free with aif (--model wire_ff_res_aif --aif-file /net/beegfs/users/P101440/DCE_NIK/aif_slice21.npz --weight-decay 0.01) -> results/tofts_vs_patlak/aif_feat/free_sl21_s0
+device=cuda
+model=wire_ff_res_aif h512 d12 w062 | FF k256/2.5 t32/1.5 | dcf_pow 0 env 0.75 | 10000 steps, batch 65536, split 0.7
+    spoke-reduction: 1708 acquired spokes, 5246976 samples, heldout=NO (same input as CS)
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/P101440/.netrc.
+wandb: Currently logged in as: spshenov (spshenov-university-of-amsterdam) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run 7nwm6ql3
+wandb: Tracking run with wandb version 0.25.0
+wandb: Run data is saved locally in results/tofts_vs_patlak/aif_feat/free_sl21_s0/wandb_runs/wandb/run-20261008_175128-7nwm6ql3
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gnik_free_sl21_s0_s21
+wandb: ⭐️ View project at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: 🚀 View run at https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/7nwm6ql3
+[wandb] gnik_free_sl21_s0_s21: mode online
+/net/beegfs/users/P101440/DCE_NIK/train_grasp_nik.py:424: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  _tr_sum += float(loss); _tr_n += 1
+    step   1000  train 8.333e-01  (avg 1.265e+00, no held-out)
+    step   2000  train 5.404e-01  (avg 6.718e-01, no held-out)
+    step   3000  train 4.072e-01  (avg 4.665e-01, no held-out)
+    step   4000  train 3.415e-01  (avg 3.754e-01, no held-out)
+    step   5000  train 3.137e-01  (avg 3.253e-01, no held-out)
+    step   6000  train 2.752e-01  (avg 2.910e-01, no held-out)
+    step   7000  train 2.531e-01  (avg 2.658e-01, no held-out)
+    step   8000  train 2.364e-01  (avg 2.466e-01, no held-out)
+    step   9000  train 2.176e-01  (avg 2.289e-01, no held-out)
+    step  10000  train 1.968e-01  (avg 2.139e-01, no held-out)
+    final weights kept (best heldout inf at step 0)
+    RESOURCES slice 21: peak_gpu_MB 12494 params 5550658 best_heldout inf
+wandb: updating run metadata
+wandb: uploading output.log; uploading wandb-summary.json; uploading config.yaml
+wandb: 
+wandb: Run history:
+wandb:     coef_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:    delay_tv ▁▁▁▁▁▁▁▁▁▁
+wandb:        loss █▅▃▃▂▂▂▁▁▁
+wandb:          lr ▁▁▁▁▁▁▁▁▁▁
+wandb: peak_gpu_mb ▁▁▁▁▁▁▁▁▁▁
+wandb:     support ▁▁▁▁▁▁▁▁▁▁
+wandb:   train_avg █▄▃▂▂▂▁▁▁▁
+wandb:      wall_s ▁▂▃▃▄▅▆▆▇█
+wandb: 
+wandb: Run summary:
+wandb: best_heldout_mse inf
+wandb:        best_step 0
+wandb:          coef_tv 0
+wandb:         delay_tv 0
+wandb:             loss 0.19682
+wandb:               lr 1e-05
+wandb:           params 5550658
+wandb:      peak_gpu_mb 12493.66455
+wandb:          support 0
+wandb:        train_avg 0.21387
+wandb:               +2 ...
+wandb: 
+wandb: 🚀 View run gnik_free_sl21_s0_s21 at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK/runs/7nwm6ql3
+wandb: ⭐️ View project at: https://wandb.ai/spshenov-university-of-amsterdam/DCE_NIK
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: results/tofts_vs_patlak/aif_feat/free_sl21_s0/wandb_runs/wandb/run-20261008_175128-7nwm6ql3/logs
+slice 21  nik (192, 192, 342)  (2350s)  vs CS: corr 0.951  nrmse 0.227
+done 2350s -> results/tofts_vs_patlak/aif_feat/free_sl21_s0
+[W1008 18:30:37.326139108 AllocatorConfig.cpp:28] Warning: PYTORCH_CUDA_ALLOC_CONF is deprecated, use PYTORCH_ALLOC_CONF instead (function operator())
+2026-10-08 18:30:37 TRAIN_DONE free aif exit 0
