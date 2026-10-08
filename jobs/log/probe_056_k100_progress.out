@@ -1,0 +1,9 @@
+09:16:20
+p3 outputs: 21 / 21 (5 from 119)
+p14 outputs: 18 / 21
+JOBID NAME ST TIME NODELIST(REASON)
+3482579 k100eval R 22:35:19 worker01
+3482578_20 k100p14 PD 0:00 (QOSMaxGRESPerUser)
+3482578_19 k100p14 R 14:32 gpu03
+3482578_18 k100p14 R 18:43 gpu02
+running: 2, pending: 1

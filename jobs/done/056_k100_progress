@@ -1,0 +1,6 @@
+probe 056_k100_progress
+host worker01.cluster
+start 2026-10-08 09:16:20
+end 2026-10-08 09:16:20
+exit 0
+log jobs/log/probe_056_k100_progress.out
