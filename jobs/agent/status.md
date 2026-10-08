@@ -1,16 +1,20 @@
 # helios agent
 
-updated 2026-10-08 17:00:00 on worker07.cluster, job 3490301, cycle 186
+updated 2026-10-08 17:51:23 on worker07.cluster, job 3490301, cycle 211
 
 ## active
 
 | jid | script | state |
 |---|---|---|
+| 3501933 | 129_aif_features | 1 PENDING None |
+| 3501934 | 130_peak_levers_3seeds | 1 PENDING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
+| 129_aif_features | 1 PENDING None |
+| 130_peak_levers_3seeds | 1 PENDING None |
 | 128_k100_panels | 1 COMPLETED 00:00:38 |
 | 127_k100_panels_lateruler | 1 COMPLETED 00:00:49 |
 | 126_k100_eval | 1 COMPLETED 1-04:59:19 |
@@ -29,5 +33,3 @@ updated 2026-10-08 17:00:00 on worker07.cluster, job 3490301, cycle 186
 | 119_k100 | 1 COMPLETED 00:39:13, 1 COMPLETED 01:03:52, 1 COMPLETED 01:04:39, 1 COMPLETED 01:05:26, 1 COMPLETED 01:05:58 |
 | 121_delay_gif | 1 COMPLETED 00:01:27 |
 | 051_118_eval_resubmit | exit 0 |
-| 118_delay_prior | 1 COMPLETED 01:04:20, 1 COMPLETED 01:04:21, 1 COMPLETED 01:04:24 |
-| 050_queue_state | exit 0 |
