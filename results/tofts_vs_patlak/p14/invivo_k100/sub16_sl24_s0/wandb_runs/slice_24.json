@@ -1,0 +1,16 @@
+{
+ "name": "gnik_sub16_sl24_s0_s24",
+ "mode": "online",
+ "loss": 0.22140495479106903,
+ "train_avg": 0.2203244597017765,
+ "lr": 1e-05,
+ "coef_tv": 0.0,
+ "support": 0.0025229604507330805,
+ "delay_tv": 0.0,
+ "wall_s": 5731.582931995392,
+ "peak_gpu_mb": 12868.24658203125,
+ "best_heldout_mse": Infinity,
+ "best_step": 0,
+ "params": 5558016,
+ "wall_total_s": 5731.582891941071
+}
