@@ -1,0 +1,6 @@
+probe 060_queue_state
+host worker07.cluster
+start 2026-10-08 21:35:43
+end 2026-10-08 21:35:43
+exit 0
+log jobs/log/probe_060_queue_state.out

@@ -1,0 +1,13 @@
+21:35:43
+       JOBID       NAME ST     TIME NODELIST(REASON)
+     3496800 helios-age PD     0:00 (Dependency)
+     3490301 helios-age  R 10:57:10 worker07
+   3502178_0 peak3s_eva PD     0:00 (Dependency)
+   3501934_5     peak3s  R    28:40 gpu03
+   3501934_4     peak3s  R    55:56 gpu03
+results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s0/train.log: 10 step lines, last:     step  10000  train 6.261e-01  (avg 6.366e-01, no held-out)
+results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s1/train.log: 9 step lines, last:     step   9000  train 6.410e-01  (avg 6.475e-01, no held-out)
+results/tofts_vs_patlak/peak_levers/dly0.1/tofts8_sl21_s2/train.log: 4 step lines, last:     step   4000  train 8.234e-01  (avg 8.537e-01, no held-out)
+results/tofts_vs_patlak/peak_levers/supfast20/tofts8_sl21_s0/train.log: 10 step lines, last:     step  10000  train 6.330e-01  (avg 6.435e-01, no held-out)
+results/tofts_vs_patlak/peak_levers/supfast20/tofts8_sl21_s1/train.log: 10 step lines, last:     step  10000  train 6.123e-01  (avg 6.299e-01, no held-out)
+results/tofts_vs_patlak/peak_levers/supfast20/tofts8_sl21_s2/train.log: 10 step lines, last:     step  10000  train 6.246e-01  (avg 6.386e-01, no held-out)
