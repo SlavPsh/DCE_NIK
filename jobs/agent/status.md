@@ -1,18 +1,17 @@
 # helios agent
 
-updated 2026-10-09 03:18:57 on worker09.cluster, job 3496800, cycle 145
+updated 2026-10-09 04:26:31 on worker09.cluster, job 3496800, cycle 178
 
 ## active
 
 | jid | script | state |
 |---|---|---|
-| 3503289 | 134_patlak13_confirm | 1 RUNNING None |
 
 ## done (last 20)
 
 | name | state |
 |---|---|
-| 134_patlak13_confirm | 1 RUNNING None |
+| 134_patlak13_confirm | 1 COMPLETED 01:06:02, 1 COMPLETED 01:06:10, 1 COMPLETED 01:36:24, 1 COMPLETED 01:36:32, 1 COMPLETED 01:36:45 |
 | 133_phantom_peak_wd | 1 COMPLETED 00:56:39, 1 COMPLETED 00:56:46, 1 COMPLETED 00:56:47, 1 COMPLETED 00:56:48, 1 COMPLETED 00:56:58 |
 | 130_peak_levers_3seeds | 1 COMPLETED 01:04:19, 1 COMPLETED 01:04:25, 2 COMPLETED 01:04:27, 1 COMPLETED 01:04:28, 1 COMPLETED 01:04:42 |
 | 060_queue_state | exit 0 |

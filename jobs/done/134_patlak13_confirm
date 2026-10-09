@@ -1,5 +1,6 @@
 queue 134_patlak13_confirm
 jid 3503289
 submitted 2026-10-08 21:39:56
-state 1 RUNNING None
+state 1 COMPLETED 01:06:02, 1 COMPLETED 01:06:10, 1 COMPLETED 01:36:24, 1 COMPLETED 01:36:32, 1 COMPLETED 01:36:45
 log jobs/log/134_patlak13_confirm_3503289.out
+ended 2026-10-09 04:26:31
